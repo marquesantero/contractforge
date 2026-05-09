@@ -1,0 +1,458 @@
+"""Motores de escrita por modo (append, overwrite, upsert, hash diff, snapshot, SCD2)."""
+from __future__ import annotations
+
+import logging
+import uuid
+from typing import Any, Dict, List, Optional
+
+from delta.tables import DeltaTable
+from pyspark.sql import DataFrame
+from pyspark.sql import functions as F
+
+from .config import CONFIG, MergeStrategy, WriteMode
+from .plan import IngestionPlan
+from .schema import (
+    add_row_hash,
+    deduplicate_by_order,
+    hash_columns,
+    hash_from_cols,
+    table_exists,
+)
+from ._spark import spark
+from ._sql import q, qt, sql_lit, validate_cols
+
+logger = logging.getLogger("lakehouse_ingestion")
+
+
+def ensure_delta_table(
+    df: DataFrame,
+    target: str,
+    cluster_cols: List[str],
+    partition_col: Optional[str],
+) -> bool:
+    if table_exists(target):
+        return False
+    writer = df.limit(0).write.format("delta").mode("overwrite").option("mergeSchema", "true")
+    if partition_col and not cluster_cols:
+        validate_cols(df, [partition_col], "partition_column")
+        writer.partitionBy(partition_col).saveAsTable(target)
+    else:
+        writer.saveAsTable(target)
+        if cluster_cols:
+            validate_cols(df, cluster_cols, "cluster_columns")
+            spark.sql(
+                f"ALTER TABLE {qt(target)} CLUSTER BY ({', '.join(q(c) for c in cluster_cols)})"
+            )
+    return True
+
+
+def run_optimize(target: str, zorder_cols: List[str]) -> None:
+    if zorder_cols:
+        spark.sql(f"OPTIMIZE {qt(target)} ZORDER BY ({', '.join(q(c) for c in zorder_cols)})")
+    else:
+        spark.sql(f"OPTIMIZE {qt(target)}")
+
+
+def delta_version(target: str) -> Optional[int]:
+    try:
+        row = spark.sql(f"DESCRIBE HISTORY {qt(target)} LIMIT 1").select("version").first()
+        return None if row is None else int(row[0])
+    except Exception:
+        return None
+
+
+def latest_operation_metrics(target: str) -> Dict[str, Any]:
+    try:
+        row = spark.sql(f"DESCRIBE HISTORY {qt(target)} LIMIT 1").first()
+        if row is None:
+            return {}
+        d = row.asDict(recursive=True)
+        return {
+            "version": d.get("version"),
+            "operation": d.get("operation"),
+            "operationMetrics": d.get("operationMetrics"),
+        }
+    except Exception:
+        return {}
+
+
+def extract_row_metrics(metrics: Dict[str, Any]) -> Dict[str, int]:
+    """Mapeia operationMetrics do Delta para contadores normalizados.
+
+    Para MERGE, Delta retorna numTargetRows{Inserted,Updated,Deleted}; para APPEND/WRITE
+    apenas numOutputRows. Quando só temos numOutputRows (modos append puros e
+    scd1_hash_diff) tratamos como inserts.
+    """
+    op = metrics.get("operationMetrics") or {}
+
+    def parse(*names: str) -> int:
+        for n in names:
+            if n in op and op[n] is not None:
+                try:
+                    return int(op[n])
+                except Exception:
+                    return 0
+        return 0
+
+    return {
+        "rows_inserted": parse("numTargetRowsInserted", "numOutputRows"),
+        "rows_updated": parse("numTargetRowsUpdated"),
+        "rows_deleted": parse("numTargetRowsDeleted"),
+    }
+
+
+def affected_partition_values(df: DataFrame, partition_col: Optional[str]) -> List[Any]:
+    if not partition_col or partition_col not in df.columns:
+        return []
+    values = [
+        r[0]
+        for r in df.select(partition_col)
+        .distinct()
+        .limit(CONFIG.max_partition_predicate_values)
+        .collect()
+    ]
+    if len(values) == CONFIG.max_partition_predicate_values:
+        logger.warning(
+            f"Leitura de valores distintos de {partition_col} atingiu o limite configurado; "
+            "a lista retornada pode estar truncada."
+        )
+    return values
+
+
+def write_strategy(mode: WriteMode) -> str:
+    return {
+        "scd0_append": "APPEND",
+        "scd0_overwrite": "OVERWRITE",
+        "scd1_upsert": "MERGE",
+        "scd1_hash_diff": "HASH_DIFF_APPEND",
+        "scd2_historical": "SCD2_MERGE",
+        "snapshot_soft_delete": "SNAPSHOT_MERGE",
+    }[mode]
+
+
+def write_append(
+    df: DataFrame,
+    target: str,
+    cluster_cols: List[str],
+    partition_col: Optional[str],
+    expected_count: Optional[int] = None,
+) -> int:
+    ensure_delta_table(df, target, cluster_cols, partition_col)
+    count = expected_count if expected_count is not None else df.count()
+    if count:
+        df.write.format("delta").mode("append").option("mergeSchema", "true").saveAsTable(target)
+    return count
+
+
+def write_overwrite(
+    df: DataFrame,
+    target: str,
+    partition_col: Optional[str],
+    partition_value: Optional[str],
+    cluster_cols: List[str],
+    expected_count: Optional[int] = None,
+) -> int:
+    ensure_delta_table(df, target, cluster_cols, partition_col)
+    count = expected_count if expected_count is not None else df.count()
+    writer = df.write.format("delta").mode("overwrite").option("mergeSchema", "true")
+    if partition_col and partition_value and not cluster_cols:
+        writer = writer.option(
+            "replaceWhere",
+            f"{q(partition_col)} = '{str(partition_value).replace(chr(39), chr(39) + chr(39))}'",
+        )
+    if partition_col and not cluster_cols:
+        writer = writer.partitionBy(partition_col)
+    writer.saveAsTable(target)
+    return count
+
+
+def write_upsert(
+    df: DataFrame,
+    target: str,
+    keys: List[str],
+    partition_col: Optional[str],
+    partition_values: Optional[List[Any]],
+    strategy: MergeStrategy,
+    expected_count: Optional[int] = None,
+) -> int:
+    validate_cols(df, keys, "merge_keys")
+    ensure_delta_table(df, target, [], partition_col)
+    count = expected_count if expected_count is not None else df.count()
+    if count == 0:
+        return 0
+
+    if strategy == "replace_partitions":
+        if not partition_col or not partition_values:
+            raise ValueError("replace_partitions requer merge_partition_column com valores detectados")
+        vals = ", ".join(sql_lit(v) for v in partition_values)
+        df.write.format("delta").mode("overwrite").option("mergeSchema", "true").option(
+            "replaceWhere", f"{q(partition_col)} IN ({vals})"
+        ).saveAsTable(target)
+        return count
+
+    source_view = f"__ingest_src_{uuid.uuid4().hex}"
+    df.createOrReplaceTempView(source_view)
+    key_cond = " AND ".join([f"t.{q(k)} <=> s.{q(k)}" for k in keys])
+    if strategy == "delta_by_partition" and partition_col and partition_values:
+        vals = ", ".join(sql_lit(v) for v in partition_values)
+        key_cond += f" AND t.{q(partition_col)} IN ({vals})"
+    update_cols = [c for c in df.columns if c not in keys]
+    update_set = ", ".join([f"t.{q(c)} = s.{q(c)}" for c in update_cols])
+    insert_cols = ", ".join(q(c) for c in df.columns)
+    insert_vals = ", ".join(f"s.{q(c)}" for c in df.columns)
+    try:
+        spark.sql(f"""
+            MERGE INTO {qt(target)} t
+            USING {q(source_view)} s
+            ON {key_cond}
+            WHEN MATCHED THEN UPDATE SET {update_set}
+            WHEN NOT MATCHED THEN INSERT ({insert_cols}) VALUES ({insert_vals})
+        """)
+    finally:
+        spark.catalog.dropTempView(source_view)
+    return count
+
+
+def write_scd1_hash_diff(
+    df: DataFrame,
+    target: str,
+    hash_keys: List[str],
+    hash_exclude: List[str],
+    cluster_cols: List[str],
+    partition_col: Optional[str],
+    latest_order_expr: Optional[str],
+    expected_count: Optional[int] = None,
+) -> int:
+    validate_cols(df, hash_keys, "hash_keys")
+    df_hashed = add_row_hash(df, hash_exclude)
+    ensure_delta_table(df_hashed, target, cluster_cols, partition_col)
+
+    if not table_exists(target) or spark.read.table(target).limit(1).count() == 0:
+        count = expected_count if expected_count is not None else df_hashed.count()
+        if count:
+            df_hashed.write.format("delta").mode("append").option(
+                "mergeSchema", "true"
+            ).saveAsTable(target)
+        return count
+
+    target_df = spark.read.table(target)
+    target_cols = set(target_df.columns)
+    if partition_col and partition_col in df_hashed.columns:
+        part_values = [
+            r[0]
+            for r in df_hashed.select(partition_col)
+            .distinct()
+            .limit(CONFIG.max_partition_predicate_values)
+            .collect()
+        ]
+        if len(part_values) == CONFIG.max_partition_predicate_values:
+            logger.warning(
+                f"scd1_hash_diff atingiu o limite configurado de valores distintos em "
+                f"{partition_col}; o predicado pode estar truncado e a leitura do target "
+                "pode ser maior que o necessário."
+            )
+        if part_values:
+            target_df = target_df.where(F.col(partition_col).isin(part_values))
+
+    if latest_order_expr:
+        order_expr = latest_order_expr
+    elif "ingestion_date" in target_cols:
+        order_expr = "ingestion_date DESC NULLS LAST"
+    else:
+        order_expr = None
+
+    if order_expr:
+        target_latest = deduplicate_by_order(target_df, hash_keys, order_expr)
+    else:
+        target_latest = target_df
+
+    target_hash = target_latest.select(*hash_keys, F.col("row_hash").alias("__tgt_row_hash"))
+    diff = (
+        df_hashed.alias("s")
+        .join(target_hash.alias("t"), on=hash_keys, how="left")
+        .where(F.col("__tgt_row_hash").isNull() | (F.col("s.row_hash") != F.col("__tgt_row_hash")))
+        .select(*[F.col(f"s.{c}").alias(c) for c in df_hashed.columns])
+    )
+    count = diff.count()
+    if count:
+        diff.write.format("delta").mode("append").option("mergeSchema", "true").saveAsTable(target)
+    return count
+
+
+def write_snapshot_soft_delete(
+    df: DataFrame,
+    target: str,
+    keys: List[str],
+    cluster_cols: List[str],
+    partition_col: Optional[str],
+    expected_count: Optional[int] = None,
+) -> int:
+    validate_cols(df, keys, "merge_keys")
+    df_src = (
+        add_row_hash(df)
+        .withColumn("is_active", F.lit(True))
+        .withColumn("deleted_at", F.lit(None).cast("timestamp"))
+    )
+    ensure_delta_table(df_src, target, cluster_cols, partition_col)
+    count = expected_count if expected_count is not None else df_src.count()
+    if count == 0:
+        return 0
+
+    dt = DeltaTable.forName(spark, target)
+    cond = " AND ".join([f"t.{q(k)} <=> s.{q(k)}" for k in keys])
+    update_cols = {c: f"s.{q(c)}" for c in df_src.columns if c not in keys}
+    insert_cols = {c: f"s.{q(c)}" for c in df_src.columns}
+    (
+        dt.alias("t")
+        .merge(df_src.alias("s"), cond)
+        .whenMatchedUpdate(condition="t.row_hash <> s.row_hash OR t.is_active = false", set=update_cols)
+        .whenNotMatchedInsert(values=insert_cols)
+        .whenNotMatchedBySourceUpdate(
+            condition="t.is_active = true",
+            set={"is_active": "false", "deleted_at": "current_timestamp()"},
+        )
+        .execute()
+    )
+    return count
+
+
+def _changed_columns_expr(change_cols: List[str]) -> str:
+    parts = [
+        f"CASE WHEN NOT (t.{q(c)} <=> s.{q(c)}) THEN '{c}' ELSE NULL END" for c in change_cols
+    ]
+    return f"concat_ws(',', {', '.join(parts)})"
+
+
+def write_scd2(
+    df: DataFrame,
+    target: str,
+    keys: List[str],
+    change_cols: List[str],
+    effective_from_col: Optional[str],
+    cluster_cols: List[str],
+    expected_count: Optional[int] = None,
+) -> int:
+    """Mantém histórico por versões; reaparições de chaves não correntes criam nova versão atual."""
+    validate_cols(df, keys, "merge_keys")
+    if change_cols:
+        validate_cols(df, change_cols, "scd2_change_columns")
+    else:
+        change_cols = [c for c in hash_columns(df, []) if c not in keys]
+    if effective_from_col:
+        validate_cols(df, [effective_from_col], "scd2_effective_from_column")
+        effective_expr = F.col(effective_from_col).cast("timestamp")
+    else:
+        effective_expr = F.current_timestamp()
+
+    src = (
+        df.withColumn("valid_from", effective_expr)
+        .withColumn("valid_to", F.lit(None).cast("timestamp"))
+        .withColumn("is_current", F.lit(True))
+        .withColumn("row_hash", hash_from_cols(change_cols))
+        .withColumn("changed_columns", F.lit(None).cast("string"))
+    )
+    ensure_delta_table(src, target, cluster_cols, None)
+    incoming_count = expected_count if expected_count is not None else src.count()
+    if incoming_count == 0:
+        return 0
+
+    if spark.read.table(target).limit(1).count() == 0:
+        src.write.format("delta").mode("append").option("mergeSchema", "true").saveAsTable(target)
+        return incoming_count
+
+    target_current = (
+        spark.read.table(target)
+        .where(F.col("is_current") == F.lit(True))
+        .select(*keys, F.col("row_hash").alias("__tgt_row_hash"))
+    )
+    changed = (
+        src.alias("s")
+        .join(target_current.alias("t"), on=keys, how="left")
+        .where(F.col("__tgt_row_hash").isNull() | (F.col("s.row_hash") != F.col("__tgt_row_hash")))
+        .select(*[F.col(f"s.{c}").alias(c) for c in src.columns], F.col("__tgt_row_hash"))
+    )
+    insert_count = changed.count()
+    if insert_count == 0:
+        return 0
+
+    merge_key_cols = [f"__merge_key_{k}" for k in keys]
+    insert_stage = changed
+    for mk in merge_key_cols:
+        insert_stage = insert_stage.withColumn(mk, F.lit(None))
+
+    update_stage = changed.where(F.col("__tgt_row_hash").isNotNull())
+    for k, mk in zip(keys, merge_key_cols):
+        update_stage = update_stage.withColumn(mk, F.col(k))
+
+    staged = insert_stage.unionByName(update_stage, allowMissingColumns=True).drop(
+        "__tgt_row_hash"
+    )
+    source_view = f"__scd2_stage_{uuid.uuid4().hex}"
+    staged.createOrReplaceTempView(source_view)
+
+    key_cond = " AND ".join([f"t.{q(k)} <=> s.{q('__merge_key_' + k)}" for k in keys])
+    changed_expr = _changed_columns_expr(change_cols)
+    insert_cols = [c for c in src.columns]
+    insert_cols_sql = ", ".join(q(c) for c in insert_cols)
+    insert_vals_sql = ", ".join(f"s.{q(c)}" for c in insert_cols)
+    try:
+        spark.sql(f"""
+            MERGE INTO {qt(target)} t
+            USING {q(source_view)} s
+            ON {key_cond} AND t.is_current = true
+            WHEN MATCHED AND t.row_hash <> s.row_hash THEN UPDATE SET
+                t.valid_to = current_timestamp(),
+                t.is_current = false,
+                t.changed_columns = {changed_expr}
+            WHEN NOT MATCHED THEN INSERT ({insert_cols_sql}) VALUES ({insert_vals_sql})
+        """)
+    finally:
+        spark.catalog.dropTempView(source_view)
+    return insert_count
+
+
+def execute_write_mode(
+    plan: IngestionPlan,
+    df: DataFrame,
+    target: str,
+    effective_rows: int,
+) -> int:
+    if effective_rows == 0:
+        return 0
+    part_vals = affected_partition_values(df, plan.merge_partition_column)
+    if plan.mode == "scd0_append":
+        return write_append(df, target, plan.cluster_columns, plan.partition_column, effective_rows)
+    if plan.mode == "scd0_overwrite":
+        return write_overwrite(
+            df, target, plan.partition_column, plan.partition_value, plan.cluster_columns, effective_rows
+        )
+    if plan.mode == "scd1_upsert":
+        return write_upsert(
+            df, target, plan.merge_keys, plan.partition_column, part_vals, plan.merge_strategy, effective_rows
+        )
+    if plan.mode == "scd1_hash_diff":
+        return write_scd1_hash_diff(
+            df,
+            target,
+            plan.hash_keys,
+            plan.hash_exclude_columns,
+            plan.cluster_columns,
+            plan.partition_column,
+            plan.dedup_order_expr,
+            effective_rows,
+        )
+    if plan.mode == "snapshot_soft_delete":
+        return write_snapshot_soft_delete(
+            df, target, plan.merge_keys, plan.cluster_columns, plan.partition_column, effective_rows
+        )
+    if plan.mode == "scd2_historical":
+        return write_scd2(
+            df,
+            target,
+            plan.merge_keys,
+            plan.scd2_change_columns,
+            plan.scd2_effective_from_column,
+            plan.cluster_columns,
+            effective_rows,
+        )
+    raise ValueError(f"Modo não suportado: {plan.mode}")

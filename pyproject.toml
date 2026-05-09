@@ -1,0 +1,44 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "lakehouse-ingestion-framework"
+version = "1.0.0"
+description = "Framework de ingestão Delta Lake para Databricks com contratos declarativos, quality gates, SCD, explain mode e eventos OpenLineage."
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+authors = [{name = "Data Platform Team"}]
+keywords = ["databricks", "delta-lake", "pyspark", "lakehouse", "openlineage", "ingestion"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+]
+dependencies = [
+    "pyspark>=3.4",
+    "delta-spark>=3.0",
+]
+
+[project.optional-dependencies]
+databricks = ["databricks-sdk>=0.20"]
+dev = ["build>=1.0", "twine>=4.0", "pytest>=7.0", "ruff>=0.4"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py310"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+addopts = "-ra"
+filterwarnings = [
+    "ignore::DeprecationWarning:pyspark.*",
+]

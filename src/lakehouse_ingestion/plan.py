@@ -1,0 +1,173 @@
+"""Contratos declarativos: IngestionPlan, QualityRules e construtor a partir de kwargs."""
+from __future__ import annotations
+
+from dataclasses import dataclass, field
+from typing import Any, Dict, List, Optional, Union
+
+from .config import (
+    CONFIG,
+    Layer,
+    MergeStrategy,
+    QualityFailAction,
+    SchemaPolicy,
+    Source,
+    VALID_WRITE_MODES,
+    WriteMode,
+)
+from ._sql import as_list
+
+
+@dataclass(frozen=True)
+class QualityRules:
+    """Regras simples de qualidade executadas antes da escrita."""
+
+    required_columns: List[str] = field(default_factory=list)
+    not_null: List[str] = field(default_factory=list)
+    unique_key: List[str] = field(default_factory=list)
+    accepted_values: Dict[str, List[Any]] = field(default_factory=dict)
+    min_rows: Optional[int] = None
+    max_null_ratio: Dict[str, float] = field(default_factory=dict)
+
+
+@dataclass(frozen=True)
+class IngestionPlan:
+    """Contrato declarativo de ingestão de uma tabela."""
+
+    source: Source
+    target_table: str
+    catalog: str = "main"
+    layer: Layer = "bronze"
+    mode: WriteMode = "scd0_append"
+    source_system: str = "default"
+    ctrl_schema: str = "ops"
+    notebook_name: str = "unknown"
+
+    select_columns: List[str] = field(default_factory=list)
+    filter_expression: Optional[str] = None
+    watermark_columns: List[str] = field(default_factory=list)
+    merge_keys: List[str] = field(default_factory=list)
+    hash_keys: List[str] = field(default_factory=list)
+    hash_exclude_columns: List[str] = field(default_factory=list)
+    custom_keys: Dict[str, List[str]] = field(default_factory=dict)
+    dedup_order_expr: Optional[str] = None
+
+    partition_column: Optional[str] = None
+    partition_value: Optional[str] = None
+    merge_strategy: MergeStrategy = "delta"
+    merge_partition_column: Optional[str] = None
+    cluster_columns: List[str] = field(default_factory=list)
+    zorder_columns: List[str] = field(default_factory=list)
+    optimize_after_write: bool = False
+
+    schema_policy: SchemaPolicy = "permissive"
+    quality_rules: Optional[QualityRules] = None
+    on_quality_fail: QualityFailAction = "fail"
+
+    scd2_change_columns: List[str] = field(default_factory=list)
+    scd2_effective_from_column: Optional[str] = None
+
+    fix_encoding: bool = False
+    encoding: str = "Windows-1252"
+    encoding_columns: List[str] = field(default_factory=list)
+
+    dry_run: bool = False
+    explain_mode: bool = False
+    explain_format: str = "formatted"
+    openlineage_enabled: bool = False
+    openlineage_namespace: Optional[str] = None
+    openlineage_producer: str = "lakehouse-ingestion-framework"
+    use_cache: bool = True
+    lock_enabled: bool = False
+    parent_run_id: Optional[str] = None
+    run_group_id: Optional[str] = None
+    master_job_id: Optional[str] = None
+    master_run_id: Optional[str] = None
+
+
+def validate_write_mode(mode: Optional[str]) -> WriteMode:
+    raw = (mode or "scd0_append").strip()
+    if raw not in VALID_WRITE_MODES:
+        raise ValueError(
+            f"Modo de escrita não suportado: {raw}. Modos válidos: {sorted(VALID_WRITE_MODES)}"
+        )
+    return raw  # type: ignore[return-value]
+
+
+def normalize_quality_rules(
+    value: Optional[Union[QualityRules, Dict[str, Any]]],
+) -> Optional[QualityRules]:
+    if value is None:
+        return None
+    if isinstance(value, QualityRules):
+        return value
+    return QualityRules(**value)
+
+
+_KNOWN_PARAMS = {
+    "source", "target_table", "catalog", "layer", "mode", "source_system", "ctrl_schema",
+    "notebook_name", "select_columns", "filter_expression", "watermark_columns",
+    "merge_keys", "hash_keys", "hash_exclude_columns", "custom_keys", "dedup_order_expr",
+    "partition_column", "partition_value", "merge_strategy", "merge_partition_column",
+    "cluster_columns", "zorder_columns", "optimize_after_write", "schema_policy",
+    "quality_rules", "on_quality_fail", "scd2_change_columns", "scd2_effective_from_column",
+    "fix_encoding", "encoding", "encoding_columns", "dry_run", "explain_mode",
+    "explain_format", "openlineage_enabled", "openlineage_namespace",
+    "openlineage_producer", "use_cache", "lock_enabled",
+    "parent_run_id", "run_group_id", "master_job_id", "master_run_id",
+}
+
+
+def build_plan_from_kwargs(**kwargs: Any) -> IngestionPlan:
+    quality = normalize_quality_rules(kwargs.pop("quality_rules", None))
+    custom = kwargs.pop("custom_keys", None) or {}
+    normalized_custom = {k: as_list(v) for k, v in custom.items()}
+
+    unexpected = set(kwargs) - _KNOWN_PARAMS
+    if unexpected:
+        raise ValueError(f"Parâmetros não reconhecidos em ingest(): {sorted(unexpected)}")
+
+    return IngestionPlan(
+        source=kwargs["source"],
+        target_table=kwargs["target_table"],
+        catalog=kwargs.get("catalog", CONFIG.default_catalog),
+        layer=kwargs.get("layer", "bronze"),
+        mode=validate_write_mode(kwargs.get("mode", "scd0_append")),
+        source_system=kwargs.get("source_system", CONFIG.default_source_system),
+        ctrl_schema=kwargs.get("ctrl_schema", CONFIG.ctrl_schema),
+        notebook_name=kwargs.get("notebook_name", "unknown"),
+        select_columns=as_list(kwargs.get("select_columns")),
+        filter_expression=kwargs.get("filter_expression"),
+        watermark_columns=as_list(kwargs.get("watermark_columns")),
+        merge_keys=as_list(kwargs.get("merge_keys")),
+        hash_keys=as_list(kwargs.get("hash_keys")),
+        hash_exclude_columns=as_list(kwargs.get("hash_exclude_columns")),
+        custom_keys=normalized_custom,
+        dedup_order_expr=kwargs.get("dedup_order_expr"),
+        partition_column=kwargs.get("partition_column"),
+        partition_value=kwargs.get("partition_value"),
+        merge_strategy=kwargs.get("merge_strategy", "delta"),
+        merge_partition_column=kwargs.get("merge_partition_column"),
+        cluster_columns=as_list(kwargs.get("cluster_columns")),
+        zorder_columns=as_list(kwargs.get("zorder_columns")),
+        optimize_after_write=bool(kwargs.get("optimize_after_write", False)),
+        schema_policy=kwargs.get("schema_policy", "permissive"),
+        quality_rules=quality,
+        on_quality_fail=kwargs.get("on_quality_fail", "fail"),
+        scd2_change_columns=as_list(kwargs.get("scd2_change_columns")),
+        scd2_effective_from_column=kwargs.get("scd2_effective_from_column"),
+        fix_encoding=bool(kwargs.get("fix_encoding", False)),
+        encoding=kwargs.get("encoding", "Windows-1252"),
+        encoding_columns=as_list(kwargs.get("encoding_columns")),
+        dry_run=bool(kwargs.get("dry_run", False)),
+        explain_mode=bool(kwargs.get("explain_mode", False)),
+        explain_format=kwargs.get("explain_format", "formatted"),
+        openlineage_enabled=bool(kwargs.get("openlineage_enabled", False)),
+        openlineage_namespace=kwargs.get("openlineage_namespace"),
+        openlineage_producer=kwargs.get("openlineage_producer", "lakehouse-ingestion-framework"),
+        use_cache=bool(kwargs.get("use_cache", True)),
+        lock_enabled=bool(kwargs.get("lock_enabled", False)),
+        parent_run_id=kwargs.get("parent_run_id"),
+        run_group_id=kwargs.get("run_group_id"),
+        master_job_id=kwargs.get("master_job_id"),
+        master_run_id=kwargs.get("master_run_id"),
+    )
