@@ -1,6 +1,7 @@
 """Contratos declarativos: IngestionPlan, QualityRules e construtor a partir de kwargs."""
 from __future__ import annotations
 
+from collections.abc import Mapping
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional, Union
 
@@ -24,6 +25,85 @@ from .config import (
     WriteMode,
 )
 from ._sql import as_list
+
+
+_QUALITY_RULE_FIELDS = {
+    "required_columns",
+    "not_null",
+    "unique_key",
+    "accepted_values",
+    "min_rows",
+    "max_null_ratio",
+    "expressions",
+}
+
+
+def _require_mapping(value: Any, field: str) -> Mapping[str, Any]:
+    if not isinstance(value, Mapping):
+        raise ValueError(f"{field} deve ser um objeto/dict")
+    return value
+
+
+def _require_positive_int(value: Any, field: str) -> int:
+    try:
+        parsed = int(value)
+    except Exception as exc:
+        raise ValueError(f"{field} deve ser inteiro positivo") from exc
+    if parsed <= 0:
+        raise ValueError(f"{field} deve ser inteiro positivo")
+    return parsed
+
+
+def _require_ratio(value: Any, field: str) -> float:
+    try:
+        parsed = float(value)
+    except Exception as exc:
+        raise ValueError(f"{field} deve ser número entre 0 e 1") from exc
+    if parsed < 0 or parsed > 1:
+        raise ValueError(f"{field} deve ser número entre 0 e 1")
+    return parsed
+
+
+def _normalize_named_list(value: Any, field: str) -> List[str]:
+    if isinstance(value, Mapping):
+        raise ValueError(f"{field} deve ser lista ou string separada por '|', não dict")
+    items = as_list(value)
+    if any(not item for item in items):
+        raise ValueError(f"{field} não pode conter valores vazios")
+    return items
+
+
+def _normalize_value_list(value: Any, field: str) -> List[Any]:
+    if value is None:
+        raise ValueError(f"{field} não pode ser vazio")
+    if isinstance(value, str):
+        values = as_list(value)
+    elif isinstance(value, (list, tuple, set)):
+        values = list(value)
+    else:
+        values = [value]
+    if not values:
+        raise ValueError(f"{field} não pode ser vazio")
+    return values
+
+
+def _normalize_quality_expression(item: Any) -> QualityExpression:
+    if isinstance(item, QualityExpression):
+        return item
+    raw = _require_mapping(item, "quality_rules.expressions[]")
+    name = str(raw.get("name") or "").strip()
+    expression = str(raw.get("expression") or "").strip()
+    return QualityExpression(
+        name=name,
+        expression=expression,
+        severity=_validate_enum(
+            raw.get("severity", "quarantine"),
+            VALID_QUALITY_RULE_SEVERITIES,
+            "quality_rules.expressions.severity",
+            default="quarantine",
+        ),
+        message=raw.get("message"),
+    )
 
 
 @dataclass(frozen=True)
@@ -179,24 +259,55 @@ def normalize_quality_rules(
         return None
     if isinstance(value, QualityRules):
         return value
-    normalized = dict(value)
-    expressions = normalized.get("expressions") or []
-    normalized["expressions"] = [
-        item
-        if isinstance(item, QualityExpression)
-        else QualityExpression(
-            name=str(item["name"]),
-            expression=str(item["expression"]),
-            severity=_validate_enum(
-                item.get("severity", "quarantine"),
-                VALID_QUALITY_RULE_SEVERITIES,
-                "quality_rules.expressions.severity",
-                default="quarantine",
-            ),
-            message=item.get("message"),
+    raw = dict(_require_mapping(value, "quality_rules"))
+    unexpected = set(raw) - _QUALITY_RULE_FIELDS
+    if unexpected:
+        raise ValueError(f"quality_rules possui campos não reconhecidos: {sorted(unexpected)}")
+
+    normalized: Dict[str, Any] = {
+        "required_columns": _normalize_named_list(raw.get("required_columns"), "quality_rules.required_columns"),
+        "not_null": _normalize_named_list(raw.get("not_null"), "quality_rules.not_null"),
+        "unique_key": _normalize_named_list(raw.get("unique_key"), "quality_rules.unique_key"),
+        "accepted_values": {},
+        "min_rows": None,
+        "max_null_ratio": {},
+        "expressions": [],
+    }
+
+    accepted_values = {} if raw.get("accepted_values") is None else raw["accepted_values"]
+    for column, values in _require_mapping(accepted_values, "quality_rules.accepted_values").items():
+        column_name = str(column).strip()
+        if not column_name:
+            raise ValueError("quality_rules.accepted_values possui coluna vazia")
+        normalized["accepted_values"][column_name] = _normalize_value_list(
+            values,
+            f"quality_rules.accepted_values.{column_name}",
         )
-        for item in expressions
-    ]
+
+    if raw.get("min_rows") is not None:
+        normalized["min_rows"] = _require_positive_int(raw["min_rows"], "quality_rules.min_rows")
+
+    max_null_ratio = {} if raw.get("max_null_ratio") is None else raw["max_null_ratio"]
+    for column, ratio in _require_mapping(max_null_ratio, "quality_rules.max_null_ratio").items():
+        column_name = str(column).strip()
+        if not column_name:
+            raise ValueError("quality_rules.max_null_ratio possui coluna vazia")
+        normalized["max_null_ratio"][column_name] = _require_ratio(
+            ratio,
+            f"quality_rules.max_null_ratio.{column_name}",
+        )
+
+    raw_expressions = [] if raw.get("expressions") is None else raw["expressions"]
+    if isinstance(raw_expressions, Mapping) or isinstance(raw_expressions, str):
+        raise ValueError("quality_rules.expressions deve ser uma lista")
+    expression_names = set()
+    normalized["expressions"] = [_normalize_quality_expression(item) for item in raw_expressions]
+    for rule in normalized["expressions"]:
+        if not rule.name or not rule.expression:
+            raise ValueError("quality_rules.expressions requer name e expression")
+        if rule.name in expression_names:
+            raise ValueError(f"quality_rules.expressions possui name duplicado: {rule.name}")
+        expression_names.add(rule.name)
     return QualityRules(**normalized)
 
 
@@ -215,6 +326,40 @@ _KNOWN_PARAMS = {
     "idempotency_policy", "parent_run_id", "run_group_id",
     "master_job_id", "master_run_id",
 }
+
+
+def validate_plan_shape(plan: IngestionPlan) -> None:
+    """Valida campos declarativos que independem de Spark/DataFrame.
+
+    Esta validação não substitui as regras de modo aplicadas no orquestrador,
+    mas pega contratos malformados cedo, especialmente YAMLs.
+    """
+    required_text_fields = {
+        "target_table": plan.target_table,
+        "catalog": plan.catalog,
+        "layer": plan.layer,
+        "mode": plan.mode,
+        "source_system": plan.source_system,
+        "ctrl_schema": plan.ctrl_schema,
+        "notebook_name": plan.notebook_name,
+    }
+    for field_name, value in required_text_fields.items():
+        if not str(value or "").strip():
+            raise ValueError(f"{field_name} é obrigatório e não pode ser vazio")
+    if not isinstance(plan.runtime_parameters, dict):
+        raise ValueError("runtime_parameters deve ser dict")
+    if any(not str(tag).strip() for tag in plan.tags):
+        raise ValueError("tags não pode conter valores vazios")
+    if plan.idempotency_policy != "always_run" and not plan.idempotency_key:
+        raise ValueError("idempotency_policy diferente de always_run requer idempotency_key")
+    if plan.allow_type_widening and plan.schema_policy == "strict":
+        raise ValueError("allow_type_widening=True é incompatível com schema_policy=strict")
+    if plan.quality_rules:
+        if plan.quality_rules.min_rows is not None and plan.quality_rules.min_rows <= 0:
+            raise ValueError("quality_rules.min_rows deve ser inteiro positivo")
+        for column, ratio in plan.quality_rules.max_null_ratio.items():
+            if ratio < 0 or ratio > 1:
+                raise ValueError(f"quality_rules.max_null_ratio.{column} deve estar entre 0 e 1")
 
 
 def build_plan_from_kwargs(**kwargs: Any) -> IngestionPlan:
@@ -269,7 +414,7 @@ def build_plan_from_kwargs(**kwargs: Any) -> IngestionPlan:
         "idempotency_policy",
         default="always_run",
     )
-    return IngestionPlan(
+    plan = IngestionPlan(
         source=kwargs["source"],
         target_table=kwargs["target_table"],
         catalog=kwargs.get("catalog", CONFIG.default_catalog),
@@ -324,3 +469,5 @@ def build_plan_from_kwargs(**kwargs: Any) -> IngestionPlan:
         master_job_id=kwargs.get("master_job_id"),
         master_run_id=kwargs.get("master_run_id"),
     )
+    validate_plan_shape(plan)
+    return plan

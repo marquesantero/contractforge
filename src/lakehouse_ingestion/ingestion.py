@@ -16,7 +16,13 @@ from pyspark.sql import functions as F
 
 from .config import CONFIG, CTRL_SCHEMA_VERSION, FRAMEWORK_VERSION, FrameworkConfig  # noqa: F401
 from .lineage import capture_explain, write_explain_plan, write_openlineage_event
-from .plan import IngestionPlan, QualityExpression, QualityRules, build_plan_from_kwargs  # noqa: F401
+from .plan import (  # noqa: F401
+    IngestionPlan,
+    QualityExpression,
+    QualityRules,
+    build_plan_from_kwargs,
+    validate_plan_shape,
+)
 from .quality import evaluate_quality, is_abort_only_failure, write_quality_results, write_quarantine
 from .schema import (
     build_custom_keys,
@@ -257,6 +263,7 @@ def _validate_plan(
 
 def _validate_static_plan_options(plan: IngestionPlan) -> None:
     """Valida combinações perigosas do plano sem tocar no DataFrame ou target."""
+    validate_plan_shape(plan)
     if plan.layer == "bronze" and plan.mode in {
         "scd1_upsert",
         "scd2_historical",

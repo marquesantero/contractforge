@@ -5,6 +5,7 @@ from .ingestion import (
     QualityRules,
     ingest,
     ingest_plan,
+    validate_plan_shape,
 )
 
 __all__ = [
@@ -14,6 +15,7 @@ __all__ = [
     "QualityRules",
     "ingest",
     "ingest_plan",
+    "validate_plan_shape",
 ]
 
-__version__ = "1.2.0"
+__version__ = "1.3.0"

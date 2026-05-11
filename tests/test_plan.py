@@ -7,6 +7,7 @@ from lakehouse_ingestion import IngestionPlan, QualityExpression, QualityRules, 
 from lakehouse_ingestion.plan import (
     build_plan_from_kwargs,
     normalize_quality_rules,
+    validate_plan_shape,
     validate_write_mode,
 )
 from lakehouse_ingestion.ingestion import _validate_static_plan_options
@@ -33,10 +34,29 @@ def test_normalize_quality_rules_passthrough():
 
 
 def test_normalize_quality_rules_from_dict():
-    qr = normalize_quality_rules({"not_null": ["a"], "min_rows": 5})
+    qr = normalize_quality_rules({"not_null": "a", "min_rows": 5})
     assert isinstance(qr, QualityRules)
     assert qr.not_null == ["a"]
     assert qr.min_rows == 5
+
+
+def test_normalize_quality_rules_rejects_unknown_fields():
+    with pytest.raises(ValueError, match="campos não reconhecidos"):
+        normalize_quality_rules({"not_null": ["a"], "custom_rule": True})
+
+
+def test_normalize_quality_rules_rejects_invalid_thresholds():
+    with pytest.raises(ValueError, match="min_rows"):
+        normalize_quality_rules({"min_rows": 0})
+    with pytest.raises(ValueError, match="max_null_ratio.email"):
+        normalize_quality_rules({"max_null_ratio": {"email": 1.5}})
+    with pytest.raises(ValueError, match="max_null_ratio deve ser um objeto"):
+        normalize_quality_rules({"max_null_ratio": 0})
+
+
+def test_normalize_quality_rules_normalizes_accepted_values_string():
+    qr = normalize_quality_rules({"accepted_values": {"status": "open|closed"}})
+    assert qr.accepted_values == {"status": ["open", "closed"]}
 
 
 def test_normalize_quality_rules_none():
@@ -201,6 +221,27 @@ def test_build_plan_accepts_contract_metadata_and_schema_widening():
 def test_build_plan_rejects_invalid_idempotency_policy():
     with pytest.raises(ValueError, match="idempotency_policy"):
         build_plan_from_kwargs(source="x", target_table="t", idempotency_policy="skip_maybe")
+
+
+def test_build_plan_requires_idempotency_key_for_non_default_policy():
+    with pytest.raises(ValueError, match="idempotency_key"):
+        build_plan_from_kwargs(source="x", target_table="t", idempotency_policy="skip_if_success")
+
+
+def test_build_plan_rejects_strict_schema_with_type_widening():
+    with pytest.raises(ValueError, match="allow_type_widening"):
+        build_plan_from_kwargs(
+            source="x",
+            target_table="t",
+            schema_policy="strict",
+            allow_type_widening=True,
+        )
+
+
+def test_validate_plan_shape_rejects_empty_contract_fields():
+    plan = IngestionPlan(source="x", target_table=" ")
+    with pytest.raises(ValueError, match="target_table"):
+        validate_plan_shape(plan)
 
 
 def test_build_plan_accepts_replace_partitions_source_complete():
