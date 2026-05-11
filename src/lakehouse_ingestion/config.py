@@ -10,8 +10,8 @@ from typing import Literal, Union
 
 from pyspark.sql import DataFrame
 
-FRAMEWORK_VERSION = "1.0.6"
-CTRL_SCHEMA_VERSION = 4
+FRAMEWORK_VERSION = "1.1.0"
+CTRL_SCHEMA_VERSION = 5
 
 #: Camadas reconhecidas (Medallion Architecture).
 Layer = Literal["bronze", "silver", "gold"]
@@ -32,8 +32,11 @@ MergeStrategy = Literal["delta", "delta_by_partition", "replace_partitions"]
 #: Política de evolução de schema do destino.
 SchemaPolicy = Literal["permissive", "additive_only", "strict"]
 
-#: Ação quando uma regra de qualidade falha.
+#: Ação global legada quando regras built-in de qualidade falham.
 QualityFailAction = Literal["fail", "warn", "quarantine"]
+
+#: Severidade por regra de qualidade.
+QualityRuleSeverity = Literal["warn", "quarantine", "abort"]
 
 #: Política de idempotência para uma ``idempotency_key`` lógica.
 IdempotencyPolicy = Literal["always_run", "skip_if_success", "fail_if_success", "rerun_if_failed"]
@@ -62,6 +65,9 @@ VALID_SCHEMA_POLICIES = {"permissive", "additive_only", "strict"}
 
 #: Ações válidas em falha de qualidade para validação runtime.
 VALID_QUALITY_FAIL_ACTIONS = {"fail", "warn", "quarantine"}
+
+#: Severidades válidas em regras de qualidade declarativas.
+VALID_QUALITY_RULE_SEVERITIES = {"warn", "quarantine", "abort"}
 
 #: Políticas válidas de idempotência para validação runtime.
 VALID_IDEMPOTENCY_POLICIES = {"always_run", "skip_if_success", "fail_if_success", "rerun_if_failed"}

@@ -76,13 +76,6 @@ def _lock_owner(plan: IngestionPlan) -> str:
     return plan.master_run_id or plan.run_group_id or plan.parent_run_id or plan.notebook_name
 
 
-def _effective_idempotency_policy(plan: IngestionPlan) -> str:
-    """Mantém compatibilidade para planos criados diretamente com ``skip_if_success``."""
-    if plan.skip_if_success and plan.idempotency_policy == "always_run":
-        return "skip_if_success"
-    return plan.idempotency_policy
-
-
 def _skip_result(
     plan: IngestionPlan,
     run_id: str,
@@ -121,7 +114,7 @@ def _skip_result(
         "openlineage_event": None,
         "error_message": None,
         "idempotency_key": plan.idempotency_key,
-        "idempotency_policy": _effective_idempotency_policy(plan),
+        "idempotency_policy": plan.idempotency_policy,
         "skip_reason": skip_reason,
         "skipped_by_run_id": skipped_by_run_id,
         "framework_version": FRAMEWORK_VERSION,
@@ -338,7 +331,7 @@ def _build_dry_run_result(
         "explain_captured": plan.explain_mode,
         "openlineage_enabled": plan.openlineage_enabled,
         "idempotency_key": plan.idempotency_key,
-        "idempotency_policy": _effective_idempotency_policy(plan),
+        "idempotency_policy": plan.idempotency_policy,
         "framework_version": FRAMEWORK_VERSION,
         "ctrl_schema_version": CTRL_SCHEMA_VERSION,
         **runtime_meta,
@@ -420,7 +413,7 @@ def _finalize_execution(
             "master_job_id": plan.master_job_id,
             "master_run_id": plan.master_run_id,
             "idempotency_key": plan.idempotency_key,
-            "idempotency_policy": _effective_idempotency_policy(plan),
+            "idempotency_policy": plan.idempotency_policy,
             "skip_reason": skip_reason,
             "skipped_by_run_id": skipped_by_run_id,
             "metrics_source": metrics_source,
@@ -490,14 +483,13 @@ def ingest_plan(plan: IngestionPlan) -> Dict[str, Any]:
     row_metrics: Dict[str, int] = {"rows_inserted": 0, "rows_updated": 0, "rows_deleted": 0}
 
     try:
-        idempotency_policy = _effective_idempotency_policy(plan)
         previous_success = find_idempotent_run(
             tables, target, plan.idempotency_key, status="SUCCESS"
         )
         previous_status = previous_success.get("status") if previous_success else None
         previous_run_id = previous_success.get("run_id") if previous_success else None
         if (
-            idempotency_policy in {"skip_if_success", "rerun_if_failed"}
+            plan.idempotency_policy in {"skip_if_success", "rerun_if_failed"}
             and previous_status == "SUCCESS"
         ):
             status = "SKIPPED"
@@ -508,7 +500,7 @@ def ingest_plan(plan: IngestionPlan) -> Dict[str, Any]:
                 plan, run_id, target, source_name, metrics_source, runtime_meta,
                 skip_reason, skipped_by_run_id,
             )
-        if idempotency_policy == "fail_if_success" and previous_status == "SUCCESS":
+        if plan.idempotency_policy == "fail_if_success" and previous_status == "SUCCESS":
             raise RuntimeError(
                 "idempotency_policy=fail_if_success bloqueou a execução: "
                 f"idempotency_key={plan.idempotency_key!r} já teve sucesso em run_id={previous_run_id}"
@@ -547,9 +539,19 @@ def ingest_plan(plan: IngestionPlan) -> Dict[str, Any]:
         if not plan.dry_run:
             write_quality_results(tables, run_id, target, quality_results)
 
-        if quality_status == "FAILED":
+        if quality_status in {"FAILED", "WARNED"}:
             effective_action = plan.on_quality_fail
-            abort_only_failed = [r for r in quality_results if is_abort_only_failure(r["rule_name"])]
+            actionable_failed = [r for r in quality_results if r.get("severity") != "warn"]
+            abort_only_failed = [
+                r
+                for r in actionable_failed
+                if r.get("severity") == "abort" or is_abort_only_failure(r["rule_name"])
+            ]
+            if not actionable_failed:
+                logger.warning(
+                    f"Quality gates emitiram warnings; execução continuará: {to_json(quality_results)}"
+                )
+                effective_action = "warn"
             if effective_action == "quarantine" and abort_only_failed:
                 names = sorted({r["rule_name"] for r in abort_only_failed})
                 logger.warning(
@@ -559,11 +561,11 @@ def ingest_plan(plan: IngestionPlan) -> Dict[str, Any]:
                 effective_action = "fail"
 
             if effective_action == "fail":
-                raise ValueError(f"Quality gates falharam: {to_json(quality_results)}")
+                raise ValueError(f"Quality gates falharam: {to_json(actionable_failed)}")
             if effective_action == "quarantine":
                 if not plan.dry_run:
                     write_quarantine(
-                        tables, quarantined_df, run_id, target, "quality_gate", to_json(quality_results)
+                        tables, quarantined_df, run_id, target, "quality_gate", to_json(actionable_failed)
                     )
                 prepared_df = valid_df
             elif effective_action == "warn":
@@ -723,7 +725,7 @@ def ingest_plan(plan: IngestionPlan) -> Dict[str, Any]:
         "openlineage_event": openlineage_event,
         "error_message": _short_error_message(error),
         "idempotency_key": plan.idempotency_key,
-        "idempotency_policy": _effective_idempotency_policy(plan),
+        "idempotency_policy": plan.idempotency_policy,
         "skip_reason": skip_reason,
         "skipped_by_run_id": skipped_by_run_id,
         "framework_version": FRAMEWORK_VERSION,

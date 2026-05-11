@@ -114,11 +114,11 @@ def test_no_rules_returns_not_configured(make_df):
 def test_abort_only_rules_classification():
     """Regras de conjunto não conseguem isolar linhas — devem ser classificadas
     como abortivas."""
-    assert ABORT_ONLY_RULES == frozenset({"required_columns", "unique_key", "min_rows", "expression_abort"})
+    assert ABORT_ONLY_RULES == frozenset({"required_columns", "unique_key", "min_rows"})
     assert is_abort_only_failure("required_columns") is True
     assert is_abort_only_failure("unique_key") is True
     assert is_abort_only_failure("min_rows") is True
-    assert is_abort_only_failure("expression_abort:valid_period") is True
+    assert is_abort_only_failure("expression:valid_period") is False
     assert is_abort_only_failure("not_null:col1") is False
     assert is_abort_only_failure("accepted_values:status") is False
     assert is_abort_only_failure("max_null_ratio:val") is False
@@ -136,6 +136,31 @@ def test_expression_rule_quarantines_invalid_rows(make_df):
     assert _by_rule(failed)["expression:positive_amount"]["failed_count"] == 2
     assert q_count == 2
     assert valid.count() == 1
+
+
+def test_expression_rule_warns_without_quarantine(make_df):
+    df = make_df(
+        [(1, 10), (2, 0)],
+        "id long, amount long",
+    )
+    rules = QualityRules(
+        expressions=[
+            QualityExpression(
+                name="positive_amount",
+                expression="amount > 0",
+                severity="warn",
+                message="amount should be positive",
+            )
+        ]
+    )
+    status, failed, valid, quarantined, q_count = evaluate_quality(df, rules, "r1", "t")
+    rule = _by_rule(failed)["expression:positive_amount"]
+    assert status == "WARNED"
+    assert rule["status"] == "WARNED"
+    assert rule["severity"] == "warn"
+    assert rule["message"] == "amount should be positive"
+    assert q_count == 0
+    assert valid.count() == 2
 
 
 def test_combined_rules_single_pass(make_df):

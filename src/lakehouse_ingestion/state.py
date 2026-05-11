@@ -162,8 +162,10 @@ def ensure_ctrl_tables(catalog: str, schema: str) -> Dict[str, str]:
             target_table STRING,
             rule_name STRING,
             status STRING,
+            severity STRING,
             failed_count BIGINT,
             checked_at_utc TIMESTAMP,
+            message STRING,
             details_json STRING
         ) USING DELTA
     """)
@@ -262,6 +264,13 @@ def ensure_ctrl_tables(catalog: str, schema: str) -> Dict[str, str]:
             "owner": "STRING",
             "ttl_minutes": "BIGINT",
             "released_at_utc": "TIMESTAMP",
+        },
+    )
+    _add_columns_if_missing(
+        tables["quality"],
+        {
+            "severity": "STRING",
+            "message": "STRING",
         },
     )
     _record_ctrl_metadata(tables)

@@ -21,7 +21,7 @@ from ._sql import to_json, utc_now_str, validate_cols
 #: colunas, contagem mínima) e não conseguem isolar linhas problemáticas. Quando
 #: ``on_quality_fail="quarantine"`` e qualquer dessas regras falhar, o
 #: orquestrador escala a ação para ``"fail"``.
-ABORT_ONLY_RULES = frozenset({"required_columns", "unique_key", "min_rows", "expression_abort"})
+ABORT_ONLY_RULES = frozenset({"required_columns", "unique_key", "min_rows"})
 
 
 def is_abort_only_failure(rule_name: str) -> bool:
@@ -84,8 +84,11 @@ def evaluate_quality(
             failed_rules.append(
                 {
                     "rule_name": "required_columns",
+                    "severity": "abort",
+                    "status": "FAILED",
                     "failed_count": len(missing),
                     "details": {"missing": missing},
+                    "message": "Colunas obrigatórias ausentes.",
                 }
             )
 
@@ -143,8 +146,11 @@ def evaluate_quality(
             failed_rules.append(
                 {
                     "rule_name": f"not_null:{c}",
+                    "severity": "quarantine",
+                    "status": "FAILED",
                     "failed_count": cnt,
                     "details": {"column": c},
+                    "message": f"Coluna {c} contém valores nulos.",
                 }
             )
             quarantine_condition = quarantine_condition | F.col(c).isNull()
@@ -155,8 +161,11 @@ def evaluate_quality(
             failed_rules.append(
                 {
                     "rule_name": f"accepted_values:{c}",
+                    "severity": "quarantine",
+                    "status": "FAILED",
                     "failed_count": cnt,
                     "details": {"column": c, "values": values},
+                    "message": f"Coluna {c} contém valores fora da lista permitida.",
                 }
             )
             quarantine_condition = quarantine_condition | (
@@ -170,8 +179,11 @@ def evaluate_quality(
             failed_rules.append(
                 {
                     "rule_name": f"max_null_ratio:{c}",
+                    "severity": "quarantine",
+                    "status": "FAILED",
                     "failed_count": null_count,
                     "details": {"column": c, "ratio": ratio, "max_ratio": max_ratio},
+                    "message": f"Coluna {c} excedeu a razão máxima de nulos.",
                 }
             )
             quarantine_condition = quarantine_condition | F.col(c).isNull()
@@ -183,16 +195,19 @@ def evaluate_quality(
         if invalid_count:
             failed_rules.append(
                 {
-                    "rule_name": f"expression:{rule.name}" if rule.quarantine else f"expression_abort:{rule.name}",
+                    "rule_name": f"expression:{rule.name}",
+                    "severity": rule.severity,
+                    "status": "WARNED" if rule.severity == "warn" else "FAILED",
                     "failed_count": invalid_count,
                     "details": {
                         "name": rule.name,
                         "expression": rule.expression,
-                        "quarantine": rule.quarantine,
+                        "severity": rule.severity,
                     },
+                    "message": rule.message,
                 }
             )
-            if rule.quarantine:
+            if rule.severity == "quarantine":
                 quarantine_condition = quarantine_condition | invalid_condition
 
     if rules.unique_key:
@@ -207,8 +222,11 @@ def evaluate_quality(
             failed_rules.append(
                 {
                     "rule_name": "unique_key",
+                    "severity": "abort",
+                    "status": "FAILED",
                     "failed_count": dup_count,
                     "details": {"columns": rules.unique_key},
+                    "message": "Chave única possui duplicidades.",
                 }
             )
 
@@ -216,15 +234,23 @@ def evaluate_quality(
         failed_rules.append(
             {
                 "rule_name": "min_rows",
+                "severity": "abort",
+                "status": "FAILED",
                 "failed_count": rules.min_rows - row_count,
                 "details": {"min_rows": rules.min_rows, "actual": row_count},
+                "message": "Quantidade mínima de linhas não atingida.",
             }
         )
 
     quarantined_df = df.where(quarantine_condition) if failed_rules else df.limit(0)
     quarantined_count = quarantined_df.count() if failed_rules else 0
     valid_df = df.where(~quarantine_condition) if quarantined_count > 0 else df
-    status = "FAILED" if failed_rules else "PASSED"
+    if not failed_rules:
+        status = "PASSED"
+    elif all(r.get("severity") == "warn" for r in failed_rules):
+        status = "WARNED"
+    else:
+        status = "FAILED"
     return status, failed_rules, valid_df, quarantined_df, quarantined_count
 
 
@@ -245,9 +271,11 @@ def write_quality_results(
             run_id,
             target,
             r["rule_name"],
-            "FAILED",
+            r.get("status", "FAILED"),
+            r.get("severity"),
             int(r.get("failed_count", 0)),
             utc_now_str(),
+            r.get("message"),
             to_json(r.get("details", {})),
         )
         for r in results
@@ -255,7 +283,7 @@ def write_quality_results(
     df = spark.createDataFrame(
         rows,
         "run_id string, target_table string, rule_name string, status string, "
-        "failed_count long, checked_at_utc string, details_json string",
+        "severity string, failed_count long, checked_at_utc string, message string, details_json string",
     )
     df = df.withColumn("checked_at_utc", F.col("checked_at_utc").cast("timestamp"))
     df.write.format("delta").mode("append").saveAsTable(tables["quality"])

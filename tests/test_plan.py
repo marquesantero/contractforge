@@ -90,13 +90,28 @@ def test_build_plan_quality_rules_expressions_dict():
         quality_rules={
             "expressions": [
                 {"name": "positive_amount", "expression": "amount > 0"},
-                {"name": "valid_period", "expression": "end_date >= start_date", "quarantine": False},
+                {
+                    "name": "valid_period",
+                    "expression": "end_date >= start_date",
+                    "severity": "abort",
+                    "message": "Período inválido.",
+                },
             ]
         },
     )
     assert isinstance(plan.quality_rules.expressions[0], QualityExpression)
-    assert plan.quality_rules.expressions[0].quarantine is True
-    assert plan.quality_rules.expressions[1].quarantine is False
+    assert plan.quality_rules.expressions[0].severity == "quarantine"
+    assert plan.quality_rules.expressions[1].severity == "abort"
+    assert plan.quality_rules.expressions[1].message == "Período inválido."
+
+
+def test_build_plan_rejects_invalid_quality_expression_severity():
+    with pytest.raises(ValueError, match="quality_rules.expressions.severity"):
+        build_plan_from_kwargs(
+            source="x",
+            target_table="t",
+            quality_rules={"expressions": [{"name": "x", "expression": "id > 0", "severity": "block"}]},
+        )
 
 
 def test_ingest_rejects_unknown_kwargs(monkeypatch):
@@ -146,10 +161,9 @@ def test_build_plan_accepts_idempotency_options():
         source="x",
         target_table="t",
         idempotency_key="job-42:batch-2026-05-11",
-        skip_if_success=True,
+        idempotency_policy="skip_if_success",
     )
     assert plan.idempotency_key == "job-42:batch-2026-05-11"
-    assert plan.skip_if_success is True
     assert plan.idempotency_policy == "skip_if_success"
 
 
@@ -159,7 +173,6 @@ def test_build_plan_accepts_explicit_idempotency_policy():
         target_table="t",
         idempotency_key="job-42:batch-2026-05-11",
         idempotency_policy="fail_if_success",
-        skip_if_success=True,
     )
     assert plan.idempotency_policy == "fail_if_success"
 

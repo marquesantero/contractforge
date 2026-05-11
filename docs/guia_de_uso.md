@@ -110,14 +110,14 @@ Recomendado para uso compartilhado em produção.
 ```bash
 pip install build
 python -m build
-# gera: dist/lakehouse_ingestion_framework-1.0.6-py3-none-any.whl
+# gera: dist/lakehouse_ingestion_framework-1.1.0-py3-none-any.whl
 ```
 
 **Passo 2 — Upload para Unity Catalog Volume:**
 
 ```bash
 # via Databricks CLI
-databricks fs cp dist/lakehouse_ingestion_framework-1.0.6-py3-none-any.whl \
+databricks fs cp dist/lakehouse_ingestion_framework-1.1.0-py3-none-any.whl \
   dbfs:/Volumes/<catalog>/<schema>/libs/
 ```
 
@@ -127,7 +127,7 @@ Ou pela UI: **Catalog → Volumes → Upload to volume**.
 
 1. Compute → seu cluster → Libraries → **Install new**
 2. Source: **Volume**
-3. File path: `/Volumes/<catalog>/<schema>/libs/lakehouse_ingestion_framework-1.0.6-py3-none-any.whl`
+3. File path: `/Volumes/<catalog>/<schema>/libs/lakehouse_ingestion_framework-1.1.0-py3-none-any.whl`
 4. Install
 5. Reinicie o cluster (a library só fica ativa após restart)
 
@@ -137,7 +137,7 @@ Em qualquer notebook anexado ao cluster:
 
 ```python
 import lakehouse_ingestion
-print(lakehouse_ingestion.__version__)  # 1.0.6
+print(lakehouse_ingestion.__version__)  # 1.1.0
 from lakehouse_ingestion import ingest, IngestionPlan, QualityRules
 ```
 
@@ -146,13 +146,13 @@ from lakehouse_ingestion import ingest, IngestionPlan, QualityRules
 Funciona em **serverless** (que não aceita cluster libraries tradicionais) e em desenvolvimento iterativo.
 
 ```python
-%pip install /Volumes/<catalog>/<schema>/libs/lakehouse_ingestion_framework-1.0.6-py3-none-any.whl
+%pip install /Volumes/<catalog>/<schema>/libs/lakehouse_ingestion_framework-1.1.0-py3-none-any.whl
 ```
 
 Se o cluster não permite `%pip` por restrição:
 
 ```python
-%pip install --index-url https://<seu_pypi_privado> lakehouse-ingestion-framework==1.0.6
+%pip install --index-url https://<seu_pypi_privado> lakehouse-ingestion-framework==1.1.0
 ```
 
 Em seguida:
@@ -392,7 +392,7 @@ quality_rules:
       expression: "valor_total > 0"
       quarantine: true
 # `quarantine` só isola linhas atingidas por not_null/accepted_values/max_null_ratio.
-# expressions com quarantine=true também são isoláveis.
+# expressions com severity=quarantine também são isoláveis.
 # Regras de conjunto (unique_key, min_rows, required_columns) escalam para fail.
 on_quality_fail: quarantine
 ```
@@ -479,7 +479,7 @@ dbutils.notebook.exit(json.dumps(result, default=str))
 
 - `build_plan_from_kwargs` valida campos desconhecidos (pega typos no YAML) e normaliza listas com `|`.
 - Placeholders `{{dt}}` permitem override de runtime sem editar o YAML.
-- `idempotency_key` pode ser preenchido com o identificador do lote/job. Prefira `idempotency_policy: skip_if_success|fail_if_success|rerun_if_failed|always_run`; `skip_if_success: true` continua aceito por compatibilidade.
+- `idempotency_key` pode ser preenchido com o identificador do lote/job. Prefira `idempotency_policy: skip_if_success|fail_if_success|rerun_if_failed|always_run`.
 - `master_run_id` é propagado para `ctrl_ingestion_runs`, viabilizando summary cross-execução.
 - `raise` em falha garante que a task aparece como failed no Workflow.
 - `dbutils.notebook.exit(json.dumps(result))` permite o master, se houver, capturar o resultado.

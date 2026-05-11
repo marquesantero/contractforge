@@ -1,7 +1,7 @@
 # Lakehouse Ingestion Framework
 
 **Documentação oficial**  
-**Versão da biblioteca:** `1.0.6`  
+**Versão da biblioteca:** `1.1.0`  
 **Pacote:** `lakehouse-ingestion-framework`  
 **Import principal:** `lakehouse_ingestion`  
 **Ambiente-alvo:** Databricks, Unity Catalog e Delta Lake  
@@ -575,7 +575,6 @@ ingest(
 | `on_quality_fail` | `"fail" | "warn" | "quarantine"` | `"fail"` | Ação quando regras falham. |
 | `idempotency_key` | `str | None` | `None` | Chave lógica opcional do lote. |
 | `idempotency_policy` | `"always_run" | "skip_if_success" | "fail_if_success" | "rerun_if_failed"` | `"always_run"` | Política explícita de reexecução para a chave lógica. |
-| `skip_if_success` | `bool` | `False` | Se `True`, retorna `SKIPPED` quando já existe execução `SUCCESS` para o mesmo target e `idempotency_key`. |
 
 Campos de `QualityRules`:
 
@@ -587,7 +586,7 @@ Campos de `QualityRules`:
 | `accepted_values` | `Dict[str, List[Any]]` | Valores permitidos por coluna. Limitado por `CONFIG.max_inline_accepted_values`. |
 | `min_rows` | `int | None` | Quantidade mínima de registros após preparação. |
 | `max_null_ratio` | `Dict[str, float]` | Percentual máximo de nulos por coluna, entre 0 e 1. |
-| `expressions` | `List[QualityExpression]` | Expressões SQL booleanas nomeadas. Valores `false` ou `NULL` falham. |
+| `expressions` | `List[QualityExpression]` | Expressões SQL booleanas nomeadas com `severity` (`warn`, `quarantine`, `abort`) e `message` opcional. Valores `false` ou `NULL` falham. |
 
 Ações:
 
@@ -615,12 +614,17 @@ ingest(
         "min_rows": 1,
         "max_null_ratio": {"customer_email": 0.20},
         "expressions": [
-            {"name": "positive_amount", "expression": "amount > 0", "quarantine": True}
+            {
+                "name": "positive_amount",
+                "expression": "amount > 0",
+                "severity": "quarantine",
+                "message": "Valor deve ser positivo.",
+            }
         ],
     },
     # unique_key, min_rows e required_columns são abort-only: a falha aborta
     # a execução. Para quarentena efetiva, remova-as e use regras de linha:
-    # not_null, accepted_values, max_null_ratio ou expressions com quarantine=true.
+    # not_null, accepted_values, max_null_ratio ou expressions com severity="quarantine".
     on_quality_fail="fail"
 )
 ```
@@ -877,8 +881,10 @@ Resultado das regras de qualidade por execução.
 | `target_table` | Destino. |
 | `rule_name` | Nome da regra. |
 | `status` | Resultado da regra. |
+| `severity` | Severidade declarada ou inferida: `warn`, `quarantine`, `abort`. |
 | `failed_count` | Quantidade de falhas. |
 | `checked_at_utc` | Momento da verificação. |
+| `message` | Mensagem customizada ou padrão da regra. |
 | `details_json` | Detalhes da regra. |
 
 ### 10.4 `ctrl_ingestion_quarantine`
@@ -1332,7 +1338,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "lakehouse-ingestion-framework"
-version = "1.0.6"
+version = "1.1.0"
 description = "Framework de ingestão Delta Lake para Databricks com contratos declarativos, quality gates, SCD, explain mode e eventos OpenLineage."
 readme = "README.md"
 requires-python = ">=3.10"

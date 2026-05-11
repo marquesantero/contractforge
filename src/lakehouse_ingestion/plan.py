@@ -10,6 +10,7 @@ from .config import (
     Layer,
     MergeStrategy,
     QualityFailAction,
+    QualityRuleSeverity,
     SchemaPolicy,
     Source,
     VALID_EXPLAIN_FORMATS,
@@ -17,6 +18,7 @@ from .config import (
     VALID_LAYERS,
     VALID_MERGE_STRATEGIES,
     VALID_QUALITY_FAIL_ACTIONS,
+    VALID_QUALITY_RULE_SEVERITIES,
     VALID_SCHEMA_POLICIES,
     VALID_WRITE_MODES,
     WriteMode,
@@ -30,7 +32,8 @@ class QualityExpression:
 
     name: str
     expression: str
-    quarantine: bool = True
+    severity: QualityRuleSeverity = "quarantine"
+    message: Optional[str] = None
 
 
 @dataclass(frozen=True)
@@ -119,7 +122,6 @@ class IngestionPlan:
     lock_enabled: bool = False
     idempotency_key: Optional[str] = None
     idempotency_policy: IdempotencyPolicy = "always_run"
-    skip_if_success: bool = False
     parent_run_id: Optional[str] = None
     run_group_id: Optional[str] = None
     master_job_id: Optional[str] = None
@@ -178,7 +180,13 @@ def normalize_quality_rules(
         else QualityExpression(
             name=str(item["name"]),
             expression=str(item["expression"]),
-            quarantine=bool(item.get("quarantine", True)),
+            severity=_validate_enum(
+                item.get("severity", "quarantine"),
+                VALID_QUALITY_RULE_SEVERITIES,
+                "quality_rules.expressions.severity",
+                default="quarantine",
+            ),
+            message=item.get("message"),
         )
         for item in expressions
     ]
@@ -195,7 +203,7 @@ _KNOWN_PARAMS = {
     "fix_encoding", "encoding", "encoding_columns", "dry_run", "explain_mode",
     "explain_format", "openlineage_enabled", "openlineage_namespace",
     "openlineage_producer", "use_cache", "lock_enabled", "idempotency_key",
-    "idempotency_policy", "skip_if_success", "parent_run_id", "run_group_id",
+    "idempotency_policy", "parent_run_id", "run_group_id",
     "master_job_id", "master_run_id",
 }
 
@@ -252,10 +260,6 @@ def build_plan_from_kwargs(**kwargs: Any) -> IngestionPlan:
         "idempotency_policy",
         default="always_run",
     )
-    skip_if_success = bool(kwargs.get("skip_if_success", False))
-    if skip_if_success and kwargs.get("idempotency_policy") in (None, ""):
-        idempotency_policy = "skip_if_success"
-
     return IngestionPlan(
         source=kwargs["source"],
         target_table=kwargs["target_table"],
@@ -299,7 +303,6 @@ def build_plan_from_kwargs(**kwargs: Any) -> IngestionPlan:
         lock_enabled=bool(kwargs.get("lock_enabled", False)),
         idempotency_key=kwargs.get("idempotency_key"),
         idempotency_policy=idempotency_policy,  # type: ignore[arg-type]
-        skip_if_success=skip_if_success,
         parent_run_id=kwargs.get("parent_run_id"),
         run_group_id=kwargs.get("run_group_id"),
         master_job_id=kwargs.get("master_job_id"),
