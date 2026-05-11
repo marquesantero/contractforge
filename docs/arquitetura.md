@@ -1,6 +1,6 @@
 # Lakehouse Ingestion Framework — Arquitetura e Referência Técnica
 
-**Versão do pacote:** `1.1.0`
+**Versão do pacote:** `1.2.0`
 **Pacote Python:** `lakehouse-ingestion-framework`
 **Import principal:** `lakehouse_ingestion`
 **Ambiente-alvo:** Databricks Runtime, Unity Catalog, Delta Lake (também roda em PySpark + delta-spark fora do Databricks)
@@ -52,8 +52,8 @@ O `lakehouse-ingestion-framework` padroniza a ingestão de dados em Delta Lake f
 - **Seis modos oficiais de escrita** cobrindo append imutável, overwrite, SCD1, SCD2 histórico, hash-diff e snapshot com soft delete.
 - **Quality gates** com três modos de falha (`fail`, `warn`, `quarantine`).
 - **Watermarks tipados** (simples e compostos) persistidos em tabela de estado.
-- **Schema policy** com três níveis (`permissive`, `additive_only`, `strict`) e evolução automática quando aplicável.
-- **Observabilidade**: tabelas de controle para runs, state, quality, quarantine, locks, explain, lineage, errors e metadata.
+- **Schema policy** com três níveis (`permissive`, `additive_only`, `strict`), evolução aditiva e alargamento seguro opcional de tipos.
+- **Observabilidade**: tabelas de controle para runs, state, quality, quarantine, locks, explain, lineage, errors, metadata e schema changes.
 - **Lineage OpenLineage** (1.0.5) e captura de plano Spark.
 - **Idempotência operacional** via locks best-effort, `with_retry` para conflitos Delta e MERGE atômico.
 
@@ -342,6 +342,7 @@ class QualityRules:
     accepted_values: Dict[str, List[Any]] = field(default_factory=dict)
     min_rows: Optional[int] = None
     max_null_ratio: Dict[str, float] = field(default_factory=dict)
+    expressions: List[QualityExpression] = field(default_factory=list)
 ```
 
 Frozen para passagem segura entre threads/jobs. Construtores aceitam dict via `normalize_quality_rules`.
@@ -352,6 +353,8 @@ Frozen dataclass com 40+ campos. Agrupados por finalidade:
 
 **Identificação** — `source` (str ou DataFrame), `target_table`, `catalog`, `layer`, `mode`, `source_system`, `ctrl_schema`, `notebook_name`.
 
+**Metadados de contrato** — `description`, `owner`, `domain`, `tags`, `sla`, `runtime_parameters`. Não mudam a escrita; são propagados para retorno e `ctrl_ingestion_runs`.
+
 **Transformações** — `select_columns`, `filter_expression`, `custom_keys`.
 
 **Chaves e dedup** — `merge_keys`, `hash_keys`, `hash_exclude_columns`, `dedup_order_expr`.
@@ -360,7 +363,7 @@ Frozen dataclass com 40+ campos. Agrupados por finalidade:
 
 **Particionamento e clustering** — `partition_column`, `partition_value`, `merge_strategy`, `merge_partition_column`, `cluster_columns`, `zorder_columns`, `optimize_after_write`.
 
-**Schema** — `schema_policy`.
+**Schema** — `schema_policy`, `allow_type_widening`.
 
 **Quality** — `quality_rules`, `on_quality_fail`.
 
@@ -476,7 +479,7 @@ Tenta primeiro `spark.catalog.tableExists("cat.sch.tbl")` (via split em `.`). Em
 #### 4.5.6 Schema policy
 
 ```python
-def validate_schema_policy(df, target, policy):
+def validate_schema_policy(df, target, policy, allow_type_widening=False):
     if not table_exists(target):
         return {"status": "new_table", ...}
     target_df = spark.read.table(target)
@@ -484,17 +487,18 @@ def validate_schema_policy(df, target, policy):
     tgt = {f.name: f.dataType.simpleString() for f in target_df.schema.fields}
     added = sorted(c for c in src if c not in tgt)
     removed = sorted(c for c in tgt if c not in src and c not in CONTROL_COLUMNS)
-    type_changes = sorted(...)
+    type_changes = sorted(..., key=lambda change: change["column"])
     if policy == "strict" and (added or removed or type_changes): raise
-    if policy == "additive_only" and (removed or type_changes): raise
-    return {"status": "checked", "added_columns", "removed_columns", "type_changes"}
+    if policy == "additive_only" and (removed or unsafe_type_changes): raise
+    if policy == "permissive" and unsafe_type_changes: raise
+    return {"status": "checked", "added_columns", "removed_columns", "type_changes", "allow_type_widening"}
 ```
 
 Comparação por nome canonical (`simpleString()` do Spark). Comparação **agnóstica de ordem** — adicionar uma coluna no meio não causa "removed".
 
 **`removed`** ignora `CONTROL_COLUMNS`: mesmo se a fonte não traz `ingestion_date`, isso não é uma "remoção" — é apenas que a coluna é gerenciada pelo framework.
 
-**`sync_delta_schema(df, target, schema_changes, policy)`** aplica `ALTER TABLE ADD COLUMNS` se houver `added_columns` e a policy permitir (`permissive` ou `additive_only`). Não removemos nem alteramos tipos automaticamente — isso requer migração manual.
+**`sync_delta_schema(df, target, schema_changes, policy)`** aplica `ALTER TABLE ADD COLUMNS` se houver `added_columns` e a policy permitir (`permissive` ou `additive_only`). Quando `allow_type_widening=True` e a mudança é reconhecida como alargamento seguro, aplica `ALTER TABLE ALTER COLUMN TYPE`. Nunca remove colunas automaticamente.
 
 ### 4.6 `watermark.py` — Watermark tipado
 
@@ -958,22 +962,23 @@ Ver §4.7 para o detalhamento. Resumo dos invariantes:
 
 ### 7.1 Quando rodam
 
-`_validate_plan` chama `validate_schema_policy(df, target, policy)` **depois** de `_prepare_dataframe` (DataFrame final, com colunas de controle adicionadas) e **antes** da escrita.
+`_validate_plan` chama `validate_schema_policy(df, target, policy, allow_type_widening)` **depois** de `_prepare_dataframe` (DataFrame final, com colunas de controle adicionadas) e **antes** da escrita.
 
 `sync_delta_schema(df, target, schema_changes, policy)` é chamado **na mesma etapa** se houver `added_columns` e a política permitir.
 
 ### 7.2 Comportamento por política
 
 ```
-                permissive   additive_only   strict
-                -----------  -------------  -------
-new_table       OK + create   OK + create   OK + create
-added cols      ALTER ADD     ALTER ADD     RAISE
-removed cols    OK (no ALTER) RAISE          RAISE
-type changes    OK (no ALTER) RAISE          RAISE
+                permissive         additive_only       strict
+                -----------------  -----------------  -------
+new_table       OK + create         OK + create        OK + create
+added cols      ALTER ADD           ALTER ADD          RAISE
+removed cols    OK (no ALTER)       RAISE              RAISE
+safe widening   ALTER TYPE*         ALTER TYPE*        RAISE
+unsafe changes  RAISE               RAISE              RAISE
 ```
 
-`permissive` é a única política que aceita type changes silenciosamente (passa para o motor de escrita resolver via `mergeSchema=true`). Use com cautela — Delta pode aceitar widening (ex.: int→long) mas não narrowing.
+`*` exige `allow_type_widening=True`. A validação reconhece alargamentos simples (`tinyint -> int -> bigint`, `float -> double`, aumento de precisão/escala decimal e `date -> timestamp`). Mudanças inseguras falham antes da escrita.
 
 `additive_only` é o default recomendado em silver/gold: protege contra perda de coluna ou mudança de tipo não-intencional, mas permite evolução por adição.
 
@@ -988,6 +993,8 @@ spark.sql(f"ALTER TABLE {qt(target)} ADD COLUMNS ({cols_sql})")
 ```
 
 Tipos vêm do DataFrame, não inferidos manualmente. As colunas adicionadas ficam **no fim** do schema (Delta não suporta posicionar). Aceitam NULL para registros antigos.
+
+Mudanças detectadas são registradas em `ctrl_ingestion_schema_changes`; isso preserva auditoria mesmo quando a evolução é aplicada automaticamente.
 
 ---
 
@@ -1040,7 +1047,9 @@ Todas vivem em `<catalog>.<ctrl_schema>` (default `<catalog>.ops`). Todas USING 
 | `watermark_column`, `watermark_previous`, `watermark_current`                                    | STRING            | watermark snapshot               |
 | `started_at_utc`, `finished_at_utc`, `duration_seconds`                                          | TIMESTAMP, DOUBLE | janela                           |
 | `quality_status`, `schema_policy`                                                                | STRING            | snapshot de configuração         |
-| `schema_changes_json`, `operation_metrics_json`                                                  | STRING            | JSONs aninhados                  |
+| `schema_changes_json`, `stage_durations_json`, `operation_metrics_json`                          | STRING            | JSONs aninhados                  |
+| `contract_description`, `contract_owner`, `contract_domain`, `contract_sla`                      | STRING            | metadados declarativos           |
+| `contract_tags_json`, `runtime_parameters_json`                                                  | STRING            | metadados em JSON                |
 | `write_started_at_utc`, `write_finished_at_utc`                                                  | TIMESTAMP         | só do passo de escrita           |
 | `delta_version_before`, `delta_version_after`, `write_committed`                                 | BIGINT, BOOLEAN   | atomicidade                      |
 | `error_message`                                                                                  | STRING            | mensagem curta do erro            |
@@ -1073,7 +1082,21 @@ Tabela particionada por `error_date` para diagnóstico detalhado de falhas. Uma 
 | `error_type`, `error_message`, `stack_trace`                                                     | STRING            | classe, mensagem curta e traceback |
 | `framework_version`, `ctrl_schema_version`, `runtime_type`, `spark_version`, `python_version`    | STRING/BIGINT     | suporte e auditoria                |
 
-### 9.3 `ctrl_ingestion_state`
+### 9.3 `ctrl_ingestion_schema_changes`
+
+Tabela de auditoria da evolução estrutural do destino.
+
+| Coluna                                                                                           | Tipo              | Observação                         |
+| ------------------------------------------------------------------------------------------------ | ----------------- | ---------------------------------- |
+| `run_id`, `target_table`, `column_name`                                                          | STRING            | execução e coluna afetada          |
+| `change_ts_utc`                                                                                  | TIMESTAMP         | momento do registro                |
+| `change_type`                                                                                    | STRING            | `add_column` ou `type_change`      |
+| `source_type`, `target_type`                                                                     | STRING            | tipo novo e tipo anterior          |
+| `applied`                                                                                        | BOOLEAN           | se o ALTER foi aplicado            |
+| `details_json`                                                                                   | STRING            | payload completo da validação      |
+| `framework_version`, `ctrl_schema_version`                                                       | STRING/BIGINT     | suporte e auditoria                |
+
+### 9.4 `ctrl_ingestion_state`
 
 **Uma linha por target_table.** Snapshot do último estado conhecido. PK em `target_table`.
 
@@ -1088,7 +1111,7 @@ Tabela particionada por `error_date` para diagnóstico detalhado de falhas. Uma 
 
 Use para dashboards de "última execução" e detectar tabelas que não rodam há X dias.
 
-### 9.4 `ctrl_ingestion_quality`
+### 9.5 `ctrl_ingestion_quality`
 
 Uma linha **por regra falhada** por execução.
 
@@ -1102,7 +1125,7 @@ Uma linha **por regra falhada** por execução.
 
 Não recebe linhas em `status=PASSED`.
 
-### 9.5 `ctrl_ingestion_quarantine`
+### 9.6 `ctrl_ingestion_quarantine`
 
 Uma linha **por linha quarentenada**, com payload JSON da linha original.
 
@@ -1113,7 +1136,7 @@ Uma linha **por linha quarentenada**, com payload JSON da linha original.
 
 Pode crescer rápido se `on_quality_fail=quarantine` for usado com fontes "sujas". Considere TTL/VACUUM.
 
-### 9.6 `ctrl_ingestion_locks`
+### 9.7 `ctrl_ingestion_locks`
 
 Uma linha **por target_table** (PK). Renovada a cada execução.
 
@@ -1123,7 +1146,7 @@ Uma linha **por target_table** (PK). Renovada a cada execução.
 
 `status` ∈ `{ACTIVE, RELEASED}`. Locks expirados são "rompidos" no próximo `acquire_lock`.
 
-### 9.7 `ctrl_ingestion_explain`
+### 9.8 `ctrl_ingestion_explain`
 
 Plano Spark capturado.
 
@@ -1134,7 +1157,7 @@ Plano Spark capturado.
 
 Só recebe linhas se `explain_mode=True`.
 
-### 9.8 `ctrl_ingestion_lineage`
+### 9.9 `ctrl_ingestion_lineage`
 
 Eventos OpenLineage como JSON.
 
@@ -1145,6 +1168,15 @@ Eventos OpenLineage como JSON.
 | `event_json` (STRING)                                    |
 
 Para um collector real, faça forwarder lendo `event_json` de execuções recentes. O framework não emite HTTP por padrão.
+
+### 9.10 `ctrl_ingestion_metadata`
+
+Uma linha por componente de controle, usada para auditoria de versão.
+
+| Campo                                                        |
+| ------------------------------------------------------------ |
+| `component`, `framework_version`, `ctrl_schema_version`      |
+| `updated_at_utc`                                             |
 
 ---
 
@@ -1318,7 +1350,7 @@ python -m build
 twine check dist/*
 ```
 
-Gera `dist/lakehouse_ingestion_framework-1.1.0-py3-none-any.whl` e `.tar.gz`.
+Gera `dist/lakehouse_ingestion_framework-1.2.0-py3-none-any.whl` e `.tar.gz`.
 
 ### 14.2 Instalação no Databricks
 

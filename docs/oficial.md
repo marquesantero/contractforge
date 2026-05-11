@@ -1,7 +1,7 @@
 # Lakehouse Ingestion Framework
 
 **Documentação oficial**  
-**Versão da biblioteca:** `1.1.0`  
+**Versão da biblioteca:** `1.2.0`
 **Pacote:** `lakehouse-ingestion-framework`  
 **Import principal:** `lakehouse_ingestion`  
 **Ambiente-alvo:** Databricks, Unity Catalog e Delta Lake  
@@ -34,7 +34,7 @@ O framework cobre:
 - Lock operacional best-effort.
 - Captura de plano físico/lógico via `explain_mode`.
 - Emissão de evento OpenLineage em JSON.
-- Métricas de operação Delta extraídas do histórico da tabela.
+- Métricas lógicas padronizadas por modo, com histórico Delta como evidência adicional quando disponível.
 - Otimização Delta opcional via `OPTIMIZE` e `ZORDER`.
 
 O framework não cobre nativamente, nesta versão:
@@ -44,7 +44,7 @@ O framework não cobre nativamente, nesta versão:
 - Lock distribuído pessimista com garantia absoluta.
 - Orquestração de DAGs.
 - Gerenciamento de permissões Unity Catalog.
-- Testes de qualidade complexos com expressões SQL arbitrárias.
+- Catálogo corporativo de regras de qualidade além do contrato da ingestão.
 
 ---
 
@@ -538,18 +538,21 @@ ingest(
 | Parâmetro | Tipo | Padrão | Descrição |
 |---|---:|---|---|
 | `schema_policy` | `"permissive" | "additive_only" | "strict"` | `"permissive"` | Política de evolução de schema. |
+| `allow_type_widening` | `bool` | `False` | Permite aplicar mudanças seguras de tipo por `ALTER COLUMN TYPE`. |
 
 Comportamento:
 
 | Política | Novas colunas | Colunas removidas | Mudança de tipo |
 |---|---|---|---|
-| `permissive` | Aceita | Aceita | Aceita conforme capacidade da escrita Delta. |
-| `additive_only` | Aceita | Rejeita | Rejeita. |
+| `permissive` | Aceita | Aceita | Rejeita quando insegura; aceita alargamento com `allow_type_widening=True`. |
+| `additive_only` | Aceita | Rejeita | Rejeita quando insegura; aceita alargamento com `allow_type_widening=True`. |
 | `strict` | Rejeita | Rejeita | Rejeita. |
 
 Observações:
 
 - Em modos com `MERGE`, novas colunas são sincronizadas antes do merge quando a política permite.
+- Mudanças de tipo não são silenciosas. Alargamentos seguros precisam de `allow_type_widening=True`; mudanças inseguras falham com mensagem explícita.
+- Mudanças aplicadas são registradas em `ctrl_ingestion_schema_changes`.
 - Em `strict`, a origem precisa ter o mesmo contrato estrutural esperado pelo destino.
 - Em `additive_only`, colunas novas são adicionadas ao destino, mas remoções e alterações de tipo falham cedo.
 
@@ -665,6 +668,9 @@ ingest(
 | `openlineage_producer` | `str` | `"lakehouse-ingestion-framework"` | Identificador do produtor no evento OpenLineage. |
 | `use_cache` | `bool` | `True` | Permite cache do DataFrame preparado. Desabilitado automaticamente em ambientes incompatíveis. |
 | `lock_enabled` | `bool` | `False` | Ativa lock operacional best-effort. |
+| `description`, `owner`, `domain`, `sla` | `str | None` | `None` | Metadados declarativos do contrato para auditoria. |
+| `tags` | `List[str]` | `[]` | Tags do contrato. |
+| `runtime_parameters` | `Dict[str, Any]` | `{}` | Parâmetros de execução propagados para retorno e ctrl table. |
 
 Exemplo com `dry_run`:
 
@@ -764,6 +770,8 @@ A função retorna um dicionário com métricas e metadados.
 | `openlineage_event` | Evento OpenLineage em formato de dicionário. |
 | `idempotency_key`, `idempotency_policy` | Chave e política de idempotência usadas. |
 | `skip_reason`, `skipped_by_run_id` | Motivo e execução original quando `status="SKIPPED"`. |
+| `stage_durations` | Duração por etapa (`read`, `schema`, `quality`, `write`, `state_update`, `lineage`, etc.). |
+| `contract_metadata` | Metadados declarativos do contrato (`description`, `owner`, `domain`, `tags`, `sla`, `runtime_parameters`). |
 | `error_message` | Mensagem curta do erro, quando houver falha. |
 
 Exemplo de consumo:
@@ -813,6 +821,9 @@ Principais colunas:
 | `quality_status` | Resultado dos quality gates. |
 | `schema_policy` | Política de schema usada. |
 | `schema_changes_json` | Diferenças estruturais detectadas. |
+| `stage_durations_json` | Duração por etapa da execução. |
+| `contract_description`, `contract_owner`, `contract_domain`, `contract_sla` | Metadados declarativos do contrato. |
+| `contract_tags_json`, `runtime_parameters_json` | Tags e parâmetros runtime serializados em JSON. |
 | `operation_metrics_json` | Métricas do histórico Delta. |
 | `write_committed` | Indica se houve commit de escrita. |
 | `delta_version_before` | Versão Delta antes. |
@@ -918,6 +929,22 @@ Stack traces completos de execuções com falha. Use esta tabela para diagnósti
 ### 10.6 `ctrl_ingestion_metadata`
 
 Tabela de uma linha por componente para registrar `framework_version`, `ctrl_schema_version` e `updated_at_utc`.
+
+### 10.7 `ctrl_ingestion_schema_changes`
+
+Histórico de evolução estrutural aplicada ou detectada no destino.
+
+| Coluna | Descrição |
+|---|---|
+| `run_id` | Execução que detectou a mudança. |
+| `change_ts_utc` | Timestamp de registro da mudança. |
+| `target_table` | Tabela Delta afetada. |
+| `change_type` | `add_column` ou `type_change`. |
+| `column_name` | Coluna afetada. |
+| `source_type`, `target_type` | Tipo novo vindo da fonte e tipo anterior do destino, quando aplicável. |
+| `applied` | Indica se o framework aplicou a mudança. |
+| `details_json` | Detalhes da validação. |
+| `framework_version`, `ctrl_schema_version` | Versões para auditoria. |
 O framework aplica apenas migrações aditivas conhecidas com `ALTER TABLE ADD COLUMNS`; colunas nunca são removidas automaticamente.
 
 ### 10.7 `ctrl_ingestion_locks`
@@ -1338,7 +1365,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "lakehouse-ingestion-framework"
-version = "1.1.0"
+version = "1.2.0"
 description = "Framework de ingestão Delta Lake para Databricks com contratos declarativos, quality gates, SCD, explain mode e eventos OpenLineage."
 readme = "README.md"
 requires-python = ">=3.10"

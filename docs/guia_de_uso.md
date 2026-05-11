@@ -110,14 +110,14 @@ Recomendado para uso compartilhado em produção.
 ```bash
 pip install build
 python -m build
-# gera: dist/lakehouse_ingestion_framework-1.1.0-py3-none-any.whl
+# gera: dist/lakehouse_ingestion_framework-1.2.0-py3-none-any.whl
 ```
 
 **Passo 2 — Upload para Unity Catalog Volume:**
 
 ```bash
 # via Databricks CLI
-databricks fs cp dist/lakehouse_ingestion_framework-1.1.0-py3-none-any.whl \
+databricks fs cp dist/lakehouse_ingestion_framework-1.2.0-py3-none-any.whl \
   dbfs:/Volumes/<catalog>/<schema>/libs/
 ```
 
@@ -127,7 +127,7 @@ Ou pela UI: **Catalog → Volumes → Upload to volume**.
 
 1. Compute → seu cluster → Libraries → **Install new**
 2. Source: **Volume**
-3. File path: `/Volumes/<catalog>/<schema>/libs/lakehouse_ingestion_framework-1.1.0-py3-none-any.whl`
+3. File path: `/Volumes/<catalog>/<schema>/libs/lakehouse_ingestion_framework-1.2.0-py3-none-any.whl`
 4. Install
 5. Reinicie o cluster (a library só fica ativa após restart)
 
@@ -137,7 +137,7 @@ Em qualquer notebook anexado ao cluster:
 
 ```python
 import lakehouse_ingestion
-print(lakehouse_ingestion.__version__)  # 1.1.0
+print(lakehouse_ingestion.__version__)  # 1.2.0
 from lakehouse_ingestion import ingest, IngestionPlan, QualityRules
 ```
 
@@ -146,13 +146,13 @@ from lakehouse_ingestion import ingest, IngestionPlan, QualityRules
 Funciona em **serverless** (que não aceita cluster libraries tradicionais) e em desenvolvimento iterativo.
 
 ```python
-%pip install /Volumes/<catalog>/<schema>/libs/lakehouse_ingestion_framework-1.1.0-py3-none-any.whl
+%pip install /Volumes/<catalog>/<schema>/libs/lakehouse_ingestion_framework-1.2.0-py3-none-any.whl
 ```
 
 Se o cluster não permite `%pip` por restrição:
 
 ```python
-%pip install --index-url https://<seu_pypi_privado> lakehouse-ingestion-framework==1.1.0
+%pip install --index-url https://<seu_pypi_privado> lakehouse-ingestion-framework==1.2.0
 ```
 
 Em seguida:
@@ -334,6 +334,13 @@ source: b_clientes              # str: nome de tabela; será resolvido com spark
 source_system: crm
 notebook_name: ingest_silver_clientes
 ctrl_schema: ops
+description: "Clientes consolidados do CRM"
+owner: dados-clientes
+domain: comercial
+tags: [silver, cliente, crm]
+sla: "D+0 08:00"
+runtime_parameters:
+  carga: incremental
 
 # chaves e watermark
 merge_keys: id_cliente
@@ -342,6 +349,7 @@ dedup_order_expr: "updated_at DESC NULLS LAST"
 
 # políticas
 schema_policy: additive_only
+allow_type_widening: false
 
 # qualidade
 quality_rules:
@@ -390,7 +398,8 @@ quality_rules:
   expressions:
     - name: valor_total_positivo
       expression: "valor_total > 0"
-      quarantine: true
+      severity: quarantine
+      message: "Valor total deve ser positivo."
 # `quarantine` só isola linhas atingidas por not_null/accepted_values/max_null_ratio.
 # expressions com severity=quarantine também são isoláveis.
 # Regras de conjunto (unique_key, min_rows, required_columns) escalam para fail.
@@ -1147,9 +1156,10 @@ Antes de subir um pipeline novo:
 - [ ] **Pacote** instalado no cluster (verificou `import lakehouse_ingestion; print(__version__)`).
 - [ ] **Catálogo `ops`** existe e o cluster tem `CREATE TABLE` lá.
 - [ ] Cada YAML tem `notebook_name` único e descritivo (vai aparecer em logs e OpenLineage).
+- [ ] Cada YAML tem `description`, `owner`, `domain`, `tags` e `sla` quando houver governança mínima.
 - [ ] `merge_keys` / `hash_keys` estão corretos (consultou amostras com duplicatas).
 - [ ] `quality_rules` tem ao menos `not_null` nas chaves.
-- [ ] `schema_policy` definida (default é `permissive`, frequentemente quer `additive_only`).
+- [ ] `schema_policy` definida e `allow_type_widening` só habilitado quando a evolução de tipos foi intencional.
 - [ ] Para SCD2: `scd2_change_columns` é o conjunto **mínimo** que define mudança real.
 - [ ] Para snapshot: source é **realmente** completo (sem watermark).
 - [ ] `dry_run=True` rodou ao menos uma vez e o resultado foi inspecionado.

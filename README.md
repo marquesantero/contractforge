@@ -98,11 +98,13 @@ quality_rules={
 
 ## Schema policy
 
-- `permissive`: permite adições, remoções e mudanças de tipo.
-- `additive_only`: aceita colunas novas, rejeita remoções/mudanças de tipo.
+- `permissive`: permite adições e remoções; mudanças de tipo inseguras continuam bloqueadas.
+- `additive_only`: aceita colunas novas, rejeita remoções e mudanças de tipo inseguras.
 - `strict`: rejeita qualquer divergência.
 
 Em `permissive` e `additive_only`, colunas novas são adicionadas ao Delta target via `ALTER TABLE`.
+
+Para evoluções seguras de tipo, use `allow_type_widening=True`. O framework valida alargamentos simples (`int -> bigint`, `float -> double`, aumento de precisão decimal, `date -> timestamp`), aplica `ALTER COLUMN TYPE` quando suportado pelo Delta e registra as mudanças em `ctrl_ingestion_schema_changes`.
 
 ## Observabilidade
 
@@ -117,6 +119,7 @@ O framework cria tabelas de controle no schema configurado:
 - `ctrl_ingestion_lineage`
 - `ctrl_ingestion_errors`
 - `ctrl_ingestion_metadata`
+- `ctrl_ingestion_schema_changes`
 
 `explain_mode=True` captura o plano Spark do DataFrame preparado.
 
@@ -126,7 +129,7 @@ Em falha, `ctrl_ingestion_runs.error_message` guarda uma mensagem curta para con
 
 `idempotency_key` permite identificar um lote lógico. Use `idempotency_policy` para controlar reexecuções: `always_run`, `skip_if_success`, `fail_if_success` ou `rerun_if_failed`.
 
-O retorno preserva `rows_written` como métrica lógica da biblioteca, expõe `rows_inserted`, `rows_updated`, `rows_deleted` e inclui `metrics_source`, `framework_version`, `ctrl_schema_version`, `runtime_type`, `spark_version` e `python_version`:
+O retorno preserva `rows_written` como métrica lógica da biblioteca, expõe `rows_inserted`, `rows_updated`, `rows_deleted`, `stage_durations`, `contract_metadata` e inclui `metrics_source`, `framework_version`, `ctrl_schema_version`, `runtime_type`, `spark_version` e `python_version`:
 
 - `logical`: apenas contadores calculados pela biblioteca.
 - `mixed`: contadores lógicos com evidência adicional do histórico Delta.
