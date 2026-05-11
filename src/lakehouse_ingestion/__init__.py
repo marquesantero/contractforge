@@ -1,5 +1,6 @@
 from .ingestion import (
     FrameworkConfig,
+    QualityExpression,
     IngestionPlan,
     QualityRules,
     ingest,
@@ -8,6 +9,7 @@ from .ingestion import (
 
 __all__ = [
     "FrameworkConfig",
+    "QualityExpression",
     "IngestionPlan",
     "QualityRules",
     "ingest",

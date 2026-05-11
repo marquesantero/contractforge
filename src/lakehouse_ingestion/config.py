@@ -65,6 +65,7 @@ VALID_EXPLAIN_FORMATS = {"simple", "extended", "codegen", "cost", "formatted"}
 #: ``row_hash``.
 CONTROL_COLUMNS = {
     "ingestion_date",
+    "ingestion_ts_utc",
     "source_system",
     "__run_id",
     "row_hash",

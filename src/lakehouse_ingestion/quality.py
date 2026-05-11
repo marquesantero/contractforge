@@ -21,7 +21,7 @@ from ._sql import to_json, utc_now_str, validate_cols
 #: colunas, contagem mínima) e não conseguem isolar linhas problemáticas. Quando
 #: ``on_quality_fail="quarantine"`` e qualquer dessas regras falhar, o
 #: orquestrador escala a ação para ``"fail"``.
-ABORT_ONLY_RULES = frozenset({"required_columns", "unique_key", "min_rows"})
+ABORT_ONLY_RULES = frozenset({"required_columns", "unique_key", "min_rows", "expression_abort"})
 
 
 def is_abort_only_failure(rule_name: str) -> bool:
@@ -100,6 +100,13 @@ def evaluate_quality(
             )
     for c in rules.max_null_ratio.keys():
         validate_cols(df, [c], "quality.max_null_ratio")
+    expression_names = set()
+    for rule in rules.expressions:
+        if not rule.name or not rule.expression:
+            raise ValueError("quality.expressions requer name e expression")
+        if rule.name in expression_names:
+            raise ValueError(f"quality.expressions possui name duplicado: {rule.name}")
+        expression_names.add(rule.name)
 
     agg_exprs = [F.count(F.lit(1)).alias("__total_rows")]
     null_alias_map: Dict[str, str] = {}
@@ -168,6 +175,25 @@ def evaluate_quality(
                 }
             )
             quarantine_condition = quarantine_condition | F.col(c).isNull()
+
+    for rule in rules.expressions:
+        expr_col = F.expr(rule.expression)
+        invalid_condition = expr_col.isNull() | (expr_col == F.lit(False))
+        invalid_count = df.where(invalid_condition).count()
+        if invalid_count:
+            failed_rules.append(
+                {
+                    "rule_name": f"expression:{rule.name}" if rule.quarantine else f"expression_abort:{rule.name}",
+                    "failed_count": invalid_count,
+                    "details": {
+                        "name": rule.name,
+                        "expression": rule.expression,
+                        "quarantine": rule.quarantine,
+                    },
+                }
+            )
+            if rule.quarantine:
+                quarantine_condition = quarantine_condition | invalid_condition
 
     if rules.unique_key:
         validate_cols(df, rules.unique_key, "quality.unique_key")

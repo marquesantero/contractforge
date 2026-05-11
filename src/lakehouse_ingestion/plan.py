@@ -23,6 +23,15 @@ from ._sql import as_list
 
 
 @dataclass(frozen=True)
+class QualityExpression:
+    """Regra de qualidade baseada em expressão SQL booleana."""
+
+    name: str
+    expression: str
+    quarantine: bool = True
+
+
+@dataclass(frozen=True)
 class QualityRules:
     """Regras de qualidade avaliadas antes da escrita.
 
@@ -45,6 +54,7 @@ class QualityRules:
     accepted_values: Dict[str, List[Any]] = field(default_factory=dict)
     min_rows: Optional[int] = None
     max_null_ratio: Dict[str, float] = field(default_factory=dict)
+    expressions: List[QualityExpression] = field(default_factory=list)
 
 
 @dataclass(frozen=True)
@@ -154,7 +164,19 @@ def normalize_quality_rules(
         return None
     if isinstance(value, QualityRules):
         return value
-    return QualityRules(**value)
+    normalized = dict(value)
+    expressions = normalized.get("expressions") or []
+    normalized["expressions"] = [
+        item
+        if isinstance(item, QualityExpression)
+        else QualityExpression(
+            name=str(item["name"]),
+            expression=str(item["expression"]),
+            quarantine=bool(item.get("quarantine", True)),
+        )
+        for item in expressions
+    ]
+    return QualityRules(**normalized)
 
 
 _KNOWN_PARAMS = {

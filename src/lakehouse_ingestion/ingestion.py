@@ -16,7 +16,7 @@ from pyspark.sql import functions as F
 
 from .config import CONFIG, FrameworkConfig  # noqa: F401
 from .lineage import capture_explain, write_explain_plan, write_openlineage_event
-from .plan import IngestionPlan, QualityRules, build_plan_from_kwargs  # noqa: F401
+from .plan import IngestionPlan, QualityExpression, QualityRules, build_plan_from_kwargs  # noqa: F401
 from .quality import evaluate_quality, is_abort_only_failure, write_quality_results, write_quarantine
 from .schema import (
     build_custom_keys,
@@ -83,6 +83,7 @@ def _prepare_dataframe(
     plan: IngestionPlan,
     run_id: str,
     run_date: str,
+    run_ts: str,
     wm_prev: Optional[str],
 ) -> DataFrame:
     """Aplica todas as transformações pré-quality em ordem determinística.
@@ -109,6 +110,7 @@ def _prepare_dataframe(
     df = fix_encoding(df, plan.fix_encoding, plan.encoding, plan.encoding_columns)
     df = (
         df.withColumn("ingestion_date", F.to_date(F.lit(run_date)))
+        .withColumn("ingestion_ts_utc", F.lit(run_ts).cast("timestamp"))
         .withColumn("source_system", F.lit(plan.source_system))
         .withColumn("__run_id", F.lit(run_id))
     )
@@ -159,6 +161,13 @@ def _validate_plan(
         raise ValueError(f"mode={plan.mode} requer merge_keys")
     if plan.mode == "scd1_hash_diff" and not plan.hash_keys:
         raise ValueError("mode=scd1_hash_diff requer hash_keys")
+    if plan.partition_value and not plan.partition_column:
+        raise ValueError("partition_value requer partition_column")
+    if plan.zorder_columns and not plan.optimize_after_write:
+        logger.warning("zorder_columns foi informado, mas optimize_after_write=false; ZORDER não será executado.")
+    if plan.mode == "scd1_upsert" and plan.merge_strategy in {"delta_by_partition", "replace_partitions"}:
+        if not plan.merge_partition_column:
+            raise ValueError(f"merge_strategy={plan.merge_strategy} requer merge_partition_column")
     if plan.mode == "snapshot_soft_delete":
         if plan.watermark_columns:
             raise ValueError(
@@ -374,7 +383,8 @@ def ingest_plan(plan: IngestionPlan) -> Dict[str, Any]:
             if plan.watermark_columns
             else None
         )
-        prepared_df = _prepare_dataframe(raw_df, plan, run_id, run_date, wm_prev)
+        ingestion_ts = started_dt.strftime("%Y-%m-%d %H:%M:%S.%f")
+        prepared_df = _prepare_dataframe(raw_df, plan, run_id, run_date, ingestion_ts, wm_prev)
         prepared_df = safe_cache(prepared_df, plan.use_cache)
 
         schema_changes = _validate_plan(plan, prepared_df, target, apply_changes=not plan.dry_run)

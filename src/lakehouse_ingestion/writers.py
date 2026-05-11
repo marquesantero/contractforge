@@ -18,7 +18,7 @@ from .schema import (
     hash_from_cols,
     table_exists,
 )
-from ._spark import spark
+from ._spark import detect_serverless, spark
 from ._sql import q, qt, sql_lit, validate_cols
 
 logger = logging.getLogger("lakehouse_ingestion")
@@ -268,9 +268,10 @@ def write_scd1_hash_diff(
     """Modo ``scd1_hash_diff``: APPEND apenas de linhas novas ou alteradas.
 
     Calcula ``row_hash`` da source, deduplica o "atual" do target via
-    ``latest_order_expr`` (default ``"ingestion_date DESC NULLS LAST"`` se a
-    coluna existir) e faz LEFT JOIN para detectar mudanças. Linhas com hash
-    diferente ou sem match no target são escritas.
+    ``latest_order_expr`` quando informado. Sem expressão explícita, usa
+    ``ingestion_sequence`` ou ``ingestion_ts_utc`` quando disponíveis. O fallback
+    antigo em ``ingestion_date`` só é aceito se não houver múltiplas versões por
+    chave no target, porque a data não ordena execuções no mesmo dia.
     """
     validate_cols(df, hash_keys, "hash_keys")
     df_hashed = add_row_hash(df, hash_exclude)
@@ -305,14 +306,42 @@ def write_scd1_hash_diff(
 
     if latest_order_expr:
         order_expr = latest_order_expr
-    elif "ingestion_date" in target_cols:
-        order_expr = "ingestion_date DESC NULLS LAST"
+    elif "ingestion_sequence" in target_cols:
+        order_expr = "ingestion_sequence DESC NULLS LAST"
+    elif "ingestion_ts_utc" in target_cols:
+        order_expr = "ingestion_ts_utc DESC NULLS LAST, __run_id DESC NULLS LAST"
+        ambiguous_legacy = (
+            target_df.groupBy(*hash_keys)
+            .agg(F.count(F.lit(1)).alias("__cnt"), F.max(F.col("ingestion_ts_utc")).alias("__max_ingestion_ts_utc"))
+            .where((F.col("__cnt") > 1) & F.col("__max_ingestion_ts_utc").isNull())
+            .limit(1)
+            .count()
+        )
+        if ambiguous_legacy:
+            raise ValueError(
+                "scd1_hash_diff encontrou múltiplas versões por chave com ingestion_ts_utc nulo no target. "
+                "Informe dedup_order_expr para migração do histórico legado ou regrave o target com "
+                "ingestion_ts_utc/ingestion_sequence."
+            )
     else:
         order_expr = None
 
     if order_expr:
         target_latest = deduplicate_by_order(target_df, hash_keys, order_expr)
     else:
+        duplicate_key = (
+            target_df.groupBy(*hash_keys)
+            .count()
+            .where(F.col("count") > 1)
+            .limit(1)
+            .count()
+        )
+        if duplicate_key:
+            raise ValueError(
+                "scd1_hash_diff encontrou múltiplas versões por chave no target, mas não há ordenação "
+                "determinística para escolher o último estado. Informe dedup_order_expr ou regrave o target "
+                "com ingestion_ts_utc/ingestion_sequence."
+            )
         target_latest = target_df
 
     target_hash = target_latest.select(*hash_keys, F.col("row_hash").alias("__tgt_row_hash"))
@@ -357,10 +386,32 @@ def write_snapshot_soft_delete(
     if count == 0:
         return 0
 
-    dt = DeltaTable.forName(spark, target)
     cond = " AND ".join([f"t.{q(k)} <=> s.{q(k)}" for k in keys])
     update_cols = {c: f"s.{q(c)}" for c in df_src.columns if c not in keys}
     insert_cols = {c: f"s.{q(c)}" for c in df_src.columns}
+    if detect_serverless():
+        source_view = f"__snapshot_src_{uuid.uuid4().hex}"
+        df_src.createOrReplaceTempView(source_view)
+        update_set = ", ".join(f"t.{q(c)} = s.{q(c)}" for c in df_src.columns if c not in keys)
+        insert_cols_sql = ", ".join(q(c) for c in df_src.columns)
+        insert_vals_sql = ", ".join(f"s.{q(c)}" for c in df_src.columns)
+        try:
+            spark.sql(f"""
+                MERGE INTO {qt(target)} t
+                USING {q(source_view)} s
+                ON {cond}
+                WHEN MATCHED AND (NOT (t.row_hash <=> s.row_hash) OR t.is_active = false)
+                    THEN UPDATE SET {update_set}
+                WHEN NOT MATCHED THEN INSERT ({insert_cols_sql}) VALUES ({insert_vals_sql})
+                WHEN NOT MATCHED BY SOURCE AND t.is_active = true THEN UPDATE SET
+                    t.is_active = false,
+                    t.deleted_at = current_timestamp()
+            """)
+        finally:
+            spark.catalog.dropTempView(source_view)
+        return count
+
+    dt = DeltaTable.forName(spark, target)
     (
         dt.alias("t")
         .merge(df_src.alias("s"), cond)

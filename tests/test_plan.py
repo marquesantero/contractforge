@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import pytest
 
-from lakehouse_ingestion import IngestionPlan, QualityRules, ingest
+from lakehouse_ingestion import IngestionPlan, QualityExpression, QualityRules, ingest
 from lakehouse_ingestion.plan import (
     build_plan_from_kwargs,
     normalize_quality_rules,
@@ -80,6 +80,22 @@ def test_build_plan_quality_rules_dict():
     )
     assert isinstance(plan.quality_rules, QualityRules)
     assert plan.quality_rules.not_null == ["id"]
+
+
+def test_build_plan_quality_rules_expressions_dict():
+    plan = build_plan_from_kwargs(
+        source="x",
+        target_table="t",
+        quality_rules={
+            "expressions": [
+                {"name": "positive_amount", "expression": "amount > 0"},
+                {"name": "valid_period", "expression": "end_date >= start_date", "quarantine": False},
+            ]
+        },
+    )
+    assert isinstance(plan.quality_rules.expressions[0], QualityExpression)
+    assert plan.quality_rules.expressions[0].quarantine is True
+    assert plan.quality_rules.expressions[1].quarantine is False
 
 
 def test_ingest_rejects_unknown_kwargs(monkeypatch):
