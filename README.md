@@ -119,9 +119,9 @@ O framework cria tabelas de controle no schema configurado:
 
 Em falha, `ctrl_ingestion_runs.error_message` guarda uma mensagem curta para consulta rápida e `ctrl_ingestion_errors.stack_trace` guarda o traceback completo.
 
-`idempotency_key` permite identificar um lote lógico. Com `skip_if_success=True`, uma nova execução com a mesma chave e `target_table` é retornada como `SKIPPED` se já houver uma execução `SUCCESS`.
+`idempotency_key` permite identificar um lote lógico. Use `idempotency_policy` para controlar reexecuções: `always_run`, `skip_if_success`, `fail_if_success` ou `rerun_if_failed`. O parâmetro legado `skip_if_success=True` continua aceito e equivale a `idempotency_policy="skip_if_success"` quando a política explícita não é informada.
 
-O retorno preserva `rows_written` como métrica lógica da biblioteca e inclui `metrics_source`, `framework_version`, `ctrl_schema_version`, `runtime_type`, `spark_version` e `python_version`:
+O retorno preserva `rows_written` como métrica lógica da biblioteca, expõe `rows_inserted`, `rows_updated`, `rows_deleted` e inclui `metrics_source`, `framework_version`, `ctrl_schema_version`, `runtime_type`, `spark_version` e `python_version`:
 
 - `logical`: apenas contadores calculados pela biblioteca.
 - `mixed`: contadores lógicos com evidência adicional do histórico Delta.

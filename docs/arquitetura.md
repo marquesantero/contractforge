@@ -1,6 +1,6 @@
 # Lakehouse Ingestion Framework — Arquitetura e Referência Técnica
 
-**Versão do pacote:** `1.0.5`
+**Versão do pacote:** `1.0.6`
 **Pacote Python:** `lakehouse-ingestion-framework`
 **Import principal:** `lakehouse_ingestion`
 **Ambiente-alvo:** Databricks Runtime, Unity Catalog, Delta Lake (também roda em PySpark + delta-spark fora do Databricks)
@@ -640,11 +640,11 @@ run_id, target_table, rule_name, error_reason, record_payload, quarantined_at_ut
 
 #### 4.8.1 `ensure_ctrl_tables(catalog, schema)`
 
-Idempotente: cria o schema (`CREATE SCHEMA IF NOT EXISTS`) e cada uma das 7 tabelas (`CREATE TABLE IF NOT EXISTS`). Retorna dict `{logical_name -> full_qualified_name}`.
+Idempotente: cria o schema (`CREATE SCHEMA IF NOT EXISTS`) e cada ctrl table (`CREATE TABLE IF NOT EXISTS`). Retorna dict `{logical_name -> full_qualified_name}`.
 
 Schemas detalhados estão em [§9](#9-tabelas-de-controle--esquemas-e-papéis).
 
-**Importante:** o framework não migra schemas de ctrl tables se você atualizar o pacote e a definição mudar. Em produção, trate isso como migração manual ou apague e recrie o schema `ops` em ambiente de teste antes de subir.
+**Importante:** o framework aplica apenas migrações aditivas conhecidas (`ALTER TABLE ADD COLUMNS`). Nunca remove ou renomeia colunas automaticamente.
 
 #### 4.8.2 `log_run(tables, payload)`
 
@@ -668,13 +668,13 @@ Existe **uma linha por target_table** — sempre o estado mais recente. Históri
 
 ```sql
 MERGE INTO ctrl_ingestion_locks
-USING (SELECT target, run_id, NOW(), NOW()+INTERVAL X MINUTES, 'ACTIVE') s
+USING (SELECT target, run_id, owner, NOW(), NOW()+INTERVAL X MINUTES, ttl, NULL, 'ACTIVE') s
 ON t.target_table = s.target_table
 WHEN MATCHED AND (status <> 'ACTIVE' OR expires < NOW()) THEN UPDATE *
 WHEN NOT MATCHED THEN INSERT *
 ```
 
-Depois faz `read.table(...).where(target).first()` para confirmar que o `run_id` ficou. Se outro `run_id` venceu, ergue `RuntimeError`.
+Depois faz `read.table(...).where(target).first()` para confirmar que o `run_id` ficou. Se outro `run_id` venceu, ergue `RuntimeError` com `owner`, `acquired_at_utc`, `expires_at_utc` e `ttl_minutes`.
 
 **Best-effort.** Há uma janela de corrida: `MERGE` e o read-back não são atômicos do ponto de vista da linha. Documentado no docstring. Para correção forte, confiar no Delta optimistic concurrency control + retry.
 
@@ -721,7 +721,7 @@ Se não existe → cria com schema vazio (`df.limit(0)`) usando `mergeSchema=tru
 
 Lêem `DESCRIBE HISTORY ... LIMIT 1`. Cada chamada é uma query Spark (não é cacheado). O orquestrador chama estrategicamente: uma vez antes (`delta_version_before`), uma vez depois (`delta_version_after`), e mais uma para `operationMetrics`.
 
-#### 4.9.3 `extract_row_metrics(metrics)`
+#### 4.9.3 `extract_row_metrics(metrics)` e `resolve_write_metrics(...)`
 
 Mapeia `operationMetrics` do Delta:
 
@@ -734,6 +734,8 @@ Mapeia `operationMetrics` do Delta:
 ```
 
 **Heurística:** para MERGE, Delta retorna os três `numTargetRows*`. Para APPEND/WRITE, só `numOutputRows`. Caímos para `numOutputRows` em `rows_inserted` quando o primeiro nome falta — isso vale para `scd0_append` e `scd1_hash_diff`.
+
+`resolve_write_metrics` sempre adiciona `operation_metrics.logicalMetrics` com os contadores calculados pela biblioteca. Quando o Delta history traz `operationMetrics`, `metrics_source="mixed"`; caso contrário, `metrics_source="logical"`.
 
 Limitação: para `scd0_overwrite` o mapping fica enganoso (overwrite tecnicamente "deleta tudo e insere"). O Delta retorna `numOutputRows` mas as linhas anteriores não aparecem em `numTargetRowsDeleted` (essa métrica só existe em DELETE/MERGE). Tratamos como insert simples — auditoria fina deve consultar `DESCRIBE HISTORY`.
 
@@ -1043,6 +1045,7 @@ Todas vivem em `<catalog>.<ctrl_schema>` (default `<catalog>.ops`). Todas USING 
 | `delta_version_before`, `delta_version_after`, `write_committed`                                 | BIGINT, BOOLEAN   | atomicidade                      |
 | `error_message`                                                                                  | STRING            | mensagem curta do erro            |
 | `parent_run_id`, `run_group_id`, `master_job_id`, `master_run_id`                                | STRING            | linhagem operacional             |
+| `idempotency_key`, `idempotency_policy`, `skip_reason`, `skipped_by_run_id`                      | STRING            | idempotência e skips             |
 | `framework_version`, `ctrl_schema_version`                                                       | STRING, BIGINT    | versão da lib e das ctrl tables  |
 | `runtime_type`, `spark_version`, `python_version`                                                | STRING            | ambiente de execução             |
 
@@ -1115,7 +1118,7 @@ Uma linha **por target_table** (PK). Renovada a cada execução.
 
 | Campo                                                                        |
 | ---------------------------------------------------------------------------- |
-| `target_table` (PK), `run_id`, `acquired_at_utc`, `expires_at_utc`, `status` |
+| `target_table` (PK), `run_id`, `owner`, `acquired_at_utc`, `expires_at_utc`, `ttl_minutes`, `released_at_utc`, `status` |
 
 `status` ∈ `{ACTIVE, RELEASED}`. Locks expirados são "rompidos" no próximo `acquire_lock`.
 
@@ -1314,7 +1317,7 @@ python -m build
 twine check dist/*
 ```
 
-Gera `dist/lakehouse_ingestion_framework-1.0.5-py3-none-any.whl` e `.tar.gz`.
+Gera `dist/lakehouse_ingestion_framework-1.0.6-py3-none-any.whl` e `.tar.gz`.
 
 ### 14.2 Instalação no Databricks
 

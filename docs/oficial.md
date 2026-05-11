@@ -1,7 +1,7 @@
 # Lakehouse Ingestion Framework
 
 **Documentação oficial**  
-**Versão da biblioteca:** `1.0.5`  
+**Versão da biblioteca:** `1.0.6`  
 **Pacote:** `lakehouse-ingestion-framework`  
 **Import principal:** `lakehouse_ingestion`  
 **Ambiente-alvo:** Databricks, Unity Catalog e Delta Lake  
@@ -574,6 +574,7 @@ ingest(
 | `quality_rules` | `QualityRules | Dict | None` | `None` | Regras de qualidade executadas antes da escrita. |
 | `on_quality_fail` | `"fail" | "warn" | "quarantine"` | `"fail"` | Ação quando regras falham. |
 | `idempotency_key` | `str | None` | `None` | Chave lógica opcional do lote. |
+| `idempotency_policy` | `"always_run" | "skip_if_success" | "fail_if_success" | "rerun_if_failed"` | `"always_run"` | Política explícita de reexecução para a chave lógica. |
 | `skip_if_success` | `bool` | `False` | Se `True`, retorna `SKIPPED` quando já existe execução `SUCCESS` para o mesmo target e `idempotency_key`. |
 
 Campos de `QualityRules`:
@@ -735,6 +736,9 @@ A função retorna um dicionário com métricas e metadados.
 | `mode` | Modo de escrita executado. |
 | `rows_read` | Quantidade de linhas após preparação. |
 | `rows_written` | Quantidade de linhas consideradas na escrita. |
+| `rows_inserted` | Linhas inseridas conforme Delta history ou fallback lógico. |
+| `rows_updated` | Linhas atualizadas conforme Delta history ou fallback lógico. |
+| `rows_deleted` | Linhas removidas/marcadas conforme Delta history ou fallback lógico. |
 | `rows_quarantined` | Quantidade de registros enviados à quarentena. |
 | `metrics_source` | Origem das métricas: `logical` ou `mixed`. |
 | `framework_version` | Versão da biblioteca que executou a ingestão. |
@@ -754,6 +758,8 @@ A função retorna um dicionário com métricas e metadados.
 | `explain_captured` | Indica se o explain foi capturado. |
 | `openlineage_event_emitted` | Indica se o evento OpenLineage foi persistido. |
 | `openlineage_event` | Evento OpenLineage em formato de dicionário. |
+| `idempotency_key`, `idempotency_policy` | Chave e política de idempotência usadas. |
+| `skip_reason`, `skipped_by_run_id` | Motivo e execução original quando `status="SKIPPED"`. |
 | `error_message` | Mensagem curta do erro, quando houver falha. |
 
 Exemplo de consumo:
@@ -808,6 +814,7 @@ Principais colunas:
 | `delta_version_before` | Versão Delta antes. |
 | `delta_version_after` | Versão Delta depois. |
 | `error_message` | Mensagem curta do erro. Stack completo fica em `ctrl_ingestion_errors`. |
+| `idempotency_policy`, `skip_reason`, `skipped_by_run_id` | Controle de idempotência e reexecução. |
 | `framework_version`, `ctrl_schema_version` | Versões da biblioteca e do schema de controle. |
 | `runtime_type`, `spark_version`, `python_version` | Metadados do runtime para suporte e auditoria. |
 
@@ -915,8 +922,11 @@ Reserva operacional best-effort por tabela alvo.
 |---|---|
 | `target_table` | Tabela protegida. |
 | `run_id` | Execução que adquiriu o lock. |
+| `owner` | Dono operacional do lock. |
 | `acquired_at_utc` | Momento de aquisição. |
 | `expires_at_utc` | Expiração por TTL. |
+| `ttl_minutes` | TTL configurado. |
+| `released_at_utc` | Momento de liberação. |
 | `status` | `ACTIVE` ou `RELEASED`. |
 
 O lock não é uma exclusão pessimista distribuída. Ele reduz colisões operacionais, mas a consistência final continua baseada no controle otimista do Delta Lake.
@@ -1322,7 +1332,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "lakehouse-ingestion-framework"
-version = "1.0.5"
+version = "1.0.6"
 description = "Framework de ingestão Delta Lake para Databricks com contratos declarativos, quality gates, SCD, explain mode e eventos OpenLineage."
 readme = "README.md"
 requires-python = ">=3.10"
