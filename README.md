@@ -63,20 +63,32 @@ result = ingest(
 - `scd0_append`: inserção imutável.
 - `scd0_overwrite`: substituição total ou por partição.
 - `scd1_upsert`: atualização do estado atual por chaves.
-- `scd1_hash_diff`: inserção apenas de versões novas ou alteradas por hash.
+- `scd1_hash_diff`: inserção apenas de versões novas ou alteradas por hash. O framework mantém `ingestion_ts_utc` como coluna técnica para ordenar o último estado quando `dedup_order_expr` não é informado.
 - `scd2_historical`: histórico completo com `valid_from`, `valid_to` e `is_current`. Reaparições de chaves não correntes criam uma nova versão atual.
-- `snapshot_soft_delete`: sincronização por snapshot com marcação de ausentes em `is_active` e `deleted_at`. Exige source completo — o framework rejeita com `ValueError` quando combinado com `watermark_columns` ou `filter_expression`.
+- `snapshot_soft_delete`: sincronização por snapshot com marcação de ausentes em `is_active` e `deleted_at`. Exige source completo — o framework rejeita com `ValueError` quando combinado com `watermark_columns` ou `filter_expression`. Em Databricks Serverless, usa `MERGE` SQL para evitar a API Python `DeltaTable`.
 
 ## Quality gates
 
 Definidas via parâmetro `quality_rules` (dict ou `QualityRules`):
 
-- `required_columns`, `not_null`, `unique_key`, `accepted_values`, `min_rows`, `max_null_ratio`.
+- `required_columns`, `not_null`, `unique_key`, `accepted_values`, `min_rows`, `max_null_ratio`, `expressions`.
 - A avaliação consolida regras de coluna numa única agregação para reduzir I/O em datasets grandes.
 - A ação em falha (`on_quality_fail`) pode ser:
   - `fail` (padrão): aborta a execução.
   - `warn`: registra mas escreve tudo.
   - `quarantine`: linhas problemáticas vão para `ctrl_ingestion_quarantine`; o restante é gravado e `effective_rows = rows_read - rows_quarantined`. **Vale apenas para regras de linha** (`not_null`, `accepted_values`, `max_null_ratio`). Regras de conjunto (`unique_key`, `min_rows`, `required_columns`) não têm como isolar linhas e escalam automaticamente para `fail`.
+
+Exemplo de regra complexa aditiva:
+
+```python
+quality_rules={
+    "not_null": ["order_id"],
+    "expressions": [
+        {"name": "positive_amount", "expression": "amount > 0", "quarantine": True},
+        {"name": "valid_period", "expression": "end_date >= start_date", "quarantine": True},
+    ],
+}
+```
 
 ## Schema policy
 

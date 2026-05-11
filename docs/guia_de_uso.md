@@ -387,7 +387,12 @@ quality_rules:
   not_null: [id_pedido, data_atualizacao]
   accepted_values:
     status: [PENDENTE, PAGO, CANCELADO, ENTREGUE]
+  expressions:
+    - name: valor_total_positivo
+      expression: "valor_total > 0"
+      quarantine: true
 # `quarantine` só isola linhas atingidas por not_null/accepted_values/max_null_ratio.
+# expressions com quarantine=true também são isoláveis.
 # Regras de conjunto (unique_key, min_rows, required_columns) escalam para fail.
 on_quality_fail: quarantine
 ```

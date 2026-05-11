@@ -248,6 +248,7 @@ Características:
 - Calcula `row_hash` sobre as colunas de negócio.
 - Exclui colunas técnicas e colunas configuradas em `hash_exclude_columns`.
 - Compara o hash atual com a última versão conhecida por `hash_keys`.
+- Usa `dedup_order_expr` quando informado. Sem expressão explícita, usa `ingestion_sequence` ou `ingestion_ts_utc`; targets legados com múltiplas versões por chave e sem ordenação confiável falham com mensagem objetiva.
 - Evita operações `UPDATE` em larga escala, privilegiando escrita append-only.
 - Pode reduzir leitura do target quando `partition_column` está presente.
 
@@ -316,6 +317,7 @@ Características:
 - Marca registros ausentes no snapshot como `is_active=false`.
 - Preenche `deleted_at` com o timestamp da execução.
 - Pressupõe snapshot completo da entidade. **Não pode ser combinado com `watermark_columns` ou `filter_expression`** — o framework rejeita com `ValueError` no `_validate_plan`. Para sincronização incremental, use `scd1_upsert`.
+- Em Databricks Serverless, executa `MERGE` SQL para evitar a API Python `DeltaTable`, que pode não estar disponível em Spark Connect.
 
 Exemplo:
 
@@ -580,6 +582,7 @@ Campos de `QualityRules`:
 | `accepted_values` | `Dict[str, List[Any]]` | Valores permitidos por coluna. Limitado por `CONFIG.max_inline_accepted_values`. |
 | `min_rows` | `int | None` | Quantidade mínima de registros após preparação. |
 | `max_null_ratio` | `Dict[str, float]` | Percentual máximo de nulos por coluna, entre 0 e 1. |
+| `expressions` | `List[QualityExpression]` | Expressões SQL booleanas nomeadas. Valores `false` ou `NULL` falham. |
 
 Ações:
 
@@ -605,11 +608,14 @@ ingest(
         "unique_key": ["order_id"],
         "accepted_values": {"status": ["open", "closed", "cancelled"]},
         "min_rows": 1,
-        "max_null_ratio": {"customer_email": 0.20}
+        "max_null_ratio": {"customer_email": 0.20},
+        "expressions": [
+            {"name": "positive_amount", "expression": "amount > 0", "quarantine": True}
+        ],
     },
     # unique_key, min_rows e required_columns são abort-only: a falha aborta
-    # a execução. Para quarentena efetiva, remova-as e use apenas not_null,
-    # accepted_values e max_null_ratio.
+    # a execução. Para quarentena efetiva, remova-as e use regras de linha:
+    # not_null, accepted_values, max_null_ratio ou expressions com quarantine=true.
     on_quality_fail="fail"
 )
 ```
