@@ -124,6 +124,9 @@ def ensure_ctrl_tables(catalog: str, schema: str) -> Dict[str, str]:
             master_job_id STRING,
             master_run_id STRING,
             idempotency_key STRING,
+            idempotency_policy STRING,
+            skip_reason STRING,
+            skipped_by_run_id STRING,
             metrics_source STRING,
             framework_version STRING,
             ctrl_schema_version BIGINT,
@@ -178,8 +181,11 @@ def ensure_ctrl_tables(catalog: str, schema: str) -> Dict[str, str]:
         CREATE TABLE IF NOT EXISTS {qt(tables['locks'])} (
             target_table STRING NOT NULL,
             run_id STRING,
+            owner STRING,
             acquired_at_utc TIMESTAMP,
             expires_at_utc TIMESTAMP,
+            ttl_minutes BIGINT,
+            released_at_utc TIMESTAMP,
             status STRING,
             CONSTRAINT pk_lock PRIMARY KEY (target_table)
         ) USING DELTA
@@ -239,12 +245,23 @@ def ensure_ctrl_tables(catalog: str, schema: str) -> Dict[str, str]:
         tables["runs"],
         {
             "idempotency_key": "STRING",
+            "idempotency_policy": "STRING",
+            "skip_reason": "STRING",
+            "skipped_by_run_id": "STRING",
             "metrics_source": "STRING",
             "framework_version": "STRING",
             "ctrl_schema_version": "BIGINT",
             "runtime_type": "STRING",
             "spark_version": "STRING",
             "python_version": "STRING",
+        },
+    )
+    _add_columns_if_missing(
+        tables["locks"],
+        {
+            "owner": "STRING",
+            "ttl_minutes": "BIGINT",
+            "released_at_utc": "TIMESTAMP",
         },
     )
     _record_ctrl_metadata(tables)
@@ -260,8 +277,9 @@ _RUN_COLUMNS = [
     "operation_metrics_json", "write_started_at_utc", "write_finished_at_utc",
     "delta_version_before", "delta_version_after", "write_committed", "error_message",
     "parent_run_id", "run_group_id", "master_job_id", "master_run_id",
-    "idempotency_key", "metrics_source", "framework_version", "ctrl_schema_version",
-    "runtime_type", "spark_version", "python_version",
+    "idempotency_key", "idempotency_policy", "skip_reason", "skipped_by_run_id",
+    "metrics_source", "framework_version", "ctrl_schema_version", "runtime_type",
+    "spark_version", "python_version",
 ]
 _RUN_INT_COLUMNS = {
     "rows_read", "rows_written", "rows_inserted", "rows_updated", "rows_deleted",
@@ -329,24 +347,40 @@ def log_error(tables: Dict[str, str], payload: Dict[str, Any]) -> None:
     )
 
 
-def has_successful_run(tables: Dict[str, str], target: str, idempotency_key: Optional[str]) -> bool:
-    """Indica se uma execução anterior com a mesma chave já terminou com sucesso."""
+def find_idempotent_run(
+    tables: Dict[str, str],
+    target: str,
+    idempotency_key: Optional[str],
+    status: Optional[str] = None,
+) -> Optional[Dict[str, Any]]:
+    """Retorna a execução mais recente para ``target`` + ``idempotency_key``."""
     if not idempotency_key:
-        return False
+        return None
     try:
-        return (
+        query = (
             spark.read.table(tables["runs"])
             .where(
                 (F.col("target_table") == target)
                 & (F.col("idempotency_key") == idempotency_key)
-                & (F.col("status") == "SUCCESS")
             )
-            .limit(1)
-            .count()
-            > 0
         )
+        if status:
+            query = query.where(F.col("status") == status)
+        row = (
+            query.orderBy(F.col("run_ts_utc").desc_nulls_last())
+            .select("run_id", "status")
+            .limit(1)
+            .first()
+        )
+        return None if row is None else row.asDict(recursive=True)
     except Exception:
-        return False
+        return None
+
+
+def has_successful_run(tables: Dict[str, str], target: str, idempotency_key: Optional[str]) -> bool:
+    """Indica se uma execução anterior com a mesma chave já terminou com sucesso."""
+    previous = find_idempotent_run(tables, target, idempotency_key, status="SUCCESS")
+    return bool(previous and previous.get("status") == "SUCCESS")
 
 
 def upsert_state(
@@ -416,6 +450,7 @@ def acquire_lock(
     tables: Dict[str, str],
     target: str,
     run_id: str,
+    owner: Optional[str] = None,
     ttl_minutes: int = CONFIG.default_lock_ttl_minutes,
 ) -> None:
     """Tenta adquirir lock best-effort em ``target_table``.
@@ -437,8 +472,11 @@ def acquire_lock(
             SELECT
                 {sql_lit(target)} AS target_table,
                 {sql_lit(run_id)} AS run_id,
+                {sql_lit(owner)} AS owner,
                 current_timestamp() AS acquired_at_utc,
                 current_timestamp() + INTERVAL {int(ttl_minutes)} MINUTES AS expires_at_utc,
+                {sql_int(ttl_minutes)} AS ttl_minutes,
+                CAST(NULL AS TIMESTAMP) AS released_at_utc,
                 'ACTIVE' AS status
         ) s
         ON t.target_table = s.target_table
@@ -448,11 +486,15 @@ def acquire_lock(
     row = (
         spark.read.table(tables["locks"])
         .where(F.col("target_table") == target)
-        .select("run_id", "status", "expires_at_utc")
+        .select("run_id", "owner", "status", "acquired_at_utc", "expires_at_utc", "ttl_minutes")
         .first()
     )
-    if row is None or row[0] != run_id or row[1] != "ACTIVE":
-        raise RuntimeError(f"Não foi possível adquirir lock para {target}. Lock atual: {row}")
+    if row is None or row[0] != run_id or row[2] != "ACTIVE":
+        details = None if row is None else row.asDict(recursive=True)
+        raise RuntimeError(
+            f"Lock ocupado para {target}. Este run_id={run_id} não adquiriu o lock. "
+            f"Lock atual: {details}"
+        )
 
 
 def release_lock(tables: Dict[str, str], target: str, run_id: str) -> None:
@@ -460,7 +502,8 @@ def release_lock(tables: Dict[str, str], target: str, run_id: str) -> None:
     try:
         spark.sql(f"""
             UPDATE {qt(tables['locks'])}
-            SET status = 'RELEASED'
+            SET status = 'RELEASED',
+                released_at_utc = current_timestamp()
             WHERE target_table = {sql_lit(target)} AND run_id = {sql_lit(run_id)}
         """)
     except Exception as exc:

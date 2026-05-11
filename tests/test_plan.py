@@ -150,6 +150,23 @@ def test_build_plan_accepts_idempotency_options():
     )
     assert plan.idempotency_key == "job-42:batch-2026-05-11"
     assert plan.skip_if_success is True
+    assert plan.idempotency_policy == "skip_if_success"
+
+
+def test_build_plan_accepts_explicit_idempotency_policy():
+    plan = build_plan_from_kwargs(
+        source="x",
+        target_table="t",
+        idempotency_key="job-42:batch-2026-05-11",
+        idempotency_policy="fail_if_success",
+        skip_if_success=True,
+    )
+    assert plan.idempotency_policy == "fail_if_success"
+
+
+def test_build_plan_rejects_invalid_idempotency_policy():
+    with pytest.raises(ValueError, match="idempotency_policy"):
+        build_plan_from_kwargs(source="x", target_table="t", idempotency_policy="skip_maybe")
 
 
 def test_build_plan_accepts_replace_partitions_source_complete():

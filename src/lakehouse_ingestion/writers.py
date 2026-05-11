@@ -113,6 +113,44 @@ def extract_row_metrics(metrics: Dict[str, Any]) -> Dict[str, int]:
     }
 
 
+def logical_row_metrics(plan: IngestionPlan, rows_written: int) -> Dict[str, int]:
+    """Contadores lógicos calculados pela lib quando Delta history é insuficiente."""
+    metrics = {
+        "rows_inserted": 0,
+        "rows_updated": 0,
+        "rows_deleted": 0,
+        "rows_affected": int(rows_written or 0),
+    }
+    if rows_written <= 0:
+        return metrics
+    if plan.mode in {"scd0_append", "scd0_overwrite", "scd1_hash_diff", "scd2_historical"}:
+        metrics["rows_inserted"] = rows_written
+    elif plan.mode == "scd1_upsert" and plan.merge_strategy == "replace_partitions":
+        metrics["rows_inserted"] = rows_written
+    return metrics
+
+
+def resolve_write_metrics(
+    plan: IngestionPlan,
+    rows_written: int,
+    delta_metrics: Dict[str, Any],
+) -> tuple[Dict[str, int], Dict[str, Any], str]:
+    """Combina métricas lógicas da lib com evidência do Delta history.
+
+    Retorna ``(row_metrics, operation_metrics, metrics_source)``. O campo
+    ``operation_metrics.logicalMetrics`` sempre existe para manter rastreio
+    consistente mesmo quando ``DESCRIBE HISTORY`` varia por runtime.
+    """
+    logical = logical_row_metrics(plan, rows_written)
+    operation_metrics = dict(delta_metrics or {})
+    operation_metrics["logicalMetrics"] = logical
+    if operation_metrics.get("operationMetrics"):
+        row_metrics = extract_row_metrics(operation_metrics)
+        row_metrics["rows_affected"] = logical["rows_affected"]
+        return row_metrics, operation_metrics, "mixed"
+    return logical, operation_metrics, "logical"
+
+
 def affected_partition_values(df: DataFrame, partition_col: Optional[str]) -> List[Any]:
     """Coleta valores distintos da coluna de partição até o limite configurado.
 

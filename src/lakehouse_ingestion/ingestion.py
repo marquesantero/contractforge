@@ -41,7 +41,7 @@ from .state import (
     acquire_lock,
     ctrl_table_names,
     ensure_ctrl_tables,
-    has_successful_run,
+    find_idempotent_run,
     log_error,
     log_run,
     release_lock,
@@ -53,8 +53,8 @@ from .writers import (
     affected_partition_values,
     delta_version,
     execute_write_mode,
-    extract_row_metrics,
     latest_operation_metrics,
+    resolve_write_metrics,
     run_optimize,
     write_strategy,
 )
@@ -69,6 +69,65 @@ def _short_error_message(error: Optional[str]) -> Optional[str]:
         return None
     lines = [line.strip() for line in error.splitlines() if line.strip()]
     return safe_truncate(lines[-1] if lines else error, 2000)
+
+
+def _lock_owner(plan: IngestionPlan) -> str:
+    """Identifica o dono operacional do lock para diagnóstico."""
+    return plan.master_run_id or plan.run_group_id or plan.parent_run_id or plan.notebook_name
+
+
+def _effective_idempotency_policy(plan: IngestionPlan) -> str:
+    """Mantém compatibilidade para planos criados diretamente com ``skip_if_success``."""
+    if plan.skip_if_success and plan.idempotency_policy == "always_run":
+        return "skip_if_success"
+    return plan.idempotency_policy
+
+
+def _skip_result(
+    plan: IngestionPlan,
+    run_id: str,
+    target: str,
+    source_name: str,
+    metrics_source: str,
+    runtime_meta: Dict[str, Optional[str]],
+    skip_reason: str,
+    skipped_by_run_id: Optional[str],
+) -> Dict[str, Any]:
+    """Payload padronizado para execuções puladas por idempotência."""
+    return {
+        "status": "SKIPPED",
+        "run_id": run_id,
+        "target_table": target,
+        "source_table": source_name,
+        "mode": plan.mode,
+        "rows_read": 0,
+        "rows_written": 0,
+        "rows_inserted": 0,
+        "rows_updated": 0,
+        "rows_deleted": 0,
+        "rows_quarantined": 0,
+        "watermark_previous": None,
+        "watermark_current": None,
+        "quality_status": "SKIPPED",
+        "schema_changes": {},
+        "operation_metrics": {},
+        "metrics_source": metrics_source,
+        "write_committed": False,
+        "delta_version_before": None,
+        "delta_version_after": None,
+        "write_delta_version": None,
+        "explain_captured": False,
+        "openlineage_event_emitted": False,
+        "openlineage_event": None,
+        "error_message": None,
+        "idempotency_key": plan.idempotency_key,
+        "idempotency_policy": _effective_idempotency_policy(plan),
+        "skip_reason": skip_reason,
+        "skipped_by_run_id": skipped_by_run_id,
+        "framework_version": FRAMEWORK_VERSION,
+        "ctrl_schema_version": CTRL_SCHEMA_VERSION,
+        **runtime_meta,
+    }
 
 
 def _resolve_source(plan: IngestionPlan) -> Tuple[DataFrame, str]:
@@ -263,6 +322,9 @@ def _build_dry_run_result(
         "rows_read": rows_read,
         "rows_effective": rows_read - rows_quarantined,
         "rows_written": 0,
+        "rows_inserted": 0,
+        "rows_updated": 0,
+        "rows_deleted": 0,
         "rows_quarantined": rows_quarantined,
         "affected_partitions": affected_partition_values(
             df, plan.partition_column or plan.merge_partition_column
@@ -276,6 +338,7 @@ def _build_dry_run_result(
         "explain_captured": plan.explain_mode,
         "openlineage_enabled": plan.openlineage_enabled,
         "idempotency_key": plan.idempotency_key,
+        "idempotency_policy": _effective_idempotency_policy(plan),
         "framework_version": FRAMEWORK_VERSION,
         "ctrl_schema_version": CTRL_SCHEMA_VERSION,
         **runtime_meta,
@@ -310,6 +373,8 @@ def _finalize_execution(
     row_metrics: Dict[str, int],
     metrics_source: str,
     runtime_meta: Dict[str, Optional[str]],
+    skip_reason: Optional[str],
+    skipped_by_run_id: Optional[str],
 ) -> None:
     """Monta o payload completo e grava em ``ctrl_ingestion_runs`` via ``log_run``.
 
@@ -355,6 +420,9 @@ def _finalize_execution(
             "master_job_id": plan.master_job_id,
             "master_run_id": plan.master_run_id,
             "idempotency_key": plan.idempotency_key,
+            "idempotency_policy": _effective_idempotency_policy(plan),
+            "skip_reason": skip_reason,
+            "skipped_by_run_id": skipped_by_run_id,
             "metrics_source": metrics_source,
             "framework_version": FRAMEWORK_VERSION,
             "ctrl_schema_version": CTRL_SCHEMA_VERSION,
@@ -416,45 +484,38 @@ def ingest_plan(plan: IngestionPlan) -> Dict[str, Any]:
     wm_candidate: Optional[str] = None
     error: Optional[str] = None
     error_type: Optional[str] = None
+    skip_reason: Optional[str] = None
+    skipped_by_run_id: Optional[str] = None
     prepared_df: Optional[DataFrame] = None
     row_metrics: Dict[str, int] = {"rows_inserted": 0, "rows_updated": 0, "rows_deleted": 0}
 
     try:
-        if plan.skip_if_success and has_successful_run(tables, target, plan.idempotency_key):
+        idempotency_policy = _effective_idempotency_policy(plan)
+        previous_success = find_idempotent_run(
+            tables, target, plan.idempotency_key, status="SUCCESS"
+        )
+        previous_status = previous_success.get("status") if previous_success else None
+        previous_run_id = previous_success.get("run_id") if previous_success else None
+        if (
+            idempotency_policy in {"skip_if_success", "rerun_if_failed"}
+            and previous_status == "SUCCESS"
+        ):
             status = "SKIPPED"
             quality_status = "SKIPPED"
-            return {
-                "status": status,
-                "run_id": run_id,
-                "target_table": target,
-                "source_table": source_name,
-                "mode": plan.mode,
-                "rows_read": 0,
-                "rows_written": 0,
-                "rows_quarantined": 0,
-                "watermark_previous": None,
-                "watermark_current": None,
-                "quality_status": "SKIPPED",
-                "schema_changes": {},
-                "operation_metrics": {},
-                "metrics_source": metrics_source,
-                "write_committed": False,
-                "delta_version_before": None,
-                "delta_version_after": None,
-                "write_delta_version": None,
-                "explain_captured": False,
-                "openlineage_event_emitted": False,
-                "openlineage_event": None,
-                "error_message": None,
-                "idempotency_key": plan.idempotency_key,
-                "skip_reason": "idempotency_key_already_succeeded",
-                "framework_version": FRAMEWORK_VERSION,
-                "ctrl_schema_version": CTRL_SCHEMA_VERSION,
-                **runtime_meta,
-            }
+            skip_reason = "idempotency_key_already_succeeded"
+            skipped_by_run_id = previous_run_id
+            return _skip_result(
+                plan, run_id, target, source_name, metrics_source, runtime_meta,
+                skip_reason, skipped_by_run_id,
+            )
+        if idempotency_policy == "fail_if_success" and previous_status == "SUCCESS":
+            raise RuntimeError(
+                "idempotency_policy=fail_if_success bloqueou a execução: "
+                f"idempotency_key={plan.idempotency_key!r} já teve sucesso em run_id={previous_run_id}"
+            )
 
         if plan.lock_enabled and not plan.dry_run:
-            acquire_lock(tables, target, run_id)
+            acquire_lock(tables, target, run_id, owner=_lock_owner(plan))
 
         raw_df, source_name = _resolve_source(plan)
         wm_prev = (
@@ -538,10 +599,11 @@ def ingest_plan(plan: IngestionPlan) -> Dict[str, Any]:
             if plan.watermark_columns and rows_read > 0
             else wm_prev
         )
-        operation_metrics = latest_operation_metrics(target) if table_exists(target) else {}
-        metrics_source = "mixed" if operation_metrics.get("operationMetrics") else "logical"
+        delta_metrics = latest_operation_metrics(target) if table_exists(target) else {}
+        row_metrics, operation_metrics, metrics_source = resolve_write_metrics(
+            plan, rows_written, delta_metrics
+        )
         delta_version_after = operation_metrics.get("version", delta_version_after)
-        row_metrics = extract_row_metrics(operation_metrics)
         upsert_state(
             tables,
             target,
@@ -597,6 +659,7 @@ def ingest_plan(plan: IngestionPlan) -> Dict[str, Any]:
                     quality_status, schema_changes, operation_metrics, write_started_at,
                     write_finished_at, delta_version_before, delta_version_after, write_committed,
                     error, row_metrics, metrics_source, runtime_meta,
+                    skip_reason, skipped_by_run_id,
                 )
             except Exception as log_exc:
                 logger.error(f"Falha ao registrar execução: {log_exc}")
@@ -641,6 +704,9 @@ def ingest_plan(plan: IngestionPlan) -> Dict[str, Any]:
         "mode": plan.mode,
         "rows_read": rows_read,
         "rows_written": rows_written,
+        "rows_inserted": row_metrics.get("rows_inserted", 0),
+        "rows_updated": row_metrics.get("rows_updated", 0),
+        "rows_deleted": row_metrics.get("rows_deleted", 0),
         "rows_quarantined": rows_quarantined,
         "watermark_previous": wm_prev,
         "watermark_current": wm_current,
@@ -657,6 +723,9 @@ def ingest_plan(plan: IngestionPlan) -> Dict[str, Any]:
         "openlineage_event": openlineage_event,
         "error_message": _short_error_message(error),
         "idempotency_key": plan.idempotency_key,
+        "idempotency_policy": _effective_idempotency_policy(plan),
+        "skip_reason": skip_reason,
+        "skipped_by_run_id": skipped_by_run_id,
         "framework_version": FRAMEWORK_VERSION,
         "ctrl_schema_version": CTRL_SCHEMA_VERSION,
         **runtime_meta,

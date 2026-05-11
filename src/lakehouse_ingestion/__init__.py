@@ -16,4 +16,4 @@ __all__ = [
     "ingest_plan",
 ]
 
-__version__ = "1.0.5"
+__version__ = "1.0.6"

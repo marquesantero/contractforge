@@ -6,12 +6,14 @@ from typing import Any, Dict, List, Optional, Union
 
 from .config import (
     CONFIG,
+    IdempotencyPolicy,
     Layer,
     MergeStrategy,
     QualityFailAction,
     SchemaPolicy,
     Source,
     VALID_EXPLAIN_FORMATS,
+    VALID_IDEMPOTENCY_POLICIES,
     VALID_LAYERS,
     VALID_MERGE_STRATEGIES,
     VALID_QUALITY_FAIL_ACTIONS,
@@ -116,6 +118,7 @@ class IngestionPlan:
     use_cache: bool = True
     lock_enabled: bool = False
     idempotency_key: Optional[str] = None
+    idempotency_policy: IdempotencyPolicy = "always_run"
     skip_if_success: bool = False
     parent_run_id: Optional[str] = None
     run_group_id: Optional[str] = None
@@ -191,8 +194,9 @@ _KNOWN_PARAMS = {
     "quality_rules", "on_quality_fail", "scd2_change_columns", "scd2_effective_from_column",
     "fix_encoding", "encoding", "encoding_columns", "dry_run", "explain_mode",
     "explain_format", "openlineage_enabled", "openlineage_namespace",
-    "openlineage_producer", "use_cache", "lock_enabled", "idempotency_key", "skip_if_success",
-    "parent_run_id", "run_group_id", "master_job_id", "master_run_id",
+    "openlineage_producer", "use_cache", "lock_enabled", "idempotency_key",
+    "idempotency_policy", "skip_if_success", "parent_run_id", "run_group_id",
+    "master_job_id", "master_run_id",
 }
 
 
@@ -242,6 +246,15 @@ def build_plan_from_kwargs(**kwargs: Any) -> IngestionPlan:
         "explain_format",
         default="formatted",
     )
+    idempotency_policy = _validate_enum(
+        kwargs.get("idempotency_policy", "always_run"),
+        VALID_IDEMPOTENCY_POLICIES,
+        "idempotency_policy",
+        default="always_run",
+    )
+    skip_if_success = bool(kwargs.get("skip_if_success", False))
+    if skip_if_success and kwargs.get("idempotency_policy") in (None, ""):
+        idempotency_policy = "skip_if_success"
 
     return IngestionPlan(
         source=kwargs["source"],
@@ -285,7 +298,8 @@ def build_plan_from_kwargs(**kwargs: Any) -> IngestionPlan:
         use_cache=bool(kwargs.get("use_cache", True)),
         lock_enabled=bool(kwargs.get("lock_enabled", False)),
         idempotency_key=kwargs.get("idempotency_key"),
-        skip_if_success=bool(kwargs.get("skip_if_success", False)),
+        idempotency_policy=idempotency_policy,  # type: ignore[arg-type]
+        skip_if_success=skip_if_success,
         parent_run_id=kwargs.get("parent_run_id"),
         run_group_id=kwargs.get("run_group_id"),
         master_job_id=kwargs.get("master_job_id"),

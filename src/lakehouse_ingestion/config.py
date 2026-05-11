@@ -10,8 +10,8 @@ from typing import Literal, Union
 
 from pyspark.sql import DataFrame
 
-FRAMEWORK_VERSION = "1.0.5"
-CTRL_SCHEMA_VERSION = 3
+FRAMEWORK_VERSION = "1.0.6"
+CTRL_SCHEMA_VERSION = 4
 
 #: Camadas reconhecidas (Medallion Architecture).
 Layer = Literal["bronze", "silver", "gold"]
@@ -34,6 +34,9 @@ SchemaPolicy = Literal["permissive", "additive_only", "strict"]
 
 #: Ação quando uma regra de qualidade falha.
 QualityFailAction = Literal["fail", "warn", "quarantine"]
+
+#: Política de idempotência para uma ``idempotency_key`` lógica.
+IdempotencyPolicy = Literal["always_run", "skip_if_success", "fail_if_success", "rerun_if_failed"]
 
 #: Fonte aceita pelo plano: nome de tabela ou DataFrame em memória.
 Source = Union[str, DataFrame]
@@ -59,6 +62,9 @@ VALID_SCHEMA_POLICIES = {"permissive", "additive_only", "strict"}
 
 #: Ações válidas em falha de qualidade para validação runtime.
 VALID_QUALITY_FAIL_ACTIONS = {"fail", "warn", "quarantine"}
+
+#: Políticas válidas de idempotência para validação runtime.
+VALID_IDEMPOTENCY_POLICIES = {"always_run", "skip_if_success", "fail_if_success", "rerun_if_failed"}
 
 #: Formatos de explain aceitos por ``DataFrame.explain``.
 VALID_EXPLAIN_FORMATS = {"simple", "extended", "codegen", "cost", "formatted"}
