@@ -14,7 +14,7 @@ from typing import Any, Dict, Optional, Tuple
 from pyspark.sql import DataFrame
 from pyspark.sql import functions as F
 
-from .config import CONFIG, FrameworkConfig  # noqa: F401
+from .config import CONFIG, CTRL_SCHEMA_VERSION, FRAMEWORK_VERSION, FrameworkConfig  # noqa: F401
 from .lineage import capture_explain, write_explain_plan, write_openlineage_event
 from .plan import IngestionPlan, QualityExpression, QualityRules, build_plan_from_kwargs  # noqa: F401
 from .quality import evaluate_quality, is_abort_only_failure, write_quality_results, write_quarantine
@@ -26,7 +26,7 @@ from .schema import (
     table_exists,
     validate_schema_policy,
 )
-from ._spark import safe_cache, safe_unpersist, spark
+from ._spark import runtime_info, safe_cache, safe_unpersist, spark
 from ._sql import (
     full_table_name,
     new_run_id,
@@ -236,6 +236,7 @@ def _build_dry_run_result(
     schema_changes: Dict[str, Any],
     started_dt: datetime,
     df: DataFrame,
+    runtime_meta: Dict[str, Optional[str]],
 ) -> Dict[str, Any]:
     """Monta o payload de retorno quando ``plan.dry_run=True``.
 
@@ -266,6 +267,9 @@ def _build_dry_run_result(
         "explain_captured": plan.explain_mode,
         "openlineage_enabled": plan.openlineage_enabled,
         "idempotency_key": plan.idempotency_key,
+        "framework_version": FRAMEWORK_VERSION,
+        "ctrl_schema_version": CTRL_SCHEMA_VERSION,
+        **runtime_meta,
     }
 
 
@@ -296,6 +300,7 @@ def _finalize_execution(
     error: Optional[str],
     row_metrics: Dict[str, int],
     metrics_source: str,
+    runtime_meta: Dict[str, Optional[str]],
 ) -> None:
     """Monta o payload completo e grava em ``ctrl_ingestion_runs`` via ``log_run``.
 
@@ -342,6 +347,9 @@ def _finalize_execution(
             "master_run_id": plan.master_run_id,
             "idempotency_key": plan.idempotency_key,
             "metrics_source": metrics_source,
+            "framework_version": FRAMEWORK_VERSION,
+            "ctrl_schema_version": CTRL_SCHEMA_VERSION,
+            **runtime_meta,
         },
     )
 
@@ -372,6 +380,7 @@ def ingest_plan(plan: IngestionPlan) -> Dict[str, Any]:
     run_date = today_str()
     started_dt = utc_now_ts()
     target = full_table_name(plan.catalog, plan.layer, plan.target_table)
+    runtime_meta = runtime_info()
     if plan.dry_run:
         tables = ctrl_table_names(plan.catalog, plan.ctrl_schema)
     else:
@@ -429,6 +438,9 @@ def ingest_plan(plan: IngestionPlan) -> Dict[str, Any]:
                 "error_message": None,
                 "idempotency_key": plan.idempotency_key,
                 "skip_reason": "idempotency_key_already_succeeded",
+                "framework_version": FRAMEWORK_VERSION,
+                "ctrl_schema_version": CTRL_SCHEMA_VERSION,
+                **runtime_meta,
             }
 
         if plan.lock_enabled and not plan.dry_run:
@@ -491,7 +503,7 @@ def ingest_plan(plan: IngestionPlan) -> Dict[str, Any]:
         if plan.dry_run:
             return _build_dry_run_result(
                 plan, run_id, target, source_name, rows_read, rows_quarantined, wm_prev,
-                wm_candidate, quality_status, schema_changes, started_dt, prepared_df,
+                wm_candidate, quality_status, schema_changes, started_dt, prepared_df, runtime_meta,
             )
 
         effective_rows = (
@@ -573,7 +585,7 @@ def ingest_plan(plan: IngestionPlan) -> Dict[str, Any]:
                     finished_dt, rows_read, rows_written, rows_quarantined, wm_prev, wm_current,
                     quality_status, schema_changes, operation_metrics, write_started_at,
                     write_finished_at, delta_version_before, delta_version_after, write_committed,
-                    error, row_metrics, metrics_source,
+                    error, row_metrics, metrics_source, runtime_meta,
                 )
             except Exception as log_exc:
                 logger.error(f"Falha ao registrar execução: {log_exc}")
@@ -612,6 +624,9 @@ def ingest_plan(plan: IngestionPlan) -> Dict[str, Any]:
         "openlineage_event": openlineage_event,
         "error_message": safe_truncate(error, 2000),
         "idempotency_key": plan.idempotency_key,
+        "framework_version": FRAMEWORK_VERSION,
+        "ctrl_schema_version": CTRL_SCHEMA_VERSION,
+        **runtime_meta,
     }
 
 

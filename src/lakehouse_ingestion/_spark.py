@@ -7,6 +7,7 @@ clara quando não há sessão.
 """
 from __future__ import annotations
 
+import platform
 from typing import Any, Optional
 
 from pyspark.sql import DataFrame, SparkSession
@@ -76,6 +77,19 @@ def detect_serverless() -> bool:
     except Exception:
         _IS_SERVERLESS = False
     return _IS_SERVERLESS
+
+
+def runtime_info() -> dict[str, Optional[str]]:
+    """Retorna metadados leves do runtime para auditoria operacional."""
+    try:
+        spark_version = getattr(get_spark(), "version", None)
+    except Exception:
+        spark_version = None
+    return {
+        "runtime_type": "serverless" if detect_serverless() else "classic",
+        "spark_version": spark_version,
+        "python_version": platform.python_version(),
+    }
 
 
 def safe_cache(df: DataFrame, enabled: bool = True) -> DataFrame:

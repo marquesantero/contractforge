@@ -118,7 +118,7 @@ O framework cria tabelas de controle no schema configurado:
 
 `idempotency_key` permite identificar um lote lógico. Com `skip_if_success=True`, uma nova execução com a mesma chave e `target_table` é retornada como `SKIPPED` se já houver uma execução `SUCCESS`.
 
-O retorno preserva `rows_written` como métrica lógica da biblioteca e inclui `metrics_source`:
+O retorno preserva `rows_written` como métrica lógica da biblioteca e inclui `metrics_source`, `framework_version`, `ctrl_schema_version`, `runtime_type`, `spark_version` e `python_version`:
 
 - `logical`: apenas contadores calculados pela biblioteca.
 - `mixed`: contadores lógicos com evidência adicional do histórico Delta.

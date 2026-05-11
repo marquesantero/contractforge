@@ -122,7 +122,12 @@ def ensure_ctrl_tables(catalog: str, schema: str) -> Dict[str, str]:
             master_job_id STRING,
             master_run_id STRING,
             idempotency_key STRING,
-            metrics_source STRING
+            metrics_source STRING,
+            framework_version STRING,
+            ctrl_schema_version BIGINT,
+            runtime_type STRING,
+            spark_version STRING,
+            python_version STRING
         ) USING DELTA PARTITIONED BY (run_date)
     """)
     spark.sql(f"""
@@ -214,6 +219,11 @@ def ensure_ctrl_tables(catalog: str, schema: str) -> Dict[str, str]:
         {
             "idempotency_key": "STRING",
             "metrics_source": "STRING",
+            "framework_version": "STRING",
+            "ctrl_schema_version": "BIGINT",
+            "runtime_type": "STRING",
+            "spark_version": "STRING",
+            "python_version": "STRING",
         },
     )
     _record_ctrl_metadata(tables)
@@ -229,11 +239,12 @@ _RUN_COLUMNS = [
     "operation_metrics_json", "write_started_at_utc", "write_finished_at_utc",
     "delta_version_before", "delta_version_after", "write_committed", "error_message",
     "parent_run_id", "run_group_id", "master_job_id", "master_run_id",
-    "idempotency_key", "metrics_source",
+    "idempotency_key", "metrics_source", "framework_version", "ctrl_schema_version",
+    "runtime_type", "spark_version", "python_version",
 ]
 _RUN_INT_COLUMNS = {
     "rows_read", "rows_written", "rows_inserted", "rows_updated", "rows_deleted",
-    "rows_quarantined", "delta_version_before", "delta_version_after",
+    "rows_quarantined", "delta_version_before", "delta_version_after", "ctrl_schema_version",
 }
 
 

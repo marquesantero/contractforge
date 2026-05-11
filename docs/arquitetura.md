@@ -1,6 +1,6 @@
 # Lakehouse Ingestion Framework — Arquitetura e Referência Técnica
 
-**Versão do pacote:** `1.0.3`
+**Versão do pacote:** `1.0.4`
 **Pacote Python:** `lakehouse-ingestion-framework`
 **Import principal:** `lakehouse_ingestion`
 **Ambiente-alvo:** Databricks Runtime, Unity Catalog, Delta Lake (também roda em PySpark + delta-spark fora do Databricks)
@@ -1043,6 +1043,8 @@ Todas vivem em `<catalog>.<ctrl_schema>` (default `<catalog>.ops`). Todas USING 
 | `delta_version_before`, `delta_version_after`, `write_committed`                                 | BIGINT, BOOLEAN   | atomicidade                      |
 | `error_message`                                                                                  | STRING            | traceback truncado em 8000 chars |
 | `parent_run_id`, `run_group_id`, `master_job_id`, `master_run_id`                                | STRING            | linhagem operacional             |
+| `framework_version`, `ctrl_schema_version`                                                       | STRING, BIGINT    | versão da lib e das ctrl tables  |
+| `runtime_type`, `spark_version`, `python_version`                                                | STRING            | ambiente de execução             |
 
 Padrões de consulta úteis:
 
@@ -1301,7 +1303,7 @@ python -m build
 twine check dist/*
 ```
 
-Gera `dist/lakehouse_ingestion_framework-1.0.3-py3-none-any.whl` e `.tar.gz`.
+Gera `dist/lakehouse_ingestion_framework-1.0.4-py3-none-any.whl` e `.tar.gz`.
 
 ### 14.2 Instalação no Databricks
 

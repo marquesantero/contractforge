@@ -1,7 +1,7 @@
 # Lakehouse Ingestion Framework
 
 **Documentação oficial**  
-**Versão da biblioteca:** `1.0.3`  
+**Versão da biblioteca:** `1.0.4`  
 **Pacote:** `lakehouse-ingestion-framework`  
 **Import principal:** `lakehouse_ingestion`  
 **Ambiente-alvo:** Databricks, Unity Catalog e Delta Lake  
@@ -737,6 +737,11 @@ A função retorna um dicionário com métricas e metadados.
 | `rows_written` | Quantidade de linhas consideradas na escrita. |
 | `rows_quarantined` | Quantidade de registros enviados à quarentena. |
 | `metrics_source` | Origem das métricas: `logical` ou `mixed`. |
+| `framework_version` | Versão da biblioteca que executou a ingestão. |
+| `ctrl_schema_version` | Versão do schema das tabelas de controle. |
+| `runtime_type` | Tipo de runtime detectado: `classic` ou `serverless`. |
+| `spark_version` | Versão Spark reportada pela sessão. |
+| `python_version` | Versão Python do processo executor. |
 | `watermark_previous` | Watermark antes da execução. |
 | `watermark_current` | Watermark após a execução bem-sucedida. |
 | `quality_status` | `PASSED`, `FAILED` ou `NOT_CONFIGURED`. |
@@ -803,6 +808,8 @@ Principais colunas:
 | `delta_version_before` | Versão Delta antes. |
 | `delta_version_after` | Versão Delta depois. |
 | `error_message` | Erro truncado. |
+| `framework_version`, `ctrl_schema_version` | Versões da biblioteca e do schema de controle. |
+| `runtime_type`, `spark_version`, `python_version` | Metadados do runtime para suporte e auditoria. |
 
 Consulta útil:
 
@@ -1300,7 +1307,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "lakehouse-ingestion-framework"
-version = "1.0.3"
+version = "1.0.4"
 description = "Framework de ingestão Delta Lake para Databricks com contratos declarativos, quality gates, SCD, explain mode e eventos OpenLineage."
 readme = "README.md"
 requires-python = ">=3.10"
