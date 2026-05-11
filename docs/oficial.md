@@ -1,7 +1,7 @@
 # Lakehouse Ingestion Framework
 
 **Documentação oficial**  
-**Versão da biblioteca:** `1.0.4`  
+**Versão da biblioteca:** `1.0.5`  
 **Pacote:** `lakehouse-ingestion-framework`  
 **Import principal:** `lakehouse_ingestion`  
 **Ambiente-alvo:** Databricks, Unity Catalog e Delta Lake  
@@ -754,7 +754,7 @@ A função retorna um dicionário com métricas e metadados.
 | `explain_captured` | Indica se o explain foi capturado. |
 | `openlineage_event_emitted` | Indica se o evento OpenLineage foi persistido. |
 | `openlineage_event` | Evento OpenLineage em formato de dicionário. |
-| `error_message` | Mensagem de erro truncada, quando houver falha. |
+| `error_message` | Mensagem curta do erro, quando houver falha. |
 
 Exemplo de consumo:
 
@@ -807,7 +807,7 @@ Principais colunas:
 | `write_committed` | Indica se houve commit de escrita. |
 | `delta_version_before` | Versão Delta antes. |
 | `delta_version_after` | Versão Delta depois. |
-| `error_message` | Erro truncado. |
+| `error_message` | Mensagem curta do erro. Stack completo fica em `ctrl_ingestion_errors`. |
 | `framework_version`, `ctrl_schema_version` | Versões da biblioteca e do schema de controle. |
 | `runtime_type`, `spark_version`, `python_version` | Metadados do runtime para suporte e auditoria. |
 
@@ -887,12 +887,27 @@ Registros rejeitados quando `on_quality_fail="quarantine"`.
 | `record_payload` | Registro original em JSON. |
 | `quarantined_at_utc` | Momento da quarentena. |
 
-### 10.5 `ctrl_ingestion_metadata`
+### 10.5 `ctrl_ingestion_errors`
+
+Stack traces completos de execuções com falha. Use esta tabela para diagnóstico detalhado sem poluir `ctrl_ingestion_runs`.
+
+| Coluna | Descrição |
+|---|---|
+| `run_id` | Execução com falha. |
+| `error_ts_utc`, `error_date` | Momento e partição do erro. |
+| `target_table`, `source_table`, `mode`, `status` | Contexto operacional. |
+| `error_type` | Classe da exceção. |
+| `error_message` | Mensagem curta. |
+| `stack_trace` | Traceback completo. |
+| `framework_version`, `ctrl_schema_version` | Versões da biblioteca e do schema de controle. |
+| `runtime_type`, `spark_version`, `python_version` | Metadados do runtime. |
+
+### 10.6 `ctrl_ingestion_metadata`
 
 Tabela de uma linha por componente para registrar `framework_version`, `ctrl_schema_version` e `updated_at_utc`.
 O framework aplica apenas migrações aditivas conhecidas com `ALTER TABLE ADD COLUMNS`; colunas nunca são removidas automaticamente.
 
-### 10.5 `ctrl_ingestion_locks`
+### 10.7 `ctrl_ingestion_locks`
 
 Reserva operacional best-effort por tabela alvo.
 
@@ -906,7 +921,7 @@ Reserva operacional best-effort por tabela alvo.
 
 O lock não é uma exclusão pessimista distribuída. Ele reduz colisões operacionais, mas a consistência final continua baseada no controle otimista do Delta Lake.
 
-### 10.6 `ctrl_ingestion_explain`
+### 10.8 `ctrl_ingestion_explain`
 
 Planos capturados quando `explain_mode=True`.
 
@@ -920,7 +935,7 @@ Planos capturados quando `explain_mode=True`.
 | `plan_text` | Texto retornado por `df.explain`. |
 | `captured_at_utc` | Momento da captura. |
 
-### 10.7 `ctrl_ingestion_lineage`
+### 10.9 `ctrl_ingestion_lineage`
 
 Eventos OpenLineage em JSON.
 
@@ -1307,7 +1322,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "lakehouse-ingestion-framework"
-version = "1.0.4"
+version = "1.0.5"
 description = "Framework de ingestão Delta Lake para Databricks com contratos declarativos, quality gates, SCD, explain mode e eventos OpenLineage."
 readme = "README.md"
 requires-python = ">=3.10"

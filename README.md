@@ -110,11 +110,14 @@ O framework cria tabelas de controle no schema configurado:
 - `ctrl_ingestion_locks`
 - `ctrl_ingestion_explain`
 - `ctrl_ingestion_lineage`
+- `ctrl_ingestion_errors`
 - `ctrl_ingestion_metadata`
 
 `explain_mode=True` captura o plano Spark do DataFrame preparado.
 
 `openlineage_enabled=True` grava um evento OpenLineage em JSON na tabela de lineage.
+
+Em falha, `ctrl_ingestion_runs.error_message` guarda uma mensagem curta para consulta rápida e `ctrl_ingestion_errors.stack_trace` guarda o traceback completo.
 
 `idempotency_key` permite identificar um lote lógico. Com `skip_if_success=True`, uma nova execução com a mesma chave e `target_table` é retornada como `SKIPPED` se já houver uma execução `SUCCESS`.
 

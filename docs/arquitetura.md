@@ -1,6 +1,6 @@
 # Lakehouse Ingestion Framework — Arquitetura e Referência Técnica
 
-**Versão do pacote:** `1.0.4`
+**Versão do pacote:** `1.0.5`
 **Pacote Python:** `lakehouse-ingestion-framework`
 **Import principal:** `lakehouse_ingestion`
 **Ambiente-alvo:** Databricks Runtime, Unity Catalog, Delta Lake (também roda em PySpark + delta-spark fora do Databricks)
@@ -53,7 +53,7 @@ O `lakehouse-ingestion-framework` padroniza a ingestão de dados em Delta Lake f
 - **Quality gates** com três modos de falha (`fail`, `warn`, `quarantine`).
 - **Watermarks tipados** (simples e compostos) persistidos em tabela de estado.
 - **Schema policy** com três níveis (`permissive`, `additive_only`, `strict`) e evolução automática quando aplicável.
-- **Observabilidade**: sete tabelas de controle (`runs`, `state`, `quality`, `quarantine`, `locks`, `explain`, `lineage`).
+- **Observabilidade**: tabelas de controle para runs, state, quality, quarantine, locks, explain, lineage, errors e metadata.
 - **Lineage OpenLineage** (1.0.5) e captura de plano Spark.
 - **Idempotência operacional** via locks best-effort, `with_retry` para conflitos Delta e MERGE atômico.
 
@@ -322,7 +322,7 @@ Source = Union[str, DataFrame]
 Campos relevantes:
 
 - `default_catalog="main"`, `default_source_system="default"`, `default_partition_col="ingestion_date"`
-- `ctrl_schema="ops"`: schema onde as 7 ctrl tables vivem.
+- `ctrl_schema="ops"`: schema onde as ctrl tables vivem.
 - `ctrl_table_*`: nomes das ctrl tables (todas começam com `ctrl_ingestion_`).
 - `max_error_len=8000`: trunca tracebacks para caber em colunas STRING.
 - `default_lock_ttl_minutes=120`, `default_retry_attempts=3`, `default_retry_backoff_seconds=5`.
@@ -656,7 +656,7 @@ Schemas detalhados estão em [§9](#9-tabelas-de-controle--esquemas-e-papéis).
 - `run_date` → `CAST('...' AS DATE)`.
 - Timestamps → `CAST('...' AS TIMESTAMP)`.
 - Strings (incluindo JSON) → `sql_lit` com escape de `'`.
-- `error_message` → `safe_truncate(v, max_error_len=8000)`.
+- `error_message` → mensagem curta; traceback completo vai para `ctrl_ingestion_errors.stack_trace`.
 
 #### 4.8.3 `upsert_state(...)`
 
@@ -1041,7 +1041,7 @@ Todas vivem em `<catalog>.<ctrl_schema>` (default `<catalog>.ops`). Todas USING 
 | `schema_changes_json`, `operation_metrics_json`                                                  | STRING            | JSONs aninhados                  |
 | `write_started_at_utc`, `write_finished_at_utc`                                                  | TIMESTAMP         | só do passo de escrita           |
 | `delta_version_before`, `delta_version_after`, `write_committed`                                 | BIGINT, BOOLEAN   | atomicidade                      |
-| `error_message`                                                                                  | STRING            | traceback truncado em 8000 chars |
+| `error_message`                                                                                  | STRING            | mensagem curta do erro            |
 | `parent_run_id`, `run_group_id`, `master_job_id`, `master_run_id`                                | STRING            | linhagem operacional             |
 | `framework_version`, `ctrl_schema_version`                                                       | STRING, BIGINT    | versão da lib e das ctrl tables  |
 | `runtime_type`, `spark_version`, `python_version`                                                | STRING            | ambiente de execução             |
@@ -1059,7 +1059,18 @@ SELECT target_table, avg(duration_seconds) FROM ops.ctrl_ingestion_runs
 WHERE run_date >= current_date() - 7 GROUP BY target_table;
 ```
 
-### 9.2 `ctrl_ingestion_state`
+### 9.2 `ctrl_ingestion_errors`
+
+Tabela particionada por `error_date` para diagnóstico detalhado de falhas. Uma linha por execução com erro.
+
+| Coluna                                                                                           | Tipo              | Observação                         |
+| ------------------------------------------------------------------------------------------------ | ----------------- | ---------------------------------- |
+| `run_id`, `target_table`, `source_table`, `mode`, `status`                                       | STRING            | contexto operacional               |
+| `error_ts_utc`, `error_date`                                                                     | TIMESTAMP, DATE   | momento e partição do erro         |
+| `error_type`, `error_message`, `stack_trace`                                                     | STRING            | classe, mensagem curta e traceback |
+| `framework_version`, `ctrl_schema_version`, `runtime_type`, `spark_version`, `python_version`    | STRING/BIGINT     | suporte e auditoria                |
+
+### 9.3 `ctrl_ingestion_state`
 
 **Uma linha por target_table.** Snapshot do último estado conhecido. PK em `target_table`.
 
@@ -1074,7 +1085,7 @@ WHERE run_date >= current_date() - 7 GROUP BY target_table;
 
 Use para dashboards de "última execução" e detectar tabelas que não rodam há X dias.
 
-### 9.3 `ctrl_ingestion_quality`
+### 9.4 `ctrl_ingestion_quality`
 
 Uma linha **por regra falhada** por execução.
 
@@ -1087,7 +1098,7 @@ Uma linha **por regra falhada** por execução.
 
 Não recebe linhas em `status=PASSED`.
 
-### 9.4 `ctrl_ingestion_quarantine`
+### 9.5 `ctrl_ingestion_quarantine`
 
 Uma linha **por linha quarentenada**, com payload JSON da linha original.
 
@@ -1098,7 +1109,7 @@ Uma linha **por linha quarentenada**, com payload JSON da linha original.
 
 Pode crescer rápido se `on_quality_fail=quarantine` for usado com fontes "sujas". Considere TTL/VACUUM.
 
-### 9.5 `ctrl_ingestion_locks`
+### 9.6 `ctrl_ingestion_locks`
 
 Uma linha **por target_table** (PK). Renovada a cada execução.
 
@@ -1108,7 +1119,7 @@ Uma linha **por target_table** (PK). Renovada a cada execução.
 
 `status` ∈ `{ACTIVE, RELEASED}`. Locks expirados são "rompidos" no próximo `acquire_lock`.
 
-### 9.6 `ctrl_ingestion_explain`
+### 9.7 `ctrl_ingestion_explain`
 
 Plano Spark capturado.
 
@@ -1119,7 +1130,7 @@ Plano Spark capturado.
 
 Só recebe linhas se `explain_mode=True`.
 
-### 9.7 `ctrl_ingestion_lineage`
+### 9.8 `ctrl_ingestion_lineage`
 
 Eventos OpenLineage como JSON.
 
@@ -1303,7 +1314,7 @@ python -m build
 twine check dist/*
 ```
 
-Gera `dist/lakehouse_ingestion_framework-1.0.4-py3-none-any.whl` e `.tar.gz`.
+Gera `dist/lakehouse_ingestion_framework-1.0.5-py3-none-any.whl` e `.tar.gz`.
 
 ### 14.2 Instalação no Databricks
 

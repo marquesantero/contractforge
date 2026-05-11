@@ -10,8 +10,8 @@ from typing import Literal, Union
 
 from pyspark.sql import DataFrame
 
-FRAMEWORK_VERSION = "1.0.4"
-CTRL_SCHEMA_VERSION = 2
+FRAMEWORK_VERSION = "1.0.5"
+CTRL_SCHEMA_VERSION = 3
 
 #: Camadas reconhecidas (Medallion Architecture).
 Layer = Literal["bronze", "silver", "gold"]
@@ -97,7 +97,7 @@ class FrameworkConfig:
         default_catalog: Catálogo Unity quando não especificado no plan.
         default_source_system: ``source_system`` quando não informado.
         default_partition_col: Coluna de partição padrão (``ingestion_date``).
-        ctrl_schema: Schema onde as 7 ctrl tables vivem.
+        ctrl_schema: Schema onde as ctrl tables vivem.
         ctrl_table_*: Nomes das ctrl tables.
         max_error_len: Tamanho máximo de ``error_message`` em ctrl tables.
         default_lock_ttl_minutes: TTL do lock best-effort em ``acquire_lock``.
@@ -119,6 +119,7 @@ class FrameworkConfig:
     ctrl_table_explain: str = "ctrl_ingestion_explain"
     ctrl_table_lineage: str = "ctrl_ingestion_lineage"
     ctrl_table_metadata: str = "ctrl_ingestion_metadata"
+    ctrl_table_errors: str = "ctrl_ingestion_errors"
     max_error_len: int = 8000
     default_lock_ttl_minutes: int = 120
     default_retry_attempts: int = 3

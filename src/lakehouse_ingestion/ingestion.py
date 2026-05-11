@@ -42,6 +42,7 @@ from .state import (
     ctrl_table_names,
     ensure_ctrl_tables,
     has_successful_run,
+    log_error,
     log_run,
     release_lock,
     upsert_state,
@@ -60,6 +61,14 @@ from .writers import (
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 logger = logging.getLogger("lakehouse_ingestion")
+
+
+def _short_error_message(error: Optional[str]) -> Optional[str]:
+    """Extrai uma mensagem curta do traceback para ``ctrl_ingestion_runs``."""
+    if not error:
+        return None
+    lines = [line.strip() for line in error.splitlines() if line.strip()]
+    return safe_truncate(lines[-1] if lines else error, 2000)
 
 
 def _resolve_source(plan: IngestionPlan) -> Tuple[DataFrame, str]:
@@ -340,7 +349,7 @@ def _finalize_execution(
             "delta_version_before": delta_version_before,
             "delta_version_after": delta_version_after,
             "write_committed": write_committed,
-            "error_message": error,
+            "error_message": _short_error_message(error),
             "parent_run_id": plan.parent_run_id,
             "run_group_id": plan.run_group_id,
             "master_job_id": plan.master_job_id,
@@ -406,6 +415,7 @@ def ingest_plan(plan: IngestionPlan) -> Dict[str, Any]:
     delta_version_after: Optional[int] = None
     wm_candidate: Optional[str] = None
     error: Optional[str] = None
+    error_type: Optional[str] = None
     prepared_df: Optional[DataFrame] = None
     row_metrics: Dict[str, int] = {"rows_inserted": 0, "rows_updated": 0, "rows_deleted": 0}
 
@@ -550,6 +560,7 @@ def ingest_plan(plan: IngestionPlan) -> Dict[str, Any]:
 
     except Exception as exc:
         status = "FAILED"
+        error_type = type(exc).__name__
         error = "".join(traceback.format_exception(type(exc), exc, exc.__traceback__))
         logger.error(f"Ingestão falhou: {exc}")
         if not plan.dry_run:
@@ -589,6 +600,28 @@ def ingest_plan(plan: IngestionPlan) -> Dict[str, Any]:
                 )
             except Exception as log_exc:
                 logger.error(f"Falha ao registrar execução: {log_exc}")
+            if error:
+                try:
+                    log_error(
+                        tables,
+                        {
+                            "run_id": run_id,
+                            "error_ts_utc": utc_now_str(),
+                            "error_date": run_date,
+                            "target_table": target,
+                            "source_table": source_name,
+                            "mode": plan.mode,
+                            "status": status,
+                            "error_type": error_type,
+                            "error_message": _short_error_message(error),
+                            "stack_trace": error,
+                            "framework_version": FRAMEWORK_VERSION,
+                            "ctrl_schema_version": CTRL_SCHEMA_VERSION,
+                            **runtime_meta,
+                        },
+                    )
+                except Exception as error_log_exc:
+                    logger.error(f"Falha ao registrar erro completo: {error_log_exc}")
             try:
                 output_df = spark.read.table(target) if table_exists(target) else None
                 if status != "SKIPPED":
@@ -622,7 +655,7 @@ def ingest_plan(plan: IngestionPlan) -> Dict[str, Any]:
         "explain_captured": bool(explain_text),
         "openlineage_event_emitted": bool(openlineage_event),
         "openlineage_event": openlineage_event,
-        "error_message": safe_truncate(error, 2000),
+        "error_message": _short_error_message(error),
         "idempotency_key": plan.idempotency_key,
         "framework_version": FRAMEWORK_VERSION,
         "ctrl_schema_version": CTRL_SCHEMA_VERSION,

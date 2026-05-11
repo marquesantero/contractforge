@@ -31,6 +31,7 @@ def ctrl_table_names(catalog: str, schema: str) -> Dict[str, str]:
         "explain": full_table_name(catalog, schema, CONFIG.ctrl_table_explain),
         "lineage": full_table_name(catalog, schema, CONFIG.ctrl_table_lineage),
         "metadata": full_table_name(catalog, schema, CONFIG.ctrl_table_metadata),
+        "errors": full_table_name(catalog, schema, CONFIG.ctrl_table_errors),
     }
 
 
@@ -67,7 +68,7 @@ def _record_ctrl_metadata(tables: Dict[str, str]) -> None:
 
 
 def ensure_ctrl_tables(catalog: str, schema: str) -> Dict[str, str]:
-    """Cria (idempotente) o schema e as 7 tabelas de controle.
+    """Cria (idempotente) o schema e as tabelas de controle.
 
     Retorna um dict com nomes lógicos -> nomes qualificados:
 
@@ -79,6 +80,7 @@ def ensure_ctrl_tables(catalog: str, schema: str) -> Dict[str, str]:
     - ``explain`` (planos Spark capturados)
     - ``lineage`` (eventos OpenLineage como JSON)
     - ``metadata`` (versão do framework e do schema de controle)
+    - ``errors`` (stack traces completos para diagnóstico)
 
     Migra apenas colunas aditivas conhecidas. Nunca remove colunas automaticamente.
     """
@@ -214,6 +216,25 @@ def ensure_ctrl_tables(catalog: str, schema: str) -> Dict[str, str]:
             CONSTRAINT pk_metadata PRIMARY KEY (component)
         ) USING DELTA
     """)
+    spark.sql(f"""
+        CREATE TABLE IF NOT EXISTS {qt(tables['errors'])} (
+            run_id STRING,
+            error_ts_utc TIMESTAMP,
+            error_date DATE,
+            target_table STRING,
+            source_table STRING,
+            mode STRING,
+            status STRING,
+            error_type STRING,
+            error_message STRING,
+            stack_trace STRING,
+            framework_version STRING,
+            ctrl_schema_version BIGINT,
+            runtime_type STRING,
+            spark_version STRING,
+            python_version STRING
+        ) USING DELTA PARTITIONED BY (error_date)
+    """)
     _add_columns_if_missing(
         tables["runs"],
         {
@@ -272,6 +293,38 @@ def log_run(tables: Dict[str, str], payload: Dict[str, Any]) -> None:
             values.append(sql_lit(safe_truncate(v) if c == "error_message" else v))
     spark.sql(
         f"INSERT INTO {qt(tables['runs'])} ({', '.join(_RUN_COLUMNS)}) "
+        f"VALUES ({', '.join(values)})"
+    )
+
+
+_ERROR_COLUMNS = [
+    "run_id", "error_ts_utc", "error_date", "target_table", "source_table", "mode",
+    "status", "error_type", "error_message", "stack_trace", "framework_version",
+    "ctrl_schema_version", "runtime_type", "spark_version", "python_version",
+]
+
+
+def log_error(tables: Dict[str, str], payload: Dict[str, Any]) -> None:
+    """Insere o erro completo em ``ctrl_ingestion_errors``.
+
+    ``ctrl_ingestion_runs.error_message`` permanece curto para consulta rápida;
+    esta tabela guarda o stack trace integral para suporte e auditoria.
+    """
+    values = []
+    for c in _ERROR_COLUMNS:
+        v = payload.get(c)
+        if c == "ctrl_schema_version":
+            values.append(sql_int(v))
+        elif c == "error_date":
+            values.append(f"CAST({sql_lit(v)} AS DATE)")
+        elif c == "error_ts_utc":
+            values.append(f"CAST({sql_lit(v)} AS TIMESTAMP)")
+        elif c == "error_message":
+            values.append(sql_lit(safe_truncate(v, 2000)))
+        else:
+            values.append(sql_lit(v))
+    spark.sql(
+        f"INSERT INTO {qt(tables['errors'])} ({', '.join(_ERROR_COLUMNS)}) "
         f"VALUES ({', '.join(values)})"
     )
 
