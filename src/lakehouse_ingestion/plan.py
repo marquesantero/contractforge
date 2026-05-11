@@ -91,6 +91,7 @@ class IngestionPlan:
     partition_value: Optional[str] = None
     merge_strategy: MergeStrategy = "delta"
     merge_partition_column: Optional[str] = None
+    replace_partitions_source_complete: bool = False
     cluster_columns: List[str] = field(default_factory=list)
     zorder_columns: List[str] = field(default_factory=list)
     optimize_after_write: bool = False
@@ -186,7 +187,7 @@ _KNOWN_PARAMS = {
     "notebook_name", "select_columns", "filter_expression", "watermark_columns",
     "merge_keys", "hash_keys", "hash_exclude_columns", "custom_keys", "dedup_order_expr",
     "partition_column", "partition_value", "merge_strategy", "merge_partition_column",
-    "cluster_columns", "zorder_columns", "optimize_after_write", "schema_policy",
+    "replace_partitions_source_complete", "cluster_columns", "zorder_columns", "optimize_after_write", "schema_policy",
     "quality_rules", "on_quality_fail", "scd2_change_columns", "scd2_effective_from_column",
     "fix_encoding", "encoding", "encoding_columns", "dry_run", "explain_mode",
     "explain_format", "openlineage_enabled", "openlineage_namespace",
@@ -263,6 +264,7 @@ def build_plan_from_kwargs(**kwargs: Any) -> IngestionPlan:
         partition_value=kwargs.get("partition_value"),
         merge_strategy=merge_strategy,  # type: ignore[arg-type]
         merge_partition_column=kwargs.get("merge_partition_column"),
+        replace_partitions_source_complete=bool(kwargs.get("replace_partitions_source_complete", False)),
         cluster_columns=as_list(kwargs.get("cluster_columns")),
         zorder_columns=as_list(kwargs.get("zorder_columns")),
         optimize_after_write=bool(kwargs.get("optimize_after_write", False)),

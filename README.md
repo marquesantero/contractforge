@@ -63,6 +63,7 @@ result = ingest(
 - `scd0_append`: inserção imutável.
 - `scd0_overwrite`: substituição total ou por partição.
 - `scd1_upsert`: atualização do estado atual por chaves.
+- `scd1_upsert` com `merge_strategy="replace_partitions"` exige `merge_partition_column` e `replace_partitions_source_complete=True`, pois sobrescreve as partições afetadas.
 - `scd1_hash_diff`: inserção apenas de versões novas ou alteradas por hash. O framework mantém `ingestion_ts_utc` como coluna técnica para ordenar o último estado quando `dedup_order_expr` não é informado.
 - `scd2_historical`: histórico completo com `valid_from`, `valid_to` e `is_current`. Reaparições de chaves não correntes criam uma nova versão atual.
 - `snapshot_soft_delete`: sincronização por snapshot com marcação de ausentes em `is_active` e `deleted_at`. Exige source completo — o framework rejeita com `ValueError` quando combinado com `watermark_columns` ou `filter_expression`. Em Databricks Serverless, usa `MERGE` SQL para evitar a API Python `DeltaTable`.

@@ -9,6 +9,7 @@ from lakehouse_ingestion.plan import (
     normalize_quality_rules,
     validate_write_mode,
 )
+from lakehouse_ingestion.ingestion import _validate_static_plan_options
 
 
 def test_validate_write_mode_accepts_valid():
@@ -149,3 +150,60 @@ def test_build_plan_accepts_idempotency_options():
     )
     assert plan.idempotency_key == "job-42:batch-2026-05-11"
     assert plan.skip_if_success is True
+
+
+def test_build_plan_accepts_replace_partitions_source_complete():
+    plan = build_plan_from_kwargs(
+        source="x",
+        target_table="t",
+        mode="scd1_upsert",
+        merge_keys="id",
+        merge_strategy="replace_partitions",
+        merge_partition_column="dt",
+        replace_partitions_source_complete=True,
+    )
+    assert plan.replace_partitions_source_complete is True
+
+
+def test_replace_partitions_requires_explicit_complete_source_confirmation():
+    plan = build_plan_from_kwargs(
+        source="x",
+        target_table="t",
+        layer="silver",
+        mode="scd1_upsert",
+        merge_keys="id",
+        merge_strategy="replace_partitions",
+        merge_partition_column="dt",
+    )
+    with pytest.raises(ValueError, match="replace_partitions_source_complete=True"):
+        _validate_static_plan_options(plan)
+
+
+def test_replace_partitions_rejects_mismatched_partition_columns():
+    plan = build_plan_from_kwargs(
+        source="x",
+        target_table="t",
+        layer="silver",
+        mode="scd1_upsert",
+        merge_keys="id",
+        merge_strategy="replace_partitions",
+        partition_column="ingestion_date",
+        merge_partition_column="dt",
+        replace_partitions_source_complete=True,
+    )
+    with pytest.raises(ValueError, match="partition_column igual"):
+        _validate_static_plan_options(plan)
+
+
+def test_replace_partitions_static_validation_accepts_complete_partition_snapshot():
+    plan = build_plan_from_kwargs(
+        source="x",
+        target_table="t",
+        layer="silver",
+        mode="scd1_upsert",
+        merge_keys="id",
+        merge_strategy="replace_partitions",
+        merge_partition_column="dt",
+        replace_partitions_source_complete=True,
+    )
+    _validate_static_plan_options(plan)

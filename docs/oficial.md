@@ -223,6 +223,7 @@ Características:
 - Atualiza colunas não-chave quando a chave já existe.
 - Insere novos registros quando a chave não existe.
 - Pode limitar o escopo do merge com `merge_strategy="delta_by_partition"` e `merge_partition_column`.
+- `merge_strategy="replace_partitions"` exige `merge_partition_column` e `replace_partitions_source_complete=True`, pois sobrescreve integralmente as partições afetadas.
 
 Exemplo:
 
@@ -505,6 +506,7 @@ ingest(
 | `partition_value` | `str | None` | `None` | Valor usado em overwrite por partição. |
 | `merge_strategy` | `"delta" | "delta_by_partition" | "replace_partitions"` | `"delta"` | Estratégia aplicada em `scd1_upsert`. |
 | `merge_partition_column` | `str | None` | `None` | Coluna usada para limitar merge por partições afetadas. |
+| `replace_partitions_source_complete` | `bool` | `False` | Confirma que o source contém o estado completo das partições afetadas quando `merge_strategy="replace_partitions"`. |
 | `cluster_columns` | `str | List[str]` | `[]` | Colunas usadas para Liquid Clustering. |
 | `zorder_columns` | `str | List[str]` | `[]` | Colunas usadas no `OPTIMIZE ZORDER BY`. |
 | `optimize_after_write` | `bool` | `False` | Executa `OPTIMIZE` após escrita com linhas gravadas. |

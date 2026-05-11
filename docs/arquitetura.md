@@ -762,7 +762,7 @@ Três estratégias (`merge_strategy`):
 
 **`delta_by_partition`**. Mesma coisa, mas adiciona `AND t.partition_col IN (vals)` na cláusula ON. Reduz arquivos varridos quando o source só toca poucas partições.
 
-**`replace_partitions`**. Não faz MERGE; faz `OVERWRITE` com `replaceWhere = partition_col IN (vals)`. **Mais rápido** quando o source contém o estado completo das partições afetadas (ex.: refeitura diária por `dt`). Cuidado: linhas que existiam no target mas não no source serão perdidas — só use quando a fonte é completa por partição.
+**`replace_partitions`**. Não faz MERGE; faz `OVERWRITE` com `replaceWhere = partition_col IN (vals)`. **Mais rápido** quando o source contém o estado completo das partições afetadas (ex.: refeitura diária por `dt`). Cuidado: linhas que existiam no target mas não no source serão perdidas — por isso o plano exige `merge_partition_column` e `replace_partitions_source_complete=True`. Se `partition_column` também for informado, ele deve ser igual a `merge_partition_column`.
 
 A view temporária `__ingest_src_<uuid>` é criada e descartada num `try/finally`.
 
@@ -773,18 +773,18 @@ Append-only, mas **só de mudanças**:
 1. `df_hashed = add_row_hash(df, hash_exclude)` — adiciona `row_hash`.
 2. Ensure table; se vazia, append direto.
 3. Lê target, opcionalmente filtra por partições afetadas.
-4. **Defasagem do "atual":** `latest_order_expr` define o que é o "registro mais recente" do target — default `"ingestion_date DESC NULLS LAST"` se a coluna existir no target, senão sem dedup.
+4. **Defasagem do "atual":** `latest_order_expr` define o que é o "registro mais recente" do target. Sem expressão explícita, usa `ingestion_sequence` ou `ingestion_ts_utc`; target legado com múltiplas versões por chave e sem ordenação determinística falha com mensagem objetiva.
 5. `target_latest = deduplicate_by_order(target_df, hash_keys, order_expr)`.
 6. Anti-join lógico via `LEFT JOIN` + `WHERE __tgt_row_hash IS NULL OR s.row_hash != __tgt_row_hash`.
 7. Append do diff.
 
-**Edge case:** se o target nunca teve `ingestion_date` (ex.: tabela legada), o default falha. Por isso o código verifica `if "ingestion_date" in target_cols` antes de aplicar o default. Se não tem nem coluna `ingestion_date` nem `latest_order_expr` explícito, **não dedup** — pode haver falsos positivos (várias versões do mesmo registro), comportamento conservador (insere tudo que não bate em hash).
+**Edge case:** target legado sem `ingestion_ts_utc`/`ingestion_sequence` e com múltiplas versões por chave não tem "último estado" confiável. O framework rejeita e orienta informar `dedup_order_expr` ou migrar o target com uma coluna técnica determinística.
 
 #### 4.9.9 `write_snapshot_soft_delete`
 
 Snapshot completo: source representa o estado-fim. Linhas ausentes ficam marcadas `is_active=false` + `deleted_at=now()`.
 
-Implementação via `DeltaTable.merge` (API Python do Delta, não SQL):
+Implementação padrão via `DeltaTable.merge` (API Python do Delta). Em Databricks Serverless/Spark Connect, o framework usa `MERGE` SQL equivalente para evitar limitações da API Python:
 
 ```python
 dt.alias("t").merge(df_src.alias("s"), cond)
@@ -835,7 +835,7 @@ staged        = insert_stage UNION update_stage
 
 #### 4.9.11 `execute_write_mode(plan, df, target, effective_rows)`
 
-Dispatcher por `plan.mode`. Calcula `affected_partition_values` para `merge_partition_column` apenas, evitando trabalho desnecessário quando o modo não precisa.
+Dispatcher por `plan.mode`. Em SCD1, calcula `affected_partition_values` para `merge_partition_column` (ou `partition_column` como fallback), evitando trabalho desnecessário quando o modo não precisa.
 
 ### 4.10 `lineage.py` — Explain e OpenLineage
 

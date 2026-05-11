@@ -549,7 +549,8 @@ def execute_write_mode(
     """
     if effective_rows == 0:
         return 0
-    part_vals = affected_partition_values(df, plan.merge_partition_column)
+    merge_partition_col = plan.merge_partition_column or plan.partition_column
+    part_vals = affected_partition_values(df, merge_partition_col)
     if plan.mode == "scd0_append":
         return write_append(df, target, plan.cluster_columns, plan.partition_column, effective_rows)
     if plan.mode == "scd0_overwrite":
@@ -558,7 +559,7 @@ def execute_write_mode(
         )
     if plan.mode == "scd1_upsert":
         return write_upsert(
-            df, target, plan.merge_keys, plan.partition_column, part_vals, plan.merge_strategy, effective_rows
+            df, target, plan.merge_keys, merge_partition_col, part_vals, plan.merge_strategy, effective_rows
         )
     if plan.mode == "scd1_hash_diff":
         return write_scd1_hash_diff(

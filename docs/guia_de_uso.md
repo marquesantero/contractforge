@@ -1092,6 +1092,7 @@ Dois jobs escrevendo na mesma tabela ao mesmo tempo. O framework já retenta aut
 - Particione melhor a tabela target (cada job escreve em partição própria).
 - Reduza paralelismo do `for_each_task` (`concurrency: 1` para testar).
 - Use `merge_strategy="delta_by_partition"` para escopo mais estreito.
+- Para `merge_strategy="replace_partitions"`, informe `merge_partition_column` e `replace_partitions_source_complete=True` somente quando o source contiver o estado completo das partições afetadas.
 
 ### "Schema policy strict violada"
 

@@ -149,37 +149,7 @@ def _validate_plan(
     Raises:
         ValueError: ao violar restrições de modo/layer ou schema policy.
     """
-    if plan.layer == "bronze" and plan.mode in {
-        "scd1_upsert",
-        "scd2_historical",
-        "snapshot_soft_delete",
-    }:
-        raise ValueError(
-            "Bronze deve ser orientada a captura. Use scd0_append, scd0_overwrite "
-            "ou scd1_hash_diff apenas quando houver contrato explícito."
-        )
-    if plan.mode in {"scd1_upsert", "snapshot_soft_delete", "scd2_historical"} and not plan.merge_keys:
-        raise ValueError(f"mode={plan.mode} requer merge_keys")
-    if plan.mode == "scd1_hash_diff" and not plan.hash_keys:
-        raise ValueError("mode=scd1_hash_diff requer hash_keys")
-    if plan.partition_value and not plan.partition_column:
-        raise ValueError("partition_value requer partition_column")
-    if plan.zorder_columns and not plan.optimize_after_write:
-        logger.warning("zorder_columns foi informado, mas optimize_after_write=false; ZORDER não será executado.")
-    if plan.mode == "scd1_upsert" and plan.merge_strategy in {"delta_by_partition", "replace_partitions"}:
-        if not plan.merge_partition_column:
-            raise ValueError(f"merge_strategy={plan.merge_strategy} requer merge_partition_column")
-    if plan.mode == "snapshot_soft_delete":
-        if plan.watermark_columns:
-            raise ValueError(
-                "snapshot_soft_delete exige snapshot completo. Remova watermark_columns "
-                "ou troque o mode (ex.: scd1_upsert)."
-            )
-        if plan.filter_expression:
-            raise ValueError(
-                "snapshot_soft_delete exige snapshot completo. Remova filter_expression "
-                "ou troque o mode (ex.: scd1_upsert)."
-            )
+    _validate_static_plan_options(plan)
 
     cols_to_validate = []
     cols_to_validate += plan.watermark_columns
@@ -201,6 +171,56 @@ def _validate_plan(
     if apply_changes:
         sync_delta_schema(df, target, schema_changes, plan.schema_policy)
     return schema_changes
+
+
+def _validate_static_plan_options(plan: IngestionPlan) -> None:
+    """Valida combinações perigosas do plano sem tocar no DataFrame ou target."""
+    if plan.layer == "bronze" and plan.mode in {
+        "scd1_upsert",
+        "scd2_historical",
+        "snapshot_soft_delete",
+    }:
+        raise ValueError(
+            "Bronze deve ser orientada a captura. Use scd0_append, scd0_overwrite "
+            "ou scd1_hash_diff apenas quando houver contrato explícito."
+        )
+    if plan.mode in {"scd1_upsert", "snapshot_soft_delete", "scd2_historical"} and not plan.merge_keys:
+        raise ValueError(f"mode={plan.mode} requer merge_keys")
+    if plan.mode == "scd1_hash_diff" and not plan.hash_keys:
+        raise ValueError("mode=scd1_hash_diff requer hash_keys")
+    if plan.partition_value and not plan.partition_column:
+        raise ValueError("partition_value requer partition_column")
+    if plan.zorder_columns and not plan.optimize_after_write:
+        logger.warning("zorder_columns foi informado, mas optimize_after_write=false; ZORDER não será executado.")
+    if plan.mode == "scd1_upsert" and plan.merge_strategy in {"delta_by_partition", "replace_partitions"}:
+        if not plan.merge_partition_column:
+            raise ValueError(f"merge_strategy={plan.merge_strategy} requer merge_partition_column")
+        if (
+            plan.merge_strategy == "replace_partitions"
+            and plan.partition_column
+            and plan.partition_column != plan.merge_partition_column
+        ):
+            raise ValueError(
+                "merge_strategy=replace_partitions requer partition_column igual a "
+                "merge_partition_column quando ambos forem informados"
+            )
+    if plan.mode == "scd1_upsert" and plan.merge_strategy == "replace_partitions":
+        if not plan.replace_partitions_source_complete:
+            raise ValueError(
+                "merge_strategy=replace_partitions exige replace_partitions_source_complete=True "
+                "para confirmar que o source contém o estado completo das partições afetadas"
+            )
+    if plan.mode == "snapshot_soft_delete":
+        if plan.watermark_columns:
+            raise ValueError(
+                "snapshot_soft_delete exige snapshot completo. Remova watermark_columns "
+                "ou troque o mode (ex.: scd1_upsert)."
+            )
+        if plan.filter_expression:
+            raise ValueError(
+                "snapshot_soft_delete exige snapshot completo. Remova filter_expression "
+                "ou troque o mode (ex.: scd1_upsert)."
+            )
 
 
 def _build_dry_run_result(
