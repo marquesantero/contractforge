@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Literal, Optional, Union
 
 from .config import (
     CONFIG,
@@ -22,6 +22,8 @@ from .config import (
     VALID_QUALITY_FAIL_ACTIONS,
     VALID_QUALITY_RULE_SEVERITIES,
     VALID_SCHEMA_POLICIES,
+    VALID_SOURCE_TRIGGERS,
+    VALID_SOURCE_TYPES,
     VALID_WRITE_MODES,
     WriteMode,
 )
@@ -128,6 +130,53 @@ def _normalize_delta_properties(value: Any) -> Dict[str, str]:
     return normalized
 
 
+def _normalize_options(value: Any, field: str) -> Dict[str, Any]:
+    if value is None:
+        return {}
+    return dict(_require_mapping(value, field))
+
+
+def _normalize_source(value: Any) -> Source:
+    if isinstance(value, SourceSpec):
+        return value
+    if isinstance(value, Mapping):
+        raw = _require_mapping(value, "source")
+        source_type = _validate_enum(raw.get("type"), VALID_SOURCE_TYPES, "source.type")
+        path = str(raw.get("path") or "").strip()
+        if not path:
+            raise ValueError("source.path é obrigatório quando source é declarativo")
+        trigger = _validate_enum(
+            raw.get("trigger", "available_now"),
+            VALID_SOURCE_TRIGGERS,
+            "source.trigger",
+            default="available_now",
+        )
+        schema_location = str(raw.get("schema_location") or "").strip()
+        checkpoint_location = str(raw.get("checkpoint_location") or "").strip()
+        if not schema_location:
+            raise ValueError("source.schema_location é obrigatório para source.type=autoloader")
+        if not checkpoint_location:
+            raise ValueError("source.checkpoint_location é obrigatório para source.trigger=available_now")
+        max_files = raw.get("max_files_per_trigger")
+        return SourceSpec(
+            type=source_type,  # type: ignore[arg-type]
+            path=path,
+            format=str(raw.get("format") or "parquet").strip() or "parquet",
+            schema_location=schema_location,
+            checkpoint_location=checkpoint_location,
+            trigger=trigger,  # type: ignore[arg-type]
+            options=_normalize_options(raw.get("options"), "source.options"),
+            schema_hints=raw.get("schema_hints"),
+            include_existing_files=bool(raw.get("include_existing_files", True)),
+            max_files_per_trigger=(
+                None
+                if max_files is None
+                else _require_positive_int(max_files, "source.max_files_per_trigger")
+            ),
+        )
+    return value
+
+
 def _normalize_quality_expression(item: Any) -> QualityExpression:
     if isinstance(item, QualityExpression):
         return item
@@ -182,6 +231,22 @@ class QualityRules:
     max_null_ratio: Dict[str, float] = field(default_factory=dict)
     expressions: List[QualityExpression] = field(default_factory=list)
     custom: Dict[str, Dict[str, Any]] = field(default_factory=dict)
+
+
+@dataclass(frozen=True)
+class SourceSpec:
+    """Source declarativo. Atualmente suporta Autoloader ``available_now``."""
+
+    type: Literal["autoloader"]
+    path: str
+    format: str = "parquet"
+    schema_location: str = ""
+    checkpoint_location: str = ""
+    trigger: Literal["available_now"] = "available_now"
+    options: Dict[str, Any] = field(default_factory=dict)
+    schema_hints: Optional[str] = None
+    include_existing_files: bool = True
+    max_files_per_trigger: Optional[int] = None
 
 
 @dataclass(frozen=True)
@@ -431,6 +496,19 @@ def validate_plan_shape(plan: IngestionPlan) -> None:
         raise ValueError(
             f"column_mapping não pode produzir colunas técnicas reservadas: {reserved_mapping_targets}"
         )
+    if isinstance(plan.source, SourceSpec):
+        if plan.source.type not in VALID_SOURCE_TYPES:
+            raise ValueError(f"source.type={plan.source.type!r} não é suportado")
+        if not plan.source.path:
+            raise ValueError("source.path é obrigatório quando source é declarativo")
+        if not plan.source.schema_location:
+            raise ValueError("source.schema_location é obrigatório para source.type=autoloader")
+        if plan.source.trigger not in VALID_SOURCE_TRIGGERS:
+            raise ValueError(f"source.trigger={plan.source.trigger!r} não é suportado")
+        if not plan.source.checkpoint_location:
+            raise ValueError("source.checkpoint_location é obrigatório para source.trigger=available_now")
+        if plan.mode == "snapshot_soft_delete":
+            raise ValueError("snapshot_soft_delete é incompatível com sources incrementais declarativos")
     if plan.quality_rules:
         if plan.quality_rules.min_rows is not None and plan.quality_rules.min_rows <= 0:
             raise ValueError("quality_rules.min_rows deve ser inteiro positivo")
@@ -492,7 +570,7 @@ def build_plan_from_kwargs(**kwargs: Any) -> IngestionPlan:
         default="always_run",
     )
     plan = IngestionPlan(
-        source=kwargs["source"],
+        source=_normalize_source(kwargs["source"]),
         target_table=kwargs["target_table"],
         catalog=kwargs.get("catalog", CONFIG.default_catalog),
         layer=layer,  # type: ignore[arg-type]

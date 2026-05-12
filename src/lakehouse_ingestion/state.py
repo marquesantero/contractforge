@@ -33,6 +33,7 @@ def ctrl_table_names(catalog: str, schema: str) -> Dict[str, str]:
         "metadata": full_table_name(catalog, schema, CONFIG.ctrl_table_metadata),
         "errors": full_table_name(catalog, schema, CONFIG.ctrl_table_errors),
         "schema_changes": full_table_name(catalog, schema, CONFIG.ctrl_table_schema_changes),
+        "streams": full_table_name(catalog, schema, CONFIG.ctrl_table_streams),
     }
 
 
@@ -266,6 +267,41 @@ def ensure_ctrl_tables(catalog: str, schema: str) -> Dict[str, str]:
             ctrl_schema_version BIGINT
         ) USING DELTA
     """)
+    spark.sql(f"""
+        CREATE TABLE IF NOT EXISTS {qt(tables['streams'])} (
+            stream_run_id STRING,
+            idempotency_key STRING,
+            idempotency_policy STRING,
+            skip_reason STRING,
+            skipped_by_stream_run_id STRING,
+            target_table STRING,
+            target_catalog STRING,
+            target_layer STRING,
+            notebook_name STRING,
+            source_type STRING,
+            source_path STRING,
+            trigger STRING,
+            checkpoint_location STRING,
+            status STRING,
+            started_at_utc TIMESTAMP,
+            ended_at_utc TIMESTAMP,
+            duration_seconds DOUBLE,
+            batches_processed BIGINT,
+            total_rows_read BIGINT,
+            total_rows_written BIGINT,
+            total_rows_quarantined BIGINT,
+            framework_version STRING,
+            ctrl_schema_version BIGINT,
+            runtime_type STRING,
+            spark_version STRING,
+            python_version STRING,
+            error_message STRING,
+            master_job_id STRING,
+            master_run_id STRING,
+            parent_run_id STRING,
+            run_group_id STRING
+        ) USING DELTA
+    """)
     _add_columns_if_missing(
         tables["runs"],
         {
@@ -305,6 +341,68 @@ def ensure_ctrl_tables(catalog: str, schema: str) -> Dict[str, str]:
     )
     _record_ctrl_metadata(tables)
     return tables
+
+
+_STREAM_COLUMNS = [
+    "stream_run_id", "idempotency_key", "idempotency_policy", "skip_reason",
+    "skipped_by_stream_run_id", "target_table", "target_catalog", "target_layer",
+    "notebook_name", "source_type", "source_path", "trigger", "checkpoint_location",
+    "status", "started_at_utc", "ended_at_utc", "duration_seconds", "batches_processed",
+    "total_rows_read", "total_rows_written", "total_rows_quarantined", "framework_version",
+    "ctrl_schema_version", "runtime_type", "spark_version", "python_version", "error_message",
+    "master_job_id", "master_run_id", "parent_run_id", "run_group_id",
+]
+_STREAM_INT_COLUMNS = {
+    "batches_processed", "total_rows_read", "total_rows_written", "total_rows_quarantined",
+    "ctrl_schema_version",
+}
+
+
+def log_stream_start(tables: Dict[str, str], payload: Dict[str, Any]) -> None:
+    """Insere início de execução em ``ctrl_ingestion_streams``."""
+    values = []
+    for c in _STREAM_COLUMNS:
+        v = payload.get(c)
+        if c in _STREAM_INT_COLUMNS:
+            values.append(sql_int(v))
+        elif c == "duration_seconds":
+            values.append("NULL" if v is None else str(float(v)))
+        elif c.endswith("_utc"):
+            values.append(f"CAST({sql_lit(v)} AS TIMESTAMP)")
+        elif c == "error_message":
+            values.append(sql_lit(safe_truncate(v, 2000)))
+        else:
+            values.append(sql_lit(v))
+    spark.sql(
+        f"INSERT INTO {qt(tables['streams'])} ({', '.join(_STREAM_COLUMNS)}) "
+        f"VALUES ({', '.join(values)})"
+    )
+
+
+def log_stream_finish(tables: Dict[str, str], stream_run_id: str, payload: Dict[str, Any]) -> None:
+    """Atualiza fim de execução em ``ctrl_ingestion_streams``."""
+    assignments = []
+    for c in _STREAM_COLUMNS:
+        if c == "stream_run_id" or c not in payload:
+            continue
+        v = payload.get(c)
+        if c in _STREAM_INT_COLUMNS:
+            rendered = sql_int(v)
+        elif c == "duration_seconds":
+            rendered = "NULL" if v is None else str(float(v))
+        elif c.endswith("_utc"):
+            rendered = f"CAST({sql_lit(v)} AS TIMESTAMP)"
+        elif c == "error_message":
+            rendered = sql_lit(safe_truncate(v, 2000))
+        else:
+            rendered = sql_lit(v)
+        assignments.append(f"{q(c)} = {rendered}")
+    if not assignments:
+        return
+    spark.sql(
+        f"UPDATE {qt(tables['streams'])} SET {', '.join(assignments)} "
+        f"WHERE stream_run_id = {sql_lit(stream_run_id)}"
+    )
 
 
 _RUN_COLUMNS = [
@@ -477,6 +575,36 @@ def find_idempotent_run(
         row = (
             query.orderBy(F.col("run_ts_utc").desc_nulls_last())
             .select("run_id", "status")
+            .limit(1)
+            .first()
+        )
+        return None if row is None else row.asDict(recursive=True)
+    except Exception:
+        return None
+
+
+def find_idempotent_stream(
+    tables: Dict[str, str],
+    target: str,
+    idempotency_key: Optional[str],
+    status: Optional[str] = None,
+) -> Optional[Dict[str, Any]]:
+    """Retorna stream mais recente para ``target`` + ``idempotency_key``."""
+    if not idempotency_key:
+        return None
+    try:
+        query = (
+            spark.read.table(tables["streams"])
+            .where(
+                (F.col("target_table") == target)
+                & (F.col("idempotency_key") == idempotency_key)
+            )
+        )
+        if status:
+            query = query.where(F.col("status") == status)
+        row = (
+            query.orderBy(F.col("started_at_utc").desc_nulls_last())
+            .select("stream_run_id", "status")
             .limit(1)
             .first()
         )

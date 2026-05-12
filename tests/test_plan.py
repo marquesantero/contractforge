@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import pytest
 
-from lakehouse_ingestion import IngestionPlan, QualityExpression, QualityRules, ingest
+from lakehouse_ingestion import IngestionPlan, QualityExpression, QualityRules, SourceSpec, ingest
 from lakehouse_ingestion.plan import (
     build_plan_from_kwargs,
     normalize_quality_rules,
@@ -127,6 +127,70 @@ def test_build_plan_accepts_programmatic_hooks():
     hooks = IngestionHooks(before_read=lambda plan: None)
     plan = build_plan_from_kwargs(source="x", target_table="t", hooks=hooks)
     assert plan.hooks is hooks
+
+
+def test_build_plan_normalizes_source_spec_from_dict():
+    plan = build_plan_from_kwargs(
+        source={
+            "type": "autoloader",
+            "path": "/Volumes/main/raw/orders",
+            "format": "json",
+            "schema_location": "/Volumes/main/ops/schemas/orders",
+            "checkpoint_location": "/Volumes/main/ops/checkpoints/orders",
+            "trigger": "available_now",
+            "options": {"cloudFiles.inferColumnTypes": "true"},
+            "max_files_per_trigger": "10",
+        },
+        target_table="b_orders",
+    )
+    assert isinstance(plan.source, SourceSpec)
+    assert plan.source.type == "autoloader"
+    assert plan.source.format == "json"
+    assert plan.source.options == {"cloudFiles.inferColumnTypes": "true"}
+    assert plan.source.max_files_per_trigger == 10
+
+
+@pytest.mark.parametrize(
+    "source, match",
+    [
+        ({"type": "autoloader"}, "source.path"),
+        (
+            {"type": "autoloader", "path": "/x", "checkpoint_location": "/c"},
+            "schema_location",
+        ),
+        (
+            {"type": "autoloader", "path": "/x", "schema_location": "/s"},
+            "checkpoint_location",
+        ),
+        (
+            {
+                "type": "files",
+                "path": "/x",
+                "schema_location": "/s",
+                "checkpoint_location": "/c",
+            },
+            "source.type",
+        ),
+    ],
+)
+def test_build_plan_rejects_invalid_source_spec(source, match):
+    with pytest.raises(ValueError, match=match):
+        build_plan_from_kwargs(source=source, target_table="b_orders")
+
+
+def test_source_spec_rejects_snapshot_soft_delete():
+    with pytest.raises(ValueError, match="snapshot_soft_delete"):
+        build_plan_from_kwargs(
+            source={
+                "type": "autoloader",
+                "path": "/x",
+                "schema_location": "/s",
+                "checkpoint_location": "/c",
+            },
+            target_table="snapshot",
+            mode="snapshot_soft_delete",
+            merge_keys="id",
+        )
 
 
 def test_build_plan_rejects_unknown_kwargs():

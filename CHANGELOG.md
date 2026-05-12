@@ -6,6 +6,14 @@ Este projeto segue versionamento semântico enquanto a biblioteca evolui:
 - `MINOR`: novo recurso compatível ou endurecimento planejado do contrato.
 - `MAJOR`: mudança incompatível depois de adoção estável.
 
+## 1.5.0 - 2026-05-12
+
+- Adiciona `SourceSpec` declarativo para Autoloader em modo `available_now`.
+- Adiciona registry de source resolvers (`register_source_resolver`).
+- Adiciona `ingest_stream_plan` com `foreachBatch` reaproveitando `ingest_plan` por batch.
+- Adiciona `ctrl_ingestion_streams` e eleva `ctrl_schema_version` para 7.
+- Aplica idempotência no nível do stream e por batch para evitar duplicação em reexecuções.
+
 ## 1.4.0 - 2026-05-12
 
 - Adiciona `column_mapping` para renomear source -> target com validação de colisões e colunas técnicas.

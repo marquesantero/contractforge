@@ -64,6 +64,33 @@ result = ingest(
 )
 ```
 
+## Fontes Declarativas
+
+Além de tabela e DataFrame, `source` aceita `SourceSpec` declarativo para Autoloader em modo finito `available_now`:
+
+```python
+result = ingest(
+    source={
+        "type": "autoloader",
+        "path": "/Volumes/main/raw/orders",
+        "format": "parquet",
+        "schema_location": "/Volumes/main/ops/schemas/orders",
+        "checkpoint_location": "/Volumes/main/ops/checkpoints/orders",
+        "trigger": "available_now",
+    },
+    target_table="b_orders",
+    catalog="main",
+    layer="bronze",
+    mode="scd0_append",
+    idempotency_key="orders-2026-05-12",
+    idempotency_policy="skip_if_success",
+)
+```
+
+O stream usa `foreachBatch` e cada batch chama `ingest_plan` internamente. A execução externa é registrada em `ctrl_ingestion_streams`; os runs filhos ficam em `ctrl_ingestion_runs` com `parent_run_id = stream_run_id`.
+
+Escopo intencional: apenas Autoloader `available_now`. Streaming contínuo (`processingTime`/`continuous`) continua fora da lib.
+
 ## Contrato declarativo
 
 - `column_mapping` renomeia colunas source -> target antes de filtros, watermarks, quality e escrita. Destinos duplicados, colisões com colunas existentes e nomes técnicos reservados são rejeitados.
@@ -134,6 +161,7 @@ O framework cria tabelas de controle no schema configurado:
 - `ctrl_ingestion_errors`
 - `ctrl_ingestion_metadata`
 - `ctrl_ingestion_schema_changes`
+- `ctrl_ingestion_streams`
 
 `explain_mode=True` captura o plano Spark do DataFrame preparado.
 
@@ -179,6 +207,7 @@ src/lakehouse_ingestion/
 ├── _sql.py            # Helpers de identificadores e literais SQL
 ├── config.py          # FrameworkConfig, tipos e constantes
 ├── plan.py            # IngestionPlan, QualityRules, build_plan_from_kwargs
+├── sources.py         # Source resolvers declarativos (Autoloader available_now)
 ├── schema.py          # hash, dedup, encoding, schema policy
 ├── watermark.py       # watermark simples e composto, encode/decode/apply
 ├── quality.py         # quality gates (avaliação consolidada) + quarentena

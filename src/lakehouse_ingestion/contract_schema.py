@@ -11,6 +11,8 @@ from .config import (
     VALID_QUALITY_FAIL_ACTIONS,
     VALID_QUALITY_RULE_SEVERITIES,
     VALID_SCHEMA_POLICIES,
+    VALID_SOURCE_TRIGGERS,
+    VALID_SOURCE_TYPES,
     VALID_WRITE_MODES,
 )
 
@@ -42,7 +44,28 @@ def yaml_schema() -> Dict[str, Any]:
         "additionalProperties": False,
         "required": ["source", "target_table"],
         "properties": {
-            "source": {"type": "string"},
+            "source": {
+                "oneOf": [
+                    {"type": "string"},
+                    {
+                        "type": "object",
+                        "additionalProperties": False,
+                        "required": ["type", "path", "schema_location", "checkpoint_location"],
+                        "properties": {
+                            "type": {"enum": sorted(VALID_SOURCE_TYPES)},
+                            "path": {"type": "string"},
+                            "format": {"type": "string"},
+                            "schema_location": {"type": "string"},
+                            "checkpoint_location": {"type": "string"},
+                            "trigger": {"enum": sorted(VALID_SOURCE_TRIGGERS)},
+                            "options": {"type": "object"},
+                            "schema_hints": {"type": ["string", "null"]},
+                            "include_existing_files": {"type": "boolean"},
+                            "max_files_per_trigger": {"type": "integer", "minimum": 1},
+                        },
+                    },
+                ]
+            },
             "target_table": {"type": "string"},
             "catalog": {"type": "string"},
             "layer": {"enum": sorted(VALID_LAYERS)},

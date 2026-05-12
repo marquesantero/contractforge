@@ -1,6 +1,6 @@
 # Lakehouse Ingestion Framework — Arquitetura e Referência Técnica
 
-**Versão do pacote:** `1.4.0`
+**Versão do pacote:** `1.5.0`
 **Pacote Python:** `lakehouse-ingestion-framework`
 **Import principal:** `lakehouse_ingestion`
 **Ambiente-alvo:** Databricks Runtime, Unity Catalog, Delta Lake (também roda em PySpark + delta-spark fora do Databricks)
@@ -100,8 +100,12 @@ lakehouse_ingestion_pkg/
 │       ├── __init__.py     # façade pública
 │       ├── _spark.py       # resolução lazy de SparkSession + serverless
 │       ├── _sql.py         # helpers de identificadores, literais, datas
+│       ├── cli.py          # comandos lakehouse-ingest validate/schema
+│       ├── contract_schema.py # JSON Schema do contrato declarativo
 │       ├── config.py       # FrameworkConfig + tipos (Layer, WriteMode, ...)
+│       ├── hooks.py        # hooks opcionais de pré/pós-ingestão
 │       ├── plan.py         # IngestionPlan, QualityRules, build_plan_from_kwargs
+│       ├── sources.py      # Source resolvers declarativos
 │       ├── schema.py       # hash, dedup, custom keys, encoding, schema policy
 │       ├── watermark.py    # encode/decode/apply/compute watermarks tipados
 │       ├── quality.py      # evaluate_quality (single-pass) + quarentena
@@ -127,6 +131,8 @@ lakehouse_ingestion_pkg/
    ingestion.py  ← orquestrador
         │
         ├─→ plan.py ─┐
+        ├─→ sources.py ─┐
+        ├─→ hooks.py ───┤
         ├─→ writers.py ──┐
         ├─→ quality.py ──┤
         ├─→ state.py ────┤
@@ -140,6 +146,9 @@ lakehouse_ingestion_pkg/
 
 - `_spark.py`, `_sql.py`, `config.py` são **folhas**: não dependem de outros módulos do pacote.
 - `plan.py` depende só de `config.py` e `_sql.py`.
+- `sources.py` depende de `plan.py` e `_spark.py`.
+- `hooks.py` é um contrato leve usado por `plan.py` e `ingestion.py`.
+- `contract_schema.py` depende de constantes em `config.py`.
 - `schema.py` depende de `_spark.py`, `_sql.py`, `config.py`.
 - `watermark.py` depende de `_spark.py`, `_sql.py`, `schema.py` (para `table_exists`).
 - `quality.py` depende de `plan.py` (`QualityRules`), `_spark.py`, `_sql.py`, `config.py`.
@@ -354,7 +363,7 @@ Frozen para passagem segura entre threads/jobs. Construtores aceitam dict via `n
 
 Frozen dataclass com 40+ campos. Agrupados por finalidade:
 
-**Identificação** — `source` (str ou DataFrame), `target_table`, `catalog`, `layer`, `mode`, `source_system`, `ctrl_schema`, `notebook_name`.
+**Identificação** — `source` (str, DataFrame ou `SourceSpec`), `target_table`, `catalog`, `layer`, `mode`, `source_system`, `ctrl_schema`, `notebook_name`.
 
 **Metadados de contrato** — `description`, `owner`, `domain`, `tags`, `sla`, `runtime_parameters`. Não mudam a escrita; são propagados para retorno e `ctrl_ingestion_runs`.
 
@@ -404,6 +413,7 @@ Pontos importantes:
 - **`column_mapping`** renomeia colunas source -> target antes da validação do plano; colisões, destinos duplicados e nomes técnicos reservados são bloqueados.
 - **`delta_properties`** aplica TBLPROPERTIES na criação da tabela Delta.
 - **`retry_attempts`/`retry_backoff_seconds`** sobrescrevem retry global por plano.
+- **`SourceSpec`** aceita Autoloader declarativo com `trigger="available_now"`, `schema_location` e `checkpoint_location` obrigatórios.
 
 ### 4.5 `schema.py` — Hash, dedup, encoding e schema policy
 
@@ -887,7 +897,15 @@ Eventos OpenLineage 1.0.5 com facets:
 Mantém apenas:
 
 - Imports e logger.
-- `_resolve_source(plan)` — abre table OU usa DataFrame.
+- `_resolve_source(plan)` — abre table OU usa DataFrame. Quando `source` é `SourceSpec`, `ingest_plan` despacha para `ingest_stream_plan`.
+
+### Streaming `available_now`
+
+`SourceSpec(type="autoloader")` usa `spark.readStream.format("cloudFiles")` com `trigger(availableNow=True)`. O stream é finito: processa arquivos disponíveis no checkpoint e termina.
+
+Cada micro-batch chama `ingest_plan` com `source=batch_df`, `parent_run_id=stream_run_id`, `lock_enabled=False` e `idempotency_key="<stream-key>:batch:<batch_id>"`. Isso preserva a semântica at-least-once do `foreachBatch` sem duplicar batches já concluídos.
+
+O ciclo externo fica em `ctrl_ingestion_streams`; os runs filhos continuam em `ctrl_ingestion_runs`.
 - `_prepare_dataframe(df, plan, run_id, run_date, wm_prev)` — encadeia transformações pré-quality.
 - `_validate_plan(plan, df, target)` — regras de negócio + schema policy.
 - `_build_dry_run_result(...)` — payload de retorno em dry-run.
@@ -1356,7 +1374,7 @@ python -m build
 twine check dist/*
 ```
 
-Gera `dist/lakehouse_ingestion_framework-1.4.0-py3-none-any.whl` e `.tar.gz`.
+Gera `dist/lakehouse_ingestion_framework-1.5.0-py3-none-any.whl` e `.tar.gz`.
 
 ### 14.2 Instalação no Databricks
 

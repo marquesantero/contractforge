@@ -9,6 +9,7 @@ from __future__ import annotations
 import logging
 import traceback
 from datetime import datetime
+from dataclasses import replace
 from typing import Any, Dict, Optional, Tuple
 
 from pyspark.sql import DataFrame
@@ -20,6 +21,7 @@ from .plan import (  # noqa: F401
     IngestionPlan,
     QualityExpression,
     QualityRules,
+    SourceSpec,
     build_plan_from_kwargs,
     validate_plan_shape,
 )
@@ -48,13 +50,17 @@ from .state import (
     ctrl_table_names,
     ensure_ctrl_tables,
     find_idempotent_run,
+    find_idempotent_stream,
     log_error,
     log_run,
     log_schema_changes,
+    log_stream_finish,
+    log_stream_start,
     release_lock,
     upsert_state,
     with_retry,
 )
+from .sources import get_source_resolver
 from .watermark import apply_watermark, compute_watermark, get_watermark
 from .writers import (
     affected_partition_values,
@@ -160,6 +166,10 @@ def _resolve_source(plan: IngestionPlan) -> Tuple[DataFrame, str]:
         )
         return spark.read.table(source_full), source_full
     return plan.source, "dataframe"
+
+
+def _stream_source_name(source: SourceSpec) -> str:
+    return f"{source.type}:{source.path}"
 
 
 def _prepare_dataframe(
@@ -531,6 +541,331 @@ def _finalize_execution(
     )
 
 
+def _stream_result(
+    plan: IngestionPlan,
+    stream_run_id: str,
+    target: str,
+    source_name: str,
+    status: str,
+    started_dt: datetime,
+    runtime_meta: Dict[str, Optional[str]],
+    batch_results: list[Dict[str, Any]],
+    stage_durations: Dict[str, float],
+    error: Optional[str] = None,
+    skip_reason: Optional[str] = None,
+    skipped_by_stream_run_id: Optional[str] = None,
+) -> Dict[str, Any]:
+    finished_dt = utc_now_ts()
+    return {
+        "status": status,
+        "stream_run_id": stream_run_id,
+        "target_table": target,
+        "source_table": source_name,
+        "mode": plan.mode,
+        "batches_processed": len(batch_results),
+        "total_rows_read": sum(int(r.get("rows_read") or 0) for r in batch_results),
+        "total_rows_written": sum(int(r.get("rows_written") or 0) for r in batch_results),
+        "total_rows_quarantined": sum(int(r.get("rows_quarantined") or 0) for r in batch_results),
+        "batch_results": batch_results,
+        "stage_durations": stage_durations,
+        "duration_seconds": (finished_dt - started_dt).total_seconds(),
+        "error_message": _short_error_message(error),
+        "idempotency_key": plan.idempotency_key,
+        "idempotency_policy": plan.idempotency_policy,
+        "skip_reason": skip_reason,
+        "skipped_by_stream_run_id": skipped_by_stream_run_id,
+        "contract_metadata": _contract_metadata(plan),
+        "framework_version": FRAMEWORK_VERSION,
+        "ctrl_schema_version": CTRL_SCHEMA_VERSION,
+        **runtime_meta,
+    }
+
+
+def ingest_stream_plan(plan: IngestionPlan) -> Dict[str, Any]:
+    """Executa ``SourceSpec`` em Autoloader ``available_now``.
+
+    Cada micro-batch vira uma chamada a ``ingest_plan`` com ``source=batch_df``.
+    A execução externa registra o ciclo em ``ctrl_ingestion_streams``.
+    """
+    validate_plan_shape(plan)
+    if not isinstance(plan.source, SourceSpec):
+        raise ValueError("ingest_stream_plan requer plan.source como SourceSpec")
+
+    stream_run_id = new_run_id()
+    run_date = today_str()
+    started_dt = utc_now_ts()
+    target = full_table_name(plan.catalog, plan.layer, plan.target_table)
+    source_name = _stream_source_name(plan.source)
+    runtime_meta = runtime_info()
+    stage_durations: Dict[str, float] = {}
+    batch_results: list[Dict[str, Any]] = []
+    status = "SUCCESS"
+    error: Optional[str] = None
+    error_type: Optional[str] = None
+    skip_reason: Optional[str] = None
+    skipped_by_stream_run_id: Optional[str] = None
+    tables = ctrl_table_names(plan.catalog, plan.ctrl_schema) if plan.dry_run else None
+    lock_acquired = False
+    stream_logged = False
+
+    if plan.dry_run:
+        return _stream_result(
+            plan,
+            stream_run_id,
+            target,
+            source_name,
+            "DRY_RUN",
+            started_dt,
+            runtime_meta,
+            batch_results,
+            stage_durations,
+        )
+
+    try:
+        stage_started = utc_now_ts()
+        tables = ensure_ctrl_tables(plan.catalog, plan.ctrl_schema)
+        stage_durations["control_setup"] = (utc_now_ts() - stage_started).total_seconds()
+
+        stage_started = utc_now_ts()
+        previous_success = find_idempotent_stream(
+            tables, target, plan.idempotency_key, status="SUCCESS"
+        )
+        stage_durations["idempotency"] = (utc_now_ts() - stage_started).total_seconds()
+        previous_status = previous_success.get("status") if previous_success else None
+        previous_stream_run_id = previous_success.get("stream_run_id") if previous_success else None
+
+        if (
+            plan.idempotency_policy in {"skip_if_success", "rerun_if_failed"}
+            and previous_status == "SUCCESS"
+        ):
+            status = "SKIPPED"
+            skip_reason = "idempotency_key_already_succeeded"
+            skipped_by_stream_run_id = previous_stream_run_id
+            log_stream_start(
+                tables,
+                {
+                    "stream_run_id": stream_run_id,
+                    "idempotency_key": plan.idempotency_key,
+                    "idempotency_policy": plan.idempotency_policy,
+                    "skip_reason": skip_reason,
+                    "skipped_by_stream_run_id": skipped_by_stream_run_id,
+                    "target_table": target,
+                    "target_catalog": plan.catalog,
+                    "target_layer": plan.layer,
+                    "notebook_name": plan.notebook_name,
+                    "source_type": plan.source.type,
+                    "source_path": plan.source.path,
+                    "trigger": plan.source.trigger,
+                    "checkpoint_location": plan.source.checkpoint_location,
+                    "status": status,
+                    "started_at_utc": started_dt.strftime("%Y-%m-%d %H:%M:%S"),
+                    "ended_at_utc": utc_now_str(),
+                    "duration_seconds": (utc_now_ts() - started_dt).total_seconds(),
+                    "batches_processed": 0,
+                    "total_rows_read": 0,
+                    "total_rows_written": 0,
+                    "total_rows_quarantined": 0,
+                    "framework_version": FRAMEWORK_VERSION,
+                    "ctrl_schema_version": CTRL_SCHEMA_VERSION,
+                    **runtime_meta,
+                    "master_job_id": plan.master_job_id,
+                    "master_run_id": plan.master_run_id,
+                    "parent_run_id": plan.parent_run_id,
+                    "run_group_id": plan.run_group_id,
+                },
+            )
+            stream_logged = True
+            return _stream_result(
+                plan,
+                stream_run_id,
+                target,
+                source_name,
+                status,
+                started_dt,
+                runtime_meta,
+                batch_results,
+                stage_durations,
+                skip_reason=skip_reason,
+                skipped_by_stream_run_id=skipped_by_stream_run_id,
+            )
+
+        if plan.idempotency_policy == "fail_if_success" and previous_status == "SUCCESS":
+            raise RuntimeError(
+                "idempotency_policy=fail_if_success bloqueou o stream: "
+                f"idempotency_key={plan.idempotency_key!r} já teve sucesso em stream_run_id={previous_stream_run_id}"
+            )
+
+        log_stream_start(
+            tables,
+            {
+                "stream_run_id": stream_run_id,
+                "idempotency_key": plan.idempotency_key,
+                "idempotency_policy": plan.idempotency_policy,
+                "target_table": target,
+                "target_catalog": plan.catalog,
+                "target_layer": plan.layer,
+                "notebook_name": plan.notebook_name,
+                "source_type": plan.source.type,
+                "source_path": plan.source.path,
+                "trigger": plan.source.trigger,
+                "checkpoint_location": plan.source.checkpoint_location,
+                "status": "RUNNING",
+                "started_at_utc": started_dt.strftime("%Y-%m-%d %H:%M:%S"),
+                "batches_processed": 0,
+                "total_rows_read": 0,
+                "total_rows_written": 0,
+                "total_rows_quarantined": 0,
+                "framework_version": FRAMEWORK_VERSION,
+                "ctrl_schema_version": CTRL_SCHEMA_VERSION,
+                **runtime_meta,
+                "master_job_id": plan.master_job_id,
+                "master_run_id": plan.master_run_id,
+                "parent_run_id": plan.parent_run_id,
+                "run_group_id": plan.run_group_id,
+            },
+        )
+        stream_logged = True
+
+        if plan.lock_enabled:
+            stage_started = utc_now_ts()
+            acquire_lock(tables, target, stream_run_id, owner=stream_run_id)
+            lock_acquired = True
+            stage_durations["lock_acquire"] = (utc_now_ts() - stage_started).total_seconds()
+
+        stage_started = utc_now_ts()
+        stream_df, source_name = get_source_resolver(plan.source.type).resolve_stream(plan.source, plan)
+        stage_durations["stream_resolve"] = (utc_now_ts() - stage_started).total_seconds()
+
+        def _process_batch(batch_df: DataFrame, batch_id: int) -> None:
+            batch_key_prefix = plan.idempotency_key or stream_run_id
+            sub_plan = replace(
+                plan,
+                source=batch_df,
+                parent_run_id=stream_run_id,
+                lock_enabled=False,
+                idempotency_key=f"{batch_key_prefix}:batch:{batch_id}",
+                idempotency_policy="skip_if_success",
+            )
+            result = ingest_plan(sub_plan)
+            batch_results.append(result)
+            if result["status"] == "FAILED":
+                raise RuntimeError(
+                    f"Batch {batch_id} falhou em stream_run_id={stream_run_id}: "
+                    f"{result.get('error_message')}"
+                )
+
+        stage_started = utc_now_ts()
+        query = (
+            stream_df.writeStream.foreachBatch(_process_batch)
+            .option("checkpointLocation", plan.source.checkpoint_location)
+            .trigger(availableNow=True)
+            .start()
+        )
+        query.awaitTermination()
+        stage_durations["stream_run"] = (utc_now_ts() - stage_started).total_seconds()
+
+    except Exception as exc:
+        status = "FAILED"
+        error_type = type(exc).__name__
+        error = "".join(traceback.format_exception(type(exc), exc, exc.__traceback__))
+        logger.error(f"Stream de ingestão falhou: {exc}")
+    finally:
+        finished_dt = utc_now_ts()
+        if tables and lock_acquired:
+            release_lock(tables, target, stream_run_id)
+        if tables:
+            if not stream_logged:
+                try:
+                    log_stream_start(
+                        tables,
+                        {
+                            "stream_run_id": stream_run_id,
+                            "idempotency_key": plan.idempotency_key,
+                            "idempotency_policy": plan.idempotency_policy,
+                            "target_table": target,
+                            "target_catalog": plan.catalog,
+                            "target_layer": plan.layer,
+                            "notebook_name": plan.notebook_name,
+                            "source_type": plan.source.type,
+                            "source_path": plan.source.path,
+                            "trigger": plan.source.trigger,
+                            "checkpoint_location": plan.source.checkpoint_location,
+                            "status": status,
+                            "started_at_utc": started_dt.strftime("%Y-%m-%d %H:%M:%S"),
+                            "batches_processed": 0,
+                            "total_rows_read": 0,
+                            "total_rows_written": 0,
+                            "total_rows_quarantined": 0,
+                            "framework_version": FRAMEWORK_VERSION,
+                            "ctrl_schema_version": CTRL_SCHEMA_VERSION,
+                            **runtime_meta,
+                            "master_job_id": plan.master_job_id,
+                            "master_run_id": plan.master_run_id,
+                            "parent_run_id": plan.parent_run_id,
+                            "run_group_id": plan.run_group_id,
+                        },
+                    )
+                    stream_logged = True
+                except Exception as start_log_exc:
+                    logger.error(f"Falha ao registrar início do stream: {start_log_exc}")
+            try:
+                log_stream_finish(
+                    tables,
+                    stream_run_id,
+                    {
+                        "status": status,
+                        "ended_at_utc": finished_dt.strftime("%Y-%m-%d %H:%M:%S"),
+                        "duration_seconds": (finished_dt - started_dt).total_seconds(),
+                        "batches_processed": len(batch_results),
+                        "total_rows_read": sum(int(r.get("rows_read") or 0) for r in batch_results),
+                        "total_rows_written": sum(int(r.get("rows_written") or 0) for r in batch_results),
+                        "total_rows_quarantined": sum(
+                            int(r.get("rows_quarantined") or 0) for r in batch_results
+                        ),
+                        "error_message": _short_error_message(error),
+                    },
+                )
+            except Exception as log_exc:
+                logger.error(f"Falha ao registrar stream: {log_exc}")
+            if error:
+                try:
+                    log_error(
+                        tables,
+                        {
+                            "run_id": stream_run_id,
+                            "error_ts_utc": utc_now_str(),
+                            "error_date": run_date,
+                            "target_table": target,
+                            "source_table": source_name,
+                            "mode": plan.mode,
+                            "status": status,
+                            "error_type": error_type,
+                            "error_message": _short_error_message(error),
+                            "stack_trace": error,
+                            "framework_version": FRAMEWORK_VERSION,
+                            "ctrl_schema_version": CTRL_SCHEMA_VERSION,
+                            **runtime_meta,
+                        },
+                    )
+                except Exception as error_log_exc:
+                    logger.error(f"Falha ao registrar erro completo do stream: {error_log_exc}")
+
+    return _stream_result(
+        plan,
+        stream_run_id,
+        target,
+        source_name,
+        status,
+        started_dt,
+        runtime_meta,
+        batch_results,
+        stage_durations,
+        error=error,
+        skip_reason=skip_reason,
+        skipped_by_stream_run_id=skipped_by_stream_run_id,
+    )
+
+
 def ingest_plan(plan: IngestionPlan) -> Dict[str, Any]:
     """Orquestra a execução de um ``IngestionPlan`` completo.
 
@@ -552,6 +887,9 @@ def ingest_plan(plan: IngestionPlan) -> Dict[str, Any]:
         Dict com status, run_id, contagens, watermarks, mudanças de schema,
         métricas Delta, evento OpenLineage e mensagem de erro (se houver).
     """
+    if isinstance(plan.source, SourceSpec):
+        return ingest_stream_plan(plan)
+
     run_id = new_run_id()
     run_ts = utc_now_str()
     run_date = today_str()

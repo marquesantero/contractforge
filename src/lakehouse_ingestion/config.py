@@ -10,8 +10,8 @@ from typing import Literal, Union
 
 from pyspark.sql import DataFrame
 
-FRAMEWORK_VERSION = "1.4.0"
-CTRL_SCHEMA_VERSION = 6
+FRAMEWORK_VERSION = "1.5.0"
+CTRL_SCHEMA_VERSION = 7
 
 #: Camadas reconhecidas (Medallion Architecture).
 Layer = Literal["bronze", "silver", "gold"]
@@ -41,8 +41,8 @@ QualityRuleSeverity = Literal["warn", "quarantine", "abort"]
 #: Política de idempotência para uma ``idempotency_key`` lógica.
 IdempotencyPolicy = Literal["always_run", "skip_if_success", "fail_if_success", "rerun_if_failed"]
 
-#: Fonte aceita pelo plano: nome de tabela ou DataFrame em memória.
-Source = Union[str, DataFrame]
+#: Fonte aceita pelo plano: nome de tabela, DataFrame em memória ou source declarativo.
+Source = Union[str, DataFrame, "SourceSpec"]  # noqa: F821
 
 #: Conjunto usado em validação runtime (Literal só faz tipagem estática).
 VALID_WRITE_MODES = {
@@ -74,6 +74,12 @@ VALID_IDEMPOTENCY_POLICIES = {"always_run", "skip_if_success", "fail_if_success"
 
 #: Formatos de explain aceitos por ``DataFrame.explain``.
 VALID_EXPLAIN_FORMATS = {"simple", "extended", "codegen", "cost", "formatted"}
+
+#: Tipos de source declarativo aceitos.
+VALID_SOURCE_TYPES = {"autoloader"}
+
+#: Triggers aceitos para sources declarativos.
+VALID_SOURCE_TRIGGERS = {"available_now"}
 
 #: Colunas gerenciadas pelo framework. Excluídas do hash determinístico em
 #: ``schema.hash_columns`` para que mudanças em controle não invalidem
@@ -133,6 +139,7 @@ class FrameworkConfig:
     ctrl_table_metadata: str = "ctrl_ingestion_metadata"
     ctrl_table_errors: str = "ctrl_ingestion_errors"
     ctrl_table_schema_changes: str = "ctrl_ingestion_schema_changes"
+    ctrl_table_streams: str = "ctrl_ingestion_streams"
     max_error_len: int = 8000
     default_lock_ttl_minutes: int = 120
     default_retry_attempts: int = 3

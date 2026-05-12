@@ -110,14 +110,14 @@ Recomendado para uso compartilhado em produção.
 ```bash
 pip install build
 python -m build
-# gera: dist/lakehouse_ingestion_framework-1.4.0-py3-none-any.whl
+# gera: dist/lakehouse_ingestion_framework-1.5.0-py3-none-any.whl
 ```
 
 **Passo 2 — Upload para Unity Catalog Volume:**
 
 ```bash
 # via Databricks CLI
-databricks fs cp dist/lakehouse_ingestion_framework-1.4.0-py3-none-any.whl \
+databricks fs cp dist/lakehouse_ingestion_framework-1.5.0-py3-none-any.whl \
   dbfs:/Volumes/<catalog>/<schema>/libs/
 ```
 
@@ -127,7 +127,7 @@ Ou pela UI: **Catalog → Volumes → Upload to volume**.
 
 1. Compute → seu cluster → Libraries → **Install new**
 2. Source: **Volume**
-3. File path: `/Volumes/<catalog>/<schema>/libs/lakehouse_ingestion_framework-1.4.0-py3-none-any.whl`
+3. File path: `/Volumes/<catalog>/<schema>/libs/lakehouse_ingestion_framework-1.5.0-py3-none-any.whl`
 4. Install
 5. Reinicie o cluster (a library só fica ativa após restart)
 
@@ -137,7 +137,7 @@ Em qualquer notebook anexado ao cluster:
 
 ```python
 import lakehouse_ingestion
-print(lakehouse_ingestion.__version__)  # 1.4.0
+print(lakehouse_ingestion.__version__)  # 1.5.0
 from lakehouse_ingestion import ingest, IngestionPlan, QualityRules
 ```
 
@@ -146,13 +146,13 @@ from lakehouse_ingestion import ingest, IngestionPlan, QualityRules
 Funciona em **serverless** (que não aceita cluster libraries tradicionais) e em desenvolvimento iterativo.
 
 ```python
-%pip install /Volumes/<catalog>/<schema>/libs/lakehouse_ingestion_framework-1.4.0-py3-none-any.whl
+%pip install /Volumes/<catalog>/<schema>/libs/lakehouse_ingestion_framework-1.5.0-py3-none-any.whl
 ```
 
 Se o cluster não permite `%pip` por restrição:
 
 ```python
-%pip install --index-url https://<seu_pypi_privado> lakehouse-ingestion-framework==1.4.0
+%pip install --index-url https://<seu_pypi_privado> lakehouse-ingestion-framework==1.5.0
 ```
 
 Em seguida:
@@ -245,7 +245,7 @@ Se chegou até aqui, a instalação está saudável. Próximo passo: configurar 
 
 **Opção 1 — Cole o `ingestion.py` direto no notebook**
 
-Não recomendado para o pacote refatorado (que tem 11 módulos). Funciona com a versão monolítica antiga (`lakehouse_ingestion_framework_pypi_ready.py`) que você guardar localmente.
+Não recomendado para o pacote refatorado (que tem múltiplos módulos). Funciona com a versão monolítica antiga (`lakehouse_ingestion_framework_pypi_ready.py`) que você guardar localmente.
 
 **Opção 2 — `%run` apontando para um notebook helper**
 
@@ -538,6 +538,30 @@ pytest tests/test_contracts.py -v
 ```
 
 Cada novo YAML que entrar no repo é automaticamente validado pelo CI.
+
+### 4.5 Fonte declarativa Autoloader
+
+Para landing zones em arquivo, use `SourceSpec` com Autoloader `available_now`:
+
+```yaml
+source:
+  type: autoloader
+  path: /Volumes/main/raw/orders
+  format: parquet
+  schema_location: /Volumes/main/ops/schemas/orders
+  checkpoint_location: /Volumes/main/ops/checkpoints/orders
+  trigger: available_now
+
+target_table: b_orders
+catalog: main
+layer: bronze
+mode: scd0_append
+source_system: landing
+ctrl_schema: ops
+notebook_name: ingest_b_orders
+```
+
+O stream é finito: processa os arquivos disponíveis e encerra. A execução externa aparece em `ctrl_ingestion_streams`, e cada batch aparece em `ctrl_ingestion_runs`.
 
 ---
 
@@ -1206,7 +1230,7 @@ Sim. O pacote no cluster + um notebook com `%run` legacy convivem. Mas evite —
 Não dá com cluster libraries — exige restart. Para atualização sem restart, use `%pip install --upgrade` notebook-scoped.
 
 **P: O framework suporta Streaming?**
-Não. É um framework batch declarativo. Para streaming, considere DLT (Delta Live Tables).
+Suporta apenas Autoloader com `trigger: available_now`. Streaming contínuo (`processingTime`/`continuous`) continua fora do escopo; para esse caso, considere DLT/Lakeflow.
 
 **P: Posso usar minhas próprias tabelas de controle?**
 Os nomes vêm de `FrameworkConfig.ctrl_table_*`. Para customizar, monkey-patch o `CONFIG` antes de qualquer chamada (não recomendado em produção). O caminho oficial é via `ctrl_schema` no plan.

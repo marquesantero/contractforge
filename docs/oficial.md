@@ -1,7 +1,7 @@
 # Lakehouse Ingestion Framework
 
 **Documentação oficial**  
-**Versão da biblioteca:** `1.4.0`
+**Versão da biblioteca:** `1.5.0`
 **Pacote:** `lakehouse-ingestion-framework`  
 **Import principal:** `lakehouse_ingestion`  
 **Ambiente-alvo:** Databricks, Unity Catalog e Delta Lake  
@@ -395,7 +395,7 @@ result = ingest_plan(plan)
 
 | Parâmetro | Tipo | Padrão | Obrigatório | Descrição |
 |---|---:|---|---|---|
-| `source` | `str | DataFrame` | sem padrão | Sim | Origem da ingestão. Pode ser nome de tabela ou DataFrame Spark. |
+| `source` | `str | DataFrame | SourceSpec` | sem padrão | Sim | Origem da ingestão. Pode ser nome de tabela, DataFrame Spark ou source declarativo Autoloader `available_now`. |
 | `target_table` | `str` | sem padrão | Sim | Nome da tabela alvo sem catálogo e sem schema. O schema é definido por `layer`. |
 | `catalog` | `str` | `"main"` | Não | Catálogo Unity Catalog onde alvo e tabelas de controle serão resolvidos. |
 | `layer` | `"bronze" | "silver" | "gold"` | `"bronze"` | Não | Camada lógica usada como schema da tabela alvo. |
@@ -583,6 +583,29 @@ Guardrails adicionais:
 
 - A origem não pode trazer colunas técnicas gerenciadas (`ingestion_date`, `ingestion_ts_utc`, `source_system`, `__run_id`, `row_hash`, etc.).
 - `MERGE` aborta quando todas as `merge_keys` vierem nulas e emite warning para nulos parciais.
+
+### 8.6.2 SourceSpec e Autoloader `available_now`
+
+`source` pode ser um dicionário declarativo:
+
+```python
+ingest(
+    source={
+        "type": "autoloader",
+        "path": "/Volumes/main/raw/orders",
+        "format": "parquet",
+        "schema_location": "/Volumes/main/ops/schemas/orders",
+        "checkpoint_location": "/Volumes/main/ops/checkpoints/orders",
+        "trigger": "available_now",
+    },
+    target_table="b_orders",
+    catalog="main",
+    layer="bronze",
+    mode="scd0_append",
+)
+```
+
+O framework usa `readStream.format("cloudFiles")` com `trigger(availableNow=True)`. Streaming contínuo não é suportado. `snapshot_soft_delete` é incompatível com `SourceSpec`.
 
 ### 8.7 Quality gates
 
@@ -1380,7 +1403,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "lakehouse-ingestion-framework"
-version = "1.4.0"
+version = "1.5.0"
 description = "Framework de ingestão Delta Lake para Databricks com contratos declarativos, quality gates, SCD, explain mode e eventos OpenLineage."
 readme = "README.md"
 requires-python = ">=3.10"
