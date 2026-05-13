@@ -4,13 +4,19 @@ from __future__ import annotations
 from typing import Any, Dict
 
 from .config import (
+    VALID_ACCESS_DRIFT_POLICIES,
+    VALID_ACCESS_MODES,
+    VALID_CRITICALITY_LEVELS,
     VALID_EXPLAIN_FORMATS,
+    VALID_GOVERNANCE_FAILURE_POLICIES,
     VALID_IDEMPOTENCY_POLICIES,
     VALID_LAYERS,
     VALID_MERGE_STRATEGIES,
+    VALID_PII_TYPES,
     VALID_QUALITY_FAIL_ACTIONS,
     VALID_QUALITY_RULE_SEVERITIES,
     VALID_SCHEMA_POLICIES,
+    VALID_SENSITIVITY_LEVELS,
     VALID_SOURCE_TRIGGERS,
     VALID_SOURCE_TYPES,
     VALID_WRITE_MODES,
@@ -34,6 +40,24 @@ def yaml_schema() -> Dict[str, Any]:
                 {"type": "boolean"},
                 {"type": "null"},
             ]
+        },
+    }
+    pii_schema = {
+        "type": "object",
+        "additionalProperties": False,
+        "properties": {
+            "enabled": {"type": "boolean"},
+            "type": {"enum": sorted(VALID_PII_TYPES)},
+            "sensitivity": {"enum": sorted(VALID_SENSITIVITY_LEVELS)},
+        },
+    }
+    deprecated_schema = {
+        "type": "object",
+        "additionalProperties": False,
+        "properties": {
+            "since": {"type": ["string", "null"]},
+            "replacement": {"type": ["string", "null"]},
+            "removal_date": {"type": ["string", "null"]},
         },
     }
     return {
@@ -159,6 +183,111 @@ def yaml_schema() -> Dict[str, Any]:
             "idempotency_policy": {"enum": sorted(VALID_IDEMPOTENCY_POLICIES)},
             "retry_attempts": {"type": "integer", "minimum": 1},
             "retry_backoff_seconds": {"type": "integer", "minimum": 0},
+            "annotations": {
+                "type": ["object", "null"],
+                "additionalProperties": False,
+                "properties": {
+                    "policy": {"enum": sorted(VALID_GOVERNANCE_FAILURE_POLICIES)},
+                    "table": {
+                        "type": "object",
+                        "additionalProperties": False,
+                        "properties": {
+                            "description": {"type": ["string", "null"]},
+                            "aliases": {"oneOf": [string_array, {"type": "string"}]},
+                            "tags": string_map,
+                            "deprecated": deprecated_schema,
+                        },
+                    },
+                    "columns": {
+                        "type": "object",
+                        "additionalProperties": {
+                            "type": "object",
+                            "additionalProperties": False,
+                            "properties": {
+                                "description": {"type": ["string", "null"]},
+                                "aliases": {"oneOf": [string_array, {"type": "string"}]},
+                                "tags": string_map,
+                                "pii": pii_schema,
+                                "deprecated": deprecated_schema,
+                            },
+                        },
+                    },
+                },
+            },
+            "operations": {
+                "type": ["object", "null"],
+                "additionalProperties": False,
+                "properties": {
+                    "criticality": {"enum": sorted(VALID_CRITICALITY_LEVELS)},
+                    "expected_frequency": {"type": ["string", "null"]},
+                    "freshness_sla_minutes": {"type": "integer", "minimum": 1},
+                    "alert_on_failure": {"type": "boolean"},
+                    "alert_on_quality_fail": {"type": "boolean"},
+                    "runbook_url": {"type": ["string", "null"]},
+                    "owners": {"oneOf": [string_array, {"type": "string"}]},
+                    "groups": {"oneOf": [string_array, {"type": "string"}]},
+                    "tags": string_map,
+                },
+            },
+            "access": {
+                "type": ["object", "null"],
+                "additionalProperties": False,
+                "properties": {
+                    "mode": {"enum": sorted(VALID_ACCESS_MODES)},
+                    "on_drift": {"enum": sorted(VALID_ACCESS_DRIFT_POLICIES)},
+                    "revoke_unmanaged": {"type": "boolean"},
+                    "grants": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "additionalProperties": False,
+                            "required": ["principal", "privileges"],
+                            "properties": {
+                                "principal": {"type": "string"},
+                                "privileges": {"oneOf": [string_array, {"type": "string"}]},
+                            },
+                        },
+                    },
+                    "row_filters": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "additionalProperties": False,
+                            "required": ["name", "function"],
+                            "properties": {
+                                "name": {"type": "string"},
+                                "function": {"type": "string"},
+                                "columns": {"oneOf": [string_array, {"type": "string"}]},
+                                "applies_to": {
+                                    "type": "object",
+                                    "properties": {
+                                        "principals": {"oneOf": [string_array, {"type": "string"}]},
+                                    },
+                                },
+                            },
+                        },
+                    },
+                    "column_masks": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "additionalProperties": False,
+                            "required": ["column", "function"],
+                            "properties": {
+                                "column": {"type": "string"},
+                                "function": {"type": "string"},
+                                "using_columns": {"oneOf": [string_array, {"type": "string"}]},
+                                "applies_to": {
+                                    "type": "object",
+                                    "properties": {
+                                        "principals": {"oneOf": [string_array, {"type": "string"}]},
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+            },
             "parent_run_id": {"type": ["string", "null"]},
             "run_group_id": {"type": ["string", "null"]},
             "master_job_id": {"type": ["string", "null"]},

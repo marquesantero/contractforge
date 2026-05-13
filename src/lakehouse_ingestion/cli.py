@@ -7,6 +7,7 @@ import sys
 from pathlib import Path
 from typing import Any, Iterable, List
 
+from .contract_bundle import load_contract_bundle
 from .contract_schema import yaml_schema
 from .plan import build_plan_from_kwargs
 
@@ -58,6 +59,18 @@ def _validate(paths: List[Path]) -> int:
     return exit_code
 
 
+def _validate_bundles(paths: List[Path]) -> int:
+    exit_code = 0
+    for path in paths:
+        try:
+            bundle = load_contract_bundle(path)
+            print(f"OK {path} (bundle para {bundle.ingestion.target_table})")
+        except Exception as exc:
+            exit_code = 1
+            print(f"ERRO {path}: {exc}", file=sys.stderr)
+    return exit_code
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="lakehouse-ingest")
     sub = parser.add_subparsers(dest="command", required=True)
@@ -65,12 +78,20 @@ def main(argv: list[str] | None = None) -> int:
     validate_parser = sub.add_parser("validate", help="Valida contratos YAML/JSON sem executar Spark")
     validate_parser.add_argument("paths", nargs="+", type=Path)
 
+    validate_bundle_parser = sub.add_parser(
+        "validate-bundle",
+        help="Valida contrato .ingestion e arquivos irmaos annotations/operations/access",
+    )
+    validate_bundle_parser.add_argument("paths", nargs="+", type=Path)
+
     schema_parser = sub.add_parser("schema", help="Imprime JSON Schema dos contratos")
     schema_parser.add_argument("--indent", type=int, default=2)
 
     args = parser.parse_args(argv)
     if args.command == "validate":
         return _validate(args.paths)
+    if args.command == "validate-bundle":
+        return _validate_bundles(args.paths)
     if args.command == "schema":
         print(json.dumps(yaml_schema(), indent=args.indent, sort_keys=True))
         return 0

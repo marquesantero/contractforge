@@ -11,7 +11,7 @@ from pyspark.sql import functions as F
 from .config import CONFIG, CTRL_SCHEMA_VERSION, FRAMEWORK_VERSION
 from .plan import IngestionPlan
 from ._spark import spark
-from ._sql import full_table_name, q, qt, safe_truncate, sql_int, sql_lit, to_json
+from ._sql import full_table_name, q, qt, safe_truncate, sql_int, sql_lit, to_json, utc_now_str
 
 logger = logging.getLogger("lakehouse_ingestion")
 
@@ -34,6 +34,9 @@ def ctrl_table_names(catalog: str, schema: str) -> Dict[str, str]:
         "errors": full_table_name(catalog, schema, CONFIG.ctrl_table_errors),
         "schema_changes": full_table_name(catalog, schema, CONFIG.ctrl_table_schema_changes),
         "streams": full_table_name(catalog, schema, CONFIG.ctrl_table_streams),
+        "annotations": full_table_name(catalog, schema, CONFIG.ctrl_table_annotations),
+        "operations": full_table_name(catalog, schema, CONFIG.ctrl_table_operations),
+        "access": full_table_name(catalog, schema, CONFIG.ctrl_table_access),
     }
 
 
@@ -302,6 +305,59 @@ def ensure_ctrl_tables(catalog: str, schema: str) -> Dict[str, str]:
             run_group_id STRING
         ) USING DELTA
     """)
+    spark.sql(f"""
+        CREATE TABLE IF NOT EXISTS {qt(tables['annotations'])} (
+            run_id STRING,
+            target_table STRING,
+            annotation_scope STRING,
+            annotation_type STRING,
+            column_name STRING,
+            key STRING,
+            value STRING,
+            status STRING,
+            error_message STRING,
+            applied_sql STRING,
+            annotation_ts_utc TIMESTAMP,
+            framework_version STRING,
+            ctrl_schema_version BIGINT
+        ) USING DELTA
+    """)
+    spark.sql(f"""
+        CREATE TABLE IF NOT EXISTS {qt(tables['operations'])} (
+            run_id STRING,
+            target_table STRING,
+            criticality STRING,
+            expected_frequency STRING,
+            freshness_sla_minutes BIGINT,
+            alert_on_failure BOOLEAN,
+            alert_on_quality_fail BOOLEAN,
+            runbook_url STRING,
+            owners_json STRING,
+            groups_json STRING,
+            tags_json STRING,
+            status STRING,
+            recorded_at_utc TIMESTAMP,
+            framework_version STRING,
+            ctrl_schema_version BIGINT
+        ) USING DELTA
+    """)
+    spark.sql(f"""
+        CREATE TABLE IF NOT EXISTS {qt(tables['access'])} (
+            run_id STRING,
+            target_table STRING,
+            access_type STRING,
+            principal STRING,
+            privilege STRING,
+            object_name STRING,
+            status STRING,
+            error_message STRING,
+            applied_sql STRING,
+            previous_value STRING,
+            access_ts_utc TIMESTAMP,
+            framework_version STRING,
+            ctrl_schema_version BIGINT
+        ) USING DELTA
+    """)
     _add_columns_if_missing(
         tables["runs"],
         {
@@ -341,6 +397,126 @@ def ensure_ctrl_tables(catalog: str, schema: str) -> Dict[str, str]:
     )
     _record_ctrl_metadata(tables)
     return tables
+
+
+_ANNOTATION_COLUMNS = [
+    "run_id", "target_table", "annotation_scope", "annotation_type", "column_name",
+    "key", "value", "status", "error_message", "applied_sql", "annotation_ts_utc",
+    "framework_version", "ctrl_schema_version",
+]
+
+
+def log_annotation_entries(
+    tables: Dict[str, str],
+    run_id: str,
+    target_table: str,
+    entries: list[Dict[str, Any]],
+) -> None:
+    """Audita aplicacao de comments/tags em ``ctrl_ingestion_annotations``."""
+    for entry in entries:
+        payload = {
+            **entry,
+            "run_id": run_id,
+            "target_table": target_table,
+            "applied_sql": entry.get("sql"),
+            "annotation_ts_utc": utc_now_str(),
+            "framework_version": FRAMEWORK_VERSION,
+            "ctrl_schema_version": CTRL_SCHEMA_VERSION,
+        }
+        values = []
+        for column in _ANNOTATION_COLUMNS:
+            value = payload.get(column)
+            if column == "ctrl_schema_version":
+                values.append(sql_int(value))
+            elif column.endswith("_utc"):
+                values.append(f"CAST({sql_lit(value)} AS TIMESTAMP)")
+            elif column == "error_message":
+                values.append(sql_lit(safe_truncate(value, 2000)))
+            else:
+                values.append(sql_lit(value))
+        spark.sql(
+            f"INSERT INTO {qt(tables['annotations'])} ({', '.join(_ANNOTATION_COLUMNS)}) "
+            f"VALUES ({', '.join(values)})"
+        )
+
+
+_OPERATION_COLUMNS = [
+    "run_id", "target_table", "criticality", "expected_frequency", "freshness_sla_minutes",
+    "alert_on_failure", "alert_on_quality_fail", "runbook_url", "owners_json", "groups_json",
+    "tags_json", "status", "recorded_at_utc", "framework_version", "ctrl_schema_version",
+]
+
+
+def log_operations_contract(
+    tables: Dict[str, str],
+    run_id: str,
+    target_table: str,
+    payload: Dict[str, Any],
+) -> None:
+    """Audita contrato operacional em ``ctrl_ingestion_operations``."""
+    enriched = {
+        **payload,
+        "run_id": run_id,
+        "target_table": target_table,
+        "framework_version": FRAMEWORK_VERSION,
+        "ctrl_schema_version": CTRL_SCHEMA_VERSION,
+    }
+    values = []
+    for column in _OPERATION_COLUMNS:
+        value = enriched.get(column)
+        if column in {"freshness_sla_minutes", "ctrl_schema_version"}:
+            values.append(sql_int(value))
+        elif column in {"alert_on_failure", "alert_on_quality_fail"}:
+            values.append("NULL" if value is None else str(bool(value)).lower())
+        elif column.endswith("_utc"):
+            values.append(f"CAST({sql_lit(value)} AS TIMESTAMP)")
+        else:
+            values.append(sql_lit(value))
+    spark.sql(
+        f"INSERT INTO {qt(tables['operations'])} ({', '.join(_OPERATION_COLUMNS)}) "
+        f"VALUES ({', '.join(values)})"
+    )
+
+
+_ACCESS_COLUMNS = [
+    "run_id", "target_table", "access_type", "principal", "privilege", "object_name",
+    "status", "error_message", "applied_sql", "previous_value", "access_ts_utc",
+    "framework_version", "ctrl_schema_version",
+]
+
+
+def log_access_entries(
+    tables: Dict[str, str],
+    run_id: str,
+    target_table: str,
+    entries: list[Dict[str, Any]],
+) -> None:
+    """Audita grants, row filters e masks em ``ctrl_ingestion_access``."""
+    for entry in entries:
+        payload = {
+            **entry,
+            "run_id": run_id,
+            "target_table": target_table,
+            "applied_sql": entry.get("sql"),
+            "access_ts_utc": utc_now_str(),
+            "framework_version": FRAMEWORK_VERSION,
+            "ctrl_schema_version": CTRL_SCHEMA_VERSION,
+        }
+        values = []
+        for column in _ACCESS_COLUMNS:
+            value = payload.get(column)
+            if column == "ctrl_schema_version":
+                values.append(sql_int(value))
+            elif column.endswith("_utc"):
+                values.append(f"CAST({sql_lit(value)} AS TIMESTAMP)")
+            elif column == "error_message":
+                values.append(sql_lit(safe_truncate(value, 2000)))
+            else:
+                values.append(sql_lit(value))
+        spark.sql(
+            f"INSERT INTO {qt(tables['access'])} ({', '.join(_ACCESS_COLUMNS)}) "
+            f"VALUES ({', '.join(values)})"
+        )
 
 
 _STREAM_COLUMNS = [

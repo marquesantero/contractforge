@@ -96,8 +96,34 @@ Escopo intencional: apenas Autoloader `available_now`. Streaming contínuo (`pro
 - `column_mapping` renomeia colunas source -> target antes de filtros, watermarks, quality e escrita. Destinos duplicados, colisões com colunas existentes e nomes técnicos reservados são rejeitados.
 - `delta_properties` aplica `TBLPROPERTIES` na criação da tabela Delta, por exemplo `delta.enableChangeDataFeed`, `delta.autoOptimize.optimizeWrite` ou propriedades de retenção.
 - `retry_attempts` e `retry_backoff_seconds` sobrescrevem a política global de retry por plano.
+- `annotations`, `operations` e `access` podem ficar no próprio contrato ou em YAMLs separados (`*.annotations.yaml`, `*.operations.yaml`, `*.access.yaml`) carregados por `load_contract_bundle()`/`ingest_bundle()`.
 - A origem não pode trazer colunas técnicas gerenciadas pelo framework (`ingestion_date`, `ingestion_ts_utc`, `source_system`, `__run_id`, `row_hash`, etc.), evitando sobrescrita silenciosa.
 - Modos baseados em `MERGE` abortam se todas as `merge_keys` vierem nulas e emitem warning quando houver nulos parciais.
+
+### Contratos separados de governança
+
+Use arquivos separados quando engenharia, governança, operações e segurança tiverem ciclos de revisão diferentes:
+
+```text
+contracts/gold/gd_orders.ingestion.yaml
+contracts/gold/gd_orders.annotations.yaml
+contracts/gold/gd_orders.operations.yaml
+contracts/gold/gd_orders.access.yaml
+```
+
+`annotations` aplica comments e tags de tabela/coluna, incluindo aliases, PII e depreciação. `operations` registra criticidade, SLA, donos, grupos e runbook para dashboards externos. `access` aplica grants, row filters e column masks declarativos.
+
+```python
+from lakehouse_ingestion import ingest_bundle
+
+result = ingest_bundle("contracts/gold/gd_orders")
+```
+
+Validação local sem Spark:
+
+```bash
+lakehouse-ingest validate-bundle contracts/gold/gd_orders
+```
 
 ## Modos oficiais
 
@@ -162,6 +188,9 @@ O framework cria tabelas de controle no schema configurado:
 - `ctrl_ingestion_metadata`
 - `ctrl_ingestion_schema_changes`
 - `ctrl_ingestion_streams`
+- `ctrl_ingestion_annotations`
+- `ctrl_ingestion_operations`
+- `ctrl_ingestion_access`
 
 `explain_mode=True` captura o plano Spark do DataFrame preparado.
 

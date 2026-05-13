@@ -6,6 +6,15 @@ Este projeto segue versionamento semântico enquanto a biblioteca evolui:
 - `MINOR`: novo recurso compatível ou endurecimento planejado do contrato.
 - `MAJOR`: mudança incompatível depois de adoção estável.
 
+## 1.6.0 - 2026-05-13
+
+- Adiciona contratos declarativos separados para `annotations`, `operations` e `access`.
+- Aplica comments/tags de tabela e coluna, incluindo aliases, PII e depreciação, com auditoria em `ctrl_ingestion_annotations`.
+- Registra contrato operacional em `ctrl_ingestion_operations` para dashboards e alertas externos.
+- Aplica grants, row filters e column masks declarativos com auditoria em `ctrl_ingestion_access`.
+- Adiciona loader de bundle (`load_contract_bundle`) e CLI `lakehouse-ingest validate-bundle`.
+- Eleva `ctrl_schema_version` para 8.
+
 ## 1.5.1 - 2026-05-13
 
 - Corrige métricas agregadas de streams Autoloader/`SourceSpec` quando `foreachBatch` registra batches filhos, mas o estado local do driver não reflete os resultados em Spark Connect/serverless.

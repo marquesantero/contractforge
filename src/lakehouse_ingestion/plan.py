@@ -27,6 +27,14 @@ from .config import (
     VALID_WRITE_MODES,
     WriteMode,
 )
+from .governance import (
+    AccessContract,
+    AnnotationsContract,
+    OperationsContract,
+    normalize_access_contract,
+    normalize_annotations_contract,
+    normalize_operations_contract,
+)
 from .hooks import IngestionHooks, normalize_hooks
 from ._sql import as_list
 
@@ -321,6 +329,9 @@ class IngestionPlan:
     retry_attempts: Optional[int] = None
     retry_backoff_seconds: Optional[int] = None
     hooks: Optional[IngestionHooks] = None
+    annotations: Optional[AnnotationsContract] = None
+    operations: Optional[OperationsContract] = None
+    access: Optional[AccessContract] = None
     parent_run_id: Optional[str] = None
     run_group_id: Optional[str] = None
     master_job_id: Optional[str] = None
@@ -454,8 +465,9 @@ _KNOWN_PARAMS = {
     "fix_encoding", "encoding", "encoding_columns", "dry_run", "explain_mode",
     "explain_format", "openlineage_enabled", "openlineage_namespace",
     "openlineage_producer", "use_cache", "lock_enabled", "idempotency_key",
-    "idempotency_policy", "retry_attempts", "retry_backoff_seconds", "hooks", "parent_run_id", "run_group_id",
-    "master_job_id", "master_run_id",
+    "idempotency_policy", "retry_attempts", "retry_backoff_seconds", "hooks",
+    "annotations", "operations", "access", "parent_run_id", "run_group_id", "master_job_id",
+    "master_run_id",
 }
 
 
@@ -635,6 +647,9 @@ def build_plan_from_kwargs(**kwargs: Any) -> IngestionPlan:
             )
         ),
         hooks=normalize_hooks(kwargs.get("hooks")),
+        annotations=normalize_annotations_contract(kwargs.get("annotations")),
+        operations=normalize_operations_contract(kwargs.get("operations")),
+        access=normalize_access_contract(kwargs.get("access")),
         parent_run_id=kwargs.get("parent_run_id"),
         run_group_id=kwargs.get("run_group_id"),
         master_job_id=kwargs.get("master_job_id"),

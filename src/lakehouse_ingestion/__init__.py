@@ -1,4 +1,16 @@
+from .contract_bundle import ContractBundle, load_contract_bundle
 from .contract_schema import yaml_schema
+from .governance import (
+    AccessContract,
+    AccessGrant,
+    AnnotationsContract,
+    ColumnAnnotations,
+    ColumnMask,
+    OperationsContract,
+    PiiAnnotation,
+    RowFilter,
+    TableAnnotations,
+)
 from .hooks import IngestionHooks
 from .ingestion import (
     FrameworkConfig,
@@ -7,6 +19,7 @@ from .ingestion import (
     QualityRules,
     SourceSpec,
     ingest,
+    ingest_bundle,
     ingest_plan,
     ingest_stream_plan,
     validate_plan_shape,
@@ -17,15 +30,27 @@ from .quality import register_quality_rule
 
 __all__ = [
     "FrameworkConfig",
+    "AccessContract",
+    "AccessGrant",
+    "AnnotationsContract",
+    "ColumnAnnotations",
+    "ColumnMask",
+    "ContractBundle",
     "IngestionHooks",
+    "OperationsContract",
+    "PiiAnnotation",
     "QualityExpression",
     "IngestionPlan",
     "QualityRules",
+    "RowFilter",
     "SourceSpec",
+    "TableAnnotations",
     "get_source_resolver",
     "ingest",
+    "ingest_bundle",
     "ingest_plan",
     "ingest_stream_plan",
+    "load_contract_bundle",
     "register_source_resolver",
     "register_write_mode",
     "register_quality_rule",
@@ -33,4 +58,4 @@ __all__ = [
     "yaml_schema",
 ]
 
-__version__ = "1.5.1"
+__version__ = "1.6.0"

@@ -1,6 +1,6 @@
 # Lakehouse Ingestion Framework — Documentação Oficial
 
-**Versão:** 1.5.1 | **Licença:** MIT | **Python:** >= 3.10
+**Versão:** 1.6.0 | **Licença:** MIT | **Python:** >= 3.10
 
 Framework declarativo para ingestão de dados em Delta Lake no Databricks (ou PySpark + delta-spark standalone), com contratos por tabela, suporte à arquitetura Medallion (Bronze/Silver/Gold), quality gates, watermarks tipados, 6 modos de escrita, snapshot com soft delete, evolução de schema, ingestão Autoloader `available_now`, explain mode e emissão de eventos OpenLineage.
 
@@ -47,7 +47,7 @@ O **Lakehouse Ingestion Framework** é uma biblioteca Python que encapsula padr�
 
 - **Não orquestra** — agendamento e DAGs ficam com Databricks Workflows, Airflow, DAB, etc.
 - **Não substitui DLT** (Delta Live Tables) — é uma alternativa batch declarativa.
-- **Não faz streaming contínuo** — a versão 1.5.1 suporta Autoloader em `available_now`, que é execução finita com checkpoint; processamento contínuo fica fora do escopo.
+- **Não faz streaming contínuo** — a versão 1.6.0 suporta Autoloader em `available_now`, que é execução finita com checkpoint; processamento contínuo fica fora do escopo.
 - **Não gerencia permissões** Unity Catalog.
 - **Não é um catálogo de qualidade empresarial** — as regras são para gates de pipeline.
 
@@ -113,14 +113,14 @@ pip install lakehouse-ingestion-framework
 # Build local
 pip install build
 python -m build
-# → dist/lakehouse_ingestion_framework-1.5.1-py3-none-any.whl
+# → dist/lakehouse_ingestion_framework-1.6.0-py3-none-any.whl
 
 # Upload para UC Volume
-databricks fs cp dist/lakehouse_ingestion_framework-1.5.1-py3-none-any.whl \
+databricks fs cp dist/lakehouse_ingestion_framework-1.6.0-py3-none-any.whl \
   dbfs:/Volumes/<catalog>/<schema>/libs/
 
 # No notebook Databricks:
-%pip install /Volumes/<catalog>/<schema>/libs/lakehouse_ingestion_framework-1.5.1-py3-none-any.whl
+%pip install /Volumes/<catalog>/<schema>/libs/lakehouse_ingestion_framework-1.6.0-py3-none-any.whl
 dbutils.library.restartPython()
 ```
 
@@ -1592,7 +1592,25 @@ Histórico das execuções externas de `SourceSpec`/Autoloader `available_now`.
 
 **Colunas:** `stream_run_id`, `idempotency_key`, `idempotency_policy`, `skip_reason`, `skipped_by_stream_run_id`, `target_table`, `target_catalog`, `target_layer`, `notebook_name`, `source_type`, `source_path`, `trigger`, `checkpoint_location`, `status`, `started_at_utc`, `ended_at_utc`, `duration_seconds`, `batches_processed`, `total_rows_read`, `total_rows_written`, `total_rows_quarantined`, `framework_version`, `ctrl_schema_version`, `runtime_type`, `spark_version`, `python_version`, `error_message`, `master_job_id`, `master_run_id`, `parent_run_id`, `run_group_id`.
 
-### 12.12 Consultas Úteis
+### 12.12 `ctrl_ingestion_annotations`
+
+Auditoria de comments/tags aplicados por `annotations`.
+
+**Colunas:** `run_id`, `target_table`, `annotation_scope`, `annotation_type`, `column_name`, `key`, `value`, `status`, `error_message`, `applied_sql`, `annotation_ts_utc`, `framework_version`, `ctrl_schema_version`.
+
+### 12.13 `ctrl_ingestion_operations`
+
+Registro de criticidade, SLA, donos, grupos e runbook declarados em `operations`.
+
+**Colunas:** `run_id`, `target_table`, `criticality`, `expected_frequency`, `freshness_sla_minutes`, `alert_on_failure`, `alert_on_quality_fail`, `runbook_url`, `owners_json`, `groups_json`, `tags_json`, `status`, `recorded_at_utc`, `framework_version`, `ctrl_schema_version`.
+
+### 12.14 `ctrl_ingestion_access`
+
+Auditoria de grants, row filters e column masks aplicados por `access`.
+
+**Colunas:** `run_id`, `target_table`, `access_type`, `principal`, `privilege`, `object_name`, `status`, `error_message`, `applied_sql`, `previous_value`, `access_ts_utc`, `framework_version`, `ctrl_schema_version`.
+
+### 12.15 Consultas Úteis
 
 ```sql
 -- Últimas execuções por tabela
@@ -1621,6 +1639,17 @@ VACUUM ops.ctrl_ingestion_runs RETAIN 168 HOURS;
 SELECT stream_run_id, target_table, source_path, status, batches_processed, total_rows_written
 FROM ops.ctrl_ingestion_streams
 ORDER BY started_at_utc DESC;
+
+-- Annotations com falha ou warning
+SELECT target_table, annotation_scope, annotation_type, column_name, status, error_message
+FROM ops.ctrl_ingestion_annotations
+WHERE status IN ('FAILED', 'WARNED')
+ORDER BY annotation_ts_utc DESC;
+
+-- Grants e politicas aplicadas
+SELECT target_table, access_type, principal, privilege, object_name, status
+FROM ops.ctrl_ingestion_access
+ORDER BY access_ts_utc DESC;
 ```
 
 ---
@@ -1720,6 +1749,94 @@ ingest(
 ```
 
 Esses valores são propagados no retorno (`contract_metadata`) e em `ctrl_ingestion_runs` (colunas `contract_description`, `contract_owner`, `contract_domain`, `contract_tags_json`, `contract_sla`, `runtime_parameters_json`).
+
+### 15.1 Contratos Separados: ingestion, annotations, operations e access
+
+Para tabelas com governança mais forte, o contrato pode ser dividido por responsabilidade:
+
+```text
+contracts/gold/gd_orders.ingestion.yaml
+contracts/gold/gd_orders.annotations.yaml
+contracts/gold/gd_orders.operations.yaml
+contracts/gold/gd_orders.access.yaml
+```
+
+Carregamento e execução:
+
+```python
+from lakehouse_ingestion import ingest_bundle, load_contract_bundle
+
+bundle = load_contract_bundle("contracts/gold/gd_orders")
+result = ingest_bundle("contracts/gold/gd_orders")
+```
+
+Validação local sem Spark:
+
+```bash
+lakehouse-ingest validate-bundle contracts/gold/gd_orders
+```
+
+`annotations` aplica metadata técnica no catálogo:
+
+```yaml
+policy: warn
+table:
+  description: "Pedidos diários consolidados."
+  aliases: [orders, sales_orders]
+  tags:
+    domain: sales
+    data_product: orders
+columns:
+  customer_email:
+    description: "Email do cliente."
+    pii:
+      enabled: true
+      type: email
+      sensitivity: restricted
+    tags:
+      confidentiality: restricted
+```
+
+`operations` registra contexto operacional em `ctrl_ingestion_operations` para dashboards/alertas externos:
+
+```yaml
+criticality: high
+expected_frequency: daily
+freshness_sla_minutes: 180
+alert_on_failure: true
+alert_on_quality_fail: true
+runbook_url: "https://wiki/runbooks/gd_orders"
+owners: [data-platform]
+groups: [data-sre, sales-analytics]
+tags:
+  cost_center: analytics
+```
+
+`access` aplica governança de acesso:
+
+```yaml
+mode: apply
+on_drift: warn
+grants:
+  - principal: data-readers
+    privileges: [SELECT]
+row_filters:
+  - name: filter_by_region
+    function: main.security.fn_filter_region
+    columns: [region]
+column_masks:
+  - column: customer_email
+    function: main.security.mask_email
+    using_columns: [customer_email]
+```
+
+Auditoria gerada:
+
+- `ctrl_ingestion_annotations`: comments/tags aplicados, ignorados ou com warning/falha.
+- `ctrl_ingestion_operations`: criticidade, SLA, donos, grupos, runbook e tags operacionais.
+- `ctrl_ingestion_access`: grants, row filters e column masks aplicados/validados.
+
+Falhas em annotations seguem `annotations.policy` (`fail`, `warn`, `ignore`). Falhas em access seguem `access.mode` (`apply`, `validate_only`, `ignore`) e `access.on_drift` (`fail`, `warn`, `reconcile`).
 
 ---
 
@@ -2352,7 +2469,7 @@ ORDER BY change_ts_utc DESC;
 ## 21. FAQ
 
 **P: Posso usar o framework com Structured Streaming?**
-Para streaming contínuo, não. A versão 1.5.1 suporta Autoloader em `available_now`, que é uma execução finita com checkpoint e `foreachBatch`. Para processamento contínuo, considere Delta Live Tables (DLT) ou Structured Streaming direto.
+Para streaming contínuo, não. A versão 1.6.0 suporta Autoloader em `available_now`, que é uma execução finita com checkpoint e `foreachBatch`. Para processamento contínuo, considere Delta Live Tables (DLT) ou Structured Streaming direto.
 
 **P: O framework suporta CDC (Change Data Feed) como origem?**
 Não nativamente. Você pode processar o CDF antes e passar um DataFrame para o `ingest()`, mas o framework não lê o feed automaticamente.

@@ -10,8 +10,8 @@ from typing import Literal, Union
 
 from pyspark.sql import DataFrame
 
-FRAMEWORK_VERSION = "1.5.1"
-CTRL_SCHEMA_VERSION = 7
+FRAMEWORK_VERSION = "1.6.0"
+CTRL_SCHEMA_VERSION = 8
 
 #: Camadas reconhecidas (Medallion Architecture).
 Layer = Literal["bronze", "silver", "gold"]
@@ -37,6 +37,15 @@ QualityFailAction = Literal["fail", "warn", "quarantine"]
 
 #: Severidade por regra de qualidade.
 QualityRuleSeverity = Literal["warn", "quarantine", "abort"]
+
+#: Politica de falha ao aplicar anotacoes de catalogo.
+GovernanceFailurePolicy = Literal["fail", "warn", "ignore"]
+
+#: Modo de aplicacao de contratos de acesso.
+AccessMode = Literal["apply", "validate_only", "ignore"]
+
+#: Politica quando o contrato de acesso encontra drift ou falha de aplicacao.
+AccessDriftPolicy = Literal["fail", "warn", "reconcile"]
 
 #: Política de idempotência para uma ``idempotency_key`` lógica.
 IdempotencyPolicy = Literal["always_run", "skip_if_success", "fail_if_success", "rerun_if_failed"]
@@ -68,6 +77,31 @@ VALID_QUALITY_FAIL_ACTIONS = {"fail", "warn", "quarantine"}
 
 #: Severidades válidas em regras de qualidade declarativas.
 VALID_QUALITY_RULE_SEVERITIES = {"warn", "quarantine", "abort"}
+
+VALID_GOVERNANCE_FAILURE_POLICIES = {"fail", "warn", "ignore"}
+
+VALID_ACCESS_MODES = {"apply", "validate_only", "ignore"}
+
+VALID_ACCESS_DRIFT_POLICIES = {"fail", "warn", "reconcile"}
+
+VALID_CRITICALITY_LEVELS = {"low", "medium", "high", "critical"}
+
+VALID_SENSITIVITY_LEVELS = {"public", "internal", "restricted", "confidential"}
+
+VALID_PII_TYPES = {
+    "address",
+    "birth_date",
+    "credit_card",
+    "document",
+    "email",
+    "financial",
+    "health",
+    "name",
+    "phone",
+    "ssn",
+    "tax_id",
+    "unknown",
+}
 
 #: Políticas válidas de idempotência para validação runtime.
 VALID_IDEMPOTENCY_POLICIES = {"always_run", "skip_if_success", "fail_if_success", "rerun_if_failed"}
@@ -140,6 +174,9 @@ class FrameworkConfig:
     ctrl_table_errors: str = "ctrl_ingestion_errors"
     ctrl_table_schema_changes: str = "ctrl_ingestion_schema_changes"
     ctrl_table_streams: str = "ctrl_ingestion_streams"
+    ctrl_table_annotations: str = "ctrl_ingestion_annotations"
+    ctrl_table_operations: str = "ctrl_ingestion_operations"
+    ctrl_table_access: str = "ctrl_ingestion_access"
     max_error_len: int = 8000
     default_lock_ttl_minutes: int = 120
     default_retry_attempts: int = 3

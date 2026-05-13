@@ -16,6 +16,13 @@ from pyspark.sql import DataFrame
 from pyspark.sql import functions as F
 
 from .config import CONFIG, CONTROL_COLUMNS, CTRL_SCHEMA_VERSION, FRAMEWORK_VERSION, FrameworkConfig  # noqa: F401
+from .governance import (
+    access_sql_preview,
+    annotation_sql_preview,
+    apply_access_contract,
+    apply_annotations_contract,
+    record_operations_contract,
+)
 from .lineage import capture_explain, write_explain_plan, write_openlineage_event
 from .plan import (  # noqa: F401
     IngestionPlan,
@@ -52,6 +59,9 @@ from .state import (
     find_idempotent_run,
     find_idempotent_stream,
     log_error,
+    log_access_entries,
+    log_annotation_entries,
+    log_operations_contract,
     log_run,
     log_schema_changes,
     log_stream_finish,
@@ -99,6 +109,16 @@ def _contract_metadata(plan: IngestionPlan) -> Dict[str, Any]:
         "tags": plan.tags,
         "sla": plan.sla,
         "runtime_parameters": plan.runtime_parameters,
+        "operations": plan.operations,
+    }
+
+
+def _governance_preview(plan: IngestionPlan, target: str) -> Dict[str, Any]:
+    """SQL/acoes previstas para contratos de governanca em dry-run."""
+    return {
+        "annotations_sql": annotation_sql_preview(target, plan.annotations),
+        "access_sql": access_sql_preview(target, plan.access),
+        "operations_configured": plan.operations is not None,
     }
 
 
@@ -489,6 +509,7 @@ def _build_dry_run_result(
         "idempotency_key": plan.idempotency_key,
         "idempotency_policy": plan.idempotency_policy,
         "contract_metadata": _contract_metadata(plan),
+        "governance": _governance_preview(plan, target),
         "framework_version": FRAMEWORK_VERSION,
         "ctrl_schema_version": CTRL_SCHEMA_VERSION,
         **runtime_meta,
@@ -970,6 +991,7 @@ def ingest_plan(plan: IngestionPlan) -> Dict[str, Any]:
     schema_changes: Dict[str, Any] = {}
     operation_metrics: Dict[str, Any] = {}
     metrics_source = "logical"
+    governance_results: Dict[str, Any] = {}
     explain_text: Optional[str] = None
     openlineage_event: Optional[Dict[str, Any]] = None
     write_started_at: Optional[str] = None
@@ -1158,6 +1180,31 @@ def ingest_plan(plan: IngestionPlan) -> Dict[str, Any]:
         row_metrics, operation_metrics, metrics_source = resolve_write_metrics(
             plan, rows_written, delta_metrics
         )
+        stage_started = utc_now_ts()
+        governance_results = {
+            "operations": record_operations_contract(
+                tables,
+                run_id,
+                target,
+                plan.operations,
+                log_operations_contract,
+            ),
+            "annotations": apply_annotations_contract(
+                tables,
+                run_id,
+                target,
+                plan.annotations,
+                log_annotation_entries,
+            ),
+            "access": apply_access_contract(
+                tables,
+                run_id,
+                target,
+                plan.access,
+                log_access_entries,
+            ),
+        }
+        stage_durations["governance"] = (utc_now_ts() - stage_started).total_seconds()
         if plan.hooks and plan.hooks.after_write:
             plan.hooks.after_write(
                 {
@@ -1297,6 +1344,7 @@ def ingest_plan(plan: IngestionPlan) -> Dict[str, Any]:
         "skip_reason": skip_reason,
         "skipped_by_run_id": skipped_by_run_id,
         "contract_metadata": _contract_metadata(plan),
+        "governance": governance_results,
         "framework_version": FRAMEWORK_VERSION,
         "ctrl_schema_version": CTRL_SCHEMA_VERSION,
         **runtime_meta,
@@ -1324,6 +1372,14 @@ def ingest(**kwargs: Any) -> Dict[str, Any]:
     """
     plan = build_plan_from_kwargs(**kwargs)
     return ingest_plan(plan)
+
+
+def ingest_bundle(path: str) -> Dict[str, Any]:
+    """Carrega contrato dividido e executa o plano de ingestao."""
+    from .contract_bundle import load_contract_bundle
+
+    bundle = load_contract_bundle(path)
+    return ingest_plan(bundle.ingestion)
 
 
 EXAMPLE_BRONZE_PLAN = {
