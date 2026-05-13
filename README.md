@@ -111,8 +111,8 @@ contracts/gold/gd_orders.operations.yaml
 contracts/gold/gd_orders.access.yaml
 ```
 
-`annotations` aplica comments e tags de tabela/coluna, incluindo aliases, PII e depreciação. `operations` registra criticidade, SLA, donos, grupos e runbook para dashboards externos. `access` aplica grants, row filters e column masks declarativos.
-`governance-check` também compara grants declarados com `SHOW GRANTS ON TABLE`; `revoke_unmanaged=true` revoga grants atuais não declarados.
+`annotations` aplica comments e tags de tabela/coluna, incluindo aliases, PII e depreciação. `operations` registra ownership estruturado, criticidade, SLA, grupos e runbook para dashboards externos. `access` aplica grants, row filters e column masks declarativos.
+`governance-check` também compara grants declarados com `SHOW GRANTS ON TABLE`. `revoke_unmanaged=true` é operação perigosa e só executa `REVOKE` via `governance-apply --force-revoke`.
 
 ```python
 from lakehouse_ingestion import ingest_bundle
@@ -127,6 +127,7 @@ lakehouse-ingest validate-bundle contracts/gold/gd_orders
 lakehouse-ingest governance-preview contracts/gold/gd_orders
 lakehouse-ingest governance-check contracts/gold/gd_orders
 lakehouse-ingest governance-apply contracts/gold/gd_orders
+lakehouse-ingest governance-apply contracts/gold/gd_orders --force-revoke
 ```
 
 ## Modos oficiais

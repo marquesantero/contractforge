@@ -548,12 +548,15 @@ def _finalize_execution(
     skip_reason: Optional[str],
     skipped_by_run_id: Optional[str],
     stage_durations: Dict[str, float],
+    governance_results: Optional[Dict[str, Any]],
 ) -> None:
     """Monta o payload completo e grava em ``ctrl_ingestion_runs`` via ``log_run``.
 
     Chamado no ``finally`` do orquestrador — sempre executa, mesmo em falha.
     """
     duration = (finished_dt - started_dt).total_seconds()
+    annotations_result = (governance_results or {}).get("annotations") or {}
+    operations_result = (governance_results or {}).get("operations") or {}
     log_run(
         tables,
         {
@@ -606,6 +609,10 @@ def _finalize_execution(
             "metrics_source": metrics_source,
             "framework_version": FRAMEWORK_VERSION,
             "ctrl_schema_version": CTRL_SCHEMA_VERSION,
+            "annotations_status": annotations_result.get("status"),
+            "annotations_result_json": to_json(annotations_result) if annotations_result else None,
+            "ownership_json": to_json(operations_result.get("ownership")) if operations_result else None,
+            "operations_json": to_json(operations_result.get("operations")) if operations_result else None,
             **runtime_meta,
         },
     )
@@ -1290,7 +1297,7 @@ def ingest_plan(plan: IngestionPlan) -> Dict[str, Any]:
                     quality_status, schema_changes, operation_metrics, write_started_at,
                     write_finished_at, delta_version_before, delta_version_after, write_committed,
                     error, row_metrics, metrics_source, runtime_meta,
-                    skip_reason, skipped_by_run_id, stage_durations,
+                    skip_reason, skipped_by_run_id, stage_durations, governance_results,
                 )
             except Exception as log_exc:
                 logger.error(f"Falha ao registrar execução: {log_exc}")
@@ -1387,7 +1394,12 @@ def ingest_bundle(path: str) -> Dict[str, Any]:
     return ingest_plan(bundle.ingestion)
 
 
-def apply_governance_bundle(path: str, run_id: Optional[str] = None) -> Dict[str, Any]:
+def apply_governance_bundle(
+    path: str,
+    run_id: Optional[str] = None,
+    *,
+    force_revoke: bool = False,
+) -> Dict[str, Any]:
     """Aplica annotations/operations/access de um bundle sem reprocessar dados."""
     from .contract_bundle import governance_preview, load_contract_bundle
 
@@ -1422,6 +1434,7 @@ def apply_governance_bundle(path: str, run_id: Optional[str] = None) -> Dict[str
             target,
             plan.access,
             log_access_entries,
+            allow_revoke_unmanaged=force_revoke,
         ),
     }
     return {

@@ -6,6 +6,14 @@ Este projeto segue versionamento semântico enquanto a biblioteca evolui:
 - `MINOR`: novo recurso compatível ou endurecimento planejado do contrato.
 - `MAJOR`: mudança incompatível depois de adoção estável.
 
+## 1.6.1 - 2026-05-13
+
+- Aceita o formato separado com `target`, `operations`/`ownership`, `access_policy` e `column_masks` como mapa por coluna.
+- Bloqueia `revoke_unmanaged=true` sem confirmação explícita (`governance-apply --force-revoke`).
+- Fortalece validações de governança: `expected_frequency`, privilégios UC, funções qualificadas, descrições vazias, aliases vazios e `deprecated` incompleto.
+- Expande auditoria em `ctrl_ingestion_annotations`, `ctrl_ingestion_operations`, `ctrl_ingestion_access` e resumo de governança em `ctrl_ingestion_runs`.
+- Eleva `ctrl_schema_version` para 9.
+
 ## 1.6.0 - 2026-05-13
 
 - Adiciona contratos declarativos separados para `annotations`, `operations` e `access`.

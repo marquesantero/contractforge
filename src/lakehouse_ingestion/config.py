@@ -10,8 +10,8 @@ from typing import Literal, Union
 
 from pyspark.sql import DataFrame
 
-FRAMEWORK_VERSION = "1.6.0"
-CTRL_SCHEMA_VERSION = 8
+FRAMEWORK_VERSION = "1.6.1"
+CTRL_SCHEMA_VERSION = 9
 
 #: Camadas reconhecidas (Medallion Architecture).
 Layer = Literal["bronze", "silver", "gold"]
@@ -86,21 +86,48 @@ VALID_ACCESS_DRIFT_POLICIES = {"fail", "warn", "reconcile"}
 
 VALID_CRITICALITY_LEVELS = {"low", "medium", "high", "critical"}
 
+VALID_EXPECTED_FREQUENCIES = {"hourly", "daily", "weekly", "monthly", "ad_hoc"}
+
 VALID_SENSITIVITY_LEVELS = {"public", "internal", "restricted", "confidential"}
 
 VALID_PII_TYPES = {
     "address",
+    "bank_account",
     "birth_date",
     "credit_card",
+    "device_id",
     "document",
     "email",
     "financial",
     "health",
+    "ip_address",
     "name",
+    "national_id",
+    "other",
     "phone",
     "ssn",
     "tax_id",
     "unknown",
+}
+
+VALID_ACCESS_PRIVILEGES = {
+    "ALL PRIVILEGES",
+    "APPLY TAG",
+    "CREATE",
+    "CREATE FUNCTION",
+    "CREATE MODEL",
+    "CREATE TABLE",
+    "CREATE VOLUME",
+    "EXECUTE",
+    "MANAGE",
+    "MODIFY",
+    "READ FILES",
+    "READ VOLUME",
+    "REFRESH",
+    "SELECT",
+    "USAGE",
+    "WRITE FILES",
+    "WRITE VOLUME",
 }
 
 #: Políticas válidas de idempotência para validação runtime.

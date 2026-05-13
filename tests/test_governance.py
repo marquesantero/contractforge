@@ -86,6 +86,18 @@ def test_governance_rejects_invalid_enums():
             target_table="t",
             access={"mode": "dry"},
         )
+    with pytest.raises(ValueError, match="operations.expected_frequency"):
+        build_plan_from_kwargs(
+            source="x",
+            target_table="t",
+            operations={"expected_frequency": "sometimes"},
+        )
+    with pytest.raises(ValueError, match="privileges"):
+        build_plan_from_kwargs(
+            source="x",
+            target_table="t",
+            access={"grants": [{"principal": "readers", "privileges": ["DROP"]}]},
+        )
 
 
 def test_governance_sql_preview_generates_catalog_statements():
@@ -144,15 +156,33 @@ def test_load_contract_bundle_reads_split_json_contracts(tmp_path):
         encoding="utf-8",
     )
     (tmp_path / "gd_orders.annotations.json").write_text(
-        json.dumps({"table": {"description": "Gold orders"}}),
+        json.dumps(
+            {
+                "target": {"catalog": "main", "schema": "gold", "table": "gd_orders"},
+                "table": {"description": "Gold orders"},
+            }
+        ),
         encoding="utf-8",
     )
     (tmp_path / "gd_orders.operations.json").write_text(
-        json.dumps({"criticality": "critical", "owners": ["data-platform"]}),
+        json.dumps(
+            {
+                "target": {"catalog": "main", "schema": "gold", "table": "gd_orders"},
+                "ownership": {"technical_owner": "data-platform"},
+                "operations": {"criticality": "critical", "expected_frequency": "daily"},
+            }
+        ),
         encoding="utf-8",
     )
     (tmp_path / "gd_orders.access.json").write_text(
-        json.dumps({"mode": "validate_only", "grants": [{"principal": "readers", "privileges": ["SELECT"]}]}),
+        json.dumps(
+            {
+                "target": {"catalog": "main", "schema": "gold", "table": "gd_orders"},
+                "access_policy": {"mode": "validate_only"},
+                "grants": [{"principal": "readers", "privileges": ["SELECT"]}],
+                "column_masks": {"email": {"function": "main.security.mask_email"}},
+            }
+        ),
         encoding="utf-8",
     )
 
@@ -161,9 +191,26 @@ def test_load_contract_bundle_reads_split_json_contracts(tmp_path):
     assert bundle.ingestion.target_table == "gd_orders"
     assert bundle.annotations.table.description == "Gold orders"
     assert bundle.operations.criticality == "critical"
+    assert bundle.operations.technical_owner == "data-platform"
     assert bundle.access.mode == "validate_only"
+    assert bundle.access.column_masks[0].column == "email"
     assert bundle.metadata["ingestion"]["contract_version"] == "1.0.0"
     assert "ingestion" in bundle.paths
+
+
+def test_load_contract_bundle_rejects_target_mismatch(tmp_path):
+    base = tmp_path / "gd_orders"
+    (tmp_path / "gd_orders.ingestion.json").write_text(
+        json.dumps({"source": "silver.orders", "target_table": "gd_orders", "layer": "gold"}),
+        encoding="utf-8",
+    )
+    (tmp_path / "gd_orders.annotations.json").write_text(
+        json.dumps({"target": {"schema": "silver", "table": "gd_orders"}}),
+        encoding="utf-8",
+    )
+
+    with pytest.raises(ValueError, match="annotations.target.schema"):
+        load_contract_bundle(base)
 
 
 def test_governance_preview_from_bundle(tmp_path):
@@ -264,6 +311,26 @@ def test_access_drift_report_detects_missing_and_unmanaged_grants():
     assert report["unmanaged_grants"] == [("legacy", "SELECT")]
 
 
+def test_apply_access_contract_blocks_revoke_without_force():
+    plan = build_plan_from_kwargs(
+        source="x",
+        target_table="orders",
+        access={
+            "revoke_unmanaged": True,
+            "grants": [{"principal": "readers", "privileges": ["SELECT"]}],
+        },
+    )
+
+    with pytest.raises(ValueError, match="--force-revoke"):
+        apply_access_contract(
+            {"access": "ops.ctrl_ingestion_access"},
+            "run-1",
+            "main.gold.orders",
+            plan.access,
+            lambda tables, run_id, target, entries: None,
+        )
+
+
 def test_apply_access_contract_revokes_unmanaged_grants(monkeypatch):
     executed = []
     logged = []
@@ -297,6 +364,7 @@ def test_apply_access_contract_revokes_unmanaged_grants(monkeypatch):
         "main.gold.orders",
         plan.access,
         lambda tables, run_id, target, entries: logged.extend(entries),
+        allow_revoke_unmanaged=True,
     )
 
     assert result["status"] == "SUCCESS"

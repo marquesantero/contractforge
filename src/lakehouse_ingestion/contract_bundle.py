@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+import re
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Iterable, Optional
@@ -17,6 +18,8 @@ from .governance import (
     validate_governance_contract,
 )
 from .plan import IngestionPlan, build_plan_from_kwargs
+
+_SEMVER_RE = re.compile(r"^\d+\.\d+\.\d+$")
 
 
 @dataclass(frozen=True)
@@ -37,6 +40,57 @@ def _strip_metadata(payload: dict[str, Any]) -> tuple[dict[str, Any], dict[str, 
     if not isinstance(metadata, dict):
         raise ValueError("_metadata deve ser um objeto/dict")
     return clean, metadata
+
+
+def _target_tuple(payload: dict[str, Any]) -> Optional[tuple[Optional[str], Optional[str], Optional[str]]]:
+    target = payload.get("target")
+    if target is None:
+        return None
+    if not isinstance(target, dict):
+        raise ValueError("target deve ser um objeto/dict")
+    table = target.get("table")
+    if not table:
+        raise ValueError("target.table e obrigatorio quando target for informado")
+    return (
+        str(target.get("catalog")).strip() if target.get("catalog") else None,
+        str(target.get("schema")).strip() if target.get("schema") else None,
+        str(table).strip(),
+    )
+
+
+def _validate_target_compatibility(
+    kind: str,
+    payload: dict[str, Any],
+    plan: IngestionPlan,
+) -> None:
+    declared = _target_tuple(payload)
+    if declared is None:
+        return
+    catalog, schema, table = declared
+    expected = (plan.catalog, plan.layer, plan.target_table)
+    if catalog and catalog != expected[0]:
+        raise ValueError(f"{kind}.target.catalog={catalog!r} diverge de ingestion.catalog={expected[0]!r}")
+    if schema and schema != expected[1]:
+        raise ValueError(f"{kind}.target.schema={schema!r} diverge de ingestion.layer={expected[1]!r}")
+    if table != expected[2]:
+        raise ValueError(f"{kind}.target.table={table!r} diverge de ingestion.target_table={expected[2]!r}")
+
+
+def _metadata_validation_warnings(metadata: dict[str, dict[str, Any]]) -> list[str]:
+    warnings = []
+    majors = {}
+    for name, content in metadata.items():
+        version = content.get("contract_version")
+        if not version:
+            continue
+        version_text = str(version)
+        if not _SEMVER_RE.match(version_text):
+            warnings.append(f"{name}._metadata.contract_version nao esta em formato MAJOR.MINOR.PATCH: {version_text}")
+            continue
+        majors[name] = version_text.split(".", 1)[0]
+    if len(set(majors.values())) > 1:
+        warnings.append(f"major version divergente entre arquivos do bundle: {majors}")
+    return warnings
 
 
 def _load_structured(path: Path) -> dict[str, Any]:
@@ -97,6 +151,7 @@ def load_contract_bundle(path: str | Path) -> ContractBundle:
     metadata = {"ingestion": ingestion_metadata}
     paths = {"ingestion": str(ingestion_path)}
 
+    annotations_payload = operations_payload = access_payload = None
     if annotations_path:
         annotations_payload, annotations_metadata = _strip_metadata(_load_structured(annotations_path))
         ingestion_payload["annotations"] = annotations_payload
@@ -114,6 +169,12 @@ def load_contract_bundle(path: str | Path) -> ContractBundle:
         paths["access"] = str(access_path)
 
     plan = build_plan_from_kwargs(**ingestion_payload)
+    if annotations_payload is not None:
+        _validate_target_compatibility("annotations", annotations_payload, plan)
+    if operations_payload is not None:
+        _validate_target_compatibility("operations", operations_payload, plan)
+    if access_payload is not None:
+        _validate_target_compatibility("access", access_payload, plan)
     return ContractBundle(
         ingestion=plan,
         annotations=plan.annotations,
@@ -142,14 +203,15 @@ def governance_preview(bundle: ContractBundle) -> dict[str, Any]:
 def contract_metadata_warnings(bundle: ContractBundle) -> list[str]:
     """Aponta inconsistencias entre `_metadata` dos arquivos do bundle."""
     metadata = bundle.metadata or {}
+    warnings = _metadata_validation_warnings(metadata)
     versions = {
         name: content.get("contract_version")
         for name, content in metadata.items()
         if content.get("contract_version")
     }
-    if len(set(versions.values())) <= 1:
-        return []
-    return [f"contract_version divergente entre arquivos do bundle: {versions}"]
+    if len(set(versions.values())) > 1:
+        warnings.append(f"contract_version divergente entre arquivos do bundle: {versions}")
+    return warnings
 
 
 def governance_check(bundle: ContractBundle) -> dict[str, Any]:

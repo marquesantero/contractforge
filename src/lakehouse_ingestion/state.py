@@ -144,7 +144,11 @@ def ensure_ctrl_tables(catalog: str, schema: str) -> Dict[str, str]:
             ctrl_schema_version BIGINT,
             runtime_type STRING,
             spark_version STRING,
-            python_version STRING
+            python_version STRING,
+            annotations_status STRING,
+            annotations_result_json STRING,
+            ownership_json STRING,
+            operations_json STRING
         ) USING DELTA PARTITIONED BY (run_date)
     """)
     spark.sql(f"""
@@ -313,11 +317,13 @@ def ensure_ctrl_tables(catalog: str, schema: str) -> Dict[str, str]:
             annotation_type STRING,
             column_name STRING,
             key STRING,
+            previous_value STRING,
             value STRING,
             status STRING,
             error_message STRING,
             applied_sql STRING,
             annotation_ts_utc TIMESTAMP,
+            annotation_date DATE,
             framework_version STRING,
             ctrl_schema_version BIGINT
         ) USING DELTA
@@ -332,6 +338,7 @@ def ensure_ctrl_tables(catalog: str, schema: str) -> Dict[str, str]:
             alert_on_failure BOOLEAN,
             alert_on_quality_fail BOOLEAN,
             runbook_url STRING,
+            ownership_json STRING,
             owners_json STRING,
             groups_json STRING,
             tags_json STRING,
@@ -343,17 +350,25 @@ def ensure_ctrl_tables(catalog: str, schema: str) -> Dict[str, str]:
     """)
     spark.sql(f"""
         CREATE TABLE IF NOT EXISTS {qt(tables['access'])} (
+            access_run_id STRING,
             run_id STRING,
             target_table STRING,
             access_type STRING,
             principal STRING,
             privilege STRING,
+            column_name STRING,
+            function_name STRING,
             object_name STRING,
             status STRING,
             error_message STRING,
             applied_sql STRING,
             previous_value STRING,
+            new_value STRING,
+            mode STRING,
+            drift_policy STRING,
+            revoke_unmanaged BOOLEAN,
             access_ts_utc TIMESTAMP,
+            access_date DATE,
             framework_version STRING,
             ctrl_schema_version BIGINT
         ) USING DELTA
@@ -378,6 +393,10 @@ def ensure_ctrl_tables(catalog: str, schema: str) -> Dict[str, str]:
             "contract_tags_json": "STRING",
             "contract_sla": "STRING",
             "runtime_parameters_json": "STRING",
+            "annotations_status": "STRING",
+            "annotations_result_json": "STRING",
+            "ownership_json": "STRING",
+            "operations_json": "STRING",
         },
     )
     _add_columns_if_missing(
@@ -395,14 +414,40 @@ def ensure_ctrl_tables(catalog: str, schema: str) -> Dict[str, str]:
             "message": "STRING",
         },
     )
+    _add_columns_if_missing(
+        tables["annotations"],
+        {
+            "previous_value": "STRING",
+            "annotation_date": "DATE",
+        },
+    )
+    _add_columns_if_missing(
+        tables["operations"],
+        {
+            "ownership_json": "STRING",
+        },
+    )
+    _add_columns_if_missing(
+        tables["access"],
+        {
+            "access_run_id": "STRING",
+            "column_name": "STRING",
+            "function_name": "STRING",
+            "new_value": "STRING",
+            "mode": "STRING",
+            "drift_policy": "STRING",
+            "revoke_unmanaged": "BOOLEAN",
+            "access_date": "DATE",
+        },
+    )
     _record_ctrl_metadata(tables)
     return tables
 
 
 _ANNOTATION_COLUMNS = [
     "run_id", "target_table", "annotation_scope", "annotation_type", "column_name",
-    "key", "value", "status", "error_message", "applied_sql", "annotation_ts_utc",
-    "framework_version", "ctrl_schema_version",
+    "key", "previous_value", "value", "status", "error_message", "applied_sql",
+    "annotation_ts_utc", "annotation_date", "framework_version", "ctrl_schema_version",
 ]
 
 
@@ -420,6 +465,7 @@ def log_annotation_entries(
             "target_table": target_table,
             "applied_sql": entry.get("sql"),
             "annotation_ts_utc": utc_now_str(),
+            "annotation_date": utc_now_str()[:10],
             "framework_version": FRAMEWORK_VERSION,
             "ctrl_schema_version": CTRL_SCHEMA_VERSION,
         }
@@ -430,6 +476,8 @@ def log_annotation_entries(
                 values.append(sql_int(value))
             elif column.endswith("_utc"):
                 values.append(f"CAST({sql_lit(value)} AS TIMESTAMP)")
+            elif column.endswith("_date"):
+                values.append(f"CAST({sql_lit(value)} AS DATE)")
             elif column == "error_message":
                 values.append(sql_lit(safe_truncate(value, 2000)))
             else:
@@ -442,8 +490,8 @@ def log_annotation_entries(
 
 _OPERATION_COLUMNS = [
     "run_id", "target_table", "criticality", "expected_frequency", "freshness_sla_minutes",
-    "alert_on_failure", "alert_on_quality_fail", "runbook_url", "owners_json", "groups_json",
-    "tags_json", "status", "recorded_at_utc", "framework_version", "ctrl_schema_version",
+    "alert_on_failure", "alert_on_quality_fail", "runbook_url", "ownership_json", "owners_json",
+    "groups_json", "tags_json", "status", "recorded_at_utc", "framework_version", "ctrl_schema_version",
 ]
 
 
@@ -479,9 +527,10 @@ def log_operations_contract(
 
 
 _ACCESS_COLUMNS = [
-    "run_id", "target_table", "access_type", "principal", "privilege", "object_name",
-    "status", "error_message", "applied_sql", "previous_value", "access_ts_utc",
-    "framework_version", "ctrl_schema_version",
+    "access_run_id", "run_id", "target_table", "access_type", "principal", "privilege",
+    "column_name", "function_name", "object_name", "status", "error_message", "applied_sql",
+    "previous_value", "new_value", "mode", "drift_policy", "revoke_unmanaged", "access_ts_utc",
+    "access_date", "framework_version", "ctrl_schema_version",
 ]
 
 
@@ -495,10 +544,12 @@ def log_access_entries(
     for entry in entries:
         payload = {
             **entry,
+            "access_run_id": run_id,
             "run_id": run_id,
             "target_table": target_table,
             "applied_sql": entry.get("sql"),
             "access_ts_utc": utc_now_str(),
+            "access_date": utc_now_str()[:10],
             "framework_version": FRAMEWORK_VERSION,
             "ctrl_schema_version": CTRL_SCHEMA_VERSION,
         }
@@ -507,8 +558,12 @@ def log_access_entries(
             value = payload.get(column)
             if column == "ctrl_schema_version":
                 values.append(sql_int(value))
+            elif column == "revoke_unmanaged":
+                values.append("NULL" if value is None else str(bool(value)).lower())
             elif column.endswith("_utc"):
                 values.append(f"CAST({sql_lit(value)} AS TIMESTAMP)")
+            elif column.endswith("_date"):
+                values.append(f"CAST({sql_lit(value)} AS DATE)")
             elif column == "error_message":
                 values.append(sql_lit(safe_truncate(value, 2000)))
             else:
@@ -638,7 +693,8 @@ _RUN_COLUMNS = [
     "run_group_id", "master_job_id", "master_run_id", "idempotency_key",
     "idempotency_policy", "skip_reason", "skipped_by_run_id", "metrics_source",
     "framework_version", "ctrl_schema_version", "runtime_type", "spark_version",
-    "python_version",
+    "python_version", "annotations_status", "annotations_result_json", "ownership_json",
+    "operations_json",
 ]
 _RUN_INT_COLUMNS = {
     "rows_read", "rows_written", "rows_inserted", "rows_updated", "rows_deleted",

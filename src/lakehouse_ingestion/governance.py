@@ -18,7 +18,9 @@ from .config import (
     GovernanceFailurePolicy,
     VALID_ACCESS_DRIFT_POLICIES,
     VALID_ACCESS_MODES,
+    VALID_ACCESS_PRIVILEGES,
     VALID_CRITICALITY_LEVELS,
+    VALID_EXPECTED_FREQUENCIES,
     VALID_GOVERNANCE_FAILURE_POLICIES,
     VALID_PII_TYPES,
     VALID_SENSITIVITY_LEVELS,
@@ -79,6 +81,11 @@ class AnnotationsContract:
 class OperationsContract:
     """Contrato operacional usado por dashboards/alertas externos."""
 
+    business_owner: Optional[str] = None
+    technical_owner: Optional[str] = None
+    steward: Optional[str] = None
+    support_group: Optional[str] = None
+    escalation_group: Optional[str] = None
     criticality: Optional[str] = None
     expected_frequency: Optional[str] = None
     freshness_sla_minutes: Optional[int] = None
@@ -146,6 +153,34 @@ def _as_list(value: Any) -> List[str]:
     return [str(value).strip()] if str(value).strip() else []
 
 
+def _non_empty_list(value: Any, field: str) -> List[str]:
+    if value is None:
+        return []
+    if isinstance(value, str):
+        raw_items = value.split("|")
+    elif isinstance(value, (list, tuple, set)):
+        raw_items = list(value)
+    else:
+        raw_items = [value]
+    items = [str(item).strip() for item in raw_items]
+    if any(not item for item in items):
+        raise ValueError(f"{field} nao pode conter valor vazio")
+    return items
+
+
+def _required_non_empty_string(value: Any, field: str) -> str:
+    parsed = str(value or "").strip()
+    if not parsed:
+        raise ValueError(f"{field} nao pode ser vazio")
+    return parsed
+
+
+def _optional_non_empty_string(value: Any, field: str) -> Optional[str]:
+    if value is None:
+        return None
+    return _required_non_empty_string(value, field)
+
+
 def _str_map(value: Any, field: str) -> Dict[str, str]:
     if value is None:
         return {}
@@ -171,6 +206,14 @@ def _enum(value: Any, valid: set[str], field: str, default: Optional[str] = None
     return raw
 
 
+def _qualified_name(value: Any, field: str) -> str:
+    name = _required_non_empty_string(value, field)
+    parts = [part.strip() for part in name.split(".")]
+    if len(parts) < 3 or any(not part for part in parts):
+        raise ValueError(f"{field} deve ser qualificado, por exemplo catalog.schema.funcao")
+    return name
+
+
 def _positive_int(value: Any, field: str) -> Optional[int]:
     if value is None:
         return None
@@ -187,10 +230,12 @@ def _normalize_deprecated(value: Any, field: str) -> Optional[DeprecatedAnnotati
     if value in (None, False):
         return None
     raw = _require_mapping(value, field)
+    since = _required_non_empty_string(raw.get("since"), f"{field}.since")
+    replacement = _required_non_empty_string(raw.get("replacement"), f"{field}.replacement")
     return DeprecatedAnnotation(
-        since=raw.get("since"),
-        replacement=raw.get("replacement"),
-        removal_date=raw.get("removal_date"),
+        since=since,
+        replacement=replacement,
+        removal_date=_optional_non_empty_string(raw.get("removal_date"), f"{field}.removal_date"),
     )
 
 
@@ -222,8 +267,8 @@ def normalize_annotations_contract(value: Any) -> Optional[AnnotationsContract]:
     )
     table_raw = _require_mapping(raw.get("table", {}), "annotations.table")
     table = TableAnnotations(
-        description=table_raw.get("description"),
-        aliases=_as_list(table_raw.get("aliases")),
+        description=_optional_non_empty_string(table_raw.get("description"), "annotations.table.description"),
+        aliases=_non_empty_list(table_raw.get("aliases"), "annotations.table.aliases"),
         tags=_str_map(table_raw.get("tags"), "annotations.table.tags"),
         deprecated=_normalize_deprecated(table_raw.get("deprecated"), "annotations.table.deprecated"),
     )
@@ -234,8 +279,11 @@ def normalize_annotations_contract(value: Any) -> Optional[AnnotationsContract]:
             raise ValueError("annotations.columns nao pode conter coluna vazia")
         column_raw = _require_mapping(config, f"annotations.columns.{column_name}")
         columns[column_name] = ColumnAnnotations(
-            description=column_raw.get("description"),
-            aliases=_as_list(column_raw.get("aliases")),
+            description=_optional_non_empty_string(
+                column_raw.get("description"),
+                f"annotations.columns.{column_name}.description",
+            ),
+            aliases=_non_empty_list(column_raw.get("aliases"), f"annotations.columns.{column_name}.aliases"),
             tags=_str_map(column_raw.get("tags"), f"annotations.columns.{column_name}.tags"),
             pii=_normalize_pii(column_raw.get("pii"), f"annotations.columns.{column_name}.pii"),
             deprecated=_normalize_deprecated(
@@ -251,26 +299,46 @@ def normalize_operations_contract(value: Any) -> Optional[OperationsContract]:
     if value is None or isinstance(value, OperationsContract):
         return value
     raw = _require_mapping(value, "operations")
-    criticality = raw.get("criticality")
+    ownership = _require_mapping(raw.get("ownership", {}), "operations.ownership")
+    operations_raw = _require_mapping(raw.get("operations", raw), "operations.operations")
+    criticality = operations_raw.get("criticality")
     if criticality is not None:
         criticality = _enum(
             criticality,
             VALID_CRITICALITY_LEVELS,
             "operations.criticality",
         )
+    expected_frequency = operations_raw.get("expected_frequency")
+    if expected_frequency is not None:
+        expected_frequency = _enum(
+            expected_frequency,
+            VALID_EXPECTED_FREQUENCIES,
+            "operations.expected_frequency",
+        )
     return OperationsContract(
+        business_owner=_optional_non_empty_string(ownership.get("business_owner"), "operations.ownership.business_owner"),
+        technical_owner=_optional_non_empty_string(
+            ownership.get("technical_owner"),
+            "operations.ownership.technical_owner",
+        ),
+        steward=_optional_non_empty_string(ownership.get("steward"), "operations.ownership.steward"),
+        support_group=_optional_non_empty_string(ownership.get("support_group"), "operations.ownership.support_group"),
+        escalation_group=_optional_non_empty_string(
+            ownership.get("escalation_group"),
+            "operations.ownership.escalation_group",
+        ),
         criticality=criticality,
-        expected_frequency=raw.get("expected_frequency"),
+        expected_frequency=expected_frequency,
         freshness_sla_minutes=_positive_int(
-            raw.get("freshness_sla_minutes"),
+            operations_raw.get("freshness_sla_minutes"),
             "operations.freshness_sla_minutes",
         ),
-        alert_on_failure=bool(raw.get("alert_on_failure", False)),
-        alert_on_quality_fail=bool(raw.get("alert_on_quality_fail", False)),
-        runbook_url=raw.get("runbook_url"),
-        owners=_as_list(raw.get("owners")),
-        groups=_as_list(raw.get("groups")),
-        tags=_str_map(raw.get("tags"), "operations.tags"),
+        alert_on_failure=bool(operations_raw.get("alert_on_failure", False)),
+        alert_on_quality_fail=bool(operations_raw.get("alert_on_quality_fail", False)),
+        runbook_url=_optional_non_empty_string(operations_raw.get("runbook_url"), "operations.runbook_url"),
+        owners=_as_list(operations_raw.get("owners")),
+        groups=_as_list(operations_raw.get("groups")),
+        tags=_str_map(operations_raw.get("tags"), "operations.tags"),
     )
 
 
@@ -279,6 +347,7 @@ def normalize_access_contract(value: Any) -> Optional[AccessContract]:
     if value is None or isinstance(value, AccessContract):
         return value
     raw = _require_mapping(value, "access")
+    policy = _require_mapping(raw.get("access_policy", {}), "access.access_policy")
     grants = []
     for item in raw.get("grants", []) or []:
         grant_raw = _require_mapping(item, "access.grants[]")
@@ -286,14 +355,17 @@ def normalize_access_contract(value: Any) -> Optional[AccessContract]:
         privileges = [priv.upper() for priv in _as_list(grant_raw.get("privileges"))]
         if not principal or not privileges:
             raise ValueError("access.grants[] requer principal e privileges")
+        invalid = sorted(set(privileges) - VALID_ACCESS_PRIVILEGES)
+        if invalid:
+            raise ValueError(f"access.grants[].privileges contem valores invalidos: {invalid}")
         grants.append(AccessGrant(principal=principal, privileges=privileges))
     row_filters = []
     for item in raw.get("row_filters", []) or []:
         filter_raw = _require_mapping(item, "access.row_filters[]")
         name = str(filter_raw.get("name") or "").strip()
-        function = str(filter_raw.get("function") or "").strip()
+        function = _qualified_name(filter_raw.get("function"), "access.row_filters[].function")
         columns = _as_list(filter_raw.get("columns"))
-        if not name or not function or not columns:
+        if not name or not columns:
             raise ValueError("access.row_filters[] requer name, function e columns")
         applies_to = filter_raw.get("applies_to", {}) or {}
         row_filters.append(
@@ -305,11 +377,16 @@ def normalize_access_contract(value: Any) -> Optional[AccessContract]:
             )
         )
     column_masks = []
-    for item in raw.get("column_masks", []) or []:
+    masks_raw = raw.get("column_masks", []) or []
+    if isinstance(masks_raw, dict):
+        masks_iter = [{**_require_mapping(config, f"access.column_masks.{column}"), "column": column} for column, config in masks_raw.items()]
+    else:
+        masks_iter = masks_raw
+    for item in masks_iter:
         mask_raw = _require_mapping(item, "access.column_masks[]")
         column = str(mask_raw.get("column") or "").strip()
-        function = str(mask_raw.get("function") or "").strip()
-        if not column or not function:
+        function = _qualified_name(mask_raw.get("function"), "access.column_masks[].function")
+        if not column:
             raise ValueError("access.column_masks[] requer column e function")
         applies_to = mask_raw.get("applies_to", {}) or {}
         column_masks.append(
@@ -321,14 +398,14 @@ def normalize_access_contract(value: Any) -> Optional[AccessContract]:
             )
         )
     return AccessContract(
-        mode=_enum(raw.get("mode", "apply"), VALID_ACCESS_MODES, "access.mode", "apply"),
+        mode=_enum(policy.get("mode", raw.get("mode", "apply")), VALID_ACCESS_MODES, "access.mode", "apply"),
         on_drift=_enum(
-            raw.get("on_drift", "warn"),
+            policy.get("on_drift", raw.get("on_drift", "warn")),
             VALID_ACCESS_DRIFT_POLICIES,
             "access.on_drift",
             "warn",
         ),
-        revoke_unmanaged=bool(raw.get("revoke_unmanaged", False)),
+        revoke_unmanaged=bool(policy.get("revoke_unmanaged", raw.get("revoke_unmanaged", False))),
         grants=grants,
         row_filters=row_filters,
         column_masks=column_masks,
@@ -507,6 +584,33 @@ def validate_governance_contract(
             ],
         }
 
+    if annotations:
+        contains_pii = annotations.table.tags.get("contains_pii", "").lower() == "true"
+        pii_columns = sorted(
+            column
+            for column, annotation in annotations.columns.items()
+            if annotation.pii and annotation.pii.enabled
+        )
+        if contains_pii and not pii_columns:
+            issues.append(
+                {
+                    "severity": "fail",
+                    "scope": "annotations",
+                    "object": "table.tags.contains_pii",
+                    "message": "contains_pii=true exige pelo menos uma coluna com pii.enabled=true",
+                }
+            )
+        for column in pii_columns:
+            if not annotations.columns[column].description:
+                issues.append(
+                    {
+                        "severity": "warn",
+                        "scope": "annotations",
+                        "object": column,
+                        "message": f"Coluna PII {column!r} deveria ter description declarada",
+                    }
+                )
+
     for scope, referenced_columns in references.items():
         if scope == "all":
             continue
@@ -521,7 +625,7 @@ def validate_governance_contract(
                 }
             )
     return {
-        "status": "FAILED" if issues else "SUCCESS",
+        "status": "FAILED" if any(issue["severity"] == "fail" for issue in issues) else "SUCCESS",
         "target_table": target_table,
         "references": references,
         "issues": issues,
@@ -639,7 +743,13 @@ def _access_steps(target_table: str, contract: AccessContract) -> List[Dict[str,
                     "access_type": "grant",
                     "principal": grant.principal,
                     "privilege": privilege,
+                    "column_name": None,
+                    "function_name": None,
                     "object_name": target_table,
+                    "new_value": "GRANTED",
+                    "mode": contract.mode,
+                    "drift_policy": contract.on_drift,
+                    "revoke_unmanaged": contract.revoke_unmanaged,
                     "sql": f"GRANT {privilege} ON TABLE {qt(target_table)} TO {q(grant.principal)}",
                 }
             )
@@ -650,7 +760,13 @@ def _access_steps(target_table: str, contract: AccessContract) -> List[Dict[str,
                 "access_type": "row_filter",
                 "principal": "|".join(row_filter.principals),
                 "privilege": "ROW_FILTER",
+                "column_name": "|".join(row_filter.columns),
+                "function_name": row_filter.function,
                 "object_name": row_filter.name,
+                "new_value": row_filter.function,
+                "mode": contract.mode,
+                "drift_policy": contract.on_drift,
+                "revoke_unmanaged": contract.revoke_unmanaged,
                 "sql": (
                     f"ALTER TABLE {qt(target_table)} SET ROW FILTER "
                     f"{_qualified_function(row_filter.function)} ON ({columns})"
@@ -666,7 +782,13 @@ def _access_steps(target_table: str, contract: AccessContract) -> List[Dict[str,
                 "access_type": "column_mask",
                 "principal": "|".join(mask.principals),
                 "privilege": "COLUMN_MASK",
+                "column_name": mask.column,
+                "function_name": mask.function,
                 "object_name": mask.column,
+                "new_value": mask.function,
+                "mode": contract.mode,
+                "drift_policy": contract.on_drift,
+                "revoke_unmanaged": contract.revoke_unmanaged,
                 "sql": (
                     f"ALTER TABLE {qt(target_table)} ALTER COLUMN {q(mask.column)} "
                     f"SET MASK {_qualified_function(mask.function)}{using}"
@@ -676,7 +798,11 @@ def _access_steps(target_table: str, contract: AccessContract) -> List[Dict[str,
     return steps
 
 
-def _revoke_grant_steps(target_table: str, grants: Iterable[tuple[str, str]]) -> List[Dict[str, Any]]:
+def _revoke_grant_steps(
+    target_table: str,
+    grants: Iterable[tuple[str, str]],
+    contract: AccessContract,
+) -> List[Dict[str, Any]]:
     steps = []
     for principal, privilege in grants:
         steps.append(
@@ -684,9 +810,15 @@ def _revoke_grant_steps(target_table: str, grants: Iterable[tuple[str, str]]) ->
                 "access_type": "revoke",
                 "principal": principal,
                 "privilege": privilege,
+                "column_name": None,
+                "function_name": None,
                 "object_name": target_table,
                 "sql": f"REVOKE {privilege} ON TABLE {qt(target_table)} FROM {q(principal)}",
                 "previous_value": "GRANTED",
+                "new_value": "REVOKED",
+                "mode": contract.mode,
+                "drift_policy": contract.on_drift,
+                "revoke_unmanaged": contract.revoke_unmanaged,
             }
         )
     return steps
@@ -744,6 +876,17 @@ def record_operations_contract(
     """Registra contrato operacional para consumo por dashboards/alertas."""
     if not contract:
         return {"status": "NOT_CONFIGURED"}
+    ownership = {
+        "business_owner": contract.business_owner,
+        "technical_owner": contract.technical_owner,
+        "steward": contract.steward,
+        "owners": contract.owners,
+    }
+    groups = {
+        "support_group": contract.support_group,
+        "escalation_group": contract.escalation_group,
+        "groups": contract.groups,
+    }
     payload = {
         "criticality": contract.criticality,
         "expected_frequency": contract.expected_frequency,
@@ -751,14 +894,27 @@ def record_operations_contract(
         "alert_on_failure": contract.alert_on_failure,
         "alert_on_quality_fail": contract.alert_on_quality_fail,
         "runbook_url": contract.runbook_url,
-        "owners_json": to_json(contract.owners),
-        "groups_json": to_json(contract.groups),
+        "ownership_json": to_json({"ownership": ownership, "groups": groups}),
+        "owners_json": to_json(ownership),
+        "groups_json": to_json(groups),
         "tags_json": to_json(contract.tags),
         "status": "RECORDED",
         "recorded_at_utc": utc_now_str(),
     }
     log_entry(tables, run_id, target_table, payload)
-    return {"status": "RECORDED", "criticality": contract.criticality}
+    return {
+        "status": "RECORDED",
+        "criticality": contract.criticality,
+        "ownership": ownership,
+        "operations": {
+            "expected_frequency": contract.expected_frequency,
+            "freshness_sla_minutes": contract.freshness_sla_minutes,
+            "alert_on_failure": contract.alert_on_failure,
+            "alert_on_quality_fail": contract.alert_on_quality_fail,
+            "runbook_url": contract.runbook_url,
+            "tags": contract.tags,
+        },
+    }
 
 
 def apply_access_contract(
@@ -767,16 +923,23 @@ def apply_access_contract(
     target_table: str,
     contract: Optional[AccessContract],
     log_entries,
+    *,
+    allow_revoke_unmanaged: bool = False,
 ) -> Dict[str, Any]:
     """Aplica grants, row filters e masks declarados no contrato de acesso."""
     if not contract:
         return {"status": "NOT_CONFIGURED", "applied": 0, "failed": 0, "sql_preview": []}
+    if contract.revoke_unmanaged and not allow_revoke_unmanaged:
+        raise ValueError(
+            "access.revoke_unmanaged=true exige confirmacao explicita "
+            "no caminho de aplicacao dedicado (--force-revoke)"
+        )
     drift = access_drift_report(target_table, contract)
     if drift["status"] == "FAILED" and contract.on_drift == "fail":
         raise ValueError(f"Falha ao calcular drift de access: {to_json(drift['issues'])}")
     steps = _access_steps(target_table, contract)
     if contract.revoke_unmanaged and drift["status"] != "FAILED":
-        steps.extend(_revoke_grant_steps(target_table, drift["unmanaged_grants"]))
+        steps.extend(_revoke_grant_steps(target_table, drift["unmanaged_grants"], contract))
     result = {"status": "SUCCESS", "applied": 0, "failed": 0, "sql_preview": [s["sql"] for s in steps]}
     entries = []
     if contract.mode == "ignore":

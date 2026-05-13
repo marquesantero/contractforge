@@ -6,7 +6,9 @@ from typing import Any, Dict
 from .config import (
     VALID_ACCESS_DRIFT_POLICIES,
     VALID_ACCESS_MODES,
+    VALID_ACCESS_PRIVILEGES,
     VALID_CRITICALITY_LEVELS,
+    VALID_EXPECTED_FREQUENCIES,
     VALID_EXPLAIN_FORMATS,
     VALID_GOVERNANCE_FAILURE_POLICIES,
     VALID_IDEMPOTENCY_POLICIES,
@@ -69,6 +71,15 @@ def yaml_schema() -> Dict[str, Any]:
         "required": ["source", "target_table"],
         "properties": {
             "_metadata": {"type": "object"},
+            "target": {
+                "type": "object",
+                "additionalProperties": False,
+                "properties": {
+                    "catalog": {"type": "string"},
+                    "schema": {"type": "string"},
+                    "table": {"type": "string"},
+                },
+            },
             "source": {
                 "oneOf": [
                     {"type": "string"},
@@ -189,6 +200,14 @@ def yaml_schema() -> Dict[str, Any]:
                 "additionalProperties": False,
                 "properties": {
                     "policy": {"enum": sorted(VALID_GOVERNANCE_FAILURE_POLICIES)},
+                    "target": {
+                        "type": "object",
+                        "properties": {
+                            "catalog": {"type": "string"},
+                            "schema": {"type": "string"},
+                            "table": {"type": "string"},
+                        },
+                    },
                     "table": {
                         "type": "object",
                         "additionalProperties": False,
@@ -219,8 +238,42 @@ def yaml_schema() -> Dict[str, Any]:
                 "type": ["object", "null"],
                 "additionalProperties": False,
                 "properties": {
+                    "target": {
+                        "type": "object",
+                        "properties": {
+                            "catalog": {"type": "string"},
+                            "schema": {"type": "string"},
+                            "table": {"type": "string"},
+                        },
+                    },
+                    "ownership": {
+                        "type": "object",
+                        "additionalProperties": False,
+                        "properties": {
+                            "business_owner": {"type": ["string", "null"]},
+                            "technical_owner": {"type": ["string", "null"]},
+                            "steward": {"type": ["string", "null"]},
+                            "support_group": {"type": ["string", "null"]},
+                            "escalation_group": {"type": ["string", "null"]},
+                        },
+                    },
+                    "operations": {
+                        "type": "object",
+                        "additionalProperties": False,
+                        "properties": {
+                            "criticality": {"enum": sorted(VALID_CRITICALITY_LEVELS)},
+                            "expected_frequency": {"enum": sorted(VALID_EXPECTED_FREQUENCIES)},
+                            "freshness_sla_minutes": {"type": "integer", "minimum": 1},
+                            "alert_on_failure": {"type": "boolean"},
+                            "alert_on_quality_fail": {"type": "boolean"},
+                            "runbook_url": {"type": ["string", "null"]},
+                            "owners": {"oneOf": [string_array, {"type": "string"}]},
+                            "groups": {"oneOf": [string_array, {"type": "string"}]},
+                            "tags": string_map,
+                        },
+                    },
                     "criticality": {"enum": sorted(VALID_CRITICALITY_LEVELS)},
-                    "expected_frequency": {"type": ["string", "null"]},
+                    "expected_frequency": {"enum": sorted(VALID_EXPECTED_FREQUENCIES)},
                     "freshness_sla_minutes": {"type": "integer", "minimum": 1},
                     "alert_on_failure": {"type": "boolean"},
                     "alert_on_quality_fail": {"type": "boolean"},
@@ -234,6 +287,23 @@ def yaml_schema() -> Dict[str, Any]:
                 "type": ["object", "null"],
                 "additionalProperties": False,
                 "properties": {
+                    "target": {
+                        "type": "object",
+                        "properties": {
+                            "catalog": {"type": "string"},
+                            "schema": {"type": "string"},
+                            "table": {"type": "string"},
+                        },
+                    },
+                    "access_policy": {
+                        "type": "object",
+                        "additionalProperties": False,
+                        "properties": {
+                            "mode": {"enum": sorted(VALID_ACCESS_MODES)},
+                            "on_drift": {"enum": sorted(VALID_ACCESS_DRIFT_POLICIES)},
+                            "revoke_unmanaged": {"type": "boolean"},
+                        },
+                    },
                     "mode": {"enum": sorted(VALID_ACCESS_MODES)},
                     "on_drift": {"enum": sorted(VALID_ACCESS_DRIFT_POLICIES)},
                     "revoke_unmanaged": {"type": "boolean"},
@@ -245,7 +315,12 @@ def yaml_schema() -> Dict[str, Any]:
                             "required": ["principal", "privileges"],
                             "properties": {
                                 "principal": {"type": "string"},
-                                "privileges": {"oneOf": [string_array, {"type": "string"}]},
+                                "privileges": {
+                                    "oneOf": [
+                                        {"type": "array", "items": {"enum": sorted(VALID_ACCESS_PRIVILEGES)}},
+                                        {"enum": sorted(VALID_ACCESS_PRIVILEGES)},
+                                    ]
+                                },
                             },
                         },
                     },
@@ -269,23 +344,45 @@ def yaml_schema() -> Dict[str, Any]:
                         },
                     },
                     "column_masks": {
-                        "type": "array",
-                        "items": {
-                            "type": "object",
-                            "additionalProperties": False,
-                            "required": ["column", "function"],
-                            "properties": {
-                                "column": {"type": "string"},
-                                "function": {"type": "string"},
-                                "using_columns": {"oneOf": [string_array, {"type": "string"}]},
-                                "applies_to": {
+                        "oneOf": [
+                            {
+                                "type": "array",
+                                "items": {
                                     "type": "object",
+                                    "additionalProperties": False,
+                                    "required": ["column", "function"],
                                     "properties": {
-                                        "principals": {"oneOf": [string_array, {"type": "string"}]},
+                                        "column": {"type": "string"},
+                                        "function": {"type": "string"},
+                                        "using_columns": {"oneOf": [string_array, {"type": "string"}]},
+                                        "applies_to": {
+                                            "type": "object",
+                                            "properties": {
+                                                "principals": {"oneOf": [string_array, {"type": "string"}]},
+                                            },
+                                        },
                                     },
                                 },
                             },
-                        },
+                            {
+                                "type": "object",
+                                "additionalProperties": {
+                                    "type": "object",
+                                    "additionalProperties": False,
+                                    "required": ["function"],
+                                    "properties": {
+                                        "function": {"type": "string"},
+                                        "using_columns": {"oneOf": [string_array, {"type": "string"}]},
+                                        "applies_to": {
+                                            "type": "object",
+                                            "properties": {
+                                                "principals": {"oneOf": [string_array, {"type": "string"}]},
+                                            },
+                                        },
+                                    },
+                                },
+                            },
+                        ],
                     },
                 },
             },

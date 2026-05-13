@@ -99,13 +99,13 @@ def _check_governance(paths: List[Path], indent: int) -> int:
     return exit_code
 
 
-def _apply_governance(paths: List[Path]) -> int:
+def _apply_governance(paths: List[Path], *, force_revoke: bool = False) -> int:
     from .ingestion import apply_governance_bundle
 
     exit_code = 0
     for path in paths:
         try:
-            result = apply_governance_bundle(str(path))
+            result = apply_governance_bundle(str(path), force_revoke=force_revoke)
             print(json.dumps(result, indent=2, sort_keys=True, default=str))
         except Exception as exc:
             exit_code = 1
@@ -145,6 +145,11 @@ def main(argv: list[str] | None = None) -> int:
         help="Aplica annotations/operations/access sem executar ingestao",
     )
     governance_apply_parser.add_argument("paths", nargs="+", type=Path)
+    governance_apply_parser.add_argument(
+        "--force-revoke",
+        action="store_true",
+        help="Permite executar REVOKE para grants nao declarados quando access.revoke_unmanaged=true",
+    )
 
     schema_parser = sub.add_parser("schema", help="Imprime JSON Schema dos contratos")
     schema_parser.add_argument("--indent", type=int, default=2)
@@ -159,7 +164,7 @@ def main(argv: list[str] | None = None) -> int:
     if args.command == "governance-check":
         return _check_governance(args.paths, args.indent)
     if args.command == "governance-apply":
-        return _apply_governance(args.paths)
+        return _apply_governance(args.paths, force_revoke=args.force_revoke)
     if args.command == "schema":
         print(json.dumps(yaml_schema(), indent=args.indent, sort_keys=True))
         return 0
