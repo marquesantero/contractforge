@@ -107,6 +107,7 @@ Escopo intencional: apenas Autoloader `available_now`. Streaming contínuo (`pro
 
 ## Contrato declarativo
 
+- `preset` aplica defaults opinativos para padrões comuns de ingestão; o contrato explícito sempre vence o preset.
 - `column_mapping` renomeia colunas source -> target antes de filtros, watermarks, quality e escrita. Destinos duplicados, colisões com colunas existentes e nomes técnicos reservados são rejeitados.
 - `delta_properties` aplica `TBLPROPERTIES` na criação da tabela Delta, por exemplo `delta.enableChangeDataFeed`, `delta.autoOptimize.optimizeWrite` ou propriedades de retenção.
 - `retry_attempts` e `retry_backoff_seconds` sobrescrevem a política global de retry por plano.
@@ -133,6 +134,51 @@ contracts/gold/gd_orders.access.yaml
 from lakehouse_ingestion import ingest_bundle
 
 result = ingest_bundle("contracts/gold/gd_orders")
+```
+
+## Presets
+
+Presets reduzem repetição sem esconder decisões críticas. Eles podem ser usados isolados ou combinados com modificadores:
+
+```yaml
+preset:
+  - runtime_databricks_serverless
+  - delta_cdf_enabled
+  - silver_scd1_upsert
+  - quality_quarantine
+
+source: raw.orders
+target_table: s_orders
+catalog: main
+merge_keys: order_id
+```
+
+Presets de ingestão disponíveis:
+
+- Bronze: `bronze_autoloader_append`, `bronze_file_append`, `bronze_table_append`, `bronze_full_overwrite`, `bronze_partition_overwrite`.
+- Silver: `silver_scd1_upsert`, `silver_scd1_partition_upsert`, `silver_replace_partitions`, `silver_hash_diff_append`, `silver_snapshot_soft_delete`, `silver_scd2_historical`, `silver_incremental_watermark_upsert`, `silver_quarantine_ingestion`.
+- Gold: `gold_full_refresh`, `gold_partition_refresh`, `gold_replace_partitions`, `gold_snapshot_serving`, `gold_scd1_serving`.
+- Modificadores: `quality_strict`, `quality_quarantine`, `delta_cdf_enabled`, `delta_optimized_writes`, `runtime_databricks_serverless`, `runtime_spark_delta_local`, `governance_uc_basic`.
+
+Comandos úteis:
+
+```bash
+lakehouse-ingest presets list
+lakehouse-ingest presets show silver_scd1_upsert
+lakehouse-ingest validate contracts/silver/orders.yaml --expand-presets
+```
+
+Extensão programática:
+
+```python
+from lakehouse_ingestion import register_preset
+
+register_preset("company_silver_default", {
+    "layer": "silver",
+    "mode": "scd1_upsert",
+    "schema_policy": "additive_only",
+    "on_quality_fail": "quarantine",
+})
 ```
 
 Validação local sem Spark:
@@ -260,6 +306,7 @@ src/lakehouse_ingestion/
 ├── _sql.py            # Helpers de identificadores e literais SQL
 ├── config.py          # FrameworkConfig, tipos e constantes
 ├── plan.py            # IngestionPlan, QualityRules, build_plan_from_kwargs
+├── presets.py         # presets declarativos e registry de presets customizados
 ├── sources.py         # Source resolvers declarativos (Autoloader available_now)
 ├── schema.py          # hash, dedup, encoding, schema policy
 ├── watermark.py       # watermark simples e composto, encode/decode/apply

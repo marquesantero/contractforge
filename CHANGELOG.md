@@ -6,6 +6,14 @@ Este projeto segue versionamento semântico enquanto a biblioteca evolui:
 - `MINOR`: novo recurso compatível ou endurecimento planejado do contrato.
 - `MAJOR`: mudança incompatível depois de adoção estável.
 
+## 1.7.0 - 2026-05-13
+
+- Adiciona presets declarativos para padrões comuns de ingestão Bronze/Silver/Gold.
+- Expõe `apply_preset`, `list_presets`, `get_preset`, `preset_details` e `register_preset`.
+- Adiciona CLI `lakehouse-ingest presets list|show` e `validate --expand-presets`.
+- Registra `applied_presets` no plano e no retorno das execuções para auditoria.
+- Adiciona modificadores reutilizáveis de quality, Delta properties, runtime e governança.
+
 ## 1.6.4 - 2026-05-13
 
 - Define semântica explícita para `access_policy.on_drift`.

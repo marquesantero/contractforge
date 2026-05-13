@@ -1,6 +1,6 @@
 # Lakehouse Ingestion Framework — Arquitetura e Referência Técnica
 
-**Versão do pacote:** `1.6.4`
+**Versão do pacote:** `1.7.0`
 **Pacote Python:** `lakehouse-ingestion-framework`
 **Import principal:** `lakehouse_ingestion`
 **Ambiente-alvo:** Databricks Runtime, Unity Catalog, Delta Lake (também roda em PySpark + delta-spark fora do Databricks)
@@ -20,13 +20,14 @@
    - [4.2 `_sql.py` — Helpers de SQL](#42-_sqlpy--helpers-de-sql)
    - [4.3 `config.py` — Configuração e tipos](#43-configpy--configuração-e-tipos)
    - [4.4 `plan.py` — Contrato declarativo](#44-planpy--contrato-declarativo)
-   - [4.5 `schema.py` — Hash, dedup, encoding e schema policy](#45-schemapy--hash-dedup-encoding-e-schema-policy)
-   - [4.6 `watermark.py` — Watermark tipado](#46-watermarkpy--watermark-tipado)
-   - [4.7 `quality.py` — Quality gates e quarentena](#47-qualitypy--quality-gates-e-quarentena)
-   - [4.8 `state.py` — Tabelas de controle, log, lock, retry](#48-statepy--tabelas-de-controle-log-lock-retry)
-   - [4.9 `writers.py` — Motores de escrita](#49-writerspy--motores-de-escrita)
-   - [4.10 `lineage.py` — Explain e OpenLineage](#410-lineagepy--explain-e-openlineage)
-   - [4.11 `ingestion.py` — Orquestrador](#411-ingestionpy--orquestrador)
+   - [4.5 `presets.py` — Defaults declarativos acopláveis](#45-presetspy--defaults-declarativos-acopláveis)
+   - [4.6 `schema.py` — Hash, dedup, encoding e schema policy](#46-schemapy--hash-dedup-encoding-e-schema-policy)
+   - [4.7 `watermark.py` — Watermark tipado](#47-watermarkpy--watermark-tipado)
+   - [4.8 `quality.py` — Quality gates e quarentena](#48-qualitypy--quality-gates-e-quarentena)
+   - [4.9 `state.py` — Tabelas de controle, log, lock, retry](#49-statepy--tabelas-de-controle-log-lock-retry)
+   - [4.10 `writers.py` — Motores de escrita](#410-writerspy--motores-de-escrita)
+   - [4.11 `lineage.py` — Explain e OpenLineage](#411-lineagepy--explain-e-openlineage)
+   - [4.12 `ingestion.py` — Orquestrador](#412-ingestionpy--orquestrador)
 5. [Modos de escrita — semântica e garantias](#5-modos-de-escrita--semântica-e-garantias)
 6. [Quality gates — avaliação consolidada](#6-quality-gates--avaliação-consolidada)
 7. [Schema policy — políticas e ALTER automático](#7-schema-policy--políticas-e-alter-automático)
@@ -105,6 +106,7 @@ lakehouse_ingestion_pkg/
 │       ├── config.py       # FrameworkConfig + tipos (Layer, WriteMode, ...)
 │       ├── hooks.py        # hooks opcionais de pré/pós-ingestão
 │       ├── plan.py         # IngestionPlan, QualityRules, build_plan_from_kwargs
+│       ├── presets.py      # presets declarativos e registry customizado
 │       ├── sources.py      # Source resolvers declarativos
 │       ├── schema.py       # hash, dedup, custom keys, encoding, schema policy
 │       ├── watermark.py    # encode/decode/apply/compute watermarks tipados
@@ -145,7 +147,8 @@ lakehouse_ingestion_pkg/
 ```
 
 - `_spark.py`, `_sql.py`, `config.py` são **folhas**: não dependem de outros módulos do pacote.
-- `plan.py` depende só de `config.py` e `_sql.py`.
+- `plan.py` depende de `config.py`, `_sql.py`, `governance.py`, `hooks.py` e `presets.py`.
+- `presets.py` depende só de `_sql.py` para normalizar listas de nomes.
 - `sources.py` depende de `plan.py` e `_spark.py`.
 - `hooks.py` é um contrato leve usado por `plan.py` e `ingestion.py`.
 - `contract_schema.py` depende de constantes em `config.py`.
@@ -414,8 +417,35 @@ Pontos importantes:
 - **`delta_properties`** aplica TBLPROPERTIES na criação da tabela Delta.
 - **`retry_attempts`/`retry_backoff_seconds`** sobrescrevem retry global por plano.
 - **`SourceSpec`** aceita Autoloader declarativo com `trigger="available_now"`, `schema_location` e `checkpoint_location` obrigatórios.
+- **`preset`/`presets`** são expandidos antes da normalização. O contrato explícito vence defaults e o plano guarda `applied_presets`.
 
-### 4.5 `schema.py` — Hash, dedup, encoding e schema policy
+### 4.5 `presets.py` — Defaults declarativos acopláveis
+
+O módulo `presets.py` implementa uma camada de defaults para padrões comuns de ingestão, sem criar um segundo validador. O fluxo é:
+
+1. `build_plan_from_kwargs()` chama `apply_preset(dict(kwargs))`.
+2. `apply_preset()` aplica um ou mais presets em ordem.
+3. O contrato explícito sobrescreve os defaults.
+4. `build_plan_from_kwargs()` normaliza e valida o contrato expandido como qualquer outro contrato.
+
+Funções públicas:
+
+- `list_presets()`: lista presets registrados.
+- `get_preset(name)`: devolve cópia defensiva do preset.
+- `preset_details(name)`: retorna metadata para CLI/docs.
+- `register_preset(name, preset, override=False)`: acopla presets internos sem editar o core.
+- `apply_preset(contract)`: expande `preset`/`presets` para um contrato final.
+
+Regras de combinação:
+
+- Um contrato aceita apenas um preset principal de `kind="ingestion"`.
+- Um contrato aceita apenas um preset de `kind="runtime"`.
+- Presets `kind="modifier"` podem ser combinados livremente.
+- `required_fields` do preset são verificados antes da construção do plano para gerar erro objetivo.
+
+O catálogo built-in traz 18 presets de ingestão alinhados aos modos da lib e modificadores para quality, Delta properties, runtime e governança.
+
+### 4.6 `schema.py` — Hash, dedup, encoding e schema policy
 
 #### 4.5.1 Hash determinístico
 

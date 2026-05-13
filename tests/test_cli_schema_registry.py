@@ -22,6 +22,7 @@ def test_yaml_schema_contains_new_contract_fields():
     assert "annotations" in props
     assert "operations" in props
     assert "access" in props
+    assert "preset" in props
 
 
 def test_cli_validate_accepts_json_contract(tmp_path, capsys):
@@ -36,6 +37,33 @@ def test_cli_validate_accepts_json_contract(tmp_path, capsys):
 
     assert main(["validate", str(path)]) == 0
     assert "OK" in capsys.readouterr().out
+
+
+def test_cli_validate_can_expand_presets(tmp_path, capsys):
+    contract = {
+        "preset": ["silver_scd1_upsert", "quality_quarantine"],
+        "source": "raw_orders",
+        "target_table": "s_orders",
+        "merge_keys": "id",
+    }
+    path = tmp_path / "contract.json"
+    path.write_text(json.dumps(contract), encoding="utf-8")
+
+    assert main(["validate", str(path), "--expand-presets"]) == 0
+    output = capsys.readouterr().out
+    assert '"applied_presets"' in output
+    assert '"mode": "scd1_upsert"' in output
+    assert "OK" in output
+
+
+def test_cli_presets_list_and_show(capsys):
+    assert main(["presets", "list", "--indent", "0"]) == 0
+    output = capsys.readouterr().out
+    assert "silver_scd1_upsert" in output
+
+    assert main(["presets", "show", "gold_full_refresh", "--indent", "0"]) == 0
+    output = capsys.readouterr().out
+    assert '"name": "gold_full_refresh"' in output
 
 
 def test_cli_governance_preview_accepts_split_contract(tmp_path, capsys):

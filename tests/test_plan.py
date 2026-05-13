@@ -3,7 +3,17 @@ from __future__ import annotations
 
 import pytest
 
-from lakehouse_ingestion import IngestionPlan, QualityExpression, QualityRules, SourceSpec, ingest
+from lakehouse_ingestion import (
+    IngestionPlan,
+    QualityExpression,
+    QualityRules,
+    SourceSpec,
+    apply_preset,
+    get_preset,
+    ingest,
+    list_presets,
+    register_preset,
+)
 from lakehouse_ingestion.plan import (
     build_plan_from_kwargs,
     normalize_quality_rules,
@@ -76,6 +86,109 @@ def test_build_plan_basic():
     assert plan.target_table == "b_orders"
     assert plan.mode == "scd0_append"
     assert plan.merge_keys == []
+
+
+def test_builtin_presets_cover_common_ingestion_modes():
+    assert len(list_presets()) >= 15
+    for name in [
+        "bronze_autoloader_append",
+        "silver_scd1_upsert",
+        "silver_hash_diff_append",
+        "silver_snapshot_soft_delete",
+        "silver_scd2_historical",
+        "gold_full_refresh",
+        "gold_replace_partitions",
+    ]:
+        assert name in list_presets()
+
+
+def test_apply_preset_merges_defaults_and_contract_wins():
+    expanded = apply_preset(
+        {
+            "preset": ["silver_scd1_upsert", "quality_quarantine", "delta_cdf_enabled"],
+            "source": "raw.orders",
+            "target_table": "s_orders",
+            "merge_keys": "id",
+            "schema_policy": "strict",
+        }
+    )
+    assert expanded["applied_presets"] == [
+        "silver_scd1_upsert",
+        "quality_quarantine",
+        "delta_cdf_enabled",
+    ]
+    assert expanded["mode"] == "scd1_upsert"
+    assert expanded["layer"] == "silver"
+    assert expanded["schema_policy"] == "strict"
+    assert expanded["on_quality_fail"] == "quarantine"
+    assert expanded["delta_properties"] == {"delta.enableChangeDataFeed": "true"}
+
+
+def test_build_plan_accepts_preset_and_records_applied_presets():
+    plan = build_plan_from_kwargs(
+        preset=["silver_scd1_upsert", "quality_quarantine"],
+        source="raw.orders",
+        target_table="s_orders",
+        merge_keys="id",
+    )
+    assert plan.mode == "scd1_upsert"
+    assert plan.layer == "silver"
+    assert plan.merge_keys == ["id"]
+    assert plan.on_quality_fail == "quarantine"
+    assert plan.applied_presets == ["silver_scd1_upsert", "quality_quarantine"]
+
+
+def test_preset_required_fields_are_validated_before_plan_build():
+    with pytest.raises(ValueError, match="silver_scd1_upsert:merge_keys"):
+        build_plan_from_kwargs(
+            preset="silver_scd1_upsert",
+            source="raw.orders",
+            target_table="s_orders",
+        )
+
+
+def test_preset_rejects_multiple_ingestion_or_runtime_presets():
+    with pytest.raises(ValueError, match="tipo ingestion"):
+        build_plan_from_kwargs(
+            preset=["silver_scd1_upsert", "gold_full_refresh"],
+            source="raw.orders",
+            target_table="orders",
+            merge_keys="id",
+        )
+    with pytest.raises(ValueError, match="tipo runtime"):
+        build_plan_from_kwargs(
+            preset=["runtime_databricks_serverless", "runtime_spark_delta_local"],
+            source="raw.orders",
+            target_table="orders",
+        )
+
+
+def test_register_preset_supports_custom_extensions():
+    name = "unit_company_silver"
+    register_preset(
+        name,
+        {
+            "layer": "silver",
+            "mode": "scd1_upsert",
+            "merge_strategy": "delta",
+            "_preset": {
+                "kind": "ingestion",
+                "category": "silver",
+                "required_fields": ["merge_keys"],
+            },
+        },
+        override=True,
+    )
+    plan = build_plan_from_kwargs(
+        preset=name,
+        source="raw.orders",
+        target_table="s_orders",
+        merge_keys="id",
+    )
+    assert plan.applied_presets == [name]
+    assert get_preset(name)["mode"] == "scd1_upsert"
+    with pytest.raises(ValueError, match="já registrado"):
+        register_preset(name, {"mode": "scd0_append"})
 
 
 def test_build_plan_normalizes_pipe_separated_lists():

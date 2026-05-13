@@ -71,6 +71,9 @@ def yaml_schema() -> Dict[str, Any]:
         "required": ["source", "target_table"],
         "properties": {
             "_metadata": {"type": "object"},
+            "preset": {"oneOf": [string_array, {"type": "string"}]},
+            "presets": {"oneOf": [string_array, {"type": "string"}]},
+            "applied_presets": string_array,
             "target": {
                 "type": "object",
                 "additionalProperties": False,

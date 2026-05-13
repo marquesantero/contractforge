@@ -54,6 +54,30 @@ def test_scd1_upsert_updates_existing_rows(spark, make_df, unique_name):
     assert by_id == {1: "a", 2: "B_NEW", 3: "c"}
 
 
+def test_preset_silver_scd1_upsert_runs_end_to_end(spark, make_df, unique_name):
+    table = f"{unique_name}_preset_scd1"
+    df = make_df([(1, "a"), (2, "b")], "id long, val string")
+    res = ingest(source=df, preset="silver_scd1_upsert", merge_keys="id", **_common(table))
+    assert res["status"] == "SUCCESS"
+    assert res["applied_presets"] == ["silver_scd1_upsert"]
+    assert res["mode"] == "scd1_upsert"
+    final = spark.table(f"spark_catalog.silver.{table}")
+    assert final.count() == 2
+
+
+def test_preset_gold_full_refresh_runs_end_to_end(spark, make_df, unique_name):
+    table = f"{unique_name}_preset_gold"
+    df1 = make_df([(1, "a"), (2, "b")], "id long, val string")
+    ingest(source=df1, preset="gold_full_refresh", **_common(table, "gold"))
+
+    df2 = make_df([(3, "c")], "id long, val string")
+    res = ingest(source=df2, preset="gold_full_refresh", **_common(table, "gold"))
+    assert res["status"] == "SUCCESS"
+    assert res["applied_presets"] == ["gold_full_refresh"]
+    final = spark.table(f"spark_catalog.gold.{table}")
+    assert sorted(r["id"] for r in final.collect()) == [3]
+
+
 def test_column_mapping_renames_source_columns_before_write(spark, make_df, unique_name):
     table = f"{unique_name}_mapping"
     df = make_df([(1, "a"), (2, "b")], "src_id long, src_val string")

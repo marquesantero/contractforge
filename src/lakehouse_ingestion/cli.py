@@ -10,6 +10,7 @@ from typing import Any, Iterable, List
 from .contract_bundle import governance_check, governance_preview, load_contract_bundle
 from .contract_schema import yaml_schema
 from .plan import build_plan_from_kwargs
+from .presets import apply_preset, list_presets, preset_details
 
 
 def _load_contract(path: Path) -> Any:
@@ -43,7 +44,7 @@ def _iter_contracts(payload: Any) -> Iterable[dict[str, Any]]:
     raise ValueError("Contrato deve ser objeto, lista de objetos ou objeto com plans[]")
 
 
-def _validate(paths: List[Path]) -> int:
+def _validate(paths: List[Path], *, expand_presets: bool = False) -> int:
     exit_code = 0
     for path in paths:
         try:
@@ -52,7 +53,12 @@ def _validate(paths: List[Path]) -> int:
             for item in _iter_contracts(payload):
                 normalized = dict(item)
                 normalized.pop("_metadata", None)
-                build_plan_from_kwargs(**normalized)
+                plan = build_plan_from_kwargs(**normalized)
+                if expand_presets:
+                    expanded = apply_preset(normalized)
+                    print(json.dumps(expanded, indent=2, sort_keys=True, default=str))
+                elif plan.applied_presets:
+                    print(f"PRESETS {path}: {', '.join(plan.applied_presets)}")
                 count += 1
             print(f"OK {path} ({count} contrato(s))")
         except Exception as exc:
@@ -175,12 +181,34 @@ def _validate_access(paths: List[Path], indent: int) -> int:
     return exit_code
 
 
+def _presets_list(indent: int) -> int:
+    details = [preset_details(name) for name in list_presets()]
+    print(json.dumps(details, indent=indent, sort_keys=True, default=str))
+    return 0
+
+
+def _presets_show(names: List[str], indent: int) -> int:
+    exit_code = 0
+    for name in names:
+        try:
+            print(json.dumps(preset_details(name), indent=indent, sort_keys=True, default=str))
+        except Exception as exc:
+            exit_code = 1
+            print(f"ERRO {name}: {exc}", file=sys.stderr)
+    return exit_code
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="lakehouse-ingest")
     sub = parser.add_subparsers(dest="command", required=True)
 
     validate_parser = sub.add_parser("validate", help="Valida contratos YAML/JSON sem executar Spark")
     validate_parser.add_argument("paths", nargs="+", type=Path)
+    validate_parser.add_argument(
+        "--expand-presets",
+        action="store_true",
+        help="Imprime o contrato expandido após aplicar presets",
+    )
 
     validate_bundle_parser = sub.add_parser(
         "validate-bundle",
@@ -242,9 +270,17 @@ def main(argv: list[str] | None = None) -> int:
     schema_parser = sub.add_parser("schema", help="Imprime JSON Schema dos contratos")
     schema_parser.add_argument("--indent", type=int, default=2)
 
+    presets_parser = sub.add_parser("presets", help="Lista ou detalha presets declarativos")
+    presets_sub = presets_parser.add_subparsers(dest="preset_command", required=True)
+    presets_list_parser = presets_sub.add_parser("list", help="Lista presets disponíveis")
+    presets_list_parser.add_argument("--indent", type=int, default=2)
+    presets_show_parser = presets_sub.add_parser("show", help="Mostra detalhes de um ou mais presets")
+    presets_show_parser.add_argument("names", nargs="+")
+    presets_show_parser.add_argument("--indent", type=int, default=2)
+
     args = parser.parse_args(argv)
     if args.command == "validate":
-        return _validate(args.paths)
+        return _validate(args.paths, expand_presets=args.expand_presets)
     if args.command == "validate-bundle":
         return _validate_bundles(args.paths)
     if args.command == "governance-preview":
@@ -262,6 +298,11 @@ def main(argv: list[str] | None = None) -> int:
     if args.command == "schema":
         print(json.dumps(yaml_schema(), indent=args.indent, sort_keys=True))
         return 0
+    if args.command == "presets":
+        if args.preset_command == "list":
+            return _presets_list(args.indent)
+        if args.preset_command == "show":
+            return _presets_show(args.names, args.indent)
     parser.error(f"Comando não suportado: {args.command}")
     return 2
 

@@ -111,6 +111,7 @@ def _contract_metadata(plan: IngestionPlan) -> Dict[str, Any]:
         "sla": plan.sla,
         "runtime_parameters": plan.runtime_parameters,
         "operations": plan.operations,
+        "applied_presets": plan.applied_presets,
     }
 
 
@@ -171,6 +172,7 @@ def _skip_result(
         "target_table": target,
         "source_table": source_name,
         "mode": plan.mode,
+        "applied_presets": plan.applied_presets,
         "rows_read": 0,
         "rows_written": 0,
         "rows_inserted": 0,
@@ -517,6 +519,7 @@ def _build_dry_run_result(
         "target_table": target,
         "source_table": source_name,
         "mode": plan.mode,
+        "applied_presets": plan.applied_presets,
         "write_strategy": write_strategy(plan.mode),
         "rows_read": rows_read,
         "rows_effective": rows_read - rows_quarantined,
@@ -672,6 +675,7 @@ def _stream_result(
         "target_table": target,
         "source_table": source_name,
         "mode": plan.mode,
+        "applied_presets": plan.applied_presets,
         "batches_processed": metrics["batches_processed"],
         "total_rows_read": metrics["total_rows_read"],
         "total_rows_written": metrics["total_rows_written"],
@@ -1359,6 +1363,7 @@ def ingest_plan(plan: IngestionPlan) -> Dict[str, Any]:
         "target_table": target,
         "source_table": source_name,
         "mode": plan.mode,
+        "applied_presets": plan.applied_presets,
         "rows_read": rows_read,
         "rows_written": rows_written,
         "rows_inserted": row_metrics.get("rows_inserted", 0),

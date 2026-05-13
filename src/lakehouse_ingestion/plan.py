@@ -36,6 +36,7 @@ from .governance import (
     normalize_operations_contract,
 )
 from .hooks import IngestionHooks, normalize_hooks
+from .presets import apply_preset
 from ._sql import as_list
 
 
@@ -332,6 +333,7 @@ class IngestionPlan:
     annotations: Optional[AnnotationsContract] = None
     operations: Optional[OperationsContract] = None
     access: Optional[AccessContract] = None
+    applied_presets: List[str] = field(default_factory=list)
     parent_run_id: Optional[str] = None
     run_group_id: Optional[str] = None
     master_job_id: Optional[str] = None
@@ -466,8 +468,8 @@ _KNOWN_PARAMS = {
     "explain_format", "openlineage_enabled", "openlineage_namespace",
     "openlineage_producer", "use_cache", "lock_enabled", "idempotency_key",
     "idempotency_policy", "retry_attempts", "retry_backoff_seconds", "hooks",
-    "annotations", "operations", "access", "parent_run_id", "run_group_id", "master_job_id",
-    "master_run_id",
+    "annotations", "operations", "access", "preset", "presets", "applied_presets",
+    "parent_run_id", "run_group_id", "master_job_id", "master_run_id",
 }
 
 
@@ -545,6 +547,7 @@ def build_plan_from_kwargs(**kwargs: Any) -> IngestionPlan:
     Raises:
         ValueError: se houver kwargs desconhecidos ou ``mode`` inválido.
     """
+    kwargs = apply_preset(dict(kwargs))
     quality = normalize_quality_rules(kwargs.pop("quality_rules", None))
     custom = kwargs.pop("custom_keys", None) or {}
     normalized_custom = {k: as_list(v) for k, v in custom.items()}
@@ -650,6 +653,7 @@ def build_plan_from_kwargs(**kwargs: Any) -> IngestionPlan:
         annotations=normalize_annotations_contract(kwargs.get("annotations")),
         operations=normalize_operations_contract(kwargs.get("operations")),
         access=normalize_access_contract(kwargs.get("access")),
+        applied_presets=as_list(kwargs.get("applied_presets")),
         parent_run_id=kwargs.get("parent_run_id"),
         run_group_id=kwargs.get("run_group_id"),
         master_job_id=kwargs.get("master_job_id"),

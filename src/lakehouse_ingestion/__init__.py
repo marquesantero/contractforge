@@ -32,6 +32,7 @@ from .ingestion import (
     validate_plan_shape,
 )
 from .sources import get_source_resolver, register_source_resolver
+from .presets import apply_preset, get_preset, list_presets, preset_details, register_preset
 from .writers import register_write_mode
 from .quality import register_quality_rule
 
@@ -67,6 +68,11 @@ __all__ = [
     "ingest_plan",
     "ingest_stream_plan",
     "load_contract_bundle",
+    "apply_preset",
+    "get_preset",
+    "list_presets",
+    "preset_details",
+    "register_preset",
     "register_source_resolver",
     "register_write_mode",
     "register_quality_rule",
@@ -75,4 +81,4 @@ __all__ = [
     "yaml_schema",
 ]
 
-__version__ = "1.6.4"
+__version__ = "1.7.0"

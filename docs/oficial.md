@@ -1,6 +1,6 @@
 # Lakehouse Ingestion Framework — Documentação Oficial
 
-**Versão:** 1.6.4 | **Licença:** MIT | **Python:** >= 3.10
+**Versão:** 1.7.0 | **Licença:** MIT | **Python:** >= 3.10
 
 Framework declarativo para ingestão de dados em Delta Lake no Databricks (ou PySpark + delta-spark standalone), com contratos por tabela, suporte à arquitetura Medallion (Bronze/Silver/Gold), quality gates, watermarks tipados, 6 modos de escrita, snapshot com soft delete, evolução de schema, ingestão Autoloader `available_now`, explain mode e emissão de eventos OpenLineage.
 
@@ -14,6 +14,7 @@ Framework declarativo para ingestão de dados em Delta Lake no Databricks (ou Py
 4. [API Pública](#4-api-pública)
 5. [Referência Completa de Parâmetros do IngestionPlan](#5-referência-completa-de-parâmetros-do-ingestionplan)
 5C. [Fontes Declarativas com SourceSpec](#5c-fontes-declarativas-com-sourcespec)
+5D. [Presets Declarativos](#5d-presets-declarativos)
 6. [Modos de Escrita — Guia Detalhado](#6-modos-de-escrita--guia-detalhado)
 7. [Quality Gates — Guia Completo](#7-quality-gates--guia-completo)
 8. [Schema Policy — Evolução de Schema](#8-schema-policy--evolução-de-schema)
@@ -51,7 +52,7 @@ O framework não compete com DLT/Lakeflow como orquestrador gerenciado. Ele ocup
 
 - **Não orquestra** — agendamento e DAGs ficam com Databricks Workflows, Airflow, DAB, etc.
 - **Não substitui DLT** (Delta Live Tables) — é uma alternativa batch declarativa.
-- **Não faz streaming contínuo** — a versão 1.6.4 suporta Autoloader em `available_now`, que é execução finita com checkpoint; processamento contínuo fica fora do escopo.
+- **Não faz streaming contínuo** — a versão 1.7.0 suporta Autoloader em `available_now`, que é execução finita com checkpoint; processamento contínuo fica fora do escopo.
 - **Não gerencia permissões** Unity Catalog.
 - **Não é um catálogo de qualidade empresarial** — as regras são para gates de pipeline.
 
@@ -631,6 +632,105 @@ result = ingest(
 - `idempotency_key` no stream gera chaves de batch no formato `<idempotency_key>:batch:<batch_id>`.
 - `snapshot_soft_delete` é incompatível com `SourceSpec`, porque snapshot exige source completo do estado atual.
 - Streaming contínuo não é suportado nesta versão; o contrato é deliberadamente finito.
+
+---
+
+## 5D. Presets Declarativos
+
+Presets são defaults opinativos para padrões comuns de ingestão. Eles existem para reduzir repetição nos YAMLs, mantendo o contrato auditável: o campo explícito no contrato sempre sobrescreve o valor definido pelo preset.
+
+### 5D.1 Regras de Aplicação
+
+- `preset` aceita string ou lista de strings.
+- Presets são aplicados na ordem declarada.
+- Apenas um preset principal de ingestão pode ser usado por contrato.
+- Apenas um preset de runtime pode ser usado por contrato.
+- Modificadores de quality, Delta e governança podem ser combinados com um preset de ingestão.
+- Dicionários fazem merge profundo; listas são substituídas pelo contrato explícito.
+- O resultado de `ingest()` inclui `applied_presets` para auditoria.
+
+### 5D.2 Exemplo YAML
+
+```yaml
+preset:
+  - runtime_databricks_serverless
+  - delta_cdf_enabled
+  - silver_scd1_upsert
+  - quality_quarantine
+
+source: raw.orders
+target_table: s_orders
+catalog: main
+merge_keys: order_id
+quality_rules:
+  not_null: [order_id]
+```
+
+Contrato expandido efetivo:
+
+```yaml
+layer: silver
+mode: scd1_upsert
+merge_strategy: delta
+schema_policy: additive_only
+on_quality_fail: quarantine
+delta_properties:
+  delta.enableChangeDataFeed: "true"
+```
+
+### 5D.3 Presets de Ingestão
+
+| Preset | Camada | Modo/estratégia | Uso principal |
+|--------|--------|-----------------|---------------|
+| `bronze_autoloader_append` | Bronze | `scd0_append` + `SourceSpec` | Arquivos em landing/raw via Auto Loader `available_now` |
+| `bronze_file_append` | Bronze | `scd0_append` | Batch de arquivos/DataFrame já resolvido |
+| `bronze_table_append` | Bronze | `scd0_append` | Replicação simples table-to-table |
+| `bronze_full_overwrite` | Bronze | `scd0_overwrite` | Snapshot completo pequeno/médio |
+| `bronze_partition_overwrite` | Bronze | `scd0_overwrite` por partição | Reprocessamento de partição |
+| `silver_scd1_upsert` | Silver | `scd1_upsert` + `delta` | Estado atual por chave |
+| `silver_scd1_partition_upsert` | Silver | `scd1_upsert` + `delta_by_partition` | Upsert grande com poda por partição |
+| `silver_replace_partitions` | Silver | `scd1_upsert` + `replace_partitions` | Source completo por partição |
+| `silver_hash_diff_append` | Silver | `scd1_hash_diff` | Registrar apenas mudanças reais |
+| `silver_snapshot_soft_delete` | Silver | `snapshot_soft_delete` | Sincronizar snapshot completo com inativação |
+| `silver_scd2_historical` | Silver | `scd2_historical` | Histórico de alterações |
+| `silver_incremental_watermark_upsert` | Silver | `scd1_upsert` + watermark | Incremental por timestamp/versão |
+| `silver_quarantine_ingestion` | Silver | `scd1_upsert` + quarantine | Ingestão tolerante a erro linha-a-linha |
+| `gold_full_refresh` | Gold | `scd0_overwrite` | Tabela agregada recalculada inteira |
+| `gold_partition_refresh` | Gold | `scd0_overwrite` por partição | Recalcular partição diária/mensal |
+| `gold_replace_partitions` | Gold | `scd1_upsert` + `replace_partitions` | Fatos/agregados por partição |
+| `gold_snapshot_serving` | Gold | `snapshot_soft_delete` | Serving com estado ativo/inativo |
+| `gold_scd1_serving` | Gold | `scd1_upsert` | Serving corrente sem histórico |
+
+### 5D.4 Modificadores
+
+| Preset | Categoria | Efeito |
+|--------|-----------|--------|
+| `quality_strict` | Quality | `on_quality_fail=fail` |
+| `quality_quarantine` | Quality | `on_quality_fail=quarantine` |
+| `delta_cdf_enabled` | Delta | `delta.enableChangeDataFeed=true` |
+| `delta_optimized_writes` | Delta | `delta.autoOptimize.optimizeWrite=true` e `delta.autoOptimize.autoCompact=true` |
+| `runtime_databricks_serverless` | Runtime | Defaults conservadores para Serverless/Spark Connect |
+| `runtime_spark_delta_local` | Runtime | Defaults conservadores para testes locais |
+| `governance_uc_basic` | Governança | `annotations.policy=warn` e `access.mode=validate_only` |
+
+### 5D.5 CLI e Extensão
+
+```bash
+lakehouse-ingest presets list
+lakehouse-ingest presets show silver_scd1_upsert
+lakehouse-ingest validate contracts/silver/orders.yaml --expand-presets
+```
+
+```python
+from lakehouse_ingestion import register_preset
+
+register_preset("company_silver_default", {
+    "layer": "silver",
+    "mode": "scd1_upsert",
+    "schema_policy": "additive_only",
+    "on_quality_fail": "quarantine",
+})
+```
 
 ---
 
@@ -2627,6 +2727,7 @@ src/lakehouse_ingestion/
 ├── contract_schema.py # JSON Schema do contrato declarativo
 ├── hooks.py           # IngestionHooks
 ├── plan.py            # IngestionPlan, QualityRules, QualityExpression, build_plan_from_kwargs
+├── presets.py         # Presets declarativos e registry de presets customizados
 ├── sources.py         # Source resolvers declarativos
 ├── schema.py          # Hash determinístico, dedup, custom keys, encoding, schema policy
 ├── watermark.py       # Watermark tipado (encode/decode/apply/compute)
