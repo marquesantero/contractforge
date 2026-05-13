@@ -6,6 +6,11 @@ Este projeto segue versionamento semântico enquanto a biblioteca evolui:
 - `MINOR`: novo recurso compatível ou endurecimento planejado do contrato.
 - `MAJOR`: mudança incompatível depois de adoção estável.
 
+## 1.5.1 - 2026-05-13
+
+- Corrige métricas agregadas de streams Autoloader/`SourceSpec` quando `foreachBatch` registra batches filhos, mas o estado local do driver não reflete os resultados em Spark Connect/serverless.
+- Normaliza métricas de micro-batches entre `rows_*` e `total_rows_*` antes de consolidar `ctrl_ingestion_streams`.
+
 ## 1.5.0 - 2026-05-12
 
 - Adiciona `SourceSpec` declarativo para Autoloader em modo `available_now`.

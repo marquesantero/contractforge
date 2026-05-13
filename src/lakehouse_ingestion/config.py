@@ -10,7 +10,7 @@ from typing import Literal, Union
 
 from pyspark.sql import DataFrame
 
-FRAMEWORK_VERSION = "1.5.0"
+FRAMEWORK_VERSION = "1.5.1"
 CTRL_SCHEMA_VERSION = 7
 
 #: Camadas reconhecidas (Medallion Architecture).

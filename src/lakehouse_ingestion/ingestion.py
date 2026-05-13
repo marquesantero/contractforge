@@ -57,6 +57,7 @@ from .state import (
     log_stream_finish,
     log_stream_start,
     release_lock,
+    stream_child_run_metrics,
     upsert_state,
     with_retry,
 )
@@ -170,6 +171,53 @@ def _resolve_source(plan: IngestionPlan) -> Tuple[DataFrame, str]:
 
 def _stream_source_name(source: SourceSpec) -> str:
     return f"{source.type}:{source.path}"
+
+
+def _int_metric(payload: Dict[str, Any], *keys: str) -> int:
+    """Lê métricas de payloads antigos/novos sem depender de um único nome."""
+    for key in keys:
+        value = payload.get(key)
+        if value is not None:
+            return int(value or 0)
+    return 0
+
+
+def _stream_metrics_from_batches(batch_results: list[Dict[str, Any]]) -> Dict[str, int]:
+    """Agrega métricas de micro-batches já retornados por ``ingest_plan``."""
+    return {
+        "batches_processed": len(batch_results),
+        "total_rows_read": sum(
+            _int_metric(result, "rows_read", "total_rows_read") for result in batch_results
+        ),
+        "total_rows_written": sum(
+            _int_metric(result, "rows_written", "total_rows_written") for result in batch_results
+        ),
+        "total_rows_quarantined": sum(
+            _int_metric(result, "rows_quarantined", "total_rows_quarantined")
+            for result in batch_results
+        ),
+    }
+
+
+def _prefer_child_stream_metrics(local: Dict[str, int], child: Dict[str, int]) -> bool:
+    """Escolhe métricas persistidas quando elas são mais completas que as locais."""
+    if child["batches_processed"] <= 0:
+        return False
+    local_rows = (
+        local["total_rows_read"]
+        + local["total_rows_written"]
+        + local["total_rows_quarantined"]
+    )
+    child_rows = (
+        child["total_rows_read"]
+        + child["total_rows_written"]
+        + child["total_rows_quarantined"]
+    )
+    return (
+        local["batches_processed"] == 0
+        or child["batches_processed"] > local["batches_processed"]
+        or child_rows > local_rows
+    )
 
 
 def _prepare_dataframe(
@@ -554,18 +602,20 @@ def _stream_result(
     error: Optional[str] = None,
     skip_reason: Optional[str] = None,
     skipped_by_stream_run_id: Optional[str] = None,
+    stream_metrics: Optional[Dict[str, int]] = None,
 ) -> Dict[str, Any]:
     finished_dt = utc_now_ts()
+    metrics = stream_metrics or _stream_metrics_from_batches(batch_results)
     return {
         "status": status,
         "stream_run_id": stream_run_id,
         "target_table": target,
         "source_table": source_name,
         "mode": plan.mode,
-        "batches_processed": len(batch_results),
-        "total_rows_read": sum(int(r.get("rows_read") or 0) for r in batch_results),
-        "total_rows_written": sum(int(r.get("rows_written") or 0) for r in batch_results),
-        "total_rows_quarantined": sum(int(r.get("rows_quarantined") or 0) for r in batch_results),
+        "batches_processed": metrics["batches_processed"],
+        "total_rows_read": metrics["total_rows_read"],
+        "total_rows_written": metrics["total_rows_written"],
+        "total_rows_quarantined": metrics["total_rows_quarantined"],
         "batch_results": batch_results,
         "stage_durations": stage_durations,
         "duration_seconds": (finished_dt - started_dt).total_seconds(),
@@ -599,6 +649,7 @@ def ingest_stream_plan(plan: IngestionPlan) -> Dict[str, Any]:
     runtime_meta = runtime_info()
     stage_durations: Dict[str, float] = {}
     batch_results: list[Dict[str, Any]] = []
+    stream_metrics: Optional[Dict[str, int]] = None
     status = "SUCCESS"
     error: Optional[str] = None
     error_type: Optional[str] = None
@@ -774,6 +825,11 @@ def ingest_stream_plan(plan: IngestionPlan) -> Dict[str, Any]:
         if tables and lock_acquired:
             release_lock(tables, target, stream_run_id)
         if tables:
+            stream_metrics = _stream_metrics_from_batches(batch_results)
+            if status != "SKIPPED":
+                child_metrics = stream_child_run_metrics(tables, stream_run_id)
+                if _prefer_child_stream_metrics(stream_metrics, child_metrics):
+                    stream_metrics = child_metrics
             if not stream_logged:
                 try:
                     log_stream_start(
@@ -816,12 +872,10 @@ def ingest_stream_plan(plan: IngestionPlan) -> Dict[str, Any]:
                         "status": status,
                         "ended_at_utc": finished_dt.strftime("%Y-%m-%d %H:%M:%S"),
                         "duration_seconds": (finished_dt - started_dt).total_seconds(),
-                        "batches_processed": len(batch_results),
-                        "total_rows_read": sum(int(r.get("rows_read") or 0) for r in batch_results),
-                        "total_rows_written": sum(int(r.get("rows_written") or 0) for r in batch_results),
-                        "total_rows_quarantined": sum(
-                            int(r.get("rows_quarantined") or 0) for r in batch_results
-                        ),
+                        "batches_processed": stream_metrics["batches_processed"],
+                        "total_rows_read": stream_metrics["total_rows_read"],
+                        "total_rows_written": stream_metrics["total_rows_written"],
+                        "total_rows_quarantined": stream_metrics["total_rows_quarantined"],
                         "error_message": _short_error_message(error),
                     },
                 )
@@ -863,6 +917,7 @@ def ingest_stream_plan(plan: IngestionPlan) -> Dict[str, Any]:
         error=error,
         skip_reason=skip_reason,
         skipped_by_stream_run_id=skipped_by_stream_run_id,
+        stream_metrics=stream_metrics,
     )
 
 

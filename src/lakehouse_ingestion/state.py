@@ -405,6 +405,50 @@ def log_stream_finish(tables: Dict[str, str], stream_run_id: str, payload: Dict[
     )
 
 
+def stream_child_run_metrics(tables: Dict[str, str], stream_run_id: str) -> Dict[str, int]:
+    """Agrega métricas dos runs filhos de um ``ingest_stream_plan``.
+
+    Em Spark Connect/serverless, o callback de ``foreachBatch`` pode executar
+    em outro contexto Python. Nesses casos, mutações em listas locais do driver
+    nem sempre ficam visíveis após ``awaitTermination``. A fonte confiável passa
+    a ser ``ctrl_ingestion_runs.parent_run_id``.
+    """
+    try:
+        row = (
+            spark.read.table(tables["runs"])
+            .where(F.col("parent_run_id") == stream_run_id)
+            .agg(
+                F.count(F.lit(1)).alias("batches_processed"),
+                F.sum(F.coalesce(F.col("rows_read"), F.lit(0))).alias("total_rows_read"),
+                F.sum(F.coalesce(F.col("rows_written"), F.lit(0))).alias("total_rows_written"),
+                F.sum(F.coalesce(F.col("rows_quarantined"), F.lit(0))).alias(
+                    "total_rows_quarantined"
+                ),
+            )
+            .first()
+        )
+        if row is None:
+            return {
+                "batches_processed": 0,
+                "total_rows_read": 0,
+                "total_rows_written": 0,
+                "total_rows_quarantined": 0,
+            }
+        return {
+            "batches_processed": int(row["batches_processed"] or 0),
+            "total_rows_read": int(row["total_rows_read"] or 0),
+            "total_rows_written": int(row["total_rows_written"] or 0),
+            "total_rows_quarantined": int(row["total_rows_quarantined"] or 0),
+        }
+    except Exception:
+        return {
+            "batches_processed": 0,
+            "total_rows_read": 0,
+            "total_rows_written": 0,
+            "total_rows_quarantined": 0,
+        }
+
+
 _RUN_COLUMNS = [
     "run_id", "run_ts_utc", "run_date", "notebook_name", "layer", "source_table",
     "target_table", "mode", "status", "rows_read", "rows_written", "rows_inserted",

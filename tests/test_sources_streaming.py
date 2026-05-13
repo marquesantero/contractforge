@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import pytest
 
+import lakehouse_ingestion.ingestion as ingestion_module
 from lakehouse_ingestion.ingestion import ingest_plan
 from lakehouse_ingestion.plan import SourceSpec, build_plan_from_kwargs
 from lakehouse_ingestion.sources import (
@@ -84,6 +85,7 @@ def test_ingest_plan_dispatches_source_spec_to_stream(monkeypatch):
             "checkpoint_location": "/checkpoints/orders",
         },
         target_table="b_orders",
+        lock_enabled=False,
     )
 
     def fake_stream(inner_plan):
@@ -96,3 +98,117 @@ def test_ingest_plan_dispatches_source_spec_to_stream(monkeypatch):
         "stream_run_id": "stream-1",
         "source": "/landing/orders",
     }
+
+
+def test_stream_metrics_from_batches_normalizes_result_keys():
+    metrics = ingestion_module._stream_metrics_from_batches(
+        [
+            {"rows_read": 2, "rows_written": 2, "rows_quarantined": 1},
+            {
+                "total_rows_read": 1,
+                "total_rows_written": 1,
+                "total_rows_quarantined": 0,
+            },
+        ]
+    )
+
+    assert metrics == {
+        "batches_processed": 2,
+        "total_rows_read": 3,
+        "total_rows_written": 3,
+        "total_rows_quarantined": 1,
+    }
+
+
+def test_stream_metrics_prefers_child_when_local_result_is_incomplete():
+    local = {
+        "batches_processed": 1,
+        "total_rows_read": 0,
+        "total_rows_written": 0,
+        "total_rows_quarantined": 0,
+    }
+    child = {
+        "batches_processed": 1,
+        "total_rows_read": 3,
+        "total_rows_written": 3,
+        "total_rows_quarantined": 0,
+    }
+
+    assert ingestion_module._prefer_child_stream_metrics(local, child) is True
+
+
+def test_ingest_stream_plan_uses_child_run_metrics_fallback(monkeypatch):
+    finish_payloads = []
+
+    class Query:
+        def awaitTermination(self):
+            return None
+
+    class Writer:
+        def foreachBatch(self, callback):
+            self.callback = callback
+            return self
+
+        def option(self, key, value):
+            return self
+
+        def trigger(self, availableNow):
+            return self
+
+        def start(self):
+            return Query()
+
+    class StreamDataFrame:
+        @property
+        def writeStream(self):
+            return Writer()
+
+    class Resolver:
+        def resolve_stream(self, spec, plan):
+            return StreamDataFrame(), f"{spec.type}:{spec.path}"
+
+    plan = build_plan_from_kwargs(
+        source={
+            "type": "autoloader",
+            "path": "/landing/orders",
+            "schema_location": "/schemas/orders",
+            "checkpoint_location": "/checkpoints/orders",
+        },
+        target_table="b_orders",
+    )
+
+    child_metrics = {
+        "batches_processed": 1,
+        "total_rows_read": 3,
+        "total_rows_written": 3,
+        "total_rows_quarantined": 0,
+    }
+    monkeypatch.setattr(
+        ingestion_module,
+        "runtime_info",
+        lambda: {"runtime_type": "unit", "spark_version": "test", "python_version": "test"},
+    )
+    monkeypatch.setattr(
+        ingestion_module,
+        "ensure_ctrl_tables",
+        lambda catalog, ctrl_schema: {"runs": "runs", "streams": "streams"},
+    )
+    monkeypatch.setattr(ingestion_module, "find_idempotent_stream", lambda *args, **kwargs: None)
+    monkeypatch.setattr(ingestion_module, "log_stream_start", lambda *args, **kwargs: None)
+    monkeypatch.setattr(
+        ingestion_module,
+        "log_stream_finish",
+        lambda tables, stream_run_id, payload: finish_payloads.append(payload),
+    )
+    monkeypatch.setattr(ingestion_module, "stream_child_run_metrics", lambda *args: child_metrics)
+    monkeypatch.setattr(ingestion_module, "get_source_resolver", lambda source_type: Resolver())
+
+    result = ingestion_module.ingest_stream_plan(plan)
+
+    assert result["status"] == "SUCCESS"
+    assert result["batches_processed"] == 1
+    assert result["total_rows_read"] == 3
+    assert result["total_rows_written"] == 3
+    assert result["total_rows_quarantined"] == 0
+    assert finish_payloads[0]["batches_processed"] == 1
+    assert finish_payloads[0]["total_rows_written"] == 3
