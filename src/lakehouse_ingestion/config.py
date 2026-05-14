@@ -10,7 +10,7 @@ from typing import Literal, Union
 
 from pyspark.sql import DataFrame
 
-FRAMEWORK_VERSION = "1.9.0"
+FRAMEWORK_VERSION = "1.10.0"
 CTRL_SCHEMA_VERSION = 11
 
 #: Camadas reconhecidas (Medallion Architecture).
@@ -142,19 +142,32 @@ VALID_SOURCE_TYPES = {"autoloader", "connector"}
 #: Conectores nativos de source. Conectores customizados podem ser registrados
 #: via ``register_source_resolver`` sem alterar esta lista.
 VALID_SOURCE_CONNECTORS = {
+    "adls",
     "autoloader",
+    "azure_blob",
+    "bigquery",
     "blob",
     "csv",
+    "delta",
     "delta_table",
+    "gcs",
     "jdbc",
     "json",
     "object_storage",
+    "oracle",
+    "orc",
     "parquet",
+    "postgres",
+    "postgresql",
     "rest_api",
+    "s3",
+    "snowflake",
     "sql",
+    "sqlserver",
     "table",
     "text",
     "view",
+    "mysql",
 }
 
 VALID_OBJECT_STORAGE_PROVIDERS = {"adls", "azure_blob", "gcs", "s3"}

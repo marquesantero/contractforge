@@ -6,6 +6,15 @@ Este projeto segue versionamento semântico enquanto a biblioteca evolui:
 - `MINOR`: novo recurso compatível ou endurecimento planejado do contrato.
 - `MAJOR`: mudança incompatível depois de adoção estável.
 
+## 1.10.0 - 2026-05-14
+
+- Adiciona aliases nativos de object storage: `s3`, `adls`, `azure_blob` e `gcs`, com provider inferido para observabilidade.
+- Adiciona conectores de arquivo `delta` e `orc` por path usando `spark.read.format(...).load(path)`.
+- Adiciona aliases JDBC nomeados: `postgres`, `postgresql`, `sqlserver`, `mysql` e `oracle`.
+- Adiciona conectores Spark externos `snowflake` e `bigquery`, delegando para os conectores Spark instalados no runtime.
+- Fortalece validação estática dos novos conectores em `contractforge validate`.
+- Atualiza README, documentação oficial e site com exemplos YAML dos novos conectores.
+
 ## 1.9.0 - 2026-05-14
 
 - Adiciona camada declarativa de conectores de source com `ConnectorSpec` e registry `register_source_resolver`.

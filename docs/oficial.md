@@ -1,6 +1,6 @@
 # ContractForge — Documentação Oficial
 
-**Versão:** 1.9.0 | **Licença:** MIT | **Python:** >= 3.10
+**Versão:** 1.10.0 | **Licença:** MIT | **Python:** >= 3.10
 
 Framework declarativo para ingestão de dados em Delta Lake no Databricks (ou PySpark + delta-spark standalone), com contratos por tabela, suporte à arquitetura Medallion (Bronze/Silver/Gold), conectores declarativos, quality gates, watermarks tipados, 6 modos de escrita, snapshot com soft delete, evolução de schema, ingestão Autoloader `available_now`, explain mode e emissão de eventos OpenLineage.
 
@@ -53,7 +53,7 @@ O framework não compete com DLT/Lakeflow como orquestrador gerenciado. Ele ocup
 
 - **Não orquestra** — agendamento e DAGs ficam com Databricks Workflows, Airflow, DAB, etc.
 - **Não substitui DLT** (Delta Live Tables) — é uma alternativa batch declarativa.
-- **Não faz streaming contínuo** — a versão 1.9.0 suporta Autoloader em `available_now`, que é execução finita com checkpoint; processamento contínuo fica fora do escopo.
+- **Não faz streaming contínuo** — a versão 1.10.0 suporta Autoloader em `available_now`, que é execução finita com checkpoint; processamento contínuo fica fora do escopo.
 - **Não substitui IAM/Unity Catalog** — access declarativo aplica ou valida políticas, mas a autoridade continua no catálogo e nos grupos corporativos.
 - **Não é um catálogo de qualidade empresarial** — as regras são para gates de pipeline.
 
@@ -125,14 +125,14 @@ pip install "contractforge[spark]"
 # Build local
 pip install build
 python -m build
-# → dist/contractforge-1.9.0-py3-none-any.whl
+# → dist/contractforge-1.10.0-py3-none-any.whl
 
 # Upload para UC Volume
-databricks fs cp dist/contractforge-1.9.0-py3-none-any.whl \
+databricks fs cp dist/contractforge-1.10.0-py3-none-any.whl \
   dbfs:/Volumes/<catalog>/<schema>/libs/
 
 # No notebook Databricks:
-%pip install /Volumes/<catalog>/<schema>/libs/contractforge-1.9.0-py3-none-any.whl
+%pip install /Volumes/<catalog>/<schema>/libs/contractforge-1.10.0-py3-none-any.whl
 dbutils.library.restartPython()
 ```
 
@@ -599,15 +599,16 @@ Conectores nativos:
 |----------|-----|-------------------|
 | `table`, `delta_table`, `view` | Tabelas/views do catálogo Spark/Unity Catalog | `table` |
 | `sql` | Query SQL declarativa | `query` |
-| `parquet`, `json`, `csv`, `text` | Arquivos batch | `path`, `options` |
-| `object_storage`, `blob` | Arquivos em ADLS/Azure Blob/S3/GCS | `provider`, `format`, `path`, `options` |
-| `jdbc` | Bancos relacionais via Spark JDBC | `options.url`, `options.dbtable` ou `options.query` |
+| `parquet`, `delta`, `json`, `csv`, `orc`, `text` | Arquivos batch | `path`, `options` |
+| `object_storage`, `blob`, `s3`, `adls`, `azure_blob`, `gcs` | Arquivos em ADLS/Azure Blob/S3/GCS | `provider` opcional nos aliases, `format`, `path`, `options` |
+| `jdbc`, `postgres`, `postgresql`, `sqlserver`, `mysql`, `oracle` | Bancos relacionais via Spark JDBC | `options.url`, `options.dbtable` ou `options.query` |
+| `snowflake`, `bigquery` | Conectores Spark externos instalados no runtime | `table`, `query`, `options.table`, `options.dbtable` ou `options.query` |
 | `rest_api` | APIs REST JSON em batch | `request`, `auth`, `pagination`, `response`, `limits` |
 | `autoloader` | Auto Loader finito `available_now` | `path`, `format`, `read.schema_location`, `read.checkpoint_location` |
 
 O retorno de `ingest()` inclui `source` com metadados do conector. `ctrl_ingestion_runs` registra `source_connector`, `source_provider`, `source_format`, `source_path`, configurações redigidas, capabilities do source e métricas operacionais em `source_metrics_json`.
 
-`source_metrics_json` é preenchido pelo resolver do conector. Em REST, inclui quantidade de requests, páginas lidas, registros extraídos, bytes lidos, tipo de paginação, retry/rate limit e watermark aplicado. Em JDBC, inclui estratégia de leitura, se houve pushdown incremental, watermark aplicado, particionamento e `fetchsize`. Em fontes Spark nativas, registra a estratégia (`spark_table`, `spark_sql` ou `spark_files`) e se a fonte foi declarada como completa.
+`source_metrics_json` é preenchido pelo resolver do conector. Em REST, inclui quantidade de requests, páginas lidas, registros extraídos, bytes lidos, tipo de paginação, retry/rate limit e watermark aplicado. Em JDBC e aliases nomeados, inclui estratégia de leitura, se houve pushdown incremental, watermark aplicado, particionamento e `fetchsize`. Em fontes Spark nativas, registra a estratégia (`spark_table`, `spark_sql`, `spark_files` ou `spark_format`) e se a fonte foi declarada como completa.
 
 `contractforge validate` faz validação estática dos conectores nativos sem abrir Spark: campos obrigatórios, tipos de paginação REST, auth REST, particionamento JDBC e formatos de object storage são verificados antes do job.
 
@@ -615,7 +616,7 @@ Descoberta via CLI:
 
 ```bash
 contractforge connectors list
-contractforge connectors show rest_api jdbc autoloader
+contractforge connectors show rest_api postgres s3 bigquery autoloader
 ```
 
 ### 5C.1 Auto Loader
@@ -696,13 +697,12 @@ mode: scd0_append
 schema_policy: additive_only
 ```
 
-Leitura em S3/ADLS/GCS usa o mesmo mecanismo Spark, deixando credenciais e mounts sob responsabilidade do runtime:
+Leitura em S3/ADLS/GCS usa o mesmo mecanismo Spark, deixando credenciais, external locations, mounts ou profiles sob responsabilidade do runtime:
 
 ```yaml
 source:
   type: connector
-  connector: object_storage
-  provider: s3
+  connector: s3
   format: parquet
   path: s3://company-landing/orders/
   read:
@@ -715,17 +715,30 @@ mode: snapshot_soft_delete
 merge_keys: [order_id]
 ```
 
-`provider` aceita `adls`, `azure_blob`, `s3` e `gcs`. A lib valida o contrato, mas não configura credenciais de cloud storage; isso deve estar no cluster/serverless/Unity Catalog external location.
-
-### 5C.3 JDBC
+Você pode usar aliases diretos (`s3`, `adls`, `azure_blob`, `gcs`) ou o formato genérico:
 
 ```yaml
 source:
   type: connector
-  connector: jdbc
+  connector: object_storage
+  provider: gcs
+  format: json
+  path: gs://company-landing/events/
+  options:
+    multiline: true
+```
+
+`provider` aceita `adls`, `azure_blob`, `s3` e `gcs`. A lib valida o contrato, mas não configura credenciais de cloud storage; isso deve estar no cluster/serverless/Unity Catalog external location.
+
+### 5C.3 JDBC e Bancos Nomeados
+
+```yaml
+source:
+  type: connector
+  connector: postgres
   name: erp_orders
   options:
-    url: "{{ secret:erp/jdbc_url }}"
+    url: "{{ secret:erp/postgres_url }}"
     dbtable: public.orders
     user: "{{ secret:erp/user }}"
     password: "{{ secret:erp/password }}"
@@ -743,12 +756,52 @@ layer: bronze
 mode: scd0_append
 ```
 
+Aliases `postgres`, `postgresql`, `sqlserver`, `mysql` e `oracle` usam o mesmo executor JDBC, mas deixam o contrato mais explícito e a observabilidade registra o conector real declarado. Os drivers JDBC continuam responsabilidade do runtime.
+
 Regras:
 
 - `source.options.url` é obrigatório.
 - Informe `source.options.dbtable` ou `source.options.query`.
 - Particionamento JDBC exige os quatro campos juntos: `partition_column`, `lower_bound`, `upper_bound`, `num_partitions`.
 - Use `source.read.source_complete=true` somente quando a query/tabela representar o estado completo necessário ao modo de escrita.
+
+### 5C.3B Snowflake e BigQuery
+
+`snowflake` e `bigquery` usam `spark.read.format("snowflake")` e `spark.read.format("bigquery")`. A lib valida contrato, resolve secrets, redige opções sensíveis e registra métricas, mas o conector Spark correspondente precisa estar disponível no runtime.
+
+```yaml
+source:
+  type: connector
+  connector: snowflake
+  name: sf_orders
+  options:
+    sfURL: "{{ secret:snowflake/url }}"
+    sfUser: "{{ secret:snowflake/user }}"
+    sfPassword: "{{ secret:snowflake/password }}"
+    sfDatabase: RAW
+    sfSchema: PUBLIC
+    sfWarehouse: INGEST_WH
+    dbtable: ORDERS
+
+target_table: b_snowflake_orders
+catalog: main
+layer: bronze
+mode: scd0_append
+```
+
+```yaml
+source:
+  type: connector
+  connector: bigquery
+  table: my-project.raw.orders
+  options:
+    parentProject: my-project
+
+target_table: b_bigquery_orders
+catalog: main
+layer: bronze
+mode: scd0_append
+```
 
 ### 5C.4 REST API
 
@@ -978,7 +1031,7 @@ delta_properties:
 contractforge presets list
 contractforge presets show silver_scd1_upsert
 contractforge connectors list
-contractforge connectors show rest_api jdbc
+contractforge connectors show rest_api postgres s3 bigquery
 contractforge validate contracts/silver/orders.yaml --expand-presets
 ```
 
@@ -3118,7 +3171,7 @@ ORDER BY change_ts_utc DESC;
 ## 21. FAQ
 
 **P: Posso usar o framework com Structured Streaming?**
-Para streaming contínuo, não. A versão 1.9.0 suporta Autoloader em `available_now`, que é uma execução finita com checkpoint e `foreachBatch`. Para processamento contínuo, considere Delta Live Tables (DLT) ou Structured Streaming direto.
+Para streaming contínuo, não. A versão 1.10.0 suporta Autoloader em `available_now`, que é uma execução finita com checkpoint e `foreachBatch`. Para processamento contínuo, considere Delta Live Tables (DLT) ou Structured Streaming direto.
 
 **P: O framework suporta CDC (Change Data Feed) como origem?**
 Não nativamente. Você pode processar o CDF antes e passar um DataFrame para o `ingest()`, mas o framework não lê o feed automaticamente.

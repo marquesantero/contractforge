@@ -99,8 +99,10 @@ BUILTIN_CONNECTOR_METADATA: Dict[str, Dict[str, Any]] = {
         "incremental": False,
     },
     "parquet": {"family": "files", "description": "Arquivos Parquet batch.", "required": ["path"], "incremental": False},
+    "delta": {"family": "files", "description": "Arquivos Delta por path.", "required": ["path"], "incremental": False},
     "json": {"family": "files", "description": "Arquivos JSON batch.", "required": ["path"], "incremental": False},
     "csv": {"family": "files", "description": "Arquivos CSV batch.", "required": ["path"], "incremental": False},
+    "orc": {"family": "files", "description": "Arquivos ORC batch.", "required": ["path"], "incremental": False},
     "text": {"family": "files", "description": "Arquivos texto batch.", "required": ["path"], "incremental": False},
     "object_storage": {
         "family": "object_storage",
@@ -114,11 +116,77 @@ BUILTIN_CONNECTOR_METADATA: Dict[str, Dict[str, Any]] = {
         "required": ["provider", "format", "path"],
         "incremental": False,
     },
+    "s3": {
+        "family": "object_storage",
+        "description": "Arquivos em Amazon S3 via Spark reader.",
+        "required": ["format", "path"],
+        "incremental": False,
+    },
+    "adls": {
+        "family": "object_storage",
+        "description": "Arquivos em Azure Data Lake Storage via Spark reader.",
+        "required": ["format", "path"],
+        "incremental": False,
+    },
+    "azure_blob": {
+        "family": "object_storage",
+        "description": "Arquivos em Azure Blob Storage via Spark reader.",
+        "required": ["format", "path"],
+        "incremental": False,
+    },
+    "gcs": {
+        "family": "object_storage",
+        "description": "Arquivos em Google Cloud Storage via Spark reader.",
+        "required": ["format", "path"],
+        "incremental": False,
+    },
     "jdbc": {
         "family": "external",
         "description": "Fonte JDBC via Spark JDBC reader.",
         "required": ["options.url", "options.dbtable ou options.query"],
         "incremental": True,
+    },
+    "postgres": {
+        "family": "external",
+        "description": "Alias JDBC para PostgreSQL.",
+        "required": ["options.url", "options.dbtable ou options.query"],
+        "incremental": True,
+    },
+    "postgresql": {
+        "family": "external",
+        "description": "Alias JDBC para PostgreSQL.",
+        "required": ["options.url", "options.dbtable ou options.query"],
+        "incremental": True,
+    },
+    "sqlserver": {
+        "family": "external",
+        "description": "Alias JDBC para Microsoft SQL Server.",
+        "required": ["options.url", "options.dbtable ou options.query"],
+        "incremental": True,
+    },
+    "mysql": {
+        "family": "external",
+        "description": "Alias JDBC para MySQL/MariaDB.",
+        "required": ["options.url", "options.dbtable ou options.query"],
+        "incremental": True,
+    },
+    "oracle": {
+        "family": "external",
+        "description": "Alias JDBC para Oracle Database.",
+        "required": ["options.url", "options.dbtable ou options.query"],
+        "incremental": True,
+    },
+    "snowflake": {
+        "family": "external",
+        "description": "Fonte Snowflake via Spark Snowflake connector.",
+        "required": ["connection options", "options.dbtable ou options.query"],
+        "incremental": False,
+    },
+    "bigquery": {
+        "family": "external",
+        "description": "Fonte BigQuery via Spark BigQuery connector.",
+        "required": ["table, options.table ou options.query"],
+        "incremental": False,
     },
     "rest_api": {
         "family": "external",
@@ -443,18 +511,80 @@ class FileConnector:
 class ObjectStorageConnector(FileConnector):
     """Lê arquivos em object storage: ADLS/Azure Blob/S3/GCS."""
 
+    def __init__(self, default_provider: Optional[str] = None) -> None:
+        super().__init__()
+        self.default_provider = default_provider
+
     def resolve_batch(self, spec: SourceSpec | ConnectorSpec, plan: IngestionPlan) -> SourceResolution:
         if not isinstance(spec, ConnectorSpec):
             raise ValueError("ObjectStorageConnector requer ConnectorSpec")
-        provider = str(spec.provider or "").strip()
+        explicit_provider = str(spec.provider or "").strip()
+        if explicit_provider and self.default_provider and explicit_provider != self.default_provider:
+            raise ValueError(
+                f"source.provider={explicit_provider!r} conflita com connector={spec.connector!r}; "
+                f"use provider={self.default_provider!r} ou remova provider"
+            )
+        provider = str(explicit_provider or self.default_provider or "").strip()
         if provider and provider not in VALID_OBJECT_STORAGE_PROVIDERS:
             raise ValueError(
                 f"source.provider={provider!r} não é suportado. "
                 f"Valores válidos: {sorted(VALID_OBJECT_STORAGE_PROVIDERS)}"
             )
         if not spec.format:
-            raise ValueError("source.format é obrigatório para connector=object_storage/blob")
-        return super().resolve_batch(spec, plan)
+            raise ValueError(f"source.format é obrigatório para connector={spec.connector}")
+        resolved = super().resolve_batch(spec, plan)
+        resolved.metadata["source_provider"] = provider or spec.provider
+        resolved.metadata["source_metrics"]["object_storage_provider"] = provider or spec.provider
+        return resolved
+
+
+class SparkFormatConnector:
+    """Lê fontes externas por ``spark.read.format`` quando o runtime já possui o conector Spark."""
+
+    def __init__(self, spark_format: str, *, table_option: str = "table") -> None:
+        self.spark_format = spark_format
+        self.table_option = table_option
+
+    def capabilities(self, spec: SourceSpec | ConnectorSpec) -> ConnectorCapabilities:
+        source_complete = _source_complete(spec) if isinstance(spec, ConnectorSpec) else False
+        return ConnectorCapabilities(
+            batch=True,
+            pushdown_filter=True,
+            schema_inference=True,
+            requires_secrets=True,
+            source_complete=source_complete,
+        )
+
+    def resolve_batch(self, spec: SourceSpec | ConnectorSpec, plan: IngestionPlan) -> SourceResolution:
+        if not isinstance(spec, ConnectorSpec):
+            raise ValueError("SparkFormatConnector requer ConnectorSpec")
+        options = {str(k): v for k, v in resolve_secrets(spec.options).items()}
+        if spec.table and "table" not in options and "dbtable" not in options and "query" not in options:
+            options[self.table_option] = spec.table
+        if spec.query and "query" not in options:
+            options["query"] = spec.query
+        if "table" not in options and "dbtable" not in options and "query" not in options:
+            raise ValueError(
+                f"connector={spec.connector} requer source.table, source.query, "
+                "source.options.table, source.options.dbtable ou source.options.query"
+            )
+        capabilities = self.capabilities(spec)
+        df = spark.read.format(self.spark_format).options(**_spark_options(options)).load()
+        metadata = _connector_metadata(spec, capabilities)
+        metadata["source_metrics"] = {
+            "read_strategy": "spark_format",
+            "spark_format": self.spark_format,
+            "source_table": options.get("table") or options.get("dbtable") or spec.table,
+            "source_query": bool(options.get("query")),
+            "source_complete": capabilities.source_complete,
+        }
+        return SourceResolution(
+            df,
+            f"{spec.connector}:{spec.name or options.get('table') or options.get('dbtable') or 'query'}",
+            spec.connector,
+            metadata,
+            capabilities,
+        )
 
 
 class JdbcConnector:
@@ -477,9 +607,9 @@ class JdbcConnector:
             raise ValueError("JdbcConnector requer ConnectorSpec")
         options = {str(k): v for k, v in resolve_secrets(spec.options).items()}
         if "url" not in options:
-            raise ValueError("source.options.url é obrigatório para connector=jdbc")
+            raise ValueError(f"source.options.url é obrigatório para connector={spec.connector}")
         if "dbtable" not in options and "query" not in options:
-            raise ValueError("connector=jdbc requer source.options.dbtable ou source.options.query")
+            raise ValueError(f"connector={spec.connector} requer source.options.dbtable ou source.options.query")
         watermark_value = _incremental_watermark_value(spec, plan)
         if watermark_value:
             self._apply_incremental_predicate(spec, options, watermark_value)
@@ -514,7 +644,7 @@ class JdbcConnector:
         }
         return SourceResolution(
             df,
-            f"jdbc:{spec.name or options.get('dbtable') or 'query'}",
+            f"{spec.connector}:{spec.name or options.get('dbtable') or 'query'}",
             spec.connector,
             metadata,
             capabilities,
@@ -863,10 +993,23 @@ register_source_resolver("delta_table", TableConnector())
 register_source_resolver("view", TableConnector())
 register_source_resolver("sql", SqlConnector())
 register_source_resolver("parquet", FileConnector("parquet"))
+register_source_resolver("delta", FileConnector("delta"))
 register_source_resolver("json", FileConnector("json"))
 register_source_resolver("csv", FileConnector("csv"))
+register_source_resolver("orc", FileConnector("orc"))
 register_source_resolver("text", FileConnector("text"))
 register_source_resolver("object_storage", ObjectStorageConnector())
 register_source_resolver("blob", ObjectStorageConnector())
+register_source_resolver("s3", ObjectStorageConnector("s3"))
+register_source_resolver("adls", ObjectStorageConnector("adls"))
+register_source_resolver("azure_blob", ObjectStorageConnector("azure_blob"))
+register_source_resolver("gcs", ObjectStorageConnector("gcs"))
 register_source_resolver("jdbc", JdbcConnector())
+register_source_resolver("postgres", JdbcConnector())
+register_source_resolver("postgresql", JdbcConnector())
+register_source_resolver("sqlserver", JdbcConnector())
+register_source_resolver("mysql", JdbcConnector())
+register_source_resolver("oracle", JdbcConnector())
+register_source_resolver("snowflake", SparkFormatConnector("snowflake", table_option="dbtable"))
+register_source_resolver("bigquery", SparkFormatConnector("bigquery", table_option="table"))
 register_source_resolver("rest_api", RestApiConnector())

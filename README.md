@@ -93,9 +93,9 @@ Além de tabela e DataFrame, `source` aceita fontes declarativas. Use `SourceSpe
 Conectores nativos:
 
 - Catálogo/SQL: `table`, `delta_table`, `view`, `sql`.
-- Arquivos: `parquet`, `json`, `csv`, `text`.
-- Object storage/blob: `object_storage`, `blob` com `provider=adls|azure_blob|s3|gcs`.
-- Sistemas externos: `jdbc`, `rest_api`.
+- Arquivos: `parquet`, `delta`, `json`, `csv`, `orc`, `text`.
+- Object storage/blob: `object_storage`, `blob` com `provider=adls|azure_blob|s3|gcs`, ou aliases diretos `s3`, `adls`, `azure_blob`, `gcs`.
+- Sistemas externos: `jdbc`, aliases JDBC `postgres`, `postgresql`, `sqlserver`, `mysql`, `oracle`, Spark connectors `snowflake`, `bigquery` e `rest_api`.
 - Streaming finito: `autoloader` com `trigger=available_now`.
 
 Exemplo com Auto Loader no formato unificado:
@@ -171,10 +171,10 @@ Exemplo com JDBC:
 ```yaml
 source:
   type: connector
-  connector: jdbc
+  connector: postgres
   name: erp_orders
   options:
-    url: "{{ secret:erp/jdbc_url }}"
+    url: "{{ secret:erp/postgres_url }}"
     dbtable: public.orders
     user: "{{ secret:erp/user }}"
     password: "{{ secret:erp/password }}"
@@ -187,6 +187,59 @@ source:
     source_complete: true
 
 target_table: b_erp_orders
+catalog: main
+layer: bronze
+mode: scd0_append
+```
+
+Exemplo com storage cloud direto:
+
+```yaml
+source:
+  type: connector
+  connector: s3
+  format: parquet
+  path: s3://company-landing/orders/
+  read:
+    source_complete: true
+
+target_table: b_orders_s3
+catalog: main
+layer: bronze
+mode: scd0_append
+schema_policy: additive_only
+```
+
+Exemplo com BigQuery ou Snowflake via Spark connector instalado no runtime:
+
+```yaml
+source:
+  type: connector
+  connector: bigquery
+  table: analytics.orders
+  options:
+    parentProject: my-gcp-project
+
+target_table: b_bigquery_orders
+catalog: main
+layer: bronze
+mode: scd0_append
+```
+
+```yaml
+source:
+  type: connector
+  connector: snowflake
+  options:
+    sfURL: "{{ secret:snowflake/url }}"
+    sfUser: "{{ secret:snowflake/user }}"
+    sfPassword: "{{ secret:snowflake/password }}"
+    sfDatabase: RAW
+    sfSchema: PUBLIC
+    sfWarehouse: INGEST_WH
+    dbtable: ORDERS
+
+target_table: b_snowflake_orders
 catalog: main
 layer: bronze
 mode: scd0_append
@@ -332,7 +385,7 @@ Comandos úteis:
 contractforge presets list
 contractforge presets show silver_scd1_upsert
 contractforge connectors list
-contractforge connectors show rest_api jdbc
+contractforge connectors show rest_api postgres s3 bigquery
 contractforge validate contracts/silver/orders.yaml --expand-presets
 ```
 
