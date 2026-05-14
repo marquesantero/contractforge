@@ -9,6 +9,7 @@ from lakehouse_ingestion.sources import (
     ConnectorCapabilities,
     JdbcConnector,
     RestApiConnector,
+    SparkFormatConnector,
     SourceResolution,
     list_source_resolvers,
     redact_secrets,
@@ -57,7 +58,29 @@ def test_build_plan_rejects_invalid_connector_name():
 def test_builtin_connectors_are_registered():
     registered = set(list_source_resolvers())
 
-    assert {"json", "parquet", "csv", "object_storage", "blob", "jdbc", "rest_api", "sql", "table"} <= registered
+    assert {
+        "adls",
+        "azure_blob",
+        "bigquery",
+        "blob",
+        "csv",
+        "delta",
+        "gcs",
+        "jdbc",
+        "json",
+        "mysql",
+        "object_storage",
+        "oracle",
+        "orc",
+        "parquet",
+        "postgres",
+        "rest_api",
+        "s3",
+        "snowflake",
+        "sql",
+        "sqlserver",
+        "table",
+    } <= registered
 
 
 def test_custom_connector_can_be_registered_and_resolved():
@@ -136,6 +159,60 @@ def test_file_connector_uses_spark_reader(monkeypatch):
     assert calls == {"format": "json", "options": {"multiline": "true"}, "load": "/landing/orders"}
 
 
+def test_object_storage_alias_sets_provider_and_uses_declared_format(monkeypatch):
+    calls = {"format": None, "options": {}, "load": None}
+
+    class Reader:
+        def format(self, value):
+            calls["format"] = value
+            return self
+
+        def options(self, **kwargs):
+            calls["options"].update(kwargs)
+            return self
+
+        def load(self, path):
+            calls["load"] = path
+            return "df"
+
+    class FakeSpark:
+        read = Reader()
+
+    monkeypatch.setattr(sources_module, "spark", FakeSpark())
+    plan = build_plan_from_kwargs(
+        source={
+            "type": "connector",
+            "connector": "s3",
+            "format": "parquet",
+            "path": "s3://landing/orders",
+            "read": {"source_complete": True},
+        },
+        target_table="b_orders",
+    )
+
+    resolved = resolve_batch_source(plan.source, plan)
+
+    assert resolved.df == "df"
+    assert calls == {"format": "parquet", "options": {}, "load": "s3://landing/orders"}
+    assert resolved.metadata["source_provider"] == "s3"
+    assert resolved.metadata["source_metrics"]["object_storage_provider"] == "s3"
+    assert resolved.metadata["source_metrics"]["source_complete"] is True
+
+
+def test_object_storage_alias_rejects_conflicting_provider():
+    with pytest.raises(ValueError, match="conflita"):
+        build_plan_from_kwargs(
+            source={
+                "type": "connector",
+                "connector": "s3",
+                "provider": "gcs",
+                "format": "parquet",
+                "path": "s3://landing/orders",
+            },
+            target_table="b_orders",
+        )
+
+
 def test_jdbc_connector_requires_complete_partition_options():
     spec = ConnectorSpec(
         connector="jdbc",
@@ -192,6 +269,79 @@ def test_jdbc_connector_applies_incremental_predicate(monkeypatch):
         "fetchsize": None,
         "source_complete": False,
     }
+
+
+def test_named_jdbc_connector_uses_jdbc_reader(monkeypatch):
+    captured = {}
+
+    class Reader:
+        def format(self, value):
+            captured["format"] = value
+            return self
+
+        def options(self, **kwargs):
+            captured.update(kwargs)
+            return self
+
+        def load(self):
+            return "df"
+
+    class FakeSpark:
+        read = Reader()
+
+    monkeypatch.setattr(sources_module, "spark", FakeSpark())
+    spec = ConnectorSpec(
+        connector="postgres",
+        options={"url": "jdbc:postgresql://host/db", "dbtable": "public.orders"},
+        read={"fetchsize": 5000},
+    )
+
+    resolved = JdbcConnector().resolve_batch(spec, build_plan_from_kwargs(source="x", target_table="t"))
+
+    assert resolved.df == "df"
+    assert resolved.label == "postgres:public.orders"
+    assert captured["format"] == "jdbc"
+    assert captured["url"] == "jdbc:postgresql://host/db"
+    assert captured["dbtable"] == "public.orders"
+    assert captured["fetchsize"] == "5000"
+    assert resolved.metadata["source_connector"] == "postgres"
+
+
+def test_spark_format_connector_uses_table_from_source(monkeypatch):
+    captured = {}
+
+    class Reader:
+        def format(self, value):
+            captured["format"] = value
+            return self
+
+        def options(self, **kwargs):
+            captured.update(kwargs)
+            return self
+
+        def load(self):
+            return "df"
+
+    class FakeSpark:
+        read = Reader()
+
+    monkeypatch.setattr(sources_module, "spark", FakeSpark())
+    spec = ConnectorSpec(
+        connector="bigquery",
+        table="project.dataset.orders",
+        options={"api_key": "plain"},
+    )
+
+    resolved = SparkFormatConnector("bigquery", table_option="table").resolve_batch(
+        spec,
+        build_plan_from_kwargs(source="x", target_table="t"),
+    )
+
+    assert resolved.df == "df"
+    assert captured["format"] == "bigquery"
+    assert captured["table"] == "project.dataset.orders"
+    assert resolved.metadata["source_metrics"]["spark_format"] == "bigquery"
+    assert resolved.metadata["source_options_redacted"]["api_key"] == "***REDACTED***"
 
 
 def test_snapshot_connector_requires_source_complete():

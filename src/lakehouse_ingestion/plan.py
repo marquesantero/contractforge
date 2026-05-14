@@ -93,6 +93,11 @@ def _require_ratio(value: Any, field: str) -> float:
 
 
 _CONNECTOR_NAME_RE = re.compile(r"^[A-Za-z][A-Za-z0-9_-]*$")
+_FILE_CONNECTORS = {"csv", "delta", "json", "orc", "parquet", "text"}
+_OBJECT_STORAGE_CONNECTORS = {"adls", "azure_blob", "blob", "gcs", "object_storage", "s3"}
+_OBJECT_STORAGE_CONNECTOR_PROVIDERS = {"adls": "adls", "azure_blob": "azure_blob", "gcs": "gcs", "s3": "s3"}
+_JDBC_CONNECTORS = {"jdbc", "mysql", "oracle", "postgres", "postgresql", "sqlserver"}
+_SPARK_FORMAT_CONNECTORS = {"bigquery", "snowflake"}
 
 
 def _validate_connector_name(value: Any, field: str = "source.connector") -> str:
@@ -211,16 +216,22 @@ def _validate_native_connector_contract(spec: "ConnectorSpec") -> None:
         if not _connector_value(spec, "query"):
             raise ValueError("source.query é obrigatório para connector=sql")
         return
-    if connector in {"parquet", "json", "csv", "text"}:
+    if connector in _FILE_CONNECTORS:
         if not spec.path and not spec.options.get("path"):
             raise ValueError(f"source.path é obrigatório para connector={connector}")
         return
-    if connector in {"object_storage", "blob"}:
+    if connector in _OBJECT_STORAGE_CONNECTORS:
         provider = str(spec.provider or "").strip()
         if provider and provider not in VALID_OBJECT_STORAGE_PROVIDERS:
             raise ValueError(
                 f"source.provider={provider!r} não é suportado. "
                 f"Valores válidos: {sorted(VALID_OBJECT_STORAGE_PROVIDERS)}"
+            )
+        expected_provider = _OBJECT_STORAGE_CONNECTOR_PROVIDERS.get(connector)
+        if provider and expected_provider and provider != expected_provider:
+            raise ValueError(
+                f"source.provider={provider!r} conflita com connector={connector!r}; "
+                f"use provider={expected_provider!r} ou remova provider"
             )
         fmt = str(spec.format or "").strip()
         if not fmt:
@@ -228,18 +239,25 @@ def _validate_native_connector_contract(spec: "ConnectorSpec") -> None:
         if fmt not in VALID_FILE_CONNECTOR_FORMATS:
             raise ValueError(f"source.format={fmt!r} não é suportado. Válidos: {sorted(VALID_FILE_CONNECTOR_FORMATS)}")
         if not spec.path and not spec.options.get("path"):
-            raise ValueError("source.path é obrigatório para connector=object_storage/blob")
+            raise ValueError(f"source.path é obrigatório para connector={connector}")
         return
-    if connector == "jdbc":
+    if connector in _JDBC_CONNECTORS:
         if "url" not in spec.options:
-            raise ValueError("source.options.url é obrigatório para connector=jdbc")
+            raise ValueError(f"source.options.url é obrigatório para connector={connector}")
         if "dbtable" not in spec.options and "query" not in spec.options:
-            raise ValueError("connector=jdbc requer source.options.dbtable ou source.options.query")
+            raise ValueError(f"connector={connector} requer source.options.dbtable ou source.options.query")
         partition_fields = {"partition_column", "lower_bound", "upper_bound", "num_partitions"}
         provided = {field for field in partition_fields if spec.read.get(field) is not None}
         if provided and provided != partition_fields:
             raise ValueError(
                 "JDBC partitioning requer partition_column, lower_bound, upper_bound e num_partitions juntos"
+            )
+        return
+    if connector in _SPARK_FORMAT_CONNECTORS:
+        if "query" not in spec.options and "dbtable" not in spec.options and "table" not in spec.options and not spec.table:
+            raise ValueError(
+                f"connector={connector} requer source.table, source.options.table, "
+                "source.options.dbtable ou source.options.query"
             )
         return
     if connector == "rest_api":
