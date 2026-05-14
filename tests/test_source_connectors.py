@@ -184,6 +184,14 @@ def test_jdbc_connector_applies_incremental_predicate(monkeypatch):
     assert captured["dbtable"] == (
         "(SELECT * FROM public.orders WHERE updated_at > '2026-05-01T00:00:00Z') cf_src"
     )
+    assert resolved.metadata["source_metrics"] == {
+        "read_strategy": "jdbc_table",
+        "incremental_applied": True,
+        "watermark_value": "2026-05-01T00:00:00Z",
+        "partitioned_read": False,
+        "fetchsize": None,
+        "source_complete": False,
+    }
 
 
 def test_snapshot_connector_requires_source_complete():
@@ -233,7 +241,7 @@ def test_rest_api_connector_paginates_cursor(monkeypatch):
     def fake_request(self, url, method, headers, body, timeout):
         requested_urls.append(url)
         payload, headers_payload = responses.pop(0)
-        return payload, headers_payload, url
+        return payload, headers_payload, url, len(str(payload).encode("utf-8"))
 
     monkeypatch.setattr(sources_module, "spark", FakeSpark())
     monkeypatch.setattr(RestApiConnector, "_request", fake_request)
@@ -254,6 +262,11 @@ def test_rest_api_connector_paginates_cursor(monkeypatch):
         "https://api.example.com/orders",
         "https://api.example.com/orders?cursor=abc",
     ]
+    assert resolved.metadata["source_metrics"]["request_count"] == 2
+    assert resolved.metadata["source_metrics"]["pages_read"] == 2
+    assert resolved.metadata["source_metrics"]["records_read"] == 2
+    assert resolved.metadata["source_metrics"]["bytes_read"] > 0
+    assert resolved.metadata["source_metrics"]["pagination_type"] == "cursor"
 
 
 def test_rest_api_connector_applies_params_and_incremental(monkeypatch):
@@ -267,7 +280,7 @@ def test_rest_api_connector_applies_params_and_incremental(monkeypatch):
         requested["url"] = url
         requested["headers"] = headers
         requested["body"] = body
-        return {"data": [{"id": 1}]}, {}, url
+        return {"data": [{"id": 1}]}, {}, url, 24
 
     monkeypatch.setattr(sources_module, "spark", FakeSpark())
     monkeypatch.setattr(RestApiConnector, "_request", fake_request)
@@ -305,6 +318,10 @@ def test_rest_api_connector_applies_params_and_incremental(monkeypatch):
     )
     assert requested["headers"]["X-Watermark"] == "2026-05-01T00:00:00Z"
     assert requested["body"] == b'{"source": "contractforge", "updated_after": "2026-05-01T00:00:00Z"}'
+    assert resolved.metadata["source_metrics"]["incremental_applied"] is True
+    assert resolved.metadata["source_metrics"]["watermark_value"] == "2026-05-01T00:00:00Z"
+    assert resolved.metadata["source_metrics"]["request_count"] == 1
+    assert resolved.metadata["source_metrics"]["records_read"] == 1
 
 
 def test_rest_api_connector_validates_missing_bearer_token():

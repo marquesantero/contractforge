@@ -854,9 +854,13 @@ layer: silver
 mode: snapshot_soft_delete
 merge_keys: [customer_id]</code></pre>
 
-<div class="alert info"><strong>Observabilidade:</strong> <code>ctrl_ingestion_runs</code> registra conector, provider, formato, path, opções redigidas, request/auth/pagination/incremental/limits e capabilities. Secrets no formato <code>{{ secret:scope/key }}</code> são resolvidos via Databricks Secrets ou variável <code>CONTRACTFORGE_SECRET_SCOPE_KEY</code>.</div>
+<div class="alert info"><strong>Observabilidade:</strong> <code>ctrl_ingestion_runs</code> registra conector, provider, formato, path, opções redigidas, request/auth/pagination/incremental/limits, capabilities e <code>source_metrics_json</code>. Em REST, as métricas incluem requests, páginas, registros, bytes, paginação, retry/rate limit e watermark aplicado. Em JDBC, incluem estratégia de leitura, incrementalidade, watermark, particionamento e fetchsize. Secrets no formato <code>{{ secret:scope/key }}</code> são resolvidos via Databricks Secrets ou variável <code>CONTRACTFORGE_SECRET_SCOPE_KEY</code>.</div>
 <div class="alert info"><strong>Incremental:</strong> <code>source.incremental</code> empurra o watermark anterior para REST (<code>watermark_param</code>, <code>watermark_header</code>, <code>watermark_body_field</code>) ou JDBC (<code>watermark_column</code>/<code>predicate</code>). O controle oficial continua em <code>watermark_columns</code>.</div>
 <div class="alert info"><strong>Extensível:</strong> novos conectores podem ser registrados com <code>register_source_resolver("meu_conector", resolver)</code>. O YAML aceita nomes válidos de conectores customizados; a execução exige que o resolver esteja registrado no runtime.</div>
+<pre><code># Descoberta e validação local
+contractforge connectors list
+contractforge connectors show rest_api jdbc
+contractforge validate contracts/bronze/b_orders_api.ingestion.yaml</code></pre>
 </section>
 
 <!-- ============ PRESETS ============ -->
@@ -922,6 +926,8 @@ register_preset("corp_silver_scd1",
 </div>
 <div class="tab-content active" data-lang="bash"><pre><code>contractforge presets list
 contractforge presets show silver_scd1_upsert
+contractforge connectors list
+contractforge connectors show rest_api jdbc
 contractforge validate --expand-presets contratos/silver/c_pedidos.ingestion.yaml</code></pre></div>
 </section>
 

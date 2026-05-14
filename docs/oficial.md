@@ -605,7 +605,18 @@ Conectores nativos:
 | `rest_api` | APIs REST JSON em batch | `request`, `auth`, `pagination`, `response`, `limits` |
 | `autoloader` | Auto Loader finito `available_now` | `path`, `format`, `read.schema_location`, `read.checkpoint_location` |
 
-O retorno de `ingest()` inclui `source` com metadados do conector. `ctrl_ingestion_runs` registra `source_connector`, `source_provider`, `source_format`, `source_path`, configurações redigidas e capabilities do source.
+O retorno de `ingest()` inclui `source` com metadados do conector. `ctrl_ingestion_runs` registra `source_connector`, `source_provider`, `source_format`, `source_path`, configurações redigidas, capabilities do source e métricas operacionais em `source_metrics_json`.
+
+`source_metrics_json` é preenchido pelo resolver do conector. Em REST, inclui quantidade de requests, páginas lidas, registros extraídos, bytes lidos, tipo de paginação, retry/rate limit e watermark aplicado. Em JDBC, inclui estratégia de leitura, se houve pushdown incremental, watermark aplicado, particionamento e `fetchsize`. Em fontes Spark nativas, registra a estratégia (`spark_table`, `spark_sql` ou `spark_files`) e se a fonte foi declarada como completa.
+
+`contractforge validate` faz validação estática dos conectores nativos sem abrir Spark: campos obrigatórios, tipos de paginação REST, auth REST, particionamento JDBC e formatos de object storage são verificados antes do job.
+
+Descoberta via CLI:
+
+```bash
+contractforge connectors list
+contractforge connectors show rest_api jdbc autoloader
+```
 
 ### 5C.1 Auto Loader
 
@@ -855,6 +866,7 @@ Os valores sensíveis são redigidos em logs e ctrl tables. A auditoria de execu
 - `source_incremental_json`
 - `source_limits_json`
 - `source_capabilities_json`
+- `source_metrics_json`
 
 ### 5C.6 Extensão
 
@@ -965,6 +977,8 @@ delta_properties:
 ```bash
 contractforge presets list
 contractforge presets show silver_scd1_upsert
+contractforge connectors list
+contractforge connectors show rest_api jdbc
 contractforge validate contracts/silver/orders.yaml --expand-presets
 ```
 
@@ -2079,7 +2093,7 @@ As tabelas de controle são criadas automaticamente no schema `ctrl_schema` (def
 
 Histórico completo de todas as execuções. Particionada por `run_date`.
 
-**Colunas principais:** `run_id`, `run_ts_utc`, `run_date`, `notebook_name`, `layer`, `source_table`, `source_type`, `source_connector`, `source_name`, `source_provider`, `source_format`, `source_path`, `source_options_json`, `source_read_json`, `source_request_json`, `source_auth_json`, `source_pagination_json`, `source_response_json`, `source_incremental_json`, `source_limits_json`, `source_capabilities_json`, `target_table`, `mode`, `status`, `rows_read`, `rows_written`, `rows_inserted`, `rows_updated`, `rows_deleted`, `rows_quarantined`, `watermark_previous`, `watermark_current`, `duration_seconds`, `quality_status`, `schema_policy`, `schema_changes_json`, `stage_durations_json`, `operation_metrics_json`, `write_committed`, `delta_version_before`, `delta_version_after`, `error_message`, `idempotency_key`, `idempotency_policy`, `skip_reason`, `skipped_by_run_id`, `contract_description`, `contract_owner`, `contract_domain`, `contract_tags_json`, `contract_sla`, `runtime_parameters_json`, `metrics_source`, `framework_version`, `ctrl_schema_version`, `runtime_type`, `spark_version`, `python_version`.
+**Colunas principais:** `run_id`, `run_ts_utc`, `run_date`, `notebook_name`, `layer`, `source_table`, `source_type`, `source_connector`, `source_name`, `source_provider`, `source_format`, `source_path`, `source_options_json`, `source_read_json`, `source_request_json`, `source_auth_json`, `source_pagination_json`, `source_response_json`, `source_incremental_json`, `source_limits_json`, `source_capabilities_json`, `source_metrics_json`, `target_table`, `mode`, `status`, `rows_read`, `rows_written`, `rows_inserted`, `rows_updated`, `rows_deleted`, `rows_quarantined`, `watermark_previous`, `watermark_current`, `duration_seconds`, `quality_status`, `schema_policy`, `schema_changes_json`, `stage_durations_json`, `operation_metrics_json`, `write_committed`, `delta_version_before`, `delta_version_after`, `error_message`, `idempotency_key`, `idempotency_policy`, `skip_reason`, `skipped_by_run_id`, `contract_description`, `contract_owner`, `contract_domain`, `contract_tags_json`, `contract_sla`, `runtime_parameters_json`, `metrics_source`, `framework_version`, `ctrl_schema_version`, `runtime_type`, `spark_version`, `python_version`.
 
 ### 12.2 `ctrl_ingestion_state`
 
@@ -2511,6 +2525,13 @@ register_write_mode("custom_append", my_writer)
 Para batch, implemente `resolve_batch(spec, plan)` e retorne `SourceResolution`. Para streaming finito, implemente `resolve_stream(spec, plan)` e retorne `(stream_df, source_label)`.
 
 Resolvers nativos registrados incluem `autoloader`, `table`, `delta_table`, `view`, `sql`, `parquet`, `json`, `csv`, `text`, `object_storage`, `blob`, `jdbc` e `rest_api`.
+
+Use a CLI para auditar capabilities disponíveis no runtime atual:
+
+```bash
+contractforge connectors list
+contractforge connectors show rest_api
+```
 
 ---
 

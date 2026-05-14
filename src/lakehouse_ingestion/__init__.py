@@ -36,11 +36,13 @@ from .sources import (
     ConnectorCapabilities,
     SourceResolution,
     get_source_resolver,
+    list_source_connector_details,
     list_source_resolvers,
     redact_secrets,
     register_source_resolver,
     resolve_batch_source,
     resolve_secrets,
+    source_connector_details,
 )
 from .presets import apply_preset, get_preset, list_presets, preset_details, register_preset
 from .shape import ShapeArrayConfig, ShapeColumnConfig, ShapeConfig, ShapeFlattenConfig, apply_shape
@@ -90,6 +92,7 @@ __all__ = [
     "apply_shape",
     "get_preset",
     "list_presets",
+    "list_source_connector_details",
     "list_source_resolvers",
     "preset_details",
     "register_preset",
@@ -97,6 +100,7 @@ __all__ = [
     "redact_secrets",
     "resolve_batch_source",
     "resolve_secrets",
+    "source_connector_details",
     "register_write_mode",
     "register_quality_rule",
     "validate_plan_shape",

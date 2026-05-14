@@ -84,6 +84,31 @@ def test_cli_presets_list_and_show(capsys):
     assert '"name": "gold_full_refresh"' in output
 
 
+def test_cli_connectors_list_and_show(capsys):
+    assert main(["connectors", "list", "--indent", "0"]) == 0
+    output = capsys.readouterr().out
+    assert '"name": "rest_api"' in output
+    assert '"incremental": true' in output
+
+    assert main(["connectors", "show", "jdbc", "--indent", "0"]) == 0
+    output = capsys.readouterr().out
+    assert '"name": "jdbc"' in output
+    assert '"partitioned_read"' in output
+
+
+def test_cli_validate_rejects_incomplete_native_connector(tmp_path, capsys):
+    contract = {
+        "source": {"type": "connector", "connector": "rest_api"},
+        "target_table": "b_orders",
+        "mode": "scd0_append",
+    }
+    path = tmp_path / "contract.json"
+    path.write_text(json.dumps(contract), encoding="utf-8")
+
+    assert main(["validate", str(path)]) == 1
+    assert "source.request.url" in capsys.readouterr().err
+
+
 def test_cli_governance_preview_accepts_split_contract(tmp_path, capsys):
     base = tmp_path / "gd_orders"
     (tmp_path / "gd_orders.ingestion.json").write_text(

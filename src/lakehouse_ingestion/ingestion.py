@@ -226,6 +226,7 @@ def _source_metadata_for_legacy_source(source_name: str, source_type: str) -> Di
         "source_incremental_redacted": {},
         "source_limits_redacted": {},
         "source_capabilities": {},
+        "source_metrics": {"read_strategy": source_type},
     }
 
 
@@ -695,6 +696,7 @@ def _finalize_execution(
             "source_incremental_json": to_json(source_metadata.get("source_incremental_redacted")),
             "source_limits_json": to_json(source_metadata.get("source_limits_redacted")),
             "source_capabilities_json": to_json(source_metadata.get("source_capabilities")),
+            "source_metrics_json": to_json(source_metadata.get("source_metrics")),
             "target_table": target,
             "mode": plan.mode,
             "status": status,

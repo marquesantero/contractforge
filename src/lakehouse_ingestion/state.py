@@ -114,6 +114,7 @@ def ensure_ctrl_tables(catalog: str, schema: str) -> Dict[str, str]:
             source_incremental_json STRING,
             source_limits_json STRING,
             source_capabilities_json STRING,
+            source_metrics_json STRING,
             target_table STRING,
             mode STRING,
             status STRING,
@@ -424,6 +425,7 @@ def ensure_ctrl_tables(catalog: str, schema: str) -> Dict[str, str]:
             "source_incremental_json": "STRING",
             "source_limits_json": "STRING",
             "source_capabilities_json": "STRING",
+            "source_metrics_json": "STRING",
         },
     )
     _add_columns_if_missing(
@@ -713,6 +715,7 @@ _RUN_COLUMNS = [
     "source_path", "source_options_json", "source_read_json", "source_request_json",
     "source_auth_json", "source_pagination_json", "source_response_json",
     "source_incremental_json", "source_limits_json", "source_capabilities_json",
+    "source_metrics_json",
     "target_table", "mode", "status", "rows_read", "rows_written", "rows_inserted",
     "rows_updated", "rows_deleted", "rows_quarantined", "watermark_column",
     "watermark_previous", "watermark_current", "started_at_utc", "finished_at_utc",

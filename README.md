@@ -194,6 +194,8 @@ mode: scd0_append
 
 `source.incremental` permite pushdown do watermark anterior para a origem sem mudar o controle de watermark do framework. Em REST, use `watermark_param`, `watermark_header` ou `watermark_body_field`; em JDBC, use `watermark_column` ou `predicate`. `initial_value` é usado apenas na primeira execução, quando ainda não há watermark salvo. A configuração incremental é auditada em `ctrl_ingestion_runs.source_incremental_json`.
 
+Cada execução com conector também grava observabilidade específica em `ctrl_ingestion_runs.source_metrics_json`. Para REST são registrados `request_count`, `pages_read`, `records_read`, `bytes_read`, paginação, retry, rate limit e watermark aplicado. Para JDBC são registrados estratégia de leitura, uso de incrementalidade, watermark aplicado, particionamento e `fetchsize`. Para arquivos/tabelas/SQL são registrados estratégia de leitura e sinalização de fonte completa.
+
 `source.read.source_complete=true` ou `full_snapshot=true` é a declaração explícita usada por modos que exigem fonte completa, como `snapshot_soft_delete` e `replace_partitions`. Credenciais com `{{ secret:scope/key }}` são resolvidas via Databricks Secrets ou variável de ambiente `CONTRACTFORGE_SECRET_SCOPE_KEY`; logs e ctrl tables recebem versões redigidas.
 
 ## Contrato declarativo
@@ -311,6 +313,8 @@ Comandos úteis:
 ```bash
 contractforge presets list
 contractforge presets show silver_scd1_upsert
+contractforge connectors list
+contractforge connectors show rest_api jdbc
 contractforge validate contracts/silver/orders.yaml --expand-presets
 ```
 
@@ -428,7 +432,8 @@ O retorno preserva `rows_written` como métrica lógica da biblioteca, expõe `r
 - `register_quality_rule(type, evaluator)` registra regras customizadas usadas por `quality_rules.custom`. Regras custom com `severity="quarantine"` devem retornar uma condição de linha.
 - `register_source_resolver(name, resolver)` registra conectores customizados. O contrato aceita qualquer `source.connector` com nome válido; a execução falha cedo se não houver resolver registrado.
 - `yaml_schema()` retorna o JSON Schema do contrato para autocomplete/validação em IDEs.
-- A CLI `contractforge validate contrato.yaml` valida contratos YAML/JSON sem executar Spark. `contractforge schema` imprime o schema.
+- A CLI `contractforge validate contrato.yaml` valida contratos YAML/JSON sem executar Spark e aplica validação estática dos conectores nativos. `contractforge schema` imprime o schema.
+- `contractforge connectors list|show` exibe conectores registrados, campos obrigatórios e capabilities.
 
 ## Matriz de runtime
 

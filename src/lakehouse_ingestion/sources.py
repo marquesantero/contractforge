@@ -67,6 +67,67 @@ class SourceResolver(Protocol):
 
 SOURCE_RESOLVER_REGISTRY: Dict[str, SourceResolver] = {}
 
+BUILTIN_CONNECTOR_METADATA: Dict[str, Dict[str, Any]] = {
+    "autoloader": {
+        "family": "streaming",
+        "description": "Databricks Auto Loader em modo available_now.",
+        "required": ["path", "format", "read.schema_location", "read.checkpoint_location"],
+        "incremental": True,
+    },
+    "table": {
+        "family": "catalog",
+        "description": "Tabela do catálogo Spark/Unity Catalog.",
+        "required": ["table"],
+        "incremental": False,
+    },
+    "delta_table": {
+        "family": "catalog",
+        "description": "Tabela Delta registrada no catálogo.",
+        "required": ["table"],
+        "incremental": False,
+    },
+    "view": {
+        "family": "catalog",
+        "description": "View registrada no catálogo.",
+        "required": ["table"],
+        "incremental": False,
+    },
+    "sql": {
+        "family": "catalog",
+        "description": "Query SQL declarativa.",
+        "required": ["query"],
+        "incremental": False,
+    },
+    "parquet": {"family": "files", "description": "Arquivos Parquet batch.", "required": ["path"], "incremental": False},
+    "json": {"family": "files", "description": "Arquivos JSON batch.", "required": ["path"], "incremental": False},
+    "csv": {"family": "files", "description": "Arquivos CSV batch.", "required": ["path"], "incremental": False},
+    "text": {"family": "files", "description": "Arquivos texto batch.", "required": ["path"], "incremental": False},
+    "object_storage": {
+        "family": "object_storage",
+        "description": "Arquivos em ADLS/Azure Blob/S3/GCS via Spark reader.",
+        "required": ["provider", "format", "path"],
+        "incremental": False,
+    },
+    "blob": {
+        "family": "object_storage",
+        "description": "Alias para object storage/blob storage.",
+        "required": ["provider", "format", "path"],
+        "incremental": False,
+    },
+    "jdbc": {
+        "family": "external",
+        "description": "Fonte JDBC via Spark JDBC reader.",
+        "required": ["options.url", "options.dbtable ou options.query"],
+        "incremental": True,
+    },
+    "rest_api": {
+        "family": "external",
+        "description": "API REST JSON em batch com auth, paginação e retry.",
+        "required": ["request.url"],
+        "incremental": True,
+    },
+}
+
 
 def _source_complete(spec: ConnectorSpec) -> bool:
     return bool(spec.read.get("source_complete", False) or spec.read.get("full_snapshot", False))
@@ -118,6 +179,7 @@ def _connector_metadata(spec: ConnectorSpec, capabilities: ConnectorCapabilities
         "source_incremental_redacted": redact_secrets(spec.incremental),
         "source_limits_redacted": redact_secrets(spec.limits),
         "source_capabilities": asdict(capabilities),
+        "source_metrics": {},
     }
 
 
@@ -216,6 +278,30 @@ def list_source_resolvers() -> list[str]:
     return sorted(SOURCE_RESOLVER_REGISTRY)
 
 
+def source_connector_details(name: str) -> Dict[str, Any]:
+    """Retorna metadata e capabilities do conector registrado."""
+    normalized = str(name or "").strip()
+    resolver = get_source_resolver(normalized)
+    spec = ConnectorSpec(connector=normalized)
+    capabilities = resolver.capabilities(spec) if hasattr(resolver, "capabilities") else ConnectorCapabilities()
+    builtin = BUILTIN_CONNECTOR_METADATA.get(normalized, {})
+    return {
+        "name": normalized,
+        "registered": True,
+        "builtin": normalized in BUILTIN_CONNECTOR_METADATA,
+        "family": builtin.get("family", "custom"),
+        "description": builtin.get("description"),
+        "required": builtin.get("required", []),
+        "incremental": builtin.get("incremental", False),
+        "capabilities": asdict(capabilities),
+    }
+
+
+def list_source_connector_details() -> list[Dict[str, Any]]:
+    """Lista metadata/capabilities de todos os conectores registrados."""
+    return [source_connector_details(name) for name in list_source_resolvers()]
+
+
 def resolve_batch_source(spec: ConnectorSpec, plan: IngestionPlan) -> SourceResolution:
     """Resolve ``ConnectorSpec`` como batch source."""
     resolver = get_source_resolver(spec.connector)
@@ -271,11 +357,16 @@ class TableConnector:
         if not table:
             raise ValueError("source.table é obrigatório para connector=table/delta_table")
         capabilities = self.capabilities(spec)
+        metadata = _connector_metadata(spec, capabilities)
+        metadata["source_metrics"] = {
+            "read_strategy": "spark_table",
+            "source_complete": capabilities.source_complete,
+        }
         return SourceResolution(
             spark.read.table(str(table)),
             f"{spec.connector}:{table}",
             spec.connector,
-            _connector_metadata(spec, capabilities),
+            metadata,
             capabilities,
         )
 
@@ -294,11 +385,16 @@ class SqlConnector:
         if not query:
             raise ValueError("source.query é obrigatório para connector=sql")
         capabilities = self.capabilities(spec)
+        metadata = _connector_metadata(spec, capabilities)
+        metadata["source_metrics"] = {
+            "read_strategy": "spark_sql",
+            "source_complete": capabilities.source_complete,
+        }
         return SourceResolution(
             spark.sql(str(query)),
             f"sql:{spec.name or 'query'}",
             spec.connector,
-            _connector_metadata(spec, capabilities),
+            metadata,
             capabilities,
         )
 
@@ -329,11 +425,17 @@ class FileConnector:
         options = resolve_secrets(spec.options)
         capabilities = self.capabilities(spec)
         df = spark.read.format(fmt).options(**_spark_options(options)).load(str(path))
+        metadata = _connector_metadata(spec, capabilities)
+        metadata["source_metrics"] = {
+            "read_strategy": "spark_files",
+            "file_format": fmt,
+            "source_complete": capabilities.source_complete,
+        }
         return SourceResolution(
             df,
             f"{spec.connector}:{path}",
             spec.connector,
-            _connector_metadata(spec, capabilities),
+            metadata,
             capabilities,
         )
 
@@ -401,11 +503,20 @@ class JdbcConnector:
             options["fetchsize"] = str(read["fetchsize"])
         capabilities = self.capabilities(spec)
         df = spark.read.format("jdbc").options(**_spark_options(options)).load()
+        metadata = _connector_metadata(spec, capabilities)
+        metadata["source_metrics"] = {
+            "read_strategy": "jdbc_query" if "query" in spec.options else "jdbc_table",
+            "incremental_applied": watermark_value is not None,
+            "watermark_value": watermark_value,
+            "partitioned_read": bool(provided),
+            "fetchsize": read.get("fetchsize"),
+            "source_complete": capabilities.source_complete,
+        }
         return SourceResolution(
             df,
             f"jdbc:{spec.name or options.get('dbtable') or 'query'}",
             spec.connector,
-            _connector_metadata(spec, capabilities),
+            metadata,
             capabilities,
         )
 
@@ -487,12 +598,13 @@ class RestApiConnector:
         headers: Mapping[str, str],
         body: Optional[bytes],
         timeout: int,
-    ) -> tuple[Any, Mapping[str, str], str]:
+    ) -> tuple[Any, Mapping[str, str], str, int]:
         request = urllib.request.Request(url=url, method=method, headers=dict(headers), data=body)
         with urllib.request.urlopen(request, timeout=timeout) as response:
-            text = response.read().decode(response.headers.get_content_charset() or "utf-8")
+            raw = response.read()
+            text = raw.decode(response.headers.get_content_charset() or "utf-8")
             payload = json.loads(text) if text else None
-            return payload, response.headers, response.geturl()
+            return payload, response.headers, response.geturl(), len(raw)
 
     def _headers(self, spec: ConnectorSpec) -> Dict[str, str]:
         request_headers = dict(spec.request.get("headers") or {})
@@ -634,6 +746,7 @@ class RestApiConnector:
         max_pages = int(spec.limits.get("max_pages") or spec.pagination.get("max_pages") or 1)
         all_records: list[Any] = []
         next_url: Optional[str] = None
+        bytes_read = 0
 
         pages = 0
         while True:
@@ -653,11 +766,12 @@ class RestApiConnector:
                     elapsed = time.monotonic() - last_request_at
                     if elapsed < min_request_interval:
                         time.sleep(min_request_interval - elapsed)
-                payload, response_headers, final_url = self._request_with_retry(
+                payload, response_headers, final_url, response_bytes = self._request_with_retry(
                     current_url, method, headers, body, timeout, retry_attempts, backoff
                 )
                 last_request_at = time.monotonic()
                 pages += 1
+                bytes_read += response_bytes
                 records = _records_from_response(payload, records_path)
                 all_records.extend(records)
                 if page_type == "cursor":
@@ -681,11 +795,25 @@ class RestApiConnector:
 
         df = _records_to_dataframe(spark, all_records)
         capabilities = self.capabilities(spec)
+        metadata = _connector_metadata(spec, capabilities)
+        metadata["source_metrics"] = {
+            "read_strategy": "rest_api",
+            "request_count": pages,
+            "pages_read": pages,
+            "records_read": len(all_records),
+            "bytes_read": bytes_read,
+            "pagination_type": page_type,
+            "incremental_applied": watermark_value is not None,
+            "watermark_value": watermark_value,
+            "rate_limit_per_minute": rate_limit_per_minute,
+            "retry_attempts": retry_attempts,
+            "source_complete": capabilities.source_complete,
+        }
         return SourceResolution(
             df,
             f"rest_api:{spec.name or urllib.parse.urlparse(url).netloc}",
             spec.connector,
-            _connector_metadata(spec, capabilities),
+            metadata,
             capabilities,
         )
 
@@ -698,7 +826,7 @@ class RestApiConnector:
         timeout: int,
         attempts: int,
         backoff: float,
-    ) -> tuple[Any, Mapping[str, str], str]:
+    ) -> tuple[Any, Mapping[str, str], str, int]:
         last_error: Optional[Exception] = None
         for attempt in range(1, attempts + 1):
             try:

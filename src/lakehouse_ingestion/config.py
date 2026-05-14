@@ -11,7 +11,7 @@ from typing import Literal, Union
 from pyspark.sql import DataFrame
 
 FRAMEWORK_VERSION = "1.9.0"
-CTRL_SCHEMA_VERSION = 10
+CTRL_SCHEMA_VERSION = 11
 
 #: Camadas reconhecidas (Medallion Architecture).
 Layer = Literal["bronze", "silver", "gold"]
