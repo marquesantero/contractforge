@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="site/assets/logo/contractforge-logo.jpg" alt="ContractForge" width="520">
+  <img src="site/assets/logo/contractforge-logo.png" alt="ContractForge" width="520">
 </p>
 
 # ContractForge
