@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="ContractForge — Framework batch declarativo para ingestão de dados em Delta Lake no Databricks. Contratos por tabela, arquitetura Medallion, quality gates, SCD, watermarks, OpenLineage.">
-<title>ContractForge v1.13.0 — Documentação</title>
+<title>ContractForge v1.14.0 — Documentação</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Serif:wght@600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -31,7 +31,7 @@
       <img src="assets/logo/contractforge-mark.png" alt="" class="brand-mark">
       <div>
         <h1>ContractForge<br>Docs</h1>
-        <span class="version">v1.13.0 · MIT · Python ≥3.10</span>
+        <span class="version">v1.14.0 · MIT · Python ≥3.10</span>
       </div>
     </div>
   </div>
@@ -120,7 +120,7 @@
     <span class="badge spark">PySpark ≥3.4</span>
     <span class="badge delta">Delta Lake ≥3.0</span>
     <span class="badge mit">MIT</span>
-    <span class="badge" style="color:#79c0ff">v1.13.0</span>
+    <span class="badge" style="color:#79c0ff">v1.14.0</span>
     <span class="badge" style="color:#e3b341">presets</span>
     <span class="badge" style="color:#56d364">shape</span>
   </div>
@@ -139,7 +139,9 @@
 <tr><td><strong>Gold</strong></td><td><code>"gold"</code></td><td><code>scd0_overwrite</code>, <code>scd1_upsert</code></td><td>Consumo, agregações</td></tr>
 </table></div>
 
-<p>A tabela alvo é montada como <code>{catalog}.{layer}.{target_table}</code>. Ex.: <code>ingest(catalog="main", layer="silver", target_table="c_cliente")</code> → <strong>main.silver.c_cliente</strong>.</p>
+<p>A tabela alvo é montada como <code>{catalog}.{target_schema ou layer}.{target_table}</code>. Ex.: <code>ingest(catalog="main", layer="silver", target_table="c_cliente")</code> → <strong>main.silver.c_cliente</strong>.</p>
+
+<div class="alert info"><strong>Organização física flexível:</strong> <code>layer</code> continua sendo a camada lógica Medallion usada por presets, validações e observabilidade. Se o schema físico não seguir o nome da camada, use <code>target_schema</code>, por exemplo <code>layer="silver"</code> com <code>target_schema="crm_curated"</code> para gravar em <code>main.crm_curated.c_cliente</code>.</div>
 
 </section>
 
@@ -220,11 +222,11 @@ flowchart TB
 pip install build && python -m build
 
 # Upload para UC Volume
-databricks fs cp dist/contractforge-1.10.0-py3-none-any.whl \
+databricks fs cp dist/contractforge-1.14.0-py3-none-any.whl \
   dbfs:/Volumes/&lt;catalog&gt;/&lt;schema&gt;/libs/
 
 # Notebook Databricks:
-%pip install /Volumes/&lt;catalog&gt;/&lt;schema&gt;/libs/contractforge-1.10.0-py3-none-any.whl
+%pip install /Volumes/&lt;catalog&gt;/&lt;schema&gt;/libs/contractforge-1.14.0-py3-none-any.whl
 dbutils.library.restartPython()</code></pre>
 
 <h3>Desenvolvimento Local</h3>
@@ -271,8 +273,10 @@ print(f"Run ID: {result['run_id']}")           # UUID</code></pre>
 <div class="tab-content" data-lang="yaml">
 <p>Arquivo <code>contracts/bronze/b_clientes.yaml</code>:</p>
 <pre><code>source: raw_clientes
-target_table: b_clientes
-catalog: main
+target:
+  catalog: main
+  schema: landing_crm
+  table: b_clientes
 layer: bronze
 mode: scd0_append
 watermark_columns: updated_at
@@ -370,7 +374,8 @@ print(f"Escritas: {result['rows_written']}, Quarentena: {result['rows_quarantine
 <tr><td><code>source</code></td><td>str | DataFrame</td><td>—</td><td>Nome de tabela UC ou DataFrame em memória</td></tr>
 <tr><td><code>target_table</code></td><td>str</td><td>—</td><td>Nome da tabela alvo <strong>sem</strong> catalog/layer</td></tr>
 <tr><td><code>catalog</code></td><td>str</td><td>"main"</td><td>Catálogo Unity Catalog</td></tr>
-<tr><td><code>layer</code></td><td>"bronze" | "silver" | "gold"</td><td>"bronze"</td><td>Camada Medallion</td></tr>
+<tr><td><code>layer</code></td><td>"bronze" | "silver" | "gold"</td><td>"bronze"</td><td>Camada lógica Medallion</td></tr>
+<tr><td><code>target_schema</code></td><td>str | None</td><td>None</td><td>Schema físico do target; default = <code>layer</code></td></tr>
 <tr><td><code>mode</code></td><td>WriteMode</td><td>"scd0_append"</td><td>Estratégia de escrita</td></tr>
 <tr><td><code>source_system</code></td><td>str</td><td>"default"</td><td>Identificador da origem</td></tr>
 <tr><td><code>ctrl_schema</code></td><td>str</td><td>"ops"</td><td>Schema das ctrl tables</td></tr>
