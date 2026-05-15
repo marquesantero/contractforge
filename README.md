@@ -24,7 +24,7 @@ Links principais:
 - Aplica quality gates, quarentena, schema policy, watermarks, idempotência, locks e retry.
 - Registra observabilidade em ctrl tables: runs, erros, qualidade, quarentena, lineage, streaming, schema changes, annotations, operations e access.
 - Integra governança declarativa com `*.annotations.yaml`, `*.operations.yaml` e `*.access.yaml`.
-- Resolve fontes declarativas via conectores: tabelas, SQL, arquivos, object storage, JDBC, REST API, Auto Loader `available_now`, Snowflake e BigQuery.
+- Resolve fontes declarativas via conectores: tabelas, SQL, arquivos, HTTP files, object storage, JDBC, REST API, Auto Loader `available_now`, Snowflake e BigQuery.
 
 ## Posicionamento
 
@@ -141,10 +141,36 @@ contractforge validate-project contracts
 contractforge templates list
 contractforge templates write silver_jdbc_scd1_upsert --output contracts/silver/s_orders
 contractforge presets list
-contractforge connectors doctor postgres rest_api s3
+contractforge connectors doctor postgres rest_api http_file s3
 contractforge maintenance ctrl-retention --catalog main --ctrl-schema ops --retention-days 180
 python examples/playground/scripts/validate_playground.py
 ```
+
+## HTTP File
+
+Para arquivos públicos ou autenticados via HTTP(S), use `http_file` em vez de depender de `spark.read` direto em `https://`. Isso evita limitações de filesystem do Spark/serverless e mantém o arquivo como fonte declarativa.
+
+```yaml
+source:
+  type: connector
+  connector: http_file
+  path: https://raw.githubusercontent.com/wcota/covid19br/master/cases-brazil-states.csv
+  format: csv
+  options:
+    header: true
+  read:
+    source_complete: true
+
+target:
+  catalog: workspace
+  schema: cf_examples_bronze
+  table: b_covid_brazil_states
+
+layer: bronze
+mode: scd0_overwrite
+```
+
+Formatos suportados: `csv`, `json`, `jsonl`, `ndjson` e `text`. Aliases: `http_csv`, `http_json` e `http_text`.
 
 ## Contratos Separados
 
@@ -184,8 +210,8 @@ Release:
 ```bash
 python -m build
 twine check dist/*
-git tag v2.0.0
-git push origin v2.0.0
+git tag v2.1.0
+git push origin v2.1.0
 ```
 
 O workflow `Release` valida metadados, confere se a tag bate com a versão do pacote, gera wheel/source distribution e anexa os artefatos à GitHub Release.

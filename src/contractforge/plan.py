@@ -18,6 +18,7 @@ from .config import (
     Source,
     VALID_EXPLAIN_FORMATS,
     VALID_FILE_CONNECTOR_FORMATS,
+    VALID_HTTP_FILE_FORMATS,
     VALID_IDEMPOTENCY_POLICIES,
     VALID_LAYERS,
     VALID_MERGE_STRATEGIES,
@@ -94,6 +95,8 @@ def _require_ratio(value: Any, field: str) -> float:
 
 _CONNECTOR_NAME_RE = re.compile(r"^[A-Za-z][A-Za-z0-9_-]*$")
 _FILE_CONNECTORS = {"csv", "delta", "json", "orc", "parquet", "text"}
+_HTTP_FILE_CONNECTORS = {"http_csv", "http_file", "http_json", "http_text"}
+_HTTP_FILE_FORMAT_BY_CONNECTOR = {"http_csv": "csv", "http_json": "json", "http_text": "text"}
 _OBJECT_STORAGE_CONNECTORS = {"adls", "azure_blob", "blob", "gcs", "object_storage", "s3"}
 _OBJECT_STORAGE_CONNECTOR_PROVIDERS = {"adls": "adls", "azure_blob": "azure_blob", "gcs": "gcs", "s3": "s3"}
 _JDBC_CONNECTORS = {"jdbc", "mysql", "oracle", "postgres", "postgresql", "sqlserver"}
@@ -219,6 +222,23 @@ def _validate_native_connector_contract(spec: "ConnectorSpec") -> None:
     if connector in _FILE_CONNECTORS:
         if not spec.path and not spec.options.get("path"):
             raise ValueError(f"source.path é obrigatório para connector={connector}")
+        return
+    if connector in _HTTP_FILE_CONNECTORS:
+        if not spec.path and not spec.request.get("url"):
+            raise ValueError(f"source.path ou source.request.url é obrigatório para connector={connector}")
+        fmt = str(
+            spec.format
+            or spec.response.get("format")
+            or spec.options.get("format")
+            or _HTTP_FILE_FORMAT_BY_CONNECTOR.get(connector, "")
+        ).strip()
+        if not fmt:
+            raise ValueError("source.format é obrigatório para connector=http_file")
+        if fmt not in VALID_HTTP_FILE_FORMATS:
+            raise ValueError(f"source.format={fmt!r} não é suportado. Válidos: {sorted(VALID_HTTP_FILE_FORMATS)}")
+        method = str(spec.request.get("method") or "GET").upper()
+        if method != "GET":
+            raise ValueError(f"connector={connector} suporta apenas HTTP GET")
         return
     if connector in _OBJECT_STORAGE_CONNECTORS:
         provider = str(spec.provider or "").strip()

@@ -570,7 +570,7 @@ notebook_name: ingest_b_orders
 
 O stream é finito: processa os arquivos disponíveis e encerra. A execução externa aparece em `ctrl_ingestion_streams`, e cada batch aparece em `ctrl_ingestion_runs`.
 
-Para arquivos batch, JDBC e REST API, use o mesmo campo `source.type=connector`:
+Para arquivos batch, arquivos HTTP(S), JDBC e REST API, use o mesmo campo `source.type=connector`:
 
 ```yaml
 source:
@@ -587,6 +587,27 @@ catalog: main
 layer: silver
 mode: snapshot_soft_delete
 merge_keys: [order_id]
+```
+
+```yaml
+source:
+  type: connector
+  connector: http_file
+  path: https://raw.githubusercontent.com/wcota/covid19br/master/cases-brazil-states.csv
+  format: csv
+  options:
+    header: true
+  read:
+    source_complete: true
+  limits:
+    timeout_seconds: 60
+    retry_attempts: 3
+
+target_table: b_covid_brazil_states
+catalog: workspace
+layer: bronze
+mode: scd0_overwrite
+source_system: covid19br_github
 ```
 
 ```yaml
@@ -626,17 +647,17 @@ mode: scd0_append
 
 Secrets no formato `{{ secret:scope/key }}` são resolvidos via Databricks Secrets ou variável de ambiente `CONTRACTFORGE_SECRET_SCOPE_KEY`. As ctrl tables recebem metadados redigidos do source.
 
-A coluna `ctrl_ingestion_runs.source_metrics_json` complementa esses metadados com métricas operacionais do conector. Em REST, ela registra `request_count`, `pages_read`, `records_read`, `bytes_read`, tipo de paginação, retry/rate limit e watermark aplicado. Em JDBC, registra estratégia de leitura, incrementalidade aplicada, watermark, particionamento e `fetchsize`. Em tabelas, SQL e arquivos, registra a estratégia Spark usada e se a fonte foi declarada como completa.
+A coluna `ctrl_ingestion_runs.source_metrics_json` complementa esses metadados com métricas operacionais do conector. Em REST, ela registra `request_count`, `pages_read`, `records_read`, `bytes_read`, tipo de paginação, retry/rate limit e watermark aplicado. Em HTTP file, registra formato, registros lidos, bytes baixados e retry. Em JDBC, registra estratégia de leitura, incrementalidade aplicada, watermark, particionamento e `fetchsize`. Em tabelas, SQL e arquivos Spark, registra a estratégia usada e se a fonte foi declarada como completa.
 
 Descubra os conectores disponíveis sem Spark:
 
 ```bash
 contractforge connectors list
-contractforge connectors show rest_api jdbc autoloader
-contractforge connectors doctor rest_api jdbc autoloader
+contractforge connectors show rest_api http_file jdbc autoloader
+contractforge connectors doctor rest_api http_file jdbc autoloader
 ```
 
-`contractforge validate` também valida os campos obrigatórios dos conectores nativos, evitando descobrir em runtime que faltou `source.request.url`, `source.options.url`, `source.read.checkpoint_location` ou configuração completa de particionamento JDBC.
+`contractforge validate` também valida os campos obrigatórios dos conectores nativos, evitando descobrir em runtime que faltou `source.request.url`, `source.format`, `source.options.url`, `source.read.checkpoint_location` ou configuração completa de particionamento JDBC.
 
 Para cargas incrementais, combine o watermark normal da lib com `source.incremental`. O framework busca o watermark salvo antes de resolver a fonte e injeta esse valor no conector:
 

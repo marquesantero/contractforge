@@ -8,6 +8,7 @@ from contractforge.plan import ConnectorSpec, build_plan_from_kwargs
 from contractforge.sources import (
     ConnectorCapabilities,
     FileConnector,
+    HttpFileConnector,
     JdbcConnector,
     RestApiConnector,
     SparkFormatConnector,
@@ -81,6 +82,10 @@ def test_builtin_connectors_are_registered():
         "csv",
         "delta",
         "gcs",
+        "http_csv",
+        "http_file",
+        "http_json",
+        "http_text",
         "jdbc",
         "json",
         "mysql",
@@ -267,6 +272,69 @@ def test_object_storage_alias_sets_provider_and_uses_declared_format(monkeypatch
     assert resolved.metadata["source_provider"] == "s3"
     assert resolved.metadata["source_metrics"]["object_storage_provider"] == "s3"
     assert resolved.metadata["source_metrics"]["source_complete"] is True
+
+
+def test_http_csv_connector_downloads_csv_without_spark_https_filesystem(monkeypatch):
+    class FakeSpark:
+        def createDataFrame(self, rows, schema=None):
+            return {"rows": rows, "schema": schema}
+
+    def fake_request(self, url, headers, timeout):
+        assert url == "https://raw.example.com/orders.csv?region=br"
+        assert headers["X-Trace"] == "unit"
+        return b"id,name\n1,Ana\n2,Beto\n", {}, url, 21
+
+    monkeypatch.setattr(sources_module, "spark", FakeSpark())
+    monkeypatch.setattr(HttpFileConnector, "_request", fake_request)
+    spec = ConnectorSpec(
+        connector="http_file",
+        format="csv",
+        path="https://raw.example.com/orders.csv",
+        request={"headers": {"X-Trace": "unit"}, "params": {"region": "br"}},
+        options={"header": True},
+        read={"source_complete": True},
+    )
+
+    resolved = HttpFileConnector().resolve_batch(spec, build_plan_from_kwargs(source="x", target_table="t"))
+
+    assert resolved.df["rows"] == [{"id": "1", "name": "Ana"}, {"id": "2", "name": "Beto"}]
+    assert resolved.metadata["source_format"] == "csv"
+    assert resolved.metadata["source_metrics"]["read_strategy"] == "http_file"
+    assert resolved.metadata["source_metrics"]["file_format"] == "csv"
+    assert resolved.metadata["source_metrics"]["records_read"] == 2
+    assert resolved.metadata["source_metrics"]["bytes_read"] == 21
+    assert resolved.metadata["source_metrics"]["source_complete"] is True
+
+
+def test_http_file_connector_supports_json_records_path(monkeypatch):
+    class FakeSpark:
+        def createDataFrame(self, rows, schema=None):
+            return {"rows": rows, "schema": schema}
+
+    def fake_request(self, url, headers, timeout):
+        return b'{"data":[{"id":1},{"id":2}]}', {}, url, 28
+
+    monkeypatch.setattr(sources_module, "spark", FakeSpark())
+    monkeypatch.setattr(HttpFileConnector, "_request", fake_request)
+    spec = ConnectorSpec(
+        connector="http_file",
+        format="json",
+        path="https://api.example.com/file.json",
+        response={"records_path": "$.data"},
+    )
+
+    resolved = HttpFileConnector().resolve_batch(spec, build_plan_from_kwargs(source="x", target_table="t"))
+
+    assert resolved.df["rows"] == [{"id": 1}, {"id": 2}]
+    assert resolved.metadata["source_metrics"]["records_read"] == 2
+
+
+def test_http_file_requires_declared_format():
+    with pytest.raises(ValueError, match="source.format"):
+        build_plan_from_kwargs(
+            source={"type": "connector", "connector": "http_file", "path": "https://example.com/data"},
+            target_table="b_data",
+        )
 
 
 def test_object_storage_alias_rejects_conflicting_provider():
