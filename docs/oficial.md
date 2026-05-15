@@ -639,6 +639,7 @@ Conectores nativos:
 | `table`, `delta_table`, `view` | Tabelas/views do catálogo Spark/Unity Catalog | `table` |
 | `sql` | Query SQL declarativa | `query` |
 | `parquet`, `delta`, `json`, `csv`, `orc`, `text` | Arquivos batch | `path`, `options` |
+| `http_file`, `http_csv`, `http_json`, `http_text` | Arquivos HTTP(S) materializados pelo driver Python | `path` ou `request.url`, `format`, `options` |
 | `object_storage`, `blob`, `s3`, `adls`, `azure_blob`, `gcs` | Arquivos em ADLS/Azure Blob/S3/GCS | `provider` opcional nos aliases, `format`, `path`, `options` |
 | `jdbc`, `postgres`, `postgresql`, `sqlserver`, `mysql`, `oracle` | Bancos relacionais via Spark JDBC | `options.url`, `options.dbtable` ou `options.query` |
 | `snowflake`, `bigquery` | Conectores Spark externos instalados no runtime | `table`, `query`, `options.table`, `options.dbtable` ou `options.query` |
@@ -647,7 +648,7 @@ Conectores nativos:
 
 O retorno de `ingest()` inclui `source` com metadados do conector. `ctrl_ingestion_runs` registra `source_connector`, `source_provider`, `source_format`, `source_path`, configurações redigidas, capabilities do source e métricas operacionais em `source_metrics_json`.
 
-`source_metrics_json` é preenchido pelo resolver do conector. Em REST, inclui quantidade de requests, páginas lidas, registros extraídos, bytes lidos, tipo de paginação, retry/rate limit e watermark aplicado. Em JDBC e aliases nomeados, inclui estratégia de leitura, se houve pushdown incremental, watermark aplicado, particionamento e `fetchsize`. Em fontes Spark nativas, registra a estratégia (`spark_table`, `spark_sql`, `spark_files` ou `spark_format`) e se a fonte foi declarada como completa.
+`source_metrics_json` é preenchido pelo resolver do conector. Em REST, inclui quantidade de requests, páginas lidas, registros extraídos, bytes lidos, tipo de paginação, retry/rate limit e watermark aplicado. Em HTTP file, inclui formato, registros materializados, bytes baixados e retry. Em JDBC e aliases nomeados, inclui estratégia de leitura, se houve pushdown incremental, watermark aplicado, particionamento e `fetchsize`. Em fontes Spark nativas, registra a estratégia (`spark_table`, `spark_sql`, `spark_files` ou `spark_format`) e se a fonte foi declarada como completa.
 
 `contractforge validate` faz validação estática dos conectores nativos sem abrir Spark: campos obrigatórios, tipos de paginação REST, auth REST, particionamento JDBC e formatos de object storage são verificados antes do job.
 
@@ -655,8 +656,8 @@ Descoberta via CLI:
 
 ```bash
 contractforge connectors list
-contractforge connectors show rest_api postgres s3 bigquery autoloader
-contractforge connectors doctor rest_api postgres s3 bigquery autoloader
+contractforge connectors show rest_api http_file postgres s3 bigquery autoloader
+contractforge connectors doctor rest_api http_file postgres s3 bigquery autoloader
 ```
 
 `connectors doctor` é diagnóstico estático: não abre conexão, não cria SparkSession e não valida credenciais. Ele informa se o conector depende de recurso do runtime, como Auto Loader, driver JDBC, connector Spark externo ou configuração cloud.
@@ -771,6 +772,56 @@ source:
 ```
 
 `provider` aceita `adls`, `azure_blob`, `s3` e `gcs`. A lib valida o contrato, mas não configura credenciais de cloud storage; isso deve estar no cluster/serverless/Unity Catalog external location.
+
+### 5C.2B HTTP File
+
+Use `http_file` quando a origem é um arquivo publicado por HTTP(S), mas o runtime Spark não consegue ler `https://` diretamente como filesystem. O conector baixa o conteúdo com Python, parseia o formato declarado e cria o DataFrame Spark. É indicado para arquivos públicos ou autenticados de volume controlado; para alto volume recorrente, prefira landing em storage + Auto Loader.
+
+```yaml
+source:
+  type: connector
+  connector: http_file
+  path: https://raw.githubusercontent.com/wcota/covid19br/master/cases-brazil-states.csv
+  format: csv
+  options:
+    header: true
+    nullValue: ""
+  read:
+    source_complete: true
+  limits:
+    timeout_seconds: 60
+    retry_attempts: 3
+    retry_backoff_seconds: 2
+
+target_table: b_covid_brazil_states
+catalog: workspace
+layer: bronze
+mode: scd0_overwrite
+source_system: covid19br_github
+```
+
+Formatos suportados: `csv`, `json`, `jsonl`, `ndjson` e `text`. Para JSON, `source.response.records_path` usa o mesmo JSON path simples do `rest_api`:
+
+```yaml
+source:
+  type: connector
+  connector: http_file
+  path: https://example.com/export.json
+  format: json
+  response:
+    records_path: $.data
+```
+
+Aliases:
+
+```yaml
+source:
+  type: connector
+  connector: http_csv
+  path: https://example.com/data.csv
+  options:
+    header: true
+```
 
 ### 5C.3 JDBC e Bancos Nomeados
 
@@ -2709,7 +2760,7 @@ register_write_mode("custom_append", my_writer)
 
 Para batch, implemente `resolve_batch(spec, plan)` e retorne `SourceResolution`. Para streaming finito, implemente `resolve_stream(spec, plan)` e retorne `(stream_df, source_label)`.
 
-Resolvers nativos registrados incluem `autoloader`, `table`, `delta_table`, `view`, `sql`, `parquet`, `json`, `csv`, `text`, `object_storage`, `blob`, `jdbc` e `rest_api`.
+Resolvers nativos registrados incluem `autoloader`, `table`, `delta_table`, `view`, `sql`, `parquet`, `json`, `csv`, `text`, `http_file`, `http_csv`, `object_storage`, `blob`, `jdbc` e `rest_api`.
 
 Use a CLI para auditar capabilities disponíveis no runtime atual:
 
@@ -3346,6 +3397,7 @@ Adicione `dry_run: true` no YAML ou passe `dry_run=True`. O framework valida sch
 |----------|:---:|:---:|:---:|---------------------|------------|
 | `table`, `delta_table`, `view`, `sql` | ✅ | ✅ | ✅ | Spark catalog | Depende de permissões no catálogo/schema/tabela. |
 | `parquet`, `delta`, `json`, `csv`, `orc`, `text` | ✅ | ✅ | ✅ | Spark/Hadoop file readers | Path precisa estar acessível ao Spark. |
+| `http_file`, `http_csv`, `http_json`, `http_text` | ✅ | ✅ | ✅ | Biblioteca padrão Python | Baixa HTTP(S) no driver; não depende de Spark filesystem para `https://`. |
 | `object_storage`, `blob`, `s3`, `adls`, `azure_blob`, `gcs` | ✅ | ✅ | Parcial | Credenciais cloud no runtime | A lib não configura IAM/storage credentials. |
 | `jdbc`, `postgres`, `postgresql`, `sqlserver`, `mysql`, `oracle` | ✅ | ✅ se driver disponível | ✅ se driver disponível | Driver JDBC | Use particionamento e `fetchsize` para volume grande. |
 | `rest_api` | ✅ | ✅ | ✅ | Biblioteca padrão Python | Indicado para APIs paginadas de volume controlado. |

@@ -6,6 +6,15 @@ Este projeto segue versionamento semântico enquanto a biblioteca evolui:
 - `MINOR`: novo recurso compatível ou endurecimento planejado do contrato.
 - `MAJOR`: mudança incompatível depois de adoção estável.
 
+## 2.1.0 - 2026-05-15
+
+- Adiciona conector nativo `http_file` para baixar arquivos HTTP(S) pelo driver Python e materializar DataFrame Spark sem depender de `spark.read` direto em `https://`.
+- Adiciona aliases `http_csv`, `http_json` e `http_text`.
+- Suporta `format=csv`, `json`, `jsonl`, `ndjson` e `text` em `http_file`.
+- Adiciona validação estática de `source.path`/`source.request.url`, `source.format` e método HTTP GET para HTTP file.
+- Registra métricas específicas em `source_metrics_json`: formato, registros lidos, bytes baixados, retry e `source_complete`.
+- Atualiza documentação de conectores com exemplo de ingestão de CSV público via HTTP.
+
 ## 2.0.0 - 2026-05-15
 
 - **Breaking:** renomeia o namespace Python para `contractforge`; imports antigos via `lakehouse_ingestion` foram removidos.

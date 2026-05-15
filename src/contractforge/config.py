@@ -10,7 +10,7 @@ from typing import Literal, Union
 
 from pyspark.sql import DataFrame
 
-FRAMEWORK_VERSION = "2.0.0"
+FRAMEWORK_VERSION = "2.1.0"
 CTRL_SCHEMA_VERSION = 11
 
 #: Camadas reconhecidas (Medallion Architecture).
@@ -151,6 +151,10 @@ VALID_SOURCE_CONNECTORS = {
     "delta",
     "delta_table",
     "gcs",
+    "http_csv",
+    "http_file",
+    "http_json",
+    "http_text",
     "jdbc",
     "json",
     "object_storage",
@@ -173,6 +177,8 @@ VALID_SOURCE_CONNECTORS = {
 VALID_OBJECT_STORAGE_PROVIDERS = {"adls", "azure_blob", "gcs", "s3"}
 
 VALID_FILE_CONNECTOR_FORMATS = {"csv", "delta", "json", "orc", "parquet", "text"}
+
+VALID_HTTP_FILE_FORMATS = {"csv", "json", "jsonl", "ndjson", "text"}
 
 #: Triggers aceitos para sources declarativos.
 VALID_SOURCE_TRIGGERS = {"available_now"}

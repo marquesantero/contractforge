@@ -39,6 +39,7 @@ from .ingestion import (
 from .streaming import ingest_stream_plan
 from .sources import (
     ConnectorCapabilities,
+    HttpFileConnector,
     SourceResolution,
     diagnose_source_connectors,
     get_source_resolver,
@@ -86,6 +87,7 @@ __all__ = [
     "ColumnMask",
     "ContractBundle",
     "IngestionHooks",
+    "HttpFileConnector",
     "OperationsContract",
     "PiiAnnotation",
     "QualityExpression",
@@ -144,4 +146,4 @@ __all__ = [
 
 logging.getLogger(__name__).addHandler(logging.NullHandler())
 
-__version__ = "2.0.0"
+__version__ = "2.1.0"

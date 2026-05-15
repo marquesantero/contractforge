@@ -2,6 +2,8 @@
 from __future__ import annotations
 
 import base64
+import csv
+import io
 import importlib.util
 import json
 import os
@@ -16,7 +18,7 @@ from typing import Any, Dict, Iterable, Mapping, Optional, Protocol, Tuple
 from pyspark.sql import DataFrame, SparkSession
 
 from ._spark import spark
-from .config import VALID_FILE_CONNECTOR_FORMATS, VALID_OBJECT_STORAGE_PROVIDERS
+from .config import VALID_FILE_CONNECTOR_FORMATS, VALID_HTTP_FILE_FORMATS, VALID_OBJECT_STORAGE_PROVIDERS
 from .plan import ConnectorSpec, IngestionPlan, SourceSpec
 
 
@@ -116,6 +118,34 @@ BUILTIN_CONNECTOR_METADATA: Dict[str, Dict[str, Any]] = {
     "csv": {"family": "files", "description": "Arquivos CSV batch.", "required": ["path"], "incremental": False},
     "orc": {"family": "files", "description": "Arquivos ORC batch.", "required": ["path"], "incremental": False},
     "text": {"family": "files", "description": "Arquivos texto batch.", "required": ["path"], "incremental": False},
+    "http_file": {
+        "family": "http_files",
+        "description": "Arquivo HTTP(S) baixado pelo driver Python e convertido para DataFrame Spark.",
+        "required": ["path ou request.url", "format"],
+        "incremental": False,
+        "runtime": "Biblioteca padrão Python urllib; não depende de Spark filesystem para https://.",
+    },
+    "http_csv": {
+        "family": "http_files",
+        "description": "Alias de http_file com format=csv.",
+        "required": ["path ou request.url"],
+        "incremental": False,
+        "runtime": "Biblioteca padrão Python urllib; não depende de Spark filesystem para https://.",
+    },
+    "http_json": {
+        "family": "http_files",
+        "description": "Alias de http_file com format=json.",
+        "required": ["path ou request.url"],
+        "incremental": False,
+        "runtime": "Biblioteca padrão Python urllib; não depende de Spark filesystem para https://.",
+    },
+    "http_text": {
+        "family": "http_files",
+        "description": "Alias de http_file com format=text.",
+        "required": ["path ou request.url"],
+        "incremental": False,
+        "runtime": "Biblioteca padrão Python urllib; não depende de Spark filesystem para https://.",
+    },
     "object_storage": {
         "family": "object_storage",
         "description": "Arquivos em ADLS/Azure Blob/S3/GCS via Spark reader.",
@@ -311,6 +341,30 @@ CONNECTOR_RUNTIME_REQUIREMENTS: Dict[str, Dict[str, Any]] = {
         "python_packages": [],
         "notes": ["Não requer biblioteca HTTP externa; adequado para volumes controlados."],
     },
+    "http_file": {
+        "status": "ok",
+        "runtime": "Python urllib + SparkSession ativa para materializar DataFrame",
+        "python_packages": [],
+        "notes": ["Não usa spark.read em https://; adequado para CSV/JSON/text de volume controlado."],
+    },
+    "http_csv": {
+        "status": "ok",
+        "runtime": "Python urllib + SparkSession ativa para materializar DataFrame",
+        "python_packages": [],
+        "notes": ["Alias de http_file com format=csv."],
+    },
+    "http_json": {
+        "status": "ok",
+        "runtime": "Python urllib + SparkSession ativa para materializar DataFrame",
+        "python_packages": [],
+        "notes": ["Alias de http_file com format=json."],
+    },
+    "http_text": {
+        "status": "ok",
+        "runtime": "Python urllib + SparkSession ativa para materializar DataFrame",
+        "python_packages": [],
+        "notes": ["Alias de http_file com format=text."],
+    },
 }
 
 _STANDARD_CONNECTOR_STATUS = {
@@ -350,6 +404,54 @@ def _spark_options(options: Mapping[str, Any]) -> Dict[str, str]:
         else:
             normalized[str(key)] = str(value)
     return normalized
+
+
+def _bool_option(value: Any, *, default: bool = False) -> bool:
+    if value is None:
+        return default
+    if isinstance(value, bool):
+        return value
+    text = str(value).strip().lower()
+    if text in {"1", "true", "yes", "y", "sim"}:
+        return True
+    if text in {"0", "false", "no", "n", "nao", "não"}:
+        return False
+    raise ValueError(f"Valor booleano inválido: {value!r}")
+
+
+def _request_headers(
+    spec: ConnectorSpec,
+    connector: str,
+    oauth_token_getter: Optional[Any] = None,
+) -> Dict[str, str]:
+    request_headers = dict(spec.request.get("headers") or {})
+    auth = resolve_secrets(spec.auth or {})
+    auth_type = str(auth.get("type") or "").strip()
+    if auth_type == "bearer_token":
+        token = auth.get("token")
+        if not token:
+            raise ValueError("auth.token é obrigatório quando auth.type=bearer_token")
+        request_headers["Authorization"] = f"Bearer {token}"
+    elif auth_type == "api_key":
+        header_name = str(auth.get("header") or "x-api-key")
+        key_value = auth.get("value") or auth.get("key")
+        if not key_value:
+            raise ValueError("auth.value ou auth.key é obrigatório quando auth.type=api_key")
+        request_headers[header_name] = str(key_value)
+    elif auth_type == "basic":
+        if not auth.get("username") or not auth.get("password"):
+            raise ValueError("auth.username e auth.password são obrigatórios quando auth.type=basic")
+        raw = f"{auth.get('username')}:{auth.get('password')}".encode("utf-8")
+        request_headers["Authorization"] = "Basic " + base64.b64encode(raw).decode("ascii")
+    elif auth_type == "oauth_client_credentials":
+        if oauth_token_getter is None:
+            raise ValueError(f"auth.type='oauth_client_credentials' não suportado para connector={connector}")
+        request_headers["Authorization"] = f"Bearer {oauth_token_getter(spec, auth)}"
+    elif auth_type in {"", "none"}:
+        pass
+    else:
+        raise ValueError(f"auth.type={auth_type!r} não suportado para connector={connector}")
+    return {str(k): str(v) for k, v in resolve_secrets(request_headers).items()}
 
 
 def _connector_metadata(spec: ConnectorSpec, capabilities: ConnectorCapabilities) -> Dict[str, Any]:
@@ -890,6 +992,156 @@ def _link_header_next(value: Optional[str]) -> Optional[str]:
     return None
 
 
+class HttpFileConnector:
+    """Baixa arquivos HTTP(S) pelo driver Python e materializa registros em DataFrame Spark."""
+
+    def __init__(self, default_format: Optional[str] = None) -> None:
+        self.default_format = default_format
+
+    def capabilities(self, spec: SourceSpec | ConnectorSpec) -> ConnectorCapabilities:
+        source_complete = _source_complete(spec) if isinstance(spec, ConnectorSpec) else False
+        return ConnectorCapabilities(
+            batch=True,
+            schema_inference=True,
+            requires_secrets=True,
+            source_complete=source_complete,
+        )
+
+    def resolve_batch(self, spec: SourceSpec | ConnectorSpec, plan: IngestionPlan) -> SourceResolution:
+        if not isinstance(spec, ConnectorSpec):
+            raise ValueError("HttpFileConnector requer ConnectorSpec")
+        request = resolve_secrets(spec.request or {})
+        url = str(request.get("url") or spec.path or "").strip()
+        if not url:
+            raise ValueError(f"source.path ou source.request.url é obrigatório para connector={spec.connector}")
+        method = str(request.get("method") or "GET").upper()
+        if method != "GET":
+            raise ValueError(f"connector={spec.connector} suporta apenas HTTP GET")
+        fmt = str(
+            spec.format
+            or spec.response.get("format")
+            or spec.options.get("format")
+            or self.default_format
+            or ""
+        ).strip().lower()
+        if not fmt:
+            raise ValueError("source.format é obrigatório para connector=http_file")
+        if fmt not in VALID_HTTP_FILE_FORMATS:
+            raise ValueError(f"Formato HTTP não suportado: {fmt}. Válidos: {sorted(VALID_HTTP_FILE_FORMATS)}")
+
+        params = resolve_secrets(request.get("params") or {})
+        if params:
+            if not isinstance(params, Mapping):
+                raise ValueError("source.request.params deve ser objeto")
+            for key, value in params.items():
+                url = _with_query_param(url, str(key), str(value))
+        timeout = int(spec.limits.get("timeout_seconds") or 60)
+        retry_attempts = int(spec.limits.get("retry_attempts") or 3)
+        backoff = float(spec.limits.get("retry_backoff_seconds") or 1)
+        headers = _request_headers(spec, spec.connector)
+
+        raw, response_headers, final_url, bytes_read = self._request_with_retry(
+            url, headers, timeout, retry_attempts, backoff
+        )
+        encoding = str(spec.response.get("encoding") or spec.options.get("encoding") or "").strip()
+        if not encoding:
+            encoding = response_headers.get_content_charset() if hasattr(response_headers, "get_content_charset") else None
+        text = raw.decode(encoding or "utf-8-sig")
+        records = self._parse_records(text, fmt, spec)
+        df = _records_to_dataframe(spark, records)
+
+        capabilities = self.capabilities(spec)
+        metadata = _connector_metadata(spec, capabilities)
+        metadata["source_format"] = fmt
+        metadata["source_metrics"] = {
+            "read_strategy": "http_file",
+            "file_format": fmt,
+            "records_read": len(records),
+            "bytes_read": bytes_read,
+            "retry_attempts": retry_attempts,
+            "source_complete": capabilities.source_complete,
+        }
+        return SourceResolution(
+            df,
+            redact_text(f"{spec.connector}:{spec.name or urllib.parse.urlparse(final_url).netloc}"),
+            spec.connector,
+            metadata,
+            capabilities,
+        )
+
+    def _request(self, url: str, headers: Mapping[str, str], timeout: int) -> tuple[bytes, Mapping[str, str], str, int]:
+        request = urllib.request.Request(url=url, method="GET", headers=dict(headers))
+        with urllib.request.urlopen(request, timeout=timeout) as response:
+            raw = response.read()
+            return raw, response.headers, response.geturl(), len(raw)
+
+    def _request_with_retry(
+        self,
+        url: str,
+        headers: Mapping[str, str],
+        timeout: int,
+        attempts: int,
+        backoff: float,
+    ) -> tuple[bytes, Mapping[str, str], str, int]:
+        last_error: Optional[Exception] = None
+        for attempt in range(1, attempts + 1):
+            try:
+                return self._request(url, headers, timeout)
+            except urllib.error.HTTPError as exc:
+                last_error = exc
+                if exc.code < 500 and exc.code != 429:
+                    raise
+            except Exception as exc:
+                last_error = exc
+            if attempt < attempts:
+                time.sleep(backoff * attempt)
+        assert last_error is not None
+        raise last_error
+
+    def _parse_records(self, text: str, fmt: str, spec: ConnectorSpec) -> list[Any]:
+        if fmt == "csv":
+            return self._parse_csv(text, spec)
+        if fmt == "json":
+            payload = json.loads(text) if text.strip() else []
+            records_path = spec.response.get("records_path") if spec.response else None
+            return _records_from_response(payload, records_path)
+        if fmt in {"jsonl", "ndjson"}:
+            return [json.loads(line) for line in text.splitlines() if line.strip()]
+        if fmt == "text":
+            return [{"value": line} for line in text.splitlines()]
+        raise ValueError(f"Formato HTTP não suportado: {fmt}. Válidos: {sorted(VALID_HTTP_FILE_FORMATS)}")
+
+    def _parse_csv(self, text: str, spec: ConnectorSpec) -> list[dict[str, Any]]:
+        options = spec.options or {}
+        delimiter = str(options.get("delimiter") or options.get("sep") or ",")
+        quotechar = str(options.get("quote") or '"')
+        escapechar = options.get("escape")
+        null_value = options.get("nullValue")
+        header = _bool_option(options.get("header"), default=False)
+        reader_options = {
+            "delimiter": delimiter,
+            "quotechar": quotechar,
+            "escapechar": (str(escapechar) if escapechar not in {None, ""} else None),
+        }
+        stream = io.StringIO(text)
+        records: list[dict[str, Any]] = []
+        if header:
+            for row in csv.DictReader(stream, **reader_options):
+                records.append({str(key): self._normalize_csv_value(value, null_value) for key, value in row.items()})
+            return records
+        for row in csv.reader(stream, **reader_options):
+            records.append({f"_c{idx}": self._normalize_csv_value(value, null_value) for idx, value in enumerate(row)})
+        return records
+
+    @staticmethod
+    def _normalize_csv_value(value: Any, null_value: Any) -> Any:
+        if value is None:
+            return None
+        if null_value is not None and str(value) == str(null_value):
+            return None
+        return value
+
+
 class RestApiConnector:
     """Conector REST API batch com paginação básica e resposta JSON."""
 
@@ -919,33 +1171,7 @@ class RestApiConnector:
             return payload, response.headers, response.geturl(), len(raw)
 
     def _headers(self, spec: ConnectorSpec) -> Dict[str, str]:
-        request_headers = dict(spec.request.get("headers") or {})
-        auth = resolve_secrets(spec.auth or {})
-        auth_type = str(auth.get("type") or "").strip()
-        if auth_type == "bearer_token":
-            token = auth.get("token")
-            if not token:
-                raise ValueError("auth.token é obrigatório quando auth.type=bearer_token")
-            request_headers["Authorization"] = f"Bearer {token}"
-        elif auth_type == "api_key":
-            header_name = str(auth.get("header") or "x-api-key")
-            key_value = auth.get("value") or auth.get("key")
-            if not key_value:
-                raise ValueError("auth.value ou auth.key é obrigatório quando auth.type=api_key")
-            request_headers[header_name] = str(key_value)
-        elif auth_type == "basic":
-            if not auth.get("username") or not auth.get("password"):
-                raise ValueError("auth.username e auth.password são obrigatórios quando auth.type=basic")
-            raw = f"{auth.get('username')}:{auth.get('password')}".encode("utf-8")
-            request_headers["Authorization"] = "Basic " + base64.b64encode(raw).decode("ascii")
-        elif auth_type == "oauth_client_credentials":
-            token = self._oauth_client_credentials_token(spec, auth)
-            request_headers["Authorization"] = f"Bearer {token}"
-        elif auth_type in {"", "none"}:
-            pass
-        else:
-            raise ValueError(f"auth.type={auth_type!r} não suportado para connector=rest_api")
-        return {str(k): str(v) for k, v in resolve_secrets(request_headers).items()}
+        return _request_headers(spec, "rest_api", self._oauth_client_credentials_token)
 
     def _oauth_client_credentials_token(self, spec: ConnectorSpec, auth: Mapping[str, Any]) -> str:
         token_url = str(auth.get("token_url") or "").strip()
@@ -1180,6 +1406,10 @@ register_source_resolver("json", FileConnector("json"))
 register_source_resolver("csv", FileConnector("csv"))
 register_source_resolver("orc", FileConnector("orc"))
 register_source_resolver("text", FileConnector("text"))
+register_source_resolver("http_file", HttpFileConnector())
+register_source_resolver("http_csv", HttpFileConnector("csv"))
+register_source_resolver("http_json", HttpFileConnector("json"))
+register_source_resolver("http_text", HttpFileConnector("text"))
 register_source_resolver("object_storage", ObjectStorageConnector())
 register_source_resolver("blob", ObjectStorageConnector())
 register_source_resolver("s3", ObjectStorageConnector("s3"))

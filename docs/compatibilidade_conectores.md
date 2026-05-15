@@ -7,6 +7,8 @@ Esta matriz descreve o contrato suportado pela lib. Drivers, credenciais, extern
 | `table`, `delta_table`, `view` | Spark catalog | Nenhuma além do Spark/Delta | Sim | Sim | Sim | Depende de permissões no catálogo/schema/tabela. |
 | `sql` | Spark SQL | Nenhuma além do Spark | Sim | Sim | Sim | Use para queries rastreáveis e versionadas; evite SQL muito grande no YAML. |
 | `parquet`, `json`, `csv`, `orc`, `text` | Spark file reader | Conectores Hadoop do runtime | Sim | Sim | Sim | Path e credenciais precisam estar acessíveis ao Spark. |
+| `http_file` | Driver Python | Biblioteca padrão `urllib` | Sim | Sim | Sim | Baixa HTTP(S) no driver e cria DataFrame; use `format=csv|json|jsonl|ndjson|text`. |
+| `http_csv`, `http_json`, `http_text` | Driver Python | Biblioteca padrão `urllib` | Sim | Sim | Sim | Aliases de `http_file`; úteis quando Spark não consegue ler `https://` como filesystem. |
 | `delta` | Spark Delta reader | Delta Lake | Sim com extra `spark` | Sim | Sim | Por path; para tabela registrada prefira `delta_table`/`table`. |
 | `object_storage`, `blob` | Spark file reader | Credencial cloud configurada | Parcial | Sim | Sim | Use `provider=adls|azure_blob|s3|gcs`. |
 | `s3` | Spark file reader | Acesso S3 no runtime | Parcial | Sim | Sim | Alias de object storage com provider inferido. |
@@ -25,6 +27,7 @@ Esta matriz descreve o contrato suportado pela lib. Drivers, credenciais, extern
 ## Regras práticas
 
 - Para arquivos recorrentes ou alto volume, prefira `autoloader` em Databricks.
+- Para arquivo público HTTP(S) pequeno/médio, prefira `http_file` em vez de `spark.read` direto em `https://`, principalmente em serverless.
 - Para APIs REST grandes, descarregue primeiro em landing files e use `autoloader`.
 - Para `snapshot_soft_delete`, declare `source.read.source_complete=true` apenas quando a fonte representar o estado completo.
 - Para JDBC em tabelas grandes, configure `partition_column`, `lower_bound`, `upper_bound`, `num_partitions` e `fetchsize`.
@@ -35,12 +38,53 @@ Esta matriz descreve o contrato suportado pela lib. Drivers, credenciais, extern
 
 ```bash
 contractforge connectors list
-contractforge connectors show s3 postgres snowflake bigquery rest_api
-contractforge connectors doctor s3 postgres snowflake bigquery rest_api
+contractforge connectors show s3 postgres snowflake bigquery rest_api http_file
+contractforge connectors doctor s3 postgres snowflake bigquery rest_api http_file
 contractforge validate contracts/bronze/b_orders.ingestion.yaml
 ```
 
 `connectors doctor` não abre conexão, não cria SparkSession e não valida credenciais. Ele mostra requisitos estáticos por conector, como driver JDBC, connector Spark externo, Auto Loader ou configuração cloud no runtime. Use esse comando em PRs e notebooks de diagnóstico antes de executar ingestões reais.
+
+## Exemplo HTTP File CSV
+
+Use `http_file` quando a origem é um arquivo publicado por HTTP(S), mas o runtime Spark não implementa leitura direta de `https://` como filesystem. O conector baixa o arquivo com Python e materializa o DataFrame no Spark, mantendo secrets e opções redigidos nas ctrl tables.
+
+```yaml
+source:
+  type: connector
+  connector: http_file
+  path: https://raw.githubusercontent.com/wcota/covid19br/master/cases-brazil-states.csv
+  format: csv
+  options:
+    header: true
+    nullValue: ""
+  read:
+    source_complete: true
+  limits:
+    timeout_seconds: 60
+    retry_attempts: 3
+    retry_backoff_seconds: 2
+
+target:
+  catalog: workspace
+  schema: cf_examples_bronze
+  table: b_covid_brazil_states
+
+layer: bronze
+mode: scd0_overwrite
+source_system: covid19br_github
+```
+
+Aliases equivalentes:
+
+```yaml
+source:
+  type: connector
+  connector: http_csv
+  path: https://example.com/data.csv
+  options:
+    header: true
+```
 
 ## Exemplo JDBC Incremental
 
