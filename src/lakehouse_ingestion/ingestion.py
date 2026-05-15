@@ -119,6 +119,41 @@ def _contract_metadata(plan: IngestionPlan) -> Dict[str, Any]:
     }
 
 
+def _base_result_payload(
+    status: str,
+    plan: IngestionPlan,
+    target: str,
+    source_name: str,
+    runtime_meta: Dict[str, Optional[str]],
+    *,
+    run_id: Optional[str] = None,
+    stream_run_id: Optional[str] = None,
+    source_metadata: Optional[Dict[str, Any]] = None,
+) -> Dict[str, Any]:
+    """Campos comuns nos payloads públicos de execução."""
+    payload: Dict[str, Any] = {
+        "status": status,
+        "target_table": target,
+        "target_schema": target_schema_name(plan),
+        "source_table": source_name,
+        "mode": plan.mode,
+        "applied_presets": plan.applied_presets,
+        "idempotency_key": plan.idempotency_key,
+        "idempotency_policy": plan.idempotency_policy,
+        "contract_metadata": _contract_metadata(plan),
+        "framework_version": FRAMEWORK_VERSION,
+        "ctrl_schema_version": CTRL_SCHEMA_VERSION,
+        **runtime_meta,
+    }
+    if run_id is not None:
+        payload["run_id"] = run_id
+    if stream_run_id is not None:
+        payload["stream_run_id"] = stream_run_id
+    if source_metadata is not None:
+        payload["source"] = source_metadata
+    return payload
+
+
 def _governance_preview(plan: IngestionPlan, target: str) -> Dict[str, Any]:
     """SQL/acoes previstas para contratos de governanca em dry-run."""
     return {
@@ -172,14 +207,15 @@ def _skip_result(
 ) -> Dict[str, Any]:
     """Payload padronizado para execuções puladas por idempotência."""
     return {
-        "status": "SKIPPED",
-        "run_id": run_id,
-        "target_table": target,
-        "target_schema": target_schema_name(plan),
-        "source_table": source_name,
-        "source": source_metadata,
-        "mode": plan.mode,
-        "applied_presets": plan.applied_presets,
+        **_base_result_payload(
+            "SKIPPED",
+            plan,
+            target,
+            source_name,
+            runtime_meta,
+            run_id=run_id,
+            source_metadata=source_metadata,
+        ),
         "rows_read": 0,
         "rows_written": 0,
         "rows_inserted": 0,
@@ -201,14 +237,8 @@ def _skip_result(
         "openlineage_event_emitted": False,
         "openlineage_event": None,
         "error_message": None,
-        "idempotency_key": plan.idempotency_key,
-        "idempotency_policy": plan.idempotency_policy,
         "skip_reason": skip_reason,
         "skipped_by_run_id": skipped_by_run_id,
-        "contract_metadata": _contract_metadata(plan),
-        "framework_version": FRAMEWORK_VERSION,
-        "ctrl_schema_version": CTRL_SCHEMA_VERSION,
-        **runtime_meta,
     }
 
 
@@ -596,14 +626,15 @@ def _build_dry_run_result(
     """
     finished_dt = utc_now_ts()
     return {
-        "status": "DRY_RUN",
-        "run_id": run_id,
-        "target_table": target,
-        "source_table": source_name,
-        "source": source_metadata,
-        "mode": plan.mode,
-        "target_schema": target_schema_name(plan),
-        "applied_presets": plan.applied_presets,
+        **_base_result_payload(
+            "DRY_RUN",
+            plan,
+            target,
+            source_name,
+            runtime_meta,
+            run_id=run_id,
+            source_metadata=source_metadata,
+        ),
         "write_strategy": write_strategy(plan.mode),
         "rows_read": rows_read,
         "rows_effective": rows_read - rows_quarantined,
@@ -624,14 +655,8 @@ def _build_dry_run_result(
         "duration_seconds": (finished_dt - started_dt).total_seconds(),
         "explain_captured": plan.explain_mode,
         "openlineage_enabled": plan.openlineage_enabled,
-        "idempotency_key": plan.idempotency_key,
-        "idempotency_policy": plan.idempotency_policy,
-        "contract_metadata": _contract_metadata(plan),
         "governance": _governance_preview(plan, target),
         "annotations_preview": _annotations_preview(plan, target),
-        "framework_version": FRAMEWORK_VERSION,
-        "ctrl_schema_version": CTRL_SCHEMA_VERSION,
-        **runtime_meta,
     }
 
 
@@ -771,13 +796,14 @@ def _stream_result(
     finished_dt = utc_now_ts()
     metrics = stream_metrics or _stream_metrics_from_batches(batch_results)
     return {
-        "status": status,
-        "stream_run_id": stream_run_id,
-        "target_table": target,
-        "target_schema": target_schema_name(plan),
-        "source_table": source_name,
-        "mode": plan.mode,
-        "applied_presets": plan.applied_presets,
+        **_base_result_payload(
+            status,
+            plan,
+            target,
+            source_name,
+            runtime_meta,
+            stream_run_id=stream_run_id,
+        ),
         "batches_processed": metrics["batches_processed"],
         "total_rows_read": metrics["total_rows_read"],
         "total_rows_written": metrics["total_rows_written"],
@@ -786,14 +812,8 @@ def _stream_result(
         "stage_durations": stage_durations,
         "duration_seconds": (finished_dt - started_dt).total_seconds(),
         "error_message": _short_error_message(error),
-        "idempotency_key": plan.idempotency_key,
-        "idempotency_policy": plan.idempotency_policy,
         "skip_reason": skip_reason,
         "skipped_by_stream_run_id": skipped_by_stream_run_id,
-        "contract_metadata": _contract_metadata(plan),
-        "framework_version": FRAMEWORK_VERSION,
-        "ctrl_schema_version": CTRL_SCHEMA_VERSION,
-        **runtime_meta,
     }
 
 
@@ -985,7 +1005,7 @@ def ingest_stream_plan(plan: IngestionPlan) -> Dict[str, Any]:
         status = "FAILED"
         error_type = type(exc).__name__
         error = "".join(traceback.format_exception(type(exc), exc, exc.__traceback__))
-        logger.error(f"Stream de ingestão falhou: {exc}")
+        logger.error("Stream de ingestão falhou: %s", exc)
     finally:
         finished_dt = utc_now_ts()
         if tables and lock_acquired:
@@ -1029,7 +1049,7 @@ def ingest_stream_plan(plan: IngestionPlan) -> Dict[str, Any]:
                     )
                     stream_logged = True
                 except Exception as start_log_exc:
-                    logger.error(f"Falha ao registrar início do stream: {start_log_exc}")
+                    logger.error("Falha ao registrar início do stream: %s", start_log_exc)
             try:
                 log_stream_finish(
                     tables,
@@ -1046,7 +1066,7 @@ def ingest_stream_plan(plan: IngestionPlan) -> Dict[str, Any]:
                     },
                 )
             except Exception as log_exc:
-                logger.error(f"Falha ao registrar stream: {log_exc}")
+                logger.error("Falha ao registrar stream: %s", log_exc)
             if error:
                 try:
                     log_error(
@@ -1068,7 +1088,7 @@ def ingest_stream_plan(plan: IngestionPlan) -> Dict[str, Any]:
                         },
                     )
                 except Exception as error_log_exc:
-                    logger.error(f"Falha ao registrar erro completo do stream: {error_log_exc}")
+                    logger.error("Falha ao registrar erro completo do stream: %s", error_log_exc)
 
     return _stream_result(
         plan,
@@ -1388,7 +1408,7 @@ def ingest_plan(plan: IngestionPlan) -> Dict[str, Any]:
         status = "FAILED"
         error_type = type(exc).__name__
         error = "".join(traceback.format_exception(type(exc), exc, exc.__traceback__))
-        logger.error(f"Ingestão falhou: {exc}")
+        logger.error("Ingestão falhou: %s", exc)
         if not plan.dry_run:
             try:
                 upsert_state(
@@ -1407,7 +1427,7 @@ def ingest_plan(plan: IngestionPlan) -> Dict[str, Any]:
                     watermark_candidate=wm_candidate,
                 )
             except Exception as state_exc:
-                logger.error(f"Falha ao atualizar tabela de estado: {state_exc}")
+                logger.error("Falha ao atualizar tabela de estado: %s", state_exc)
         row_metrics = {"rows_inserted": 0, "rows_updated": 0, "rows_deleted": 0}
     finally:
         if prepared_df is not None:
@@ -1427,7 +1447,7 @@ def ingest_plan(plan: IngestionPlan) -> Dict[str, Any]:
                     )
                 stage_durations["lineage"] = (utc_now_ts() - stage_started).total_seconds()
             except Exception as lineage_exc:
-                logger.error(f"Falha ao registrar evento OpenLineage: {lineage_exc}")
+                logger.error("Falha ao registrar evento OpenLineage: %s", lineage_exc)
             try:
                 _finalize_execution(
                     tables, plan, run_id, run_ts, run_date, source_name, source_metadata, target,
@@ -1438,7 +1458,7 @@ def ingest_plan(plan: IngestionPlan) -> Dict[str, Any]:
                     skip_reason, skipped_by_run_id, stage_durations, governance_results,
                 )
             except Exception as log_exc:
-                logger.error(f"Falha ao registrar execução: {log_exc}")
+                logger.error("Falha ao registrar execução: %s", log_exc)
             if error:
                 try:
                     log_error(
@@ -1460,17 +1480,18 @@ def ingest_plan(plan: IngestionPlan) -> Dict[str, Any]:
                         },
                     )
                 except Exception as error_log_exc:
-                    logger.error(f"Falha ao registrar erro completo: {error_log_exc}")
+                    logger.error("Falha ao registrar erro completo: %s", error_log_exc)
 
     return {
-        "status": status,
-        "run_id": run_id,
-        "target_table": target,
-        "target_schema": target_schema_name(plan),
-        "source_table": source_name,
-        "source": source_metadata,
-        "mode": plan.mode,
-        "applied_presets": plan.applied_presets,
+        **_base_result_payload(
+            status,
+            plan,
+            target,
+            source_name,
+            runtime_meta,
+            run_id=run_id,
+            source_metadata=source_metadata,
+        ),
         "rows_read": rows_read,
         "rows_written": rows_written,
         "rows_inserted": row_metrics.get("rows_inserted", 0),
@@ -1492,15 +1513,9 @@ def ingest_plan(plan: IngestionPlan) -> Dict[str, Any]:
         "openlineage_event_emitted": bool(openlineage_event),
         "openlineage_event": openlineage_event,
         "error_message": _short_error_message(error),
-        "idempotency_key": plan.idempotency_key,
-        "idempotency_policy": plan.idempotency_policy,
         "skip_reason": skip_reason,
         "skipped_by_run_id": skipped_by_run_id,
-        "contract_metadata": _contract_metadata(plan),
         "governance": governance_results,
-        "framework_version": FRAMEWORK_VERSION,
-        "ctrl_schema_version": CTRL_SCHEMA_VERSION,
-        **runtime_meta,
     }
 
 
