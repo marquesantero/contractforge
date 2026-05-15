@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="ContractForge — Framework batch declarativo para ingestão de dados em Delta Lake no Databricks. Contratos por tabela, arquitetura Medallion, quality gates, SCD, watermarks, OpenLineage.">
-<title>ContractForge v1.14.0 — Documentação</title>
+<title>ContractForge v2.4.3 — Documentação</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Serif:wght@600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -31,7 +31,7 @@
       <img src="assets/logo/contractforge-mark.png" alt="" class="brand-mark">
       <div>
         <h1>ContractForge<br>Docs</h1>
-        <span class="version">v1.14.0 · MIT · Python ≥3.10</span>
+        <span class="version">v2.4.3 · MIT · Python ≥3.10</span>
       </div>
     </div>
   </div>
@@ -120,7 +120,7 @@
     <span class="badge spark">PySpark ≥3.4</span>
     <span class="badge delta">Delta Lake ≥3.0</span>
     <span class="badge mit">MIT</span>
-    <span class="badge" style="color:#79c0ff">v1.14.0</span>
+    <span class="badge" style="color:#79c0ff">v2.4.3</span>
     <span class="badge" style="color:#e3b341">presets</span>
     <span class="badge" style="color:#56d364">shape</span>
   </div>
@@ -222,11 +222,11 @@ flowchart TB
 pip install build && python -m build
 
 # Upload para UC Volume
-databricks fs cp dist/contractforge-1.14.0-py3-none-any.whl \
+databricks fs cp dist/contractforge-2.4.3-py3-none-any.whl \
   dbfs:/Volumes/&lt;catalog&gt;/&lt;schema&gt;/libs/
 
 # Notebook Databricks:
-%pip install /Volumes/&lt;catalog&gt;/&lt;schema&gt;/libs/contractforge-1.14.0-py3-none-any.whl
+%pip install /Volumes/&lt;catalog&gt;/&lt;schema&gt;/libs/contractforge-2.4.3-py3-none-any.whl
 dbutils.library.restartPython()</code></pre>
 
 <h3>Desenvolvimento Local</h3>
@@ -248,7 +248,7 @@ pytest</code></pre>
 </div>
 
 <div class="tab-content active" data-lang="python">
-<pre><code>from lakehouse_ingestion import ingest
+<pre><code>from contractforge import ingest
 
 df = spark.createDataFrame(
     [(1, "Alice", "2024-01-01"), (2, "Bob", "2024-01-02")],
@@ -285,8 +285,8 @@ notebook_name: bronze_clientes
 description: "Captura bruta de clientes do CRM"</code></pre>
 <p>Notebook genérico:</p>
 <pre><code>import yaml
-from lakehouse_ingestion import ingest_plan
-from lakehouse_ingestion.plan import build_plan_from_kwargs
+from contractforge import ingest_plan
+from contractforge.plan import build_plan_from_kwargs
 
 with open("contracts/bronze/b_clientes.yaml") as f:
     cfg = yaml.safe_load(f)
@@ -302,7 +302,7 @@ print(f"Status: {result['status']}")</code></pre>
 <section id="api-publica">
 <h2>API Pública</h2>
 
-<pre><code>from lakehouse_ingestion import (
+<pre><code>from contractforge import (
     ingest,              # Função procedural (kwargs)
     ingest_plan,         # Função recebendo IngestionPlan
     IngestionPlan,       # Dataclass do contrato (frozen)
@@ -773,13 +773,14 @@ schema_policy: strict</code></pre></div>
 <!-- ============ CONNECTORS ============ -->
 <section id="connectors-guide">
 <h2>Conectores Declarativos</h2>
-<p><strong>Disponível em v1.9+.</strong> O campo <code>source</code> agora aceita <code>ConnectorSpec</code> para descrever fontes reais sem criar wrappers em notebooks.</p>
+<p><strong>Atualizado em v2.4.3.</strong> O campo <code>source</code> aceita <code>ConnectorSpec</code> para descrever fontes reais sem criar wrappers em notebooks. Em Databricks serverless, Azure Blob/ADLS deve preferir Unity Catalog External Location/Volume.</p>
 
 <div class="table-wrap"><table>
 <tr><th>Família</th><th>Conectores</th><th>Uso principal</th></tr>
 <tr><td>Catálogo</td><td><code>table</code>, <code>delta_table</code>, <code>view</code>, <code>sql</code></td><td>Table-to-table e queries declarativas.</td></tr>
-<tr><td>Arquivos</td><td><code>parquet</code>, <code>delta</code>, <code>json</code>, <code>csv</code>, <code>orc</code>, <code>text</code></td><td>Landing batch em Volumes, DBFS ou paths cloud configurados no runtime.</td></tr>
-<tr><td>Blob/Object storage</td><td><code>object_storage</code>, <code>blob</code>, <code>s3</code>, <code>adls</code>, <code>azure_blob</code>, <code>gcs</code></td><td>ADLS, Azure Blob, S3 e GCS via Spark reader.</td></tr>
+<tr><td>Arquivos</td><td><code>parquet</code>, <code>delta</code>, <code>json</code>, <code>jsonl</code>, <code>ndjson</code>, <code>csv</code>, <code>orc</code>, <code>text</code>, <code>avro</code>, <code>xml</code></td><td>Landing batch em Volumes, DBFS ou paths cloud configurados no runtime.</td></tr>
+<tr><td>HTTP file</td><td><code>http_file</code>, <code>http_csv</code>, <code>http_json</code>, <code>http_text</code></td><td>Arquivo HTTP(S) explícito, pequeno/médio, baixado no driver e materializado como DataFrame.</td></tr>
+<tr><td>Blob/Object storage</td><td><code>object_storage</code>, <code>blob</code>, <code>s3</code>, <code>adls</code>, <code>azure_blob</code>, <code>gcs</code></td><td>ADLS, Azure Blob, S3 e GCS via Spark reader e credenciais do runtime/Unity Catalog.</td></tr>
 <tr><td>Sistemas externos</td><td><code>jdbc</code>, <code>postgres</code>, <code>sqlserver</code>, <code>mysql</code>, <code>oracle</code>, <code>snowflake</code>, <code>bigquery</code>, <code>rest_api</code></td><td>Bancos relacionais, Spark connectors externos e APIs JSON paginadas.</td></tr>
 <tr><td>Streaming finito</td><td><code>autoloader</code></td><td>Auto Loader <code>available_now</code> com checkpoint e batches filhos.</td></tr>
 </table></div>
@@ -789,8 +790,9 @@ schema_policy: strict</code></pre></div>
 <tr><th>Conector</th><th>Campos obrigatórios</th><th>Campos comuns</th><th>Observações</th></tr>
 <tr><td><code>table</code>, <code>delta_table</code>, <code>view</code></td><td><code>table</code></td><td><code>read.source_complete</code></td><td>Usado para table-to-table, snapshots completos e reprocessamentos controlados.</td></tr>
 <tr><td><code>sql</code></td><td><code>query</code></td><td><code>name</code>, <code>read.source_complete</code></td><td>Permite uma query declarativa como origem; use com cuidado para manter rastreabilidade.</td></tr>
-<tr><td><code>parquet</code>, <code>delta</code>, <code>json</code>, <code>csv</code>, <code>orc</code>, <code>text</code></td><td><code>path</code></td><td><code>format</code>, <code>options</code>, <code>read.source_complete</code></td><td>Usa <code>spark.read.format(...).load(path)</code>; credenciais ficam no runtime.</td></tr>
-<tr><td><code>object_storage</code>, <code>blob</code>, <code>s3</code>, <code>adls</code>, <code>azure_blob</code>, <code>gcs</code></td><td><code>format</code>, <code>path</code></td><td><code>provider</code>, <code>options</code>, <code>read.source_complete</code></td><td>Aliases diretos definem o provider automaticamente; <code>object_storage</code>/<code>blob</code> aceitam provider explícito.</td></tr>
+<tr><td><code>parquet</code>, <code>delta</code>, <code>json</code>, <code>jsonl</code>, <code>ndjson</code>, <code>csv</code>, <code>orc</code>, <code>text</code>, <code>avro</code>, <code>xml</code></td><td><code>path</code></td><td><code>format</code>, <code>options</code>, <code>read.source_complete</code></td><td>Usa <code>spark.read.format(...).load(path)</code>; <code>jsonl</code>/<code>ndjson</code> usam reader Spark <code>json</code>; <code>xml</code> depende do suporte do runtime.</td></tr>
+<tr><td><code>http_file</code>, <code>http_csv</code>, <code>http_json</code>, <code>http_text</code></td><td><code>path</code> ou <code>request.url</code></td><td><code>format</code>, <code>options</code>, <code>request.headers</code>, <code>limits</code></td><td>Para arquivos HTTP(S) explícitos de volume controlado. Não é fallback automático de object storage.</td></tr>
+<tr><td><code>object_storage</code>, <code>blob</code>, <code>s3</code>, <code>adls</code>, <code>azure_blob</code>, <code>gcs</code></td><td><code>format</code>, <code>path</code></td><td><code>provider</code>, <code>options</code>, <code>auth.sas_token</code>, <code>read.source_complete</code></td><td>Aliases diretos definem o provider automaticamente. Em serverless, prefira External Location/Volume; SAS direto é voltado a classic/job cluster/local.</td></tr>
 <tr><td><code>jdbc</code>, <code>postgres</code>, <code>postgresql</code>, <code>sqlserver</code>, <code>mysql</code>, <code>oracle</code></td><td><code>options.url</code> + <code>options.dbtable</code> ou <code>options.query</code></td><td><code>read.partition_column</code>, <code>fetchsize</code>, <code>incremental</code></td><td>Suporta particionamento, secrets e pushdown incremental por watermark/predicate.</td></tr>
 <tr><td><code>snowflake</code>, <code>bigquery</code></td><td><code>table</code>, <code>query</code> ou opções equivalentes</td><td><code>options</code>, <code>read.source_complete</code></td><td>Usa Spark connector instalado no runtime: <code>format("snowflake")</code> ou <code>format("bigquery")</code>.</td></tr>
 <tr><td><code>rest_api</code></td><td><code>request.url</code></td><td><code>auth</code>, <code>pagination</code>, <code>response.records_path</code>, <code>limits</code>, <code>incremental</code></td><td>Batch JSON paginado; indicado para APIs administrativas e volumes controlados.</td></tr>
@@ -966,6 +968,45 @@ catalog: main
 layer: bronze
 mode: scd0_append</code></pre>
 
+<h3>Azure Blob / ADLS em Databricks Serverless</h3>
+<p>Em serverless/Spark Connect, use Unity Catalog External Location ou Volume. A ContractForge lê o path governado pelo Spark reader e não precisa receber SAS no contrato.</p>
+
+<pre><code>source:
+  type: connector
+  connector: azure_blob
+  path: abfss://databricksdata@generalcafe.dfs.core.windows.net/blob_teste/generated/csv/large/orders_250k.csv
+  format: csv
+  options:
+    header: true
+    inferSchema: false
+  read:
+    source_complete: true
+
+target_table: b_blob_sales
+catalog: workspace
+target_schema: cf_blob_bronze
+layer: bronze
+mode: scd0_overwrite</code></pre>
+
+<div class="alert info"><strong>Validação real:</strong> o exemplo Azure Blob em Databricks serverless foi executado com External Location no job <code>167679097954456</code>, run <code>506278831552877</code>, cobrindo setup, bronze CSV, bronze JSONL, silver com <code>shape</code> e gold.</div>
+
+<h4>SAS direto: classic/job cluster/local</h4>
+<p>Quando o runtime permite configuração Hadoop/Spark, o conector <code>azure_blob</code> também aceita <code>account_url</code>, <code>container</code> e <code>auth.sas_token</code>. Em serverless, se <code>fs.azure.sas...</code> for bloqueado, a lib falha rápido com orientação para External Location/Volume ou Network Policy/NCC.</p>
+
+<pre><code>source:
+  type: connector
+  connector: azure_blob
+  account_url: https://storageaccount.blob.core.windows.net/
+  container: landing
+  path: datasets/orders.csv
+  format: csv
+  auth:
+    sas_token: "{{ secret:azure/storage_sas }}"
+  options:
+    header: true</code></pre>
+
+<div class="alert warn"><strong>Sem fallback oculto:</strong> <code>azure_blob</code> não baixa blobs por REST implicitamente. Isso evita mudanças silenciosas de semântica, custo, memória e rede. Para arquivo HTTP(S) explícito e controlado, use <code>http_file</code>.</div>
+
 <h3>Snowflake e BigQuery</h3>
 <pre><code>source:
   type: connector
@@ -1012,7 +1053,7 @@ contractforge validate contracts/bronze/b_orders_api.ingestion.yaml</code></pre>
 
 <h3>Conectores customizados</h3>
 <p>O registry permite acoplar novos conectores sem alterar o core. O contrato YAML aceita qualquer nome válido de conector customizado; em runtime, o resolver precisa estar registrado antes da execução.</p>
-<pre><code>from lakehouse_ingestion import (
+<pre><code>from contractforge import (
     ConnectorCapabilities,
     SourceResolution,
     register_source_resolver,
@@ -1092,7 +1133,7 @@ quality_rules:
 <div class="alert info"><strong>Custom presets:</strong> use <code>register_preset("corp_silver_scd1", preset={...}, metadata={...})</code> para padrões corporativos reutilizáveis.</div>
 
 <h3>API de Presets</h3>
-<pre><code>from lakehouse_ingestion import list_presets, preset_details, register_preset
+<pre><code>from contractforge import list_presets, preset_details, register_preset
 
 print(list_presets())
 # ['bronze_autoloader_append', 'silver_scd1_upsert', 'gold_full_refresh', ...]
@@ -1335,7 +1376,7 @@ ALTER TABLE main.silver.c_pedidos ALTER COLUMN email_cliente
 </table></div>
 
 <h3>API de Bundle</h3>
-<pre><code>from lakehouse_ingestion import ingest_bundle, load_contract_bundle
+<pre><code>from contractforge import ingest_bundle, load_contract_bundle
 
 # Carrega todos os contratos de uma pasta
 bundle = load_contract_bundle("contracts/silver/c_pedidos")
@@ -1449,7 +1490,7 @@ DELETE FROM ops.ctrl_ingestion_runs WHERE run_date < current_date() - 90;</code>
   <button class="tab-btn active" data-lang="python">Python</button>
   <button class="tab-btn" data-lang="yaml">YAML</button>
 </div>
-<div class="tab-content active" data-lang="python"><pre><code>from lakehouse_ingestion import ingest
+<div class="tab-content active" data-lang="python"><pre><code>from contractforge import ingest
 result = ingest(
     source="raw_erp_orders",
     target_table="b_erp_orders",
@@ -1642,8 +1683,8 @@ zorder_columns: month_ref|region</code></pre></div>
 
 <h3>9. Notebook Genérico com YAML</h3>
 <pre><code>import yaml
-from lakehouse_ingestion import ingest_plan
-from lakehouse_ingestion.plan import build_plan_from_kwargs
+from contractforge import ingest_plan
+from contractforge.plan import build_plan_from_kwargs
 
 dbutils.widgets.text("contract_path", "")
 dbutils.widgets.text("master_run_id", "")
@@ -1765,7 +1806,7 @@ optimize_after_write: true</code></pre></div>
 <h3>Notebook Genérico com Bundle</h3>
 <pre><code># notebooks/run_ingestion_bundle.py
 import json, sys
-from lakehouse_ingestion import ingest_bundle
+from contractforge import ingest_bundle
 
 dbutils.widgets.text("contract_path", "", "Caminho do contrato")
 dbutils.widgets.text("master_run_id", "", "ID do job mestre")
@@ -1894,7 +1935,7 @@ ORDER BY change_ts_utc DESC;</code></pre>
 
 <div class="card">
 <ul style="list-style:none;padding:0">
-<li><input type="checkbox"> Pacote instalado no cluster (<code>import lakehouse_ingestion; print(__version__)</code>)</li>
+<li><input type="checkbox"> Pacote instalado no cluster (<code>import contractforge; print(__version__)</code>)</li>
 <li><input type="checkbox"> Schema <code>ops</code> existe e cluster tem <code>CREATE TABLE</code></li>
 <li><input type="checkbox"> Permissões UC: <code>USE CATALOG</code>, <code>USE SCHEMA</code>, <code>CREATE TABLE</code>, <code>MODIFY</code>, <code>SELECT</code></li>
 <li><input type="checkbox"> Cada contrato tem <code>notebook_name</code> único</li>
@@ -1920,3 +1961,4 @@ ORDER BY change_ts_utc DESC;</code></pre>
 <script src="js/main.js"></script>
 </body>
 </html>
+
