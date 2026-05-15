@@ -1,4 +1,5 @@
 # Databricks notebook source
+# ruff: noqa: E402,F821
 dbutils.widgets.text("contract", "")
 contract_path = dbutils.widgets.get("contract")
 
