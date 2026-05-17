@@ -1,46 +1,46 @@
-# Guidelines de Performance
+# Performance Guidelines
 
-ContractForge padroniza padrões de ingestão, mas performance final depende do modo de escrita, tamanho da origem, particionamento e runtime Spark.
+ContractForge standardizes ingestion patterns, but final performance depends on the write mode, source size, table layout and Spark runtime.
 
-## Escolha do modo
+## Choose the Right Mode
 
-| Cenário | Modo recomendado | Observação |
-|---------|------------------|------------|
-| Landing append-only | `scd0_append` | Mais barato; combine com idempotência quando reprocessar lotes. |
-| Reprocessamento completo pequeno | `scd0_overwrite` | Simples, mas reescreve tudo. |
-| Dimensão atual por chave | `scd1_upsert` | Exige `merge_keys`; cuide de chaves nulas. |
-| Upsert com redução de merges inúteis | `scd1_hash_diff` | Use `dedup_order_expr` determinístico. |
-| Histórico tipo 2 | `scd2_historical` | Mais custoso; considere particionamento e volume de mudanças. |
-| Snapshot completo com soft delete | `snapshot_soft_delete` | Exige fonte completa, sem watermark/filter incremental. |
+| Scenario | Recommended mode | Note |
+| --- | --- | --- |
+| Append-only landing | `scd0_append` | Cheapest path; combine with idempotency when reprocessing batches. |
+| Small full refresh | `scd0_overwrite` | Simple, but rewrites the whole target. |
+| Current-state dimension by key | `scd1_upsert` | Requires `merge_keys`; protect against null keys. |
+| Upsert with fewer unnecessary merges | `scd1_hash_diff` | Use deterministic `dedup_order_expr`. |
+| Type 2 history | `scd2_historical` | More expensive; consider partitioning and change volume. |
+| Complete snapshot with soft delete | `snapshot_soft_delete` | Requires a complete source, with no incremental watermark/filter. |
 
 ## Cache
 
-- Use `use_cache=true` apenas quando o mesmo DataFrame for reutilizado por etapas caras.
-- Evite cache em origens grandes quando o cluster tem memória limitada.
-- Se houver OOM, primeiro desligue cache e reduza paralelismo/partições de leitura.
+- Use `use_cache=true` only when the same DataFrame is reused by expensive stages.
+- Avoid caching large sources on clusters with limited memory.
+- If you hit OOM, first disable cache and reduce read parallelism/partitions.
 
 ## JDBC
 
-- Sempre particione leituras grandes por coluna numérica ou temporal estável.
-- Evite `query` complexa sem índice do lado da origem.
-- Use pushdown incremental (`source.incremental.watermark_column` ou `predicate`) para reduzir volume.
-- Ajuste `fetchsize` conforme banco/driver.
+- Partition large reads by a stable numeric or temporal column.
+- Avoid complex unindexed `query` values on the source database.
+- Use incremental pushdown (`source.incremental.watermark_column` or `predicate`) to reduce volume.
+- Tune `fetchsize` according to the database and driver.
 
 ## REST API
 
-- Use `limits.max_pages`, `timeout_seconds`, `retry_attempts`, `retry_backoff_seconds` e `rate_limit_per_minute`.
-- Não use REST direto para cargas massivas ou replay bruto. Grave raw files e processe com Auto Loader.
-- Registre `response.records_path` para evitar DataFrames com payloads aninhados desnecessários.
+- Use `limits.max_pages`, `timeout_seconds`, `retry_attempts`, `retry_backoff_seconds` and `rate_limit_per_minute`.
+- Do not use REST directly for massive loads or raw replay. Land raw files and process them with Auto Loader.
+- Set `response.records_path` to avoid unnecessarily nested DataFrames.
 
-## Delta layout
+## Delta Layout
 
-- Para novas tabelas Databricks, prefira `cluster_columns` quando fizer sentido para Liquid Clustering.
-- Use `partition_column` apenas quando a cardinalidade e o padrão de filtro justificarem.
-- `zorder_columns` só tem efeito quando `optimize_after_write=true` e o runtime suporta a operação.
+- For new Databricks tables, prefer `cluster_columns` when Liquid Clustering fits the access pattern.
+- Use `partition_column` only when cardinality and filter patterns justify it.
+- `zorder_columns` only has an effect when `optimize_after_write=true` and the runtime supports the operation.
 
-## Observabilidade de custo
+## Cost Observability
 
-Monitore por tabela:
+Monitor by table:
 
 ```sql
 SELECT
@@ -54,4 +54,3 @@ WHERE status = 'SUCCESS'
 GROUP BY target_table, mode
 ORDER BY avg_duration_seconds DESC;
 ```
-

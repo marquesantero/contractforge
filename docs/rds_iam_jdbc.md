@@ -1,20 +1,20 @@
-# Amazon RDS/Aurora JDBC com IAM Auth
+# Amazon RDS/Aurora JDBC with IAM Auth
 
-Este guia descreve o caminho validado para ler Amazon RDS/Aurora via JDBC usando `source.auth.type: rds_iam`.
+This guide describes the validated path for reading Amazon RDS/Aurora through JDBC using `source.auth.type: rds_iam`.
 
-Validação real executada:
+Real validation performed:
 
 - Runtime: Azure Databricks classic single-node.
-- Cluster: `SINGLE_USER`, com driver PostgreSQL JDBC instalado.
-- Banco: Amazon Aurora PostgreSQL 17.7.
-- ContractForge: `2.6.5` e superior.
-- Resultado: `ingest()` com `connector: postgres`, `auth.type: rds_iam`, particionamento JDBC e `scd1_hash_diff` terminou `SUCCESS`.
+- Cluster: `SINGLE_USER`, with PostgreSQL JDBC driver installed.
+- Database: Amazon Aurora PostgreSQL 17.7.
+- ContractForge: `2.6.5` and later.
+- Result: `ingest()` with `connector: postgres`, `auth.type: rds_iam`, JDBC partitioning and `scd1_hash_diff` finished with `SUCCESS`.
 
-## Quando usar
+## When to Use
 
-Use `auth.type: rds_iam` quando a fonte for Amazon RDS/Aurora com IAM database authentication habilitado e você quiser evitar senha fixa de banco no contrato.
+Use `auth.type: rds_iam` when the source is Amazon RDS/Aurora with IAM database authentication enabled and you want to avoid a fixed database password in the contract.
 
-Use `auth.type: basic` apenas quando o banco aceitar autenticação por usuário/senha tradicional:
+Use `auth.type: basic` only when the database accepts traditional username/password authentication:
 
 ```yaml
 source:
@@ -24,30 +24,30 @@ source:
     password: "{{ secret:scope/db_password }}"
 ```
 
-## Pré-requisitos
+## Prerequisites
 
-- O endpoint RDS/Aurora precisa estar acessível por TCP a partir do compute Databricks.
-- O driver JDBC do banco precisa estar instalado no cluster.
-- O usuário do banco precisa existir e estar autorizado para IAM auth.
-- A IAM principal usada pela ContractForge precisa ter `rds-db:connect`.
-- As credenciais AWS precisam estar em `source.auth`, Databricks Secrets, variáveis de ambiente ou na AWS credential provider chain quando `credential_provider: default_chain` for usado.
+- The RDS/Aurora endpoint must be reachable over TCP from the Databricks compute.
+- The database JDBC driver must be installed on the cluster.
+- The database user must exist and be authorized for IAM auth.
+- The IAM principal used by ContractForge must have `rds-db:connect`.
+- AWS credentials must be available in `source.auth`, Databricks Secrets, environment variables or the AWS credential provider chain when `credential_provider: default_chain` is used.
 
-## Driver JDBC no Databricks
+## JDBC Driver on Databricks
 
-Para PostgreSQL:
+For PostgreSQL:
 
 ```text
 org.postgresql:postgresql:42.7.4
 ```
 
-Em clusters Unity Catalog `standard`/shared, Maven libraries podem exigir artifact allowlist. Se a instalação falhar com mensagem de allowlist, há duas opções:
+On Unity Catalog `standard`/shared clusters, Maven libraries may require artifact allowlisting. If installation fails with an allowlist message, use one of these options:
 
-- Pedir ao admin do metastore para allowlistar o artefato Maven.
-- Usar cluster `SINGLE_USER` para validações controladas.
+- Ask the metastore admin to allowlist the Maven artifact.
+- Use a `SINGLE_USER` cluster for controlled validation.
 
-## Usuário PostgreSQL
+## PostgreSQL User
 
-Exemplo com usuário dedicado:
+Example with a dedicated user:
 
 ```sql
 CREATE USER contractforge_iam;
@@ -59,13 +59,13 @@ ALTER DEFAULT PRIVILEGES IN SCHEMA public
 GRANT SELECT ON TABLES TO contractforge_iam;
 ```
 
-Para validações rápidas, o usuário master também pode funcionar se estiver autorizado, mas o padrão recomendado é usuário dedicado com permissões mínimas.
+For quick validation, the master user may also work when authorized, but the recommended pattern is a dedicated user with minimum permissions.
 
-## Policy IAM
+## IAM Policy
 
-O recurso de `rds-db:connect` usa o `DbiResourceId` ou `DbClusterResourceId`, não o ARN comum do cluster.
+The `rds-db:connect` resource uses the `DbiResourceId` or `DbClusterResourceId`, not the common cluster ARN.
 
-Para Aurora cluster:
+For an Aurora cluster:
 
 ```bash
 aws rds describe-db-clusters \
@@ -74,7 +74,7 @@ aws rds describe-db-clusters \
   --output text
 ```
 
-Policy exemplo:
+Example policy:
 
 ```json
 {
@@ -89,11 +89,11 @@ Policy exemplo:
 }
 ```
 
-Anexe a policy ao usuário/role usado pelo job.
+Attach the policy to the user or role used by the job.
 
 ## Secrets
 
-Exemplo de secrets no Databricks:
+Example Databricks secrets:
 
 ```bash
 databricks secrets put-secret contractforge-aws rds_jdbc_url
@@ -102,13 +102,13 @@ databricks secrets put-secret contractforge-aws aws_access_key_id
 databricks secrets put-secret contractforge-aws aws_secret_access_key
 ```
 
-`aws_session_token` é opcional. Só declare quando estiver usando credenciais temporárias válidas. Token STS expirado causa falha de autenticação.
+`aws_session_token` is optional. Declare it only when using valid temporary credentials. An expired STS token causes authentication failure.
 
 ## AWS Credential Provider Chain
 
-Quando o runtime já fornece credenciais AWS por instance profile, profile local, web identity, variável de ambiente gerenciada ou outro mecanismo suportado pelo `botocore`, use `credential_provider: default_chain`.
+When the runtime already provides AWS credentials through an instance profile, local profile, web identity, managed environment variable or another mechanism supported by `botocore`, use `credential_provider: default_chain`.
 
-Esse modo exige `botocore` no driver Python. Instale a extra `contractforge[aws]` ou disponibilize `botocore` no ambiente. A ContractForge continua gerando o token IAM internamente; `boto3` e AWS CLI não são necessários.
+This mode requires `botocore` in the Python driver. Install the `contractforge[aws]` extra or make `botocore` available in the environment. ContractForge still generates the IAM token internally; `boto3` and AWS CLI are not required.
 
 ```yaml
 source:
@@ -125,13 +125,13 @@ source:
     credential_provider: default_chain
 ```
 
-Prioridade usada pelo conector:
+Connector credential priority:
 
-1. Credenciais explícitas em `source.auth`.
-2. Variáveis `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY` e `AWS_SESSION_TOKEN`.
-3. `credential_provider: default_chain`, se configurado.
+1. Explicit credentials in `source.auth`.
+2. `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY` and `AWS_SESSION_TOKEN` environment variables.
+3. `credential_provider: default_chain`, when configured.
 
-## Contrato YAML
+## YAML Contract
 
 ```yaml
 source:
@@ -169,9 +169,9 @@ quality_rules:
   unique_key: [order_id]
 ```
 
-## Contrato Python
+## Python Contract
 
-Quando usar `ingest()` diretamente, informe `catalog` explicitamente. `target_schema` qualificado não substitui `catalog`.
+When using `ingest()` directly, pass `catalog` explicitly. A qualified `target_schema` does not replace `catalog`.
 
 ```python
 from contractforge import ingest
@@ -212,9 +212,9 @@ result = ingest(
 )
 ```
 
-## Métricas
+## Metrics
 
-O retorno e `ctrl_ingestion_runs.source_metrics_json` registram:
+The result and `ctrl_ingestion_runs.source_metrics_json` record:
 
 - `jdbc_auth_configured=true`
 - `jdbc_auth_type=rds_iam`
@@ -223,41 +223,41 @@ O retorno e `ctrl_ingestion_runs.source_metrics_json` registram:
 - `jdbc_rds_iam_credential_source=explicit|env|default_chain`
 - `jdbc_ssl_enabled=true`
 - `partitioned_read=true|false`
-- `fetchsize=<valor>`
+- `fetchsize=<value>`
 
-Tokens e secrets são redigidos em metadata, lineage e control tables.
+Tokens and secrets are redacted in metadata, lineage and control tables.
 
 ## Troubleshooting
 
 `PAM authentication failed`
 
-- O usuário do banco não tem `rds_iam`.
-- A IAM principal não tem `rds-db:connect`.
-- O token foi gerado para usuário, host, porta ou região diferentes.
-- O `aws_session_token` expirou.
-- O banco está exigindo IAM auth e você tentou `auth.type: basic`.
+- The database user does not have `rds_iam`.
+- The IAM principal does not have `rds-db:connect`.
+- The token was generated for a different user, host, port or region.
+- The `aws_session_token` expired.
+- The database requires IAM auth and you tried `auth.type: basic`.
 
-`No suitable driver` ou `ClassNotFoundException`
+`No suitable driver` or `ClassNotFoundException`
 
-- O driver JDBC não está instalado no cluster.
-- Em cluster UC standard/shared, o Maven pode estar bloqueado por artifact allowlist.
+- The JDBC driver is not installed on the cluster.
+- On UC standard/shared clusters, Maven may be blocked by artifact allowlisting.
 
-Timeout ou `Connection refused`
+Timeout or `Connection refused`
 
-- O runtime Databricks não alcança o endpoint RDS.
-- Verifique VPC, peering, Transit Gateway, PrivateLink/NLB, security groups, firewall ou Aurora Express Internet Access Gateway.
+- The Databricks runtime cannot reach the RDS endpoint.
+- Check VPC routing, peering, Transit Gateway, PrivateLink/NLB, security groups, firewall rules or Aurora Express Internet Access Gateway.
 
 `Catalog 'main' was not found`
 
-- Informe `catalog` explicitamente no `ingest()`.
-- Não dependa de catalog default em workspaces novos.
+- Pass `catalog` explicitly to `ingest()`.
+- Do not depend on the default catalog in new workspaces.
 
 `Metastore storage root URL does not exist`
 
-- Não tente criar catálogo novo sem managed location.
-- Use um catálogo já existente ou crie o catálogo via UI/SQL com `MANAGED LOCATION`.
+- Do not try to create a new catalog without a managed location.
+- Use an existing catalog or create the catalog through UI/SQL with `MANAGED LOCATION`.
 
-## Limitações Atuais
+## Current Limitations
 
-- `credential_provider: default_chain` depende de `botocore` instalado e das credenciais estarem realmente disponíveis no driver Python.
-- A conectividade de rede com RDS/Aurora continua fora do escopo da lib.
+- `credential_provider: default_chain` depends on `botocore` being installed and credentials actually being available in the Python driver.
+- Network connectivity to RDS/Aurora remains outside the scope of the library.

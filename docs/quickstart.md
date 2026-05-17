@@ -1,24 +1,30 @@
-# Quick Start em 5 minutos
+# 5-Minute Quick Start
 
-Este guia mostra o menor fluxo funcional para validar o ContractForge sem montar uma arquitetura completa.
+This guide shows the smallest functional flow to validate ContractForge without building a complete data platform structure.
 
-## 1. Instale
+## 1. Install
 
-No Databricks, instale o wheel versionado no cluster/job:
+On Databricks, install a versioned wheel on the cluster or job:
 
 ```bash
-%pip install /Volumes/<catalog>/<schema>/libs/contractforge-2.6.5-py3-none-any.whl
+%pip install /Volumes/<catalog>/<schema>/libs/contractforge-2.12.0-py3-none-any.whl
 ```
 
-Para desenvolvimento local com Spark:
+For local development:
 
 ```bash
 pip install -e ".[dev]"
 ```
 
-## 2. Crie uma tabela de origem simples
+For local Spark/Delta execution:
 
-Em um notebook Databricks:
+```bash
+pip install ".[spark]"
+```
+
+## 2. Create a Simple Source Table
+
+In a Databricks notebook:
 
 ```python
 from pyspark.sql import Row
@@ -35,7 +41,7 @@ df = spark.createDataFrame([
 df.write.mode("overwrite").saveAsTable("main.raw.orders_quickstart")
 ```
 
-## 3. Execute uma ingestão mínima
+## 3. Run a Minimal Ingestion
 
 ```python
 from contractforge import ingest
@@ -62,16 +68,16 @@ result = ingest(
 result
 ```
 
-Resultado esperado:
+Expected result:
 
 - `status = SUCCESS`
 - `target_table = main.bronze.b_orders_quickstart`
 - `rows_read = 2`
 - `rows_written = 2`
 
-Por padrão, o schema físico do target é o próprio `layer`. Se sua organização usa schemas de negócio, adicione `target_schema`, por exemplo `target_schema="landing_orders"` para gravar em `main.landing_orders.b_orders_quickstart` mantendo `layer="bronze"` como camada lógica.
+By default, the physical target schema is the `layer` value. If your organization uses business schemas, add `target_schema`, for example `target_schema="landing_orders"`, to write to `main.landing_orders.b_orders_quickstart` while keeping `layer="bronze"` as logical metadata.
 
-## 4. Consulte evidências operacionais
+## 4. Inspect Operational Evidence
 
 ```sql
 SELECT run_id, target_table, mode, status, rows_read, rows_written, framework_version
@@ -85,12 +91,12 @@ LIMIT 10;
 SELECT target_table, rule_name, status, failed_count
 FROM main.ops.ctrl_ingestion_quality
 WHERE target_table = 'main.bronze.b_orders_quickstart'
-ORDER BY quality_ts_utc DESC;
+ORDER BY checked_at_utc DESC;
 ```
 
-## 5. Próximo passo
+## 5. Move to YAML
 
-Depois que o fluxo mínimo passar, evolua para contrato YAML:
+After the minimal flow succeeds, move the ingestion intent to a YAML contract:
 
 ```yaml
 source:
@@ -112,9 +118,8 @@ quality_rules:
   unique_key: [order_id]
 ```
 
-Valide antes de executar:
+Validate before running:
 
 ```bash
 contractforge validate contracts/bronze/b_orders_quickstart.ingestion.yaml
 ```
-

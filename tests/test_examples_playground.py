@@ -21,4 +21,4 @@ def test_playground_validation_script_runs(capsys):
     from examples.playground.scripts.validate_playground import run
 
     assert run() == 0
-    assert "Validando contratos" in capsys.readouterr().out
+    assert "Validating contracts" in capsys.readouterr().out

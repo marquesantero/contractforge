@@ -1,10 +1,10 @@
-# Anti-patterns
+# Anti-Patterns
 
-Esta página lista configurações que parecem válidas, mas costumam gerar perda de dados, custo excessivo ou baixa governança.
+This page lists configurations that look valid but usually cause data loss, excessive cost or weak governance.
 
-## Snapshot Incremental
+## Incremental Snapshot
 
-Errado:
+Wrong:
 
 ```yaml
 mode: snapshot_soft_delete
@@ -12,7 +12,7 @@ watermark_columns: updated_at
 merge_keys: device_id
 ```
 
-`snapshot_soft_delete` precisa de fonte completa. Se a fonte é filtrada por watermark, a lib não consegue distinguir registro ausente de registro não lido.
+`snapshot_soft_delete` requires a complete source. If the source is filtered by watermark, ContractForge cannot distinguish a deleted record from a record that was not read.
 
 Use:
 
@@ -27,9 +27,9 @@ source:
     source_complete: true
 ```
 
-## Secrets Literais no YAML
+## Literal Secrets in YAML
 
-Errado:
+Wrong:
 
 ```yaml
 source:
@@ -38,10 +38,10 @@ source:
   options:
     url: jdbc:postgresql://host/db
     user: app_user
-    password: senha-em-texto
+    password: plain-text-password
 ```
 
-Use placeholders:
+Use secret placeholders:
 
 ```yaml
 source:
@@ -53,11 +53,11 @@ source:
     password: "{{ secret:erp/password }}"
 ```
 
-O ContractForge redige metadados antes de persistir em ctrl tables, mas não deve receber segredo literal quando existe secret manager.
+ContractForge redacts metadata before persisting it to control tables, but contracts should not contain literal secrets when a secret manager is available.
 
-## Explode Cedo Demais
+## Exploding Too Early
 
-Evite alterar cardinalidade em Bronze sem intenção explícita:
+Avoid changing cardinality in Bronze unless that is an explicit design choice:
 
 ```yaml
 layer: bronze
@@ -67,7 +67,7 @@ shape:
       mode: explode
 ```
 
-Prefira preservar o payload bruto em Bronze e fazer normalização em Silver:
+Prefer preserving the raw payload in Bronze and normalizing it in Silver:
 
 ```yaml
 layer: silver
@@ -78,9 +78,9 @@ shape:
       mode: explode_outer
 ```
 
-## Merge Key Nula
+## Nullable Merge Key
 
-Errado:
+Wrong:
 
 ```yaml
 mode: scd1_upsert
@@ -89,7 +89,7 @@ quality_rules:
   not_null: []
 ```
 
-Use quality gate explícito:
+Use an explicit quality gate:
 
 ```yaml
 mode: scd1_upsert
@@ -99,22 +99,22 @@ quality_rules:
   unique_key: [customer_id]
 ```
 
-Chaves nulas em `MERGE` tornam o resultado difícil de auditar e podem esconder problemas de origem.
+Null keys in `MERGE` make results hard to audit and can hide source-system defects.
 
-## Explain Permanente em Produção
+## Permanent Explain Mode in Production
 
-Errado:
+Wrong:
 
 ```yaml
 explain_mode: true
 explain_format: formatted
 ```
 
-Use `explain_mode` em desenvolvimento, CI ou diagnóstico pontual. Em execução contínua, o plano Spark pode ser grande e custoso.
+Use `explain_mode` in development, CI or targeted diagnostics. In continuous runs, Spark plans can become large and expensive to capture.
 
-## REST API Como Carga Massiva
+## REST API as a Bulk Loader
 
-Errado:
+Wrong:
 
 ```yaml
 source:
@@ -126,7 +126,7 @@ source:
     max_pages: 100000
 ```
 
-Para volumes altos, descarregue primeiro em storage e ingira por Auto Loader:
+For high-volume ingestion, land files in storage first and ingest them with Auto Loader:
 
 ```yaml
 source:
@@ -139,9 +139,9 @@ source:
     checkpoint_location: /Volumes/main/ops/checkpoints/events
 ```
 
-## Reconcile Agressivo de Access
+## Aggressive Access Reconciliation
 
-Evite começar com revogação automática:
+Avoid starting with automatic revocation:
 
 ```yaml
 access_policy:
@@ -150,7 +150,7 @@ access_policy:
   revoke_unmanaged: true
 ```
 
-Prefira validar primeiro:
+Validate first:
 
 ```yaml
 access_policy:
@@ -159,4 +159,4 @@ access_policy:
   revoke_unmanaged: false
 ```
 
-Quando a revogação for necessária, use `contractforge apply-access --force-revoke` em janela controlada.
+When revocation is required, run `contractforge apply-access --force-revoke` during a controlled change window.

@@ -1,7 +1,7 @@
 annotations:
   policy: warn
   table:
-    description: "Silver NASA EONET com uma linha por observação geográfica do evento."
+    description: "Silver NASA EONET with one row per geographic event observation."
     aliases: [nasa_eonet_event_observations]
     tags:
       domain: natural-events
@@ -10,12 +10,12 @@ annotations:
       contains_pii: "false"
   columns:
     event_id:
-      description: "Identificador do evento EONET."
+      description: "EONET event identifier."
     category_title:
-      description: "Categoria principal do evento."
+      description: "Main event category."
     observed_at:
-      description: "Timestamp da observação geográfica."
+      description: "Geographic observation timestamp."
     longitude:
-      description: "Longitude extraída do array de coordenadas."
+      description: "Longitude extracted from the coordinates array."
     latitude:
-      description: "Latitude extraída do array de coordenadas."
+      description: "Latitude extracted from the coordinates array."

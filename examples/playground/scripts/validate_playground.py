@@ -10,7 +10,7 @@ CONTRACTS = ROOT / "contracts"
 
 
 def run() -> int:
-    print(f"Validando contratos em {CONTRACTS}")
+    print(f"Validating contracts in {CONTRACTS}")
     return main(["validate-project", str(CONTRACTS), "--indent", "2"])
 
 

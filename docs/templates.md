@@ -1,33 +1,33 @@
-# Templates de Contratos
+# Contract Templates
 
-Templates são exemplos executáveis de contratos completos. Eles não substituem presets:
+Templates are executable examples of complete contract bundles. They do not replace presets:
 
-- `preset` define defaults reutilizáveis dentro de um contrato.
-- `template` gera arquivos YAML de partida para um cenário real.
+- A `preset` provides reusable defaults inside a contract.
+- A `template` writes starter YAML files for a real scenario.
 
-Use templates para acelerar onboarding e padronizar projetos novos.
+Use templates to speed up onboarding and standardize new data projects.
 
-## Listar Templates
+## List Templates
 
 ```bash
 contractforge templates list
 ```
 
-## Ver Um Template
+## Inspect a Template
 
 ```bash
 contractforge templates show silver_jdbc_scd1_upsert
 contractforge templates show silver_jdbc_scd1_upsert --metadata-only
 ```
 
-## Gerar Um Bundle YAML
+## Write a YAML Bundle
 
 ```bash
 contractforge templates write silver_jdbc_scd1_upsert \
   --output contracts/silver/s_orders
 ```
 
-Esse comando gera arquivos split quando o template possui governança:
+When the template contains governance files, this command writes split contracts:
 
 ```text
 contracts/silver/s_orders.ingestion.yaml
@@ -36,16 +36,16 @@ contracts/silver/s_orders.operations.yaml
 contracts/silver/s_orders.access.yaml
 ```
 
-Depois valide:
+Validate the generated bundle:
 
 ```bash
 contractforge validate-bundle contracts/silver/s_orders
 contractforge governance-preview contracts/silver/s_orders
 ```
 
-## Wizard de Templates
+## Template Wizard
 
-Use `templates wizard` para recomendar templates por cenário antes de gerar arquivos:
+Use `templates wizard` to get deterministic recommendations before writing files:
 
 ```bash
 contractforge templates wizard --layer silver --source jdbc --mode scd1_upsert
@@ -55,7 +55,7 @@ contractforge templates wizard --layer silver --source jdbc --pattern rds_iam
 contractforge templates wizard --layer silver --pattern hash_diff --limit 1
 ```
 
-Para gravar o melhor template recomendado:
+Write the best recommended template:
 
 ```bash
 contractforge templates wizard \
@@ -64,7 +64,7 @@ contractforge templates wizard \
   --output contracts/bronze/b_orders_files
 ```
 
-Se quiser gravar um template específico dentro do mesmo fluxo:
+Write a specific template in the same flow:
 
 ```bash
 contractforge templates wizard \
@@ -74,36 +74,36 @@ contractforge templates wizard \
   --output contracts/silver/s_products_hash_diff
 ```
 
-O wizard é determinístico: ele não usa IA nem abre conexão com Databricks. O retorno JSON inclui `score`, `matched` e os metadados de cada template recomendado.
+The wizard is deterministic: it does not use AI and does not open a Databricks connection. The JSON response includes `score`, `matched` and template metadata.
 
-## Templates Built-in
+## Built-in Templates
 
-| Template | Uso |
-|----------|-----|
-| `bronze_rest_api_incremental` | API REST paginada com watermark e secrets. |
-| `bronze_http_file_csv_snapshot` | CSV público/autenticado via HTTP(S), com schema explícito e overwrite. |
-| `bronze_autoloader_json` | Auto Loader JSON em modo `available_now`. |
-| `bronze_autoloader_available_now_json` | Auto Loader `available_now` com checkpoint externo e controle de microbatches. |
-| `bronze_blob_partitioned_files` | CSV/Parquet particionado em S3/Blob/ADLS/GCS com schema explícito e filtro opcional. |
-| `bronze_object_storage_nested_json_shape` | JSON aninhado em object storage com `transform.shape.columns`. |
-| `bronze_object_storage_small_files` | Muitas dezenas/centenas de arquivos pequenos com glob, regex e schema explícito. |
-| `silver_jdbc_scd1_upsert` | JDBC incremental com SCD1, quality e access validate-only. |
-| `silver_jdbc_rds_iam_hash_diff` | Amazon RDS/Aurora IAM auth com JDBC incremental e hash diff. |
-| `silver_raw_json_payload_shape` | Coluna JSON string normalizada com `transform.shape.parse_json`. |
-| `silver_parallel_arrays_shape` | Arrays paralelos de APIs normalizados com `zip_arrays` + `explode_outer`. |
-| `silver_snapshot_soft_delete` | Snapshot completo com soft delete de ausentes. |
-| `silver_scd1_hash_diff` | Hash diff append-only para manter versões alteradas. |
-| `silver_scd2_history` | Histórico SCD2 para dimensões mutáveis. |
-| `gold_full_refresh_kpi` | Gold full refresh para tabela agregada/KPI. |
+| Template | Use |
+| --- | --- |
+| `bronze_rest_api_incremental` | Paginated REST API with watermark and secrets. |
+| `bronze_http_file_csv_snapshot` | Public/authenticated HTTP(S) CSV with explicit schema and overwrite. |
+| `bronze_autoloader_json` | Auto Loader JSON in `available_now` mode. |
+| `bronze_autoloader_available_now_json` | Auto Loader `available_now` with external checkpoint and microbatch controls. |
+| `bronze_blob_partitioned_files` | Partitioned CSV/Parquet in S3/Blob/ADLS/GCS with explicit schema and optional filtering. |
+| `bronze_object_storage_nested_json_shape` | Nested JSON in object storage using `transform.shape.columns`. |
+| `bronze_object_storage_small_files` | Many small files with glob, regex and explicit schema. |
+| `silver_jdbc_scd1_upsert` | Incremental JDBC with SCD1, quality and access validate-only. |
+| `silver_jdbc_rds_iam_hash_diff` | Amazon RDS/Aurora IAM auth with incremental JDBC and hash diff. |
+| `silver_raw_json_payload_shape` | JSON string column normalized with `transform.shape.parse_json`. |
+| `silver_parallel_arrays_shape` | Parallel API arrays normalized with `zip_arrays` + `explode_outer`. |
+| `silver_snapshot_soft_delete` | Full snapshot with soft delete for missing rows. |
+| `silver_scd1_hash_diff` | Append-only hash diff to keep changed versions. |
+| `silver_scd2_history` | SCD2 history for mutable dimensions. |
+| `gold_full_refresh_kpi` | Gold full refresh for aggregate/KPI tables. |
 
-## Exemplo: API REST Para Bronze
+## Example: REST API to Bronze
 
 ```bash
 contractforge templates write bronze_rest_api_incremental \
   --output contracts/bronze/b_orders_api
 ```
 
-O template gerado usa:
+The generated template uses:
 
 ```yaml
 source:
@@ -119,14 +119,14 @@ source:
     watermark_header: X-Watermark
 ```
 
-## Exemplo: JDBC Para Silver
+## Example: JDBC to Silver
 
 ```bash
 contractforge templates write silver_jdbc_scd1_upsert \
   --output contracts/silver/s_orders
 ```
 
-O template gerado combina:
+The generated template combines:
 
 ```yaml
 preset:
@@ -151,14 +151,14 @@ target:
   table: s_orders
 ```
 
-## Exemplo: Shape Para JSON Aninhado
+## Example: Shape for Nested JSON
 
 ```bash
 contractforge templates write bronze_object_storage_nested_json_shape \
   --output contracts/bronze/b_earthquake_events
 ```
 
-O template gerado usa `transform.shape` para projetar campos aninhados e expressões, sem PySpark manual:
+The generated template uses `transform.shape` to project nested fields and expressions without manual PySpark:
 
 ```yaml
 transform:
@@ -176,25 +176,25 @@ transform:
         expression: "element_at(geometry.coordinates, 1)"
 ```
 
-## Exemplo: RDS/Aurora IAM + Hash Diff
+## Example: RDS/Aurora IAM + Hash Diff
 
 ```bash
 contractforge templates write silver_jdbc_rds_iam_hash_diff \
   --output contracts/silver/s_orders_hash_diff
 ```
 
-Esse template demonstra:
+This template demonstrates:
 
 - `auth.type: rds_iam`
 - `credential_provider: default_chain`
-- particionamento JDBC com `partition_column`, bounds e `num_partitions`
+- JDBC partitioning with `partition_column`, bounds and `num_partitions`
 - `transform.deduplicate`
 - `mode: scd1_hash_diff`
 
-## Ajustes Recomendados Depois de Gerar
+## Recommended Edits After Generation
 
-- Troque `target.schema` e `target.table` para o padrão físico do projeto.
-- Troque owners, grupos e runbook no arquivo `.operations.yaml`.
-- Troque grants no `.access.yaml`.
-- Substitua URLs e nomes de secrets.
-- Rode `contractforge validate-bundle` e `contractforge governance-preview`.
+- Replace `target.schema` and `target.table` with your physical naming standard.
+- Replace owners, groups and runbook URLs in `.operations.yaml`.
+- Replace grants in `.access.yaml`.
+- Replace URLs, paths and secret names.
+- Run `contractforge validate-bundle` and `contractforge governance-preview`.

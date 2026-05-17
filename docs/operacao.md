@@ -1,24 +1,24 @@
-# Operação e Manutenção
+# Operations and Maintenance
 
-Este guia cobre rotinas operacionais que não fazem parte da ingestão em si, mas mantêm o ambiente saudável.
+This guide covers operational routines that are not part of ingestion itself but keep the environment healthy.
 
-## Retenção das Ctrl Tables
+## Control Table Retention
 
-As tabelas `ctrl_*` são evidência operacional. Elas devem ser preservadas por tempo suficiente para auditoria, suporte e troubleshooting, mas não devem crescer indefinidamente.
+`ctrl_*` tables are operational evidence. Keep them long enough for audit, support and troubleshooting, but do not let them grow indefinitely.
 
-Recomendação inicial:
+Initial recommendation:
 
-| Ambiente | Retenção sugerida | Observação |
-|----------|-------------------|------------|
-| Desenvolvimento | 15 a 30 dias | Evita acúmulo local. |
-| Homologação | 30 a 90 dias | Útil para regressões e validação de releases. |
-| Produção | 180 a 400 dias | Ajuste conforme auditoria, LGPD e políticas internas. |
+| Environment | Suggested retention | Notes |
+| --- | --- | --- |
+| Development | 15 to 30 days | Avoids local accumulation. |
+| Staging | 30 to 90 days | Useful for regressions and release validation. |
+| Production | 180 to 400 days | Adjust to audit, privacy and internal policies. |
 
-O estado corrente (`ctrl_ingestion_state`) e metadados de versão (`ctrl_ingestion_metadata`) não entram na limpeza histórica. Eles representam o estado operacional atual.
+Current state (`ctrl_ingestion_state`) and version metadata (`ctrl_ingestion_metadata`) are not part of historical cleanup. They represent current operational state.
 
 ## Preview
 
-Por padrão, o comando apenas imprime o plano SQL:
+By default, the command only prints the SQL plan:
 
 ```bash
 contractforge maintenance ctrl-retention \
@@ -27,7 +27,7 @@ contractforge maintenance ctrl-retention \
   --retention-days 180
 ```
 
-Para limpar apenas algumas tabelas:
+Clean only selected tables:
 
 ```bash
 contractforge maintenance ctrl-retention \
@@ -39,9 +39,9 @@ contractforge maintenance ctrl-retention \
   --target quarantine
 ```
 
-## Aplicação
+## Apply Cleanup
 
-Use `--apply` somente em job operacional controlado:
+Use `--apply` only from a controlled operational job:
 
 ```bash
 contractforge maintenance ctrl-retention \
@@ -51,7 +51,7 @@ contractforge maintenance ctrl-retention \
   --apply
 ```
 
-Para executar `VACUUM` após os `DELETE`s:
+Run `VACUUM` after the `DELETE`s when your Delta retention policy allows it:
 
 ```bash
 contractforge maintenance ctrl-retention \
@@ -63,9 +63,9 @@ contractforge maintenance ctrl-retention \
   --apply
 ```
 
-## Contrato Operacional Recomendado
+## Recommended Operations Contract
 
-Em projetos com contratos separados, registre a criticidade da própria tabela ingerida no `*.operations.yaml`:
+In projects with split contracts, record the operational criticality of each ingested table in `*.operations.yaml`:
 
 ```yaml
 target:
@@ -89,13 +89,13 @@ operations:
     maintenance_window: "02:00-04:00 UTC"
 ```
 
-O ContractForge não envia alertas diretamente. Ele registra dados suficientes em `ctrl_ingestion_runs`, `ctrl_ingestion_errors`, `ctrl_ingestion_quality`, `ctrl_ingestion_streams` e `ctrl_ingestion_operations` para dashboards e ferramentas externas.
+ContractForge does not send alerts directly. It records enough data in `ctrl_ingestion_runs`, `ctrl_ingestion_errors`, `ctrl_ingestion_quality`, `ctrl_ingestion_streams` and `ctrl_ingestion_operations` for dashboards and external alerting tools.
 
-Para um dashboard operacional completo no Databricks SQL, use o pacote em [`docs/dashboards`](dashboards/README.md). Ele traz blueprint de páginas, filtros, widgets e queries para visão executiva, confiabilidade, performance, qualidade, streaming, conectores e governança.
+For a complete Databricks SQL operational dashboard, use the package in [`docs/dashboards`](dashboards/README.md). It includes page blueprints, filters, widgets and queries for executive overview, reliability, performance, quality, streaming, connectors and governance.
 
-## Tabelas Históricas Limpas
+## Historical Tables Cleaned
 
-O comando atua sobre:
+The retention command operates on:
 
 - `ctrl_ingestion_runs`
 - `ctrl_ingestion_errors`
@@ -110,14 +110,14 @@ O comando atua sobre:
 - `ctrl_ingestion_operations`
 - `ctrl_ingestion_access`
 
-Não limpa:
+It does not clean:
 
 - `ctrl_ingestion_state`
 - `ctrl_ingestion_metadata`
 
-## Práticas
+## Practices
 
-- Agende a limpeza fora da janela principal de ingestão.
-- Rode primeiro sem `--apply` e revise o SQL gerado.
-- Use `VACUUM` somente se a política de retenção Delta do ambiente permitir.
-- Restrinja permissões de execução desse comando ao time de plataforma.
+- Schedule cleanup outside the main ingestion window.
+- Run without `--apply` first and review the generated SQL.
+- Use `VACUUM` only when the environment Delta retention policy allows it.
+- Restrict execution permissions for this command to the platform team.

@@ -1,10 +1,10 @@
-# Template de Projeto
+# Project Template
 
-O diretório `examples/project_template/` contém uma estrutura mínima para iniciar um projeto ContractForge com Databricks Asset Bundles.
+The `examples/project_template/` directory contains a minimal structure for starting a ContractForge project with Databricks Asset Bundles.
 
-Para exemplos mais completos e validáveis por CLI, veja também `examples/playground/`.
+For richer examples that can be validated by CLI, also see `examples/playground/`.
 
-## Estrutura
+## Structure
 
 ```text
 examples/project_template/
@@ -22,41 +22,41 @@ examples/project_template/
     run_contract.py
 ```
 
-## Uso esperado
+## Expected Usage
 
-1. Copie o template para um novo repositório de dados.
-2. Ajuste `bundle.name`, `workspace.root_path`, `catalog`, schemas e paths.
-3. Publique o wheel do ContractForge em um Volume ou registry.
-4. Para criar novos contratos, use `contractforge init --output contracts/silver/c_orders --source bronze.b_orders --target-table c_orders --layer silver --mode scd1_upsert --merge-keys order_id --split`.
-5. Execute `contractforge validate-project contracts` localmente/CI.
-6. Execute o notebook genérico passando o path do contrato como parâmetro.
+1. Copy the template into a new data repository.
+2. Adjust `bundle.name`, `workspace.root_path`, `catalog`, schemas and paths.
+3. Publish the ContractForge wheel to a Volume or package registry.
+4. Create new contracts with `contractforge init --output contracts/silver/c_orders --source bronze.b_orders --target-table c_orders --layer silver --mode scd1_upsert --merge-keys order_id --split`.
+5. Run `contractforge validate-project contracts` locally or in CI.
+6. Run the generic notebook with the contract path as a parameter.
 
 ## Playground
 
-O diretório `examples/playground/` contém contratos prontos para cenários comuns:
+The `examples/playground/` directory contains ready-to-copy contracts for common scenarios:
 
-- REST API incremental para Bronze.
+- Incremental REST API to Bronze.
 - Auto Loader JSON `available_now`.
-- JDBC incremental com SCD1.
-- Snapshot com soft delete.
-- Histórico SCD2.
-- Gold full refresh de KPI.
+- Incremental JDBC with SCD1.
+- Snapshot with soft delete.
+- SCD2 history.
+- Gold KPI full refresh.
 
-Valide todos os exemplos:
+Validate all examples:
 
 ```bash
 python examples/playground/scripts/validate_playground.py
 ```
 
-Ou:
+Or directly:
 
 ```bash
 contractforge validate-project examples/playground/contracts
 ```
 
-## Princípio
+## Principle
 
-O notebook deve ser genérico. A lógica de ingestão fica no YAML:
+The notebook should stay generic. Ingestion logic belongs in YAML:
 
 ```python
 from contractforge import ingest_bundle, load_contract_bundle
@@ -66,5 +66,4 @@ result = ingest_bundle(bundle)
 display(result)
 ```
 
-Isso evita notebooks por tabela e deixa mudanças de pipeline revisáveis em pull request.
-
+This avoids one notebook per table and keeps pipeline changes reviewable in pull requests.
