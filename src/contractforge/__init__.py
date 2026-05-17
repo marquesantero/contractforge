@@ -59,6 +59,7 @@ from .templates import (
     contract_template_files,
     get_contract_template,
     list_contract_templates,
+    recommend_contract_templates,
 )
 from .presets import apply_preset, get_preset, list_presets, preset_details, register_preset
 from .plan import target_full_table_name, target_schema_name
@@ -134,6 +135,7 @@ __all__ = [
     "preset_details",
     "register_preset",
     "register_source_resolver",
+    "recommend_contract_templates",
     "redact_secrets",
     "redact_text",
     "resolve_batch_source",
@@ -150,4 +152,4 @@ __all__ = [
 
 logging.getLogger(__name__).addHandler(logging.NullHandler())
 
-__version__ = "2.8.0"
+__version__ = "2.9.0"

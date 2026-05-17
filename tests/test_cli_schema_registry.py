@@ -10,6 +10,7 @@ from contractforge.cli import main
 from contractforge.contract_schema import yaml_schema
 from contractforge.plan import build_plan_from_kwargs
 from contractforge.quality import QUALITY_RULE_REGISTRY, register_quality_rule
+from contractforge.templates import recommend_contract_templates
 from contractforge.writers import register_write_mode
 
 
@@ -229,6 +230,39 @@ def test_cli_presets_list_and_show(capsys):
     assert main(["presets", "show", "gold_full_refresh", "--indent", "0"]) == 0
     output = capsys.readouterr().out
     assert '"name": "gold_full_refresh"' in output
+
+
+def test_contract_template_wizard_recommends_and_writes(tmp_path, capsys):
+    recommendations = recommend_contract_templates(layer="silver", pattern="hash_diff")
+    assert recommendations[0]["name"] == "silver_scd1_hash_diff"
+
+    assert main(["templates", "wizard", "--layer", "bronze", "--source", "s3", "--limit", "1", "--indent", "0"]) == 0
+    output = capsys.readouterr().out
+    assert "bronze_blob_partitioned_files" in output
+
+    base = tmp_path / "contracts" / "bronze" / "b_orders_files"
+    assert (
+        main(
+            [
+                "templates",
+                "wizard",
+                "--layer",
+                "bronze",
+                "--source",
+                "s3",
+                "--output",
+                str(base),
+                "--indent",
+                "0",
+            ]
+        )
+        == 0
+    )
+    output = capsys.readouterr().out
+    assert '"selected_template": "bronze_blob_partitioned_files"' in output
+    assert (tmp_path / "contracts" / "bronze" / "b_orders_files.ingestion.yaml").exists()
+    assert main(["validate-bundle", str(base)]) == 0
+    assert "OK" in capsys.readouterr().out
 
 
 def test_cli_connectors_list_and_show(capsys):

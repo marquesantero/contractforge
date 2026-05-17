@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from copy import deepcopy
+import json
 from typing import Any, Dict
 
 
@@ -133,6 +134,76 @@ BUILTIN_CONTRACT_TEMPLATES: dict[str, ContractTemplate] = {
                 "criticality": "medium",
                 "expected_frequency": "hourly",
                 "freshness_sla_minutes": 120,
+                "alert_on_failure": True,
+                "alert_on_quality_fail": True,
+                "runbook_url": "https://wiki.example.com/runbooks/b_orders_files",
+            },
+        },
+    },
+    "bronze_blob_partitioned_files": {
+        _TEMPLATE_META_KEY: {
+            "name": "bronze_blob_partitioned_files",
+            "description": "Bronze batch para CSV/Parquet particionado em object storage.",
+            "category": "bronze",
+            "files": ["ingestion", "annotations", "operations"],
+        },
+        "ingestion": {
+            "preset": "bronze_file_append",
+            "source": {
+                "type": "connector",
+                "connector": "s3",
+                "format": "parquet",
+                "path": "s3a://company-landing/orders/",
+                "options": {
+                    "recursiveFileLookup": True,
+                    "pathGlobFilter": "*.parquet",
+                },
+                "read": {
+                    "source_complete": True,
+                    "schema": "order_id STRING, order_date DATE, customer_id STRING, amount DOUBLE",
+                    "file_regex": "^year=2026/month=05/.*/orders_\\d+\\.parquet$",
+                    "file_regex_scope": "relative_path",
+                    "file_regex_max_listed": 50000,
+                },
+            },
+            "target": _target("bronze", "b_orders_files"),
+            "layer": "bronze",
+            "mode": "scd0_append",
+            "schema_policy": "additive_only",
+            "quality_rules": {
+                "not_null": ["order_id"],
+                "expressions": [
+                    {
+                        "name": "valid_amount",
+                        "expression": "amount IS NULL OR amount >= 0",
+                        "severity": "warn",
+                        "message": "amount negativo no arquivo bruto",
+                    }
+                ],
+            },
+        },
+        "annotations": {
+            "target": _target("bronze", "b_orders_files"),
+            "table": {
+                "description": "Arquivos particionados de pedidos em object storage.",
+                "tags": {"domain": "sales", "source": "object_storage", "format": "parquet"},
+            },
+            "columns": {
+                "order_id": {"description": "Identificador do pedido no arquivo."},
+                "order_date": {"description": "Data do pedido usada para particionamento lógico."},
+            },
+        },
+        "operations": {
+            "target": _target("bronze", "b_orders_files"),
+            "ownership": {
+                "business_owner": "sales-ops",
+                "technical_owner": "data-platform",
+                "support_group": "data-platform",
+            },
+            "operations": {
+                "criticality": "medium",
+                "expected_frequency": "daily",
+                "freshness_sla_minutes": 240,
                 "alert_on_failure": True,
                 "alert_on_quality_fail": True,
                 "runbook_url": "https://wiki.example.com/runbooks/b_orders_files",
@@ -273,6 +344,67 @@ BUILTIN_CONTRACT_TEMPLATES: dict[str, ContractTemplate] = {
                 "alert_on_failure": True,
                 "alert_on_quality_fail": True,
                 "runbook_url": "https://wiki.example.com/runbooks/s_devices",
+            },
+        },
+    },
+    "silver_scd1_hash_diff": {
+        _TEMPLATE_META_KEY: {
+            "name": "silver_scd1_hash_diff",
+            "description": "Silver append-only com hash diff para manter versões alteradas.",
+            "category": "silver",
+            "files": ["ingestion", "annotations", "operations"],
+        },
+        "ingestion": {
+            "preset": "silver_hash_diff_append",
+            "source": "bronze.b_products",
+            "target": _target("catalog_curated", "s_products_hash_diff"),
+            "layer": "silver",
+            "mode": "scd1_hash_diff",
+            "hash_keys": ["product_id"],
+            "hash_exclude_columns": ["updated_at", "ingestion_date", "ingestion_ts_utc", "__run_id"],
+            "transform": {
+                "deduplicate": {
+                    "keys": ["product_id"],
+                    "order_by": "updated_at DESC NULLS LAST, ingestion_ts_utc DESC NULLS LAST",
+                }
+            },
+            "quality_rules": {
+                "not_null": ["product_id"],
+                "expressions": [
+                    {
+                        "name": "valid_product_status",
+                        "expression": "status IS NULL OR status IN ('active', 'inactive', 'discontinued')",
+                        "severity": "quarantine",
+                        "message": "status de produto inválido",
+                    }
+                ],
+            },
+        },
+        "annotations": {
+            "target": _target("catalog_curated", "s_products_hash_diff"),
+            "table": {
+                "description": "Versões alteradas de produtos detectadas por hash diff.",
+                "tags": {"domain": "catalog", "pattern": "scd1_hash_diff"},
+            },
+            "columns": {
+                "product_id": {"description": "Chave natural do produto."},
+                "row_hash": {"description": "Hash técnico calculado pelo ContractForge."},
+            },
+        },
+        "operations": {
+            "target": _target("catalog_curated", "s_products_hash_diff"),
+            "ownership": {
+                "business_owner": "catalog",
+                "technical_owner": "data-platform",
+                "support_group": "data-platform",
+            },
+            "operations": {
+                "criticality": "medium",
+                "expected_frequency": "daily",
+                "freshness_sla_minutes": 240,
+                "alert_on_failure": True,
+                "alert_on_quality_fail": True,
+                "runbook_url": "https://wiki.example.com/runbooks/s_products_hash_diff",
             },
         },
     },
@@ -422,6 +554,8 @@ def contract_template_details(name: str) -> dict[str, Any]:
         "files": files,
         "target": (template.get("ingestion") or {}).get("target"),
         "presets": (template.get("ingestion") or {}).get("preset"),
+        "source": _template_source_kind(template),
+        "mode": (template.get("ingestion") or {}).get("mode"),
     }
 
 
@@ -434,3 +568,70 @@ def contract_template_files(name: str) -> dict[str, dict[str, Any]]:
         for key in ("ingestion", "annotations", "operations", "access")
         if key in template
     }
+
+
+def recommend_contract_templates(
+    *,
+    layer: str | None = None,
+    source: str | None = None,
+    mode: str | None = None,
+    pattern: str | None = None,
+    limit: int | None = None,
+) -> list[dict[str, Any]]:
+    """Recomenda templates por cenário sem depender de prompt interativo."""
+
+    criteria = {
+        "layer": _norm(layer),
+        "source": _norm(source),
+        "mode": _norm(mode),
+        "pattern": _norm(pattern),
+    }
+    has_criteria = any(criteria.values())
+    recommendations = []
+    for name in list_contract_templates():
+        details = contract_template_details(name)
+        haystack = _template_search_text(name)
+        score = 0
+        matched: list[str] = []
+        if criteria["layer"] and criteria["layer"] == _norm(details.get("category")):
+            score += 4
+            matched.append("layer")
+        if criteria["source"] and criteria["source"] in haystack:
+            score += 3
+            matched.append("source")
+        if criteria["mode"] and criteria["mode"] in haystack:
+            score += 3
+            matched.append("mode")
+        if criteria["pattern"] and criteria["pattern"] in haystack:
+            score += 2
+            matched.append("pattern")
+        if has_criteria and score == 0:
+            continue
+        recommendations.append({**details, "score": score, "matched": matched})
+    recommendations.sort(key=lambda item: (-int(item["score"]), str(item["name"])))
+    if limit is not None:
+        return recommendations[: max(0, int(limit))]
+    return recommendations
+
+
+def _template_source_kind(template: ContractTemplate) -> str:
+    ingestion = template.get("ingestion") or {}
+    source = ingestion.get("source")
+    if isinstance(source, str):
+        return "table"
+    if isinstance(source, dict):
+        return str(source.get("connector") or source.get("type") or "connector")
+    return "unknown"
+
+
+def _template_search_text(name: str) -> str:
+    payload = {
+        "name": name,
+        "details": contract_template_details(name),
+        "template": get_contract_template(name),
+    }
+    return _norm(json.dumps(payload, ensure_ascii=False, default=str))
+
+
+def _norm(value: Any) -> str:
+    return str(value or "").strip().lower().replace("-", "_")

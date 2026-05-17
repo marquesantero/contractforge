@@ -43,14 +43,47 @@ contractforge validate-bundle contracts/silver/s_orders
 contractforge governance-preview contracts/silver/s_orders
 ```
 
+## Wizard de Templates
+
+Use `templates wizard` para recomendar templates por cenário antes de gerar arquivos:
+
+```bash
+contractforge templates wizard --layer silver --source jdbc --mode scd1_upsert
+contractforge templates wizard --layer bronze --source s3 --pattern partitioned
+contractforge templates wizard --layer silver --pattern hash_diff --limit 1
+```
+
+Para gravar o melhor template recomendado:
+
+```bash
+contractforge templates wizard \
+  --layer bronze \
+  --source s3 \
+  --output contracts/bronze/b_orders_files
+```
+
+Se quiser gravar um template específico dentro do mesmo fluxo:
+
+```bash
+contractforge templates wizard \
+  --layer silver \
+  --pattern hash_diff \
+  --name silver_scd1_hash_diff \
+  --output contracts/silver/s_products_hash_diff
+```
+
+O wizard é determinístico: ele não usa IA nem abre conexão com Databricks. O retorno JSON inclui `score`, `matched` e os metadados de cada template recomendado.
+
 ## Templates Built-in
 
 | Template | Uso |
 |----------|-----|
 | `bronze_rest_api_incremental` | API REST paginada com watermark e secrets. |
 | `bronze_autoloader_json` | Auto Loader JSON em modo `available_now`. |
+| `bronze_blob_partitioned_files` | CSV/Parquet particionado em S3/Blob/ADLS/GCS com schema explícito e filtro opcional. |
 | `silver_jdbc_scd1_upsert` | JDBC incremental com SCD1, quality e access validate-only. |
 | `silver_snapshot_soft_delete` | Snapshot completo com soft delete de ausentes. |
+| `silver_scd1_hash_diff` | Hash diff append-only para manter versões alteradas. |
 | `silver_scd2_history` | Histórico SCD2 para dimensões mutáveis. |
 | `gold_full_refresh_kpi` | Gold full refresh para tabela agregada/KPI. |
 

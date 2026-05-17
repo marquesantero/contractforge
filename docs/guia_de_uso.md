@@ -508,6 +508,8 @@ Antes de subir um YAML, valide localmente que ele é parseável e produz um `Ing
 ```bash
 contractforge init --output contracts/silver/c_pedidos --source bronze.b_pedidos --target-table c_pedidos --layer silver --mode scd1_upsert --merge-keys pedido_id --split
 contractforge templates list
+contractforge templates wizard --layer silver --source jdbc --mode scd1_upsert
+contractforge templates wizard --layer bronze --source s3 --output contracts/bronze/b_orders_files
 contractforge templates write silver_jdbc_scd1_upsert --output contracts/silver/s_orders
 contractforge validate contracts/silver/c_pedidos.yaml
 contractforge validate-project contracts

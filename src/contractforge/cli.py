@@ -14,7 +14,13 @@ from .maintenance import apply_ctrl_retention
 from .plan import build_plan_from_kwargs, target_full_table_name
 from .presets import apply_preset, list_presets, preset_details
 from .sources import diagnose_source_connectors, list_source_connector_details, source_connector_details
-from .templates import contract_template_details, contract_template_files, get_contract_template, list_contract_templates
+from .templates import (
+    contract_template_details,
+    contract_template_files,
+    get_contract_template,
+    list_contract_templates,
+    recommend_contract_templates,
+)
 
 
 def _load_contract(path: Path) -> Any:
@@ -483,12 +489,7 @@ def _templates_show(name: str, indent: int, *, metadata_only: bool = False) -> i
 def _templates_write(args: argparse.Namespace) -> int:
     try:
         output = _template_output_base(args.output)
-        files = contract_template_files(args.name)
-        written = []
-        for kind, payload in files.items():
-            path = output.with_suffix(f".{kind}.yaml")
-            _write_yaml(path, payload, force=args.force)
-            written.append(str(path))
+        written = _write_template_files(args.name, output, force=args.force)
         print(
             json.dumps(
                 {"status": "SUCCESS", "template": args.name, "written": written},
@@ -500,6 +501,51 @@ def _templates_write(args: argparse.Namespace) -> int:
     except Exception as exc:
         print(f"ERRO templates write: {exc}", file=sys.stderr)
         return 1
+
+
+def _templates_wizard(args: argparse.Namespace) -> int:
+    try:
+        recommendations = recommend_contract_templates(
+            layer=args.layer,
+            source=args.source,
+            mode=args.mode,
+            pattern=args.pattern,
+            limit=args.limit,
+        )
+        if not recommendations:
+            raise ValueError("Nenhum template compatível encontrado para os critérios informados")
+        result: dict[str, Any] = {
+            "status": "SUCCESS",
+            "criteria": {
+                "layer": args.layer,
+                "source": args.source,
+                "mode": args.mode,
+                "pattern": args.pattern,
+            },
+            "recommendations": recommendations,
+        }
+        if args.output:
+            selected = args.name or str(recommendations[0]["name"])
+            if selected not in {str(item["name"]) for item in recommendations} and not args.name:
+                selected = str(recommendations[0]["name"])
+            output = _template_output_base(args.output)
+            result["selected_template"] = selected
+            result["written"] = _write_template_files(selected, output, force=args.force)
+        print(json.dumps(result, indent=args.indent, sort_keys=True, default=str))
+        return 0
+    except Exception as exc:
+        print(f"ERRO templates wizard: {exc}", file=sys.stderr)
+        return 1
+
+
+def _write_template_files(name: str, output: Path, *, force: bool) -> list[str]:
+    files = contract_template_files(name)
+    written = []
+    for kind, payload in files.items():
+        path = output.with_suffix(f".{kind}.yaml")
+        _write_yaml(path, payload, force=force)
+        written.append(str(path))
+    return written
 
 
 def _maintenance_ctrl_retention(args: argparse.Namespace) -> int:
@@ -676,6 +722,19 @@ def main(argv: list[str] | None = None) -> int:
     templates_write_parser.add_argument("--output", required=True, type=Path)
     templates_write_parser.add_argument("--force", action="store_true", help="Sobrescreve arquivos existentes")
     templates_write_parser.add_argument("--indent", type=int, default=2)
+    templates_wizard_parser = templates_sub.add_parser(
+        "wizard",
+        help="Recomenda templates por cenário e opcionalmente grava o melhor bundle",
+    )
+    templates_wizard_parser.add_argument("--layer", help="Camada lógica desejada, ex.: bronze, silver ou gold")
+    templates_wizard_parser.add_argument("--source", help="Origem/conector, ex.: rest_api, jdbc, autoloader, s3")
+    templates_wizard_parser.add_argument("--mode", help="Modo de escrita desejado, ex.: scd1_upsert")
+    templates_wizard_parser.add_argument("--pattern", help="Padrão de uso, ex.: hash_diff, snapshot ou partitioned")
+    templates_wizard_parser.add_argument("--limit", type=int, default=5)
+    templates_wizard_parser.add_argument("--name", help="Template a gravar quando --output for informado")
+    templates_wizard_parser.add_argument("--output", type=Path, help="Base de saída para gravar bundle YAML split")
+    templates_wizard_parser.add_argument("--force", action="store_true", help="Sobrescreve arquivos existentes")
+    templates_wizard_parser.add_argument("--indent", type=int, default=2)
 
     maintenance_parser = sub.add_parser("maintenance", help="Operacoes de manutencao operacional")
     maintenance_sub = maintenance_parser.add_subparsers(dest="maintenance_command", required=True)
@@ -744,6 +803,8 @@ def main(argv: list[str] | None = None) -> int:
             return _templates_show(args.name, args.indent, metadata_only=args.metadata_only)
         if args.template_command == "write":
             return _templates_write(args)
+        if args.template_command == "wizard":
+            return _templates_wizard(args)
     if args.command == "maintenance":
         if args.maintenance_command == "ctrl-retention":
             return _maintenance_ctrl_retention(args)
