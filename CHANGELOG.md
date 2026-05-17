@@ -6,6 +6,12 @@ Este projeto segue versionamento semântico enquanto a biblioteca evolui:
 - `MINOR`: novo recurso compatível ou endurecimento planejado do contrato.
 - `MAJOR`: mudança incompatível depois de adoção estável.
 
+## 2.9.0 - 2026-05-17
+
+- Adiciona `contractforge templates wizard` para recomendar templates por `layer`, `source`, `mode` e `pattern`, com opção de gravar o melhor bundle YAML.
+- Adiciona templates `bronze_blob_partitioned_files` e `silver_scd1_hash_diff`, cobrindo object storage particionado e hash diff.
+- Expõe `recommend_contract_templates()` como API pública para notebooks, automações e ferramentas de DX.
+
 ## 2.8.0 - 2026-05-17
 
 - Adiciona `source.read.file_regex` para filtrar arquivos por regex antes do `spark.read`, sem substituir `pathGlobFilter`.

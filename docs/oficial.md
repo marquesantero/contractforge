@@ -1323,6 +1323,8 @@ delta_properties:
 contractforge presets list
 contractforge presets show silver_scd1_upsert
 contractforge templates list
+contractforge templates wizard --layer silver --source jdbc --mode scd1_upsert
+contractforge templates wizard --layer bronze --source s3 --output contracts/bronze/b_orders_files
 contractforge templates write silver_jdbc_scd1_upsert --output contracts/silver/s_orders
 contractforge connectors list
 contractforge connectors show rest_api postgres s3 bigquery
