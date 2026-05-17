@@ -1,45 +1,45 @@
 # ContractForge Playground
 
-Projeto de exemplo para explorar o ContractForge sem depender de fontes externas reais.
+Example project for exploring ContractForge without depending on real external sources.
 
-O objetivo é mostrar contratos completos, validar estrutura e servir como base para copiar cenários para projetos reais.
+The goal is to show complete contracts, validate structure and provide copyable patterns for real projects.
 
-## Cenários
+## Scenarios
 
 ```text
 contracts/
   bronze/
-    b_orders_api.*              # REST API incremental
-    b_nasa_eonet_events.*       # REST API raw payload + shape.parse_json na silver
+    b_orders_api.*              # incremental REST API
+    b_nasa_eonet_events.*       # REST API raw payload + shape.parse_json in silver
     b_orders_files.*            # Auto Loader JSON available_now
   silver/
-    s_orders.*                  # JDBC incremental + SCD1
-    s_nasa_eonet_event_observations.* # JSON complexo estruturado por shape
+    s_orders.*                  # incremental JDBC + SCD1
+    s_nasa_eonet_event_observations.* # complex JSON structured by shape
     s_devices.*                 # snapshot_soft_delete
     s_customers_history.*       # SCD2
   gold/
     g_daily_orders.*            # Gold full refresh KPI
 notebooks/
-  run_contract.py               # notebook genérico para Databricks
+  run_contract.py               # generic Databricks notebook
 scripts/
-  validate_playground.py        # valida todos os contratos via CLI
+  validate_playground.py        # validates all contracts through the CLI
 ```
 
-## Validação Local
+## Local Validation
 
-Instale a lib em modo desenvolvimento:
+Install the library in development mode:
 
 ```bash
 pip install -e ".[dev]"
 ```
 
-Valide o playground:
+Validate the playground:
 
 ```bash
 python examples/playground/scripts/validate_playground.py
 ```
 
-Ou diretamente:
+Or directly:
 
 ```bash
 contractforge validate-project examples/playground/contracts
@@ -47,17 +47,17 @@ contractforge governance-preview examples/playground/contracts/silver/s_orders
 contractforge templates list
 ```
 
-## Uso Em Projeto Real
+## Use in a Real Project
 
-1. Copie o cenário mais próximo para seu repositório.
-2. Ajuste `target.catalog`, `target.schema`, `target.table`.
-3. Troque URLs, paths, names e secrets.
-4. Revise `quality_rules`, `operations` e `access`.
-5. Rode `contractforge validate-bundle`.
-6. Execute com o notebook genérico ou com uma chamada `ingest_bundle()`.
+1. Copy the closest scenario into your repository.
+2. Adjust `target.catalog`, `target.schema` and `target.table`.
+3. Replace URLs, paths, names and secrets.
+4. Review `quality_rules`, `operations` and `access`.
+5. Run `contractforge validate-bundle`.
+6. Execute with the generic notebook or with `ingest_bundle()`.
 
-## Observação
+## Note
 
-Os contratos são exemplos de estrutura e governança. Eles não devem ser executados como ingestão real sem ajustar fontes, credenciais, schemas, permissões e paths.
+Contracts are structure and governance examples. Do not run them as real ingestion without adjusting sources, credentials, schemas, permissions and paths.
 
-O par `b_nasa_eonet_events`/`s_nasa_eonet_event_observations` demonstra o padrão recomendado para APIs REST com JSON complexo: o conector baixa o payload bruto com `response.mode: raw`, enquanto `shape.parse_json`, `shape.arrays` e `shape.columns` fazem a estruturação declarativa com schema explícito.
+The `b_nasa_eonet_events` / `s_nasa_eonet_event_observations` pair demonstrates the recommended pattern for REST APIs with complex JSON: the connector downloads the raw payload with `response.mode: raw`, while `shape.parse_json`, `shape.arrays` and `shape.columns` perform declarative structuring with an explicit schema.

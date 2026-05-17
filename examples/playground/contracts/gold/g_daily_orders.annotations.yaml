@@ -4,7 +4,7 @@ target:
   table: g_daily_orders
 
 table:
-  description: KPIs diários de pedidos para consumo executivo.
+  description: Daily order KPIs for executive consumption.
   tags:
     domain: sales
     layer: gold
@@ -12,6 +12,6 @@ table:
 
 columns:
   order_date:
-    description: Data de referência do KPI.
+    description: KPI reference date.
   gross_revenue:
-    description: Receita bruta diária.
+    description: Daily gross revenue.

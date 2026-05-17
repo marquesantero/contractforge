@@ -1,8 +1,8 @@
 # ContractForge Project Template
 
-Template mínimo para um projeto de ingestão declarativa com ContractForge e Databricks Asset Bundles.
+Minimal template for a declarative ingestion project with ContractForge and Databricks Asset Bundles.
 
-## Estrutura
+## Structure
 
 ```text
 contracts/
@@ -18,11 +18,11 @@ notebooks/
 databricks.yml
 ```
 
-## Fluxo
+## Flow
 
-1. Ajuste `catalog`, schemas, paths e permissões.
-2. Instale o wheel versionado do ContractForge no job/cluster.
-3. Valide contratos no CI:
+1. Adjust `catalog`, schemas, paths and permissions.
+2. Install the versioned ContractForge wheel on the job or cluster.
+3. Validate contracts in CI:
 
 ```bash
 contractforge init --output contracts/bronze/b_orders.ingestion.yaml --source main.raw.orders --target-table b_orders
@@ -31,5 +31,4 @@ contractforge validate-bundle contracts/silver/c_orders
 contractforge validate-project contracts
 ```
 
-4. Execute o notebook genérico passando o parâmetro `contract`.
-
+4. Run the generic notebook with the `contract` parameter.

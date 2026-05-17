@@ -1,46 +1,46 @@
-# Matriz de Compatibilidade de Conectores
+# Connector Compatibility Matrix
 
-Esta matriz descreve o contrato suportado pela lib. Drivers, credenciais, external locations e bibliotecas Spark externas continuam responsabilidade do runtime.
+This matrix describes the connector contract supported by ContractForge. Drivers, credentials, external locations and external Spark libraries remain runtime responsibilities.
 
-| Conector | Runtime esperado | Dependência externa | Local Spark | Databricks classic | Databricks serverless | Observações |
-|----------|------------------|---------------------|-------------|--------------------|-----------------------|-------------|
-| `table`, `delta_table`, `view` | Spark catalog | Nenhuma além do Spark/Delta | Sim | Sim | Sim | Depende de permissões no catálogo/schema/tabela. |
-| `sql` | Spark SQL | Nenhuma além do Spark | Sim | Sim | Sim | Use para queries rastreáveis e versionadas; evite SQL muito grande no YAML. |
-| `parquet`, `json`, `jsonl`, `ndjson`, `csv`, `orc`, `text`, `avro`, `xml` | Spark file reader | Conectores Hadoop/Spark do runtime | Sim | Sim | Sim | Path e credenciais precisam estar acessíveis ao Spark; `jsonl/ndjson` usam reader `json`; `xml` depende do suporte do runtime. |
-| `http_file` | Driver Python | Biblioteca padrão `urllib` | Sim | Sim | Sim | Baixa HTTP(S) no driver e cria DataFrame; use `format=csv|json|jsonl|ndjson|text`. |
-| `http_csv`, `http_json`, `http_text` | Driver Python | Biblioteca padrão `urllib` | Sim | Sim | Sim | Aliases de `http_file`; úteis quando Spark não consegue ler `https://` como filesystem. |
-| `delta` | Spark Delta reader | Delta Lake | Sim com extra `spark` | Sim | Sim | Por path; para tabela registrada prefira `delta_table`/`table`. |
-| `object_storage`, `blob` | Spark file reader | Credencial cloud configurada | Parcial | Sim | Sim | Use `provider=adls|azure_blob|s3|gcs`; para Azure Blob, SAS pode ser declarado em `auth.sas_token`; para S3, chaves podem ser declaradas em `auth` em runtimes classic/local. |
-| `s3` | Spark file reader | Acesso S3 no runtime ou `source.auth` em classic/local | Parcial | Sim | Sim via External Location; auth direto pode ser bloqueado | Alias de object storage com provider inferido; `source.auth.access_key_id`, `secret_access_key` e `session_token` opcional configuram `fs.s3a.*`. |
-| `adls`, `azure_blob` | Spark file reader | Acesso Azure Storage no runtime/Unity Catalog ou SAS em runtime que permita config Hadoop | Parcial | Sim | Sim, via External Location/Volume ou rede liberada | `azure_blob` aceita `account_url`, `container` e `auth.sas_token`; se serverless bloquear `fs.azure.sas...`, a lib falha rápido com orientação operacional. |
-| `gcs` | Spark file reader | Acesso GCS no runtime | Parcial | Sim | Sim | Requer configuração GCS no cluster/serverless. |
-| `jdbc` | Spark JDBC | Driver JDBC | Sim | Sim | Sim, se driver/runtime suportar | Exige `options.url` e `dbtable` ou `query`; aceita `source.auth` para basic/RDS IAM. |
-| `postgres`, `postgresql` | Spark JDBC | Driver PostgreSQL | Sim | Sim | Sim, se driver disponível | Alias de `jdbc`; suporta `auth.type=rds_iam` para Amazon RDS/Aurora. |
-| `sqlserver` | Spark JDBC | Driver Microsoft SQL Server | Sim | Sim | Sim, se driver disponível | Use `fetchsize` e particionamento em tabelas grandes. |
-| `mysql` | Spark JDBC | Driver MySQL/MariaDB | Sim | Sim | Sim, se driver disponível | Alias de `jdbc`. |
-| `oracle` | Spark JDBC | Driver Oracle | Sim | Sim | Sim, se driver disponível | Driver costuma exigir distribuição/licença controlada. |
-| `rest_api` | Driver Python | Biblioteca padrão `urllib` | Sim | Sim | Sim | Adequado para APIs paginadas de volume controlado. |
-| `snowflake` | Spark connector | Spark Snowflake connector | Sim, se instalado | Sim, se instalado | Sim, se suportado pelo runtime | Delegado a `spark.read.format("snowflake")`. |
-| `bigquery` | Spark connector | Spark BigQuery connector | Sim, se instalado | Sim, se instalado | Sim, se suportado pelo runtime | Delegado a `spark.read.format("bigquery")`. |
-| `autoloader` | Databricks Auto Loader | Databricks Runtime | Não | Sim | Sim | Apenas `available_now`; streaming contínuo fica fora do escopo. |
+| Connector | Expected runtime | External dependency | Local Spark | Databricks classic | Databricks serverless | Notes |
+| --- | --- | --- | --- | --- | --- | --- |
+| `table`, `delta_table`, `view` | Spark catalog | Spark/Delta only | Yes | Yes | Yes | Depends on catalog/schema/table permissions. |
+| `sql` | Spark SQL | Spark only | Yes | Yes | Yes | Use for traceable, versioned queries; avoid very large SQL strings in YAML. |
+| `parquet`, `json`, `jsonl`, `ndjson`, `csv`, `orc`, `text`, `avro`, `xml` | Spark file reader | Runtime Hadoop/Spark connectors | Yes | Yes | Yes | Path and credentials must be accessible to Spark; `jsonl`/`ndjson` use the JSON reader; `xml` depends on runtime support. |
+| `http_file` | Python driver | Standard library `urllib` | Yes | Yes | Yes | Downloads HTTP(S) on the driver and creates a DataFrame; use `format=csv|json|jsonl|ndjson|text`. |
+| `http_csv`, `http_json`, `http_text` | Python driver | Standard library `urllib` | Yes | Yes | Yes | Aliases for `http_file`; useful when Spark cannot read `https://` as a filesystem path. |
+| `delta` | Spark Delta reader | Delta Lake | Yes with `spark` extra | Yes | Yes | Path-based; prefer `delta_table`/`table` for registered tables. |
+| `object_storage`, `blob` | Spark file reader | Configured cloud credentials | Partial | Yes | Yes | Use `provider=adls|azure_blob|s3|gcs`; Azure Blob SAS can be declared in `auth.sas_token`; S3 keys can be declared in `auth` for classic/local runtimes. |
+| `s3` | Spark file reader | S3 runtime access or `source.auth` in classic/local | Partial | Yes | Yes via External Location; direct auth may be blocked | Alias for object storage with inferred provider; `source.auth.access_key_id`, `secret_access_key` and optional `session_token` configure `fs.s3a.*`. |
+| `adls`, `azure_blob` | Spark file reader | Azure Storage access through runtime/Unity Catalog or SAS in runtimes that allow Hadoop config | Partial | Yes | Yes through External Location/Volume or allowed networking | `azure_blob` accepts `account_url`, `container` and `auth.sas_token`; if serverless blocks `fs.azure.sas...`, ContractForge fails fast with operational guidance. |
+| `gcs` | Spark file reader | GCS access in the runtime | Partial | Yes | Yes | Requires GCS configuration in the cluster/serverless runtime. |
+| `jdbc` | Spark JDBC | JDBC driver | Yes | Yes | Yes, if driver/runtime supports it | Requires `options.url` and `dbtable` or `query`; accepts `source.auth` for basic/RDS IAM. |
+| `postgres`, `postgresql` | Spark JDBC | PostgreSQL driver | Yes | Yes | Yes, if driver is available | Alias for `jdbc`; supports `auth.type=rds_iam` for Amazon RDS/Aurora. |
+| `sqlserver` | Spark JDBC | Microsoft SQL Server driver | Yes | Yes | Yes, if driver is available | Use `fetchsize` and partitioning for large tables. |
+| `mysql` | Spark JDBC | MySQL/MariaDB driver | Yes | Yes | Yes, if driver is available | Alias for `jdbc`. |
+| `oracle` | Spark JDBC | Oracle driver | Yes | Yes | Yes, if driver is available | Driver distribution is often controlled by licensing. |
+| `rest_api` | Python driver | Standard library `urllib` | Yes | Yes | Yes | Suitable for paginated APIs with controlled volume. |
+| `snowflake` | Spark connector | Spark Snowflake connector | Yes, if installed | Yes, if installed | Yes, if supported by the runtime | Delegates to `spark.read.format("snowflake")`. |
+| `bigquery` | Spark connector | Spark BigQuery connector | Yes, if installed | Yes, if installed | Yes, if supported by the runtime | Delegates to `spark.read.format("bigquery")`. |
+| `autoloader` | Databricks Auto Loader | Databricks Runtime | No | Yes | Yes | `available_now` only; continuous streaming is out of scope. |
 
-## Regras práticas
+## Practical Rules
 
-- Para arquivos recorrentes ou alto volume, prefira `autoloader` em Databricks.
-- Para arquivo público HTTP(S) pequeno/médio, prefira `http_file` em vez de `spark.read` direto em `https://`, principalmente em serverless.
-- Para APIs REST grandes, descarregue primeiro em landing files e use `autoloader`.
-- Para `snapshot_soft_delete`, declare `source.read.source_complete=true` apenas quando a fonte representar o estado completo.
-- Para filtros de arquivo, prefira `pathGlobFilter` quando o glob simples do Spark resolver. Use `source.read.file_regex` apenas quando precisar de regex real por `filename` ou `relative_path`; a lib lista arquivos pelo filesystem do Spark/Hadoop e aplica limite por `source.read.file_regex_max_listed`.
-- Para JDBC em tabelas grandes, configure `partition_column`, `lower_bound`, `upper_bound`, `num_partitions` e `fetchsize`.
-- Para Amazon RDS/Aurora, conectividade de rede não é resolvida pela lib: use mesma VPC, VPC peering, Transit Gateway, PrivateLink/NLB ou endpoint público tradicional. Aurora criado por Express Configuration pode usar Internet Access Gateway com IAM token, mas ainda exige permissão IAM e TCP acessível a partir do runtime.
-- Para Snowflake/BigQuery, valide o conector Spark no runtime antes de usar o contrato em produção.
-- Para conectores que usam credenciais, use `{{ secret:scope/key }}` e valide que `contractforge validate`/`connectors doctor` não exibem segredo literal.
-- Para Azure Blob com SAS, salve apenas o SAS token no secret scope e declare `account_url`, `container` e `path` separadamente no contrato.
-- Para Azure Blob em Databricks serverless, prefira Unity Catalog External Location/Volume e paths `abfss://...` ou `/Volumes/...`; SAS direto via `fs.azure.sas...` pode ser bloqueado por Spark Connect.
-- Para S3 em Databricks serverless, prefira Unity Catalog External Location/Volume. `source.auth` com chaves S3 é para classic/job cluster/local, onde `fs.s3a.*` pode ser configurado.
-- Se a origem é um arquivo HTTP(S) explícito e pequeno/médio, use `http_file`. Não trate `azure_blob` como downloader REST implícito.
+- For recurring files or high volume, prefer `autoloader` on Databricks.
+- For small or medium public HTTP(S) files, prefer `http_file` instead of direct `spark.read` on `https://`, especially on serverless.
+- For large REST APIs, land files first and ingest them with `autoloader`.
+- For `snapshot_soft_delete`, set `source.read.source_complete=true` only when the source represents the complete current state.
+- For file filters, prefer `pathGlobFilter` when Spark globbing is enough. Use `source.read.file_regex` only when you need real regex filtering on `filename` or `relative_path`; ContractForge lists files through the Spark/Hadoop filesystem and applies `source.read.file_regex_max_listed`.
+- For large JDBC tables, configure `partition_column`, `lower_bound`, `upper_bound`, `num_partitions` and `fetchsize`.
+- For Amazon RDS/Aurora, network connectivity is not solved by the library: use the same VPC, VPC peering, Transit Gateway, PrivateLink/NLB or a traditional public endpoint. Aurora created by Express Configuration may use Internet Access Gateway with IAM token, but still requires IAM permission and TCP reachability from the runtime.
+- For Snowflake/BigQuery, validate the Spark connector in the runtime before using the contract in production.
+- For connectors that use credentials, use `{{ secret:scope/key }}` and verify that `contractforge validate`/`connectors doctor` do not print literal secrets.
+- For Azure Blob with SAS, store only the SAS token in the secret scope and declare `account_url`, `container` and `path` separately in the contract.
+- For Azure Blob on Databricks serverless, prefer Unity Catalog External Location/Volume and `abfss://...` or `/Volumes/...` paths; direct SAS through `fs.azure.sas...` may be blocked by Spark Connect.
+- For S3 on Databricks serverless, prefer Unity Catalog External Location/Volume. `source.auth` with S3 keys is for classic/job clusters/local runtimes where `fs.s3a.*` can be configured.
+- If the source is an explicit small or medium HTTP(S) file, use `http_file`. Do not treat `azure_blob` as an implicit REST downloader.
 
-## Exemplos de validação
+## Validation Examples
 
 ```bash
 contractforge connectors list
@@ -49,11 +49,11 @@ contractforge connectors doctor s3 postgres snowflake bigquery rest_api http_fil
 contractforge validate contracts/bronze/b_orders.ingestion.yaml
 ```
 
-`connectors doctor` não abre conexão, não cria SparkSession e não valida credenciais. Ele mostra requisitos estáticos por conector, como driver JDBC, connector Spark externo, Auto Loader ou configuração cloud no runtime. Use esse comando em PRs e notebooks de diagnóstico antes de executar ingestões reais.
+`connectors doctor` does not open network connections, create a SparkSession or validate credentials. It shows static connector requirements such as JDBC drivers, external Spark connectors, Auto Loader or cloud runtime configuration. Use it in PRs and diagnostic notebooks before running real ingestion jobs.
 
-## Exemplo HTTP File CSV
+## HTTP File CSV Example
 
-Use `http_file` quando a origem é um arquivo publicado por HTTP(S), mas o runtime Spark não implementa leitura direta de `https://` como filesystem. O conector baixa o arquivo com Python e materializa o DataFrame no Spark, mantendo secrets e opções redigidos nas ctrl tables.
+Use `http_file` when the source is a file published through HTTP(S), but the Spark runtime does not implement direct `https://` reads as a filesystem. The connector downloads the file with Python and materializes the DataFrame in Spark while keeping secrets and options redacted in control tables.
 
 ```yaml
 source:
@@ -81,7 +81,7 @@ mode: scd0_overwrite
 source_system: covid19br_github
 ```
 
-Aliases equivalentes:
+Equivalent aliases:
 
 ```yaml
 source:
@@ -92,7 +92,7 @@ source:
     header: true
 ```
 
-## Exemplo JDBC Incremental
+## Incremental JDBC Example
 
 ```yaml
 source:
@@ -125,11 +125,11 @@ merge_keys: order_id
 watermark_columns: updated_at
 ```
 
-## Exemplo JDBC Amazon RDS/Aurora com IAM Auth
+## Amazon RDS/Aurora JDBC with IAM Auth
 
-`auth.type: rds_iam` gera o token IAM no driver Python no momento da leitura. O token vale poucos minutos para abrir a conexão, mas a sessão estabelecida continua válida. Use esse caminho quando o runtime já tem credenciais AWS declaradas em secrets, variáveis de ambiente ou AWS credential provider chain.
+`auth.type: rds_iam` generates the IAM token in the Python driver at read time. The token is short-lived for opening the connection, but the established session remains valid. Use this path when the runtime already has AWS credentials through secrets, environment variables or the AWS credential provider chain.
 
-O setup completo de usuário PostgreSQL, IAM policy `rds-db:connect`, secrets, driver JDBC e troubleshooting está em [RDS/Aurora JDBC com IAM Auth](rds_iam_jdbc.md).
+The full PostgreSQL user, IAM policy, `rds-db:connect`, secrets, JDBC driver and troubleshooting setup is in [RDS/Aurora JDBC with IAM Auth](rds_iam_jdbc.md).
 
 ```yaml
 source:
@@ -149,7 +149,7 @@ source:
     sslmode: require
 ```
 
-Para instance profile, web identity ou outro mecanismo da provider chain do `botocore`, omita as chaves explícitas e use:
+For instance profile, web identity or another `botocore` provider-chain mechanism, omit explicit keys and use:
 
 ```yaml
   auth:
@@ -159,23 +159,23 @@ Para instance profile, web identity ou outro mecanismo da provider chain do `bot
     credential_provider: default_chain
 ```
 
-Esse modo exige `botocore` no driver Python, por exemplo instalando `contractforge[aws]`.
+This mode requires `botocore` in the Python driver, for example by installing `contractforge[aws]`.
 
-Alternativas de rede recomendadas:
+Recommended network alternatives:
 
-- Databricks AWS e RDS na mesma VPC/subnets roteáveis.
-- VPC peering ou Transit Gateway entre VPC do Databricks e VPC do RDS.
-- AWS PrivateLink com NLB para cenários cross-VPC/cross-account.
-- RDS público tradicional com security group restrito ao CIDR/IP de saída do Databricks, apenas para validações controladas.
-- Aurora Express Internet Access Gateway com IAM token quando o cluster foi criado nesse modo e o relay aceitar conexão TCP do runtime.
+- Databricks AWS and RDS in the same VPC or routable subnets.
+- VPC peering or Transit Gateway between the Databricks VPC and the RDS VPC.
+- AWS PrivateLink with NLB for cross-VPC/cross-account scenarios.
+- Traditional public RDS endpoint with security group restricted to the Databricks egress CIDR/IP, only for controlled validation.
+- Aurora Express Internet Access Gateway with IAM token when the cluster was created in that mode and the relay accepts TCP from the runtime.
 
-Observações práticas:
+Practical notes:
 
-- Em clusters Unity Catalog `standard`/shared, Maven libraries podem exigir artifact allowlist. Se o driver JDBC for bloqueado, use cluster `SINGLE_USER` para validações ou peça allowlist ao admin do metastore.
-- `PAM authentication failed` normalmente indica usuário sem `rds_iam`, IAM principal sem `rds-db:connect`, token expirado ou token gerado para usuário/host/região diferentes.
-- Quando usar `ingest()` diretamente, informe `catalog` explicitamente. `target_schema` qualificado não substitui `plan.catalog`.
+- On Unity Catalog `standard`/shared clusters, Maven libraries may require artifact allowlisting. If the JDBC driver is blocked, use a `SINGLE_USER` cluster for validation or ask the metastore admin for allowlisting.
+- `PAM authentication failed` usually means the database user does not have `rds_iam`, the IAM principal lacks `rds-db:connect`, the token expired, or the token was generated for a different user/host/region.
+- When using `ingest()` directly, pass `catalog` explicitly. A qualified `target_schema` does not replace `plan.catalog`.
 
-## Exemplo REST API Incremental
+## Incremental REST API Example
 
 ```yaml
 source:
@@ -213,15 +213,15 @@ mode: scd0_append
 watermark_columns: updated_at
 ```
 
-## REST API com Payload JSON Complexo
+## REST API with Complex JSON Payload
 
-Para JSON aninhado, arrays de structs ou payloads com schema variável, `response.mode: records` consegue materializar registros reais com mais robustez em Spark clássico usando JSON lines + `spark.read.json`, por RDD quando disponível ou por `source.read.staging_path` configurado. O caminho usado fica em `source_metrics.dataframe_materialization`.
+For nested JSON, arrays of structs or payloads with variable schema, `response.mode: records` can materialize real records more robustly on classic Spark by using JSON lines + `spark.read.json`, through RDD when available or through configured `source.read.staging_path`. The selected path is stored in `source_metrics.dataframe_materialization`.
 
-`response.records_path` suporta navegação JSON simples, não JSONPath completo: use `$` para a raiz, `$.data.items` para campos, `$[1]` para índice de array raiz e `$.data[0].items` para arrays intermediários. Wildcards, filtros e expressões não são suportados.
+`response.records_path` supports simple JSON navigation, not full JSONPath: use `$` for the root, `$.data.items` for fields, `$[1]` for an index in a root array and `$.data[0].items` for intermediate arrays. Wildcards, filters and expressions are not supported.
 
-Quando a API retorna objetos dinâmicos ou JSON heterogêneo demais para inferência segura, declare `source.read.schema`. `source.schema` é aceito como alias curto e é normalizado para `source.read.schema`; conflitos entre os dois falham antes da leitura. O conector aplica esse DDL no Spark JSON reader antes de ler os registros materializados. Isso é a forma recomendada para APIs públicas grandes, em vez de depender de inferência automática.
+When the API returns dynamic objects or JSON that is too heterogeneous for safe inference, declare `source.read.schema`. `source.schema` is accepted as a short alias and normalized to `source.read.schema`; conflicts between the two fail before reading. The connector applies this DDL to the Spark JSON reader before reading materialized records. This is the recommended path for large public APIs instead of relying on automatic inference.
 
-Se o runtime não expõe `sparkContext`, declare um staging acessível ao driver Python e ao Spark reader:
+If the runtime does not expose `sparkContext`, declare staging that is accessible to both the Python driver and Spark reader:
 
 ```yaml
 source:
@@ -239,7 +239,7 @@ source:
       readerCaseSensitive: true
 ```
 
-Prefira `response.mode: raw` quando a resposta precisa ser tratada como documento completo por página, quando você quer controlar o schema explicitamente, ou quando o payload é grande demais para materialização direta em memória. Nesse modo o conector apenas baixa uma linha por página com o JSON bruto em `raw_response`; a estruturação fica no `shape.parse_json`, com schema Spark DDL explícito.
+Prefer `response.mode: raw` when the response must be treated as a full document per page, when you want explicit schema control, or when the payload is too large for direct in-memory materialization. In that mode, the connector downloads one row per page with the raw JSON in `raw_response`; structuring is handled by `shape.parse_json` with explicit Spark DDL.
 
 ```yaml
 source:
@@ -277,5 +277,4 @@ shape:
         >
 ```
 
-Use `response.mode: records` quando a API retorna uma lista em `records_path` e cada item representa uma linha de negócio. Use `response.mode: raw` quando a resposta precisa ser tratada por `shape` como documento completo. Para payloads grandes ou replay recorrente, faça landing em storage e processe com Auto Loader.
-
+Use `response.mode: records` when the API returns a list in `records_path` and each item represents a business row. Use `response.mode: raw` when the response should be handled by `shape` as a complete document. For large payloads or recurring replay, land files in storage and process them with Auto Loader.

@@ -1,18 +1,18 @@
 # Architecture Decision Records
 
-Este diretório registra decisões arquiteturais que explicam escolhas de produto e engenharia do ContractForge.
+This directory records architecture decisions that explain ContractForge product and engineering choices.
 
-Formato usado:
+Format:
 
-- **Status:** proposta, aceita, substituida ou removida.
-- **Contexto:** problema que motivou a decisao.
-- **Decisao:** escolha adotada.
-- **Consequencias:** efeitos positivos, custos e restricoes.
+- **Status:** proposed, accepted, superseded or removed.
+- **Context:** the problem that motivated the decision.
+- **Decision:** the adopted choice.
+- **Consequences:** positive effects, costs and constraints.
 
 ## ADRs
 
-| ADR | Status | Decisao |
-|-----|--------|---------|
-| [ADR-001](ADR-001-contratos-separados-por-responsabilidade.md) | Aceita | Separar contratos de ingestion, annotations, operations e access. |
-| [ADR-002](ADR-002-access-deferred.md) | Aceita | Nao aplicar governanca de acesso dentro da ingestao normal. |
-| [ADR-003](ADR-003-snapshot-soft-delete-sql-merge.md) | Aceita | Implementar `snapshot_soft_delete` com SQL `MERGE` e bloquear fontes parciais. |
+| ADR | Status | Decision |
+| --- | --- | --- |
+| [ADR-001](ADR-001-split-contracts-by-responsibility.md) | Accepted | Split contracts by responsibility: ingestion, annotations, operations and access. |
+| [ADR-002](ADR-002-deferred-access-control.md) | Accepted | Do not apply access governance inside normal ingestion. |
+| [ADR-003](ADR-003-snapshot-soft-delete-sql-merge.md) | Accepted | Implement `snapshot_soft_delete` with SQL `MERGE` and reject partial sources. |

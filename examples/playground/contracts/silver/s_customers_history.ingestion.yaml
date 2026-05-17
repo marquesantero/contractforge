@@ -18,4 +18,4 @@ quality_rules:
     - name: valid_updated_at
       expression: updated_at IS NOT NULL
       severity: abort
-      message: updated_at obrigatório para histórico SCD2
+      message: updated_at is required for SCD2 history

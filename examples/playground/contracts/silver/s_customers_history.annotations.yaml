@@ -4,16 +4,16 @@ target:
   table: s_customers_history
 
 table:
-  description: Histórico SCD2 de clientes.
+  description: Customer SCD2 history.
   tags:
     domain: crm
     history: scd2
 
 columns:
   customer_id:
-    description: Chave do cliente.
+    description: Customer key.
   email:
-    description: Email do cliente.
+    description: Customer email.
     pii:
       enabled: true
       type: email

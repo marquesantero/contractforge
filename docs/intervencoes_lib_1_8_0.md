@@ -1,25 +1,25 @@
-# Intervencoes Necessarias Na Lib 1.8.0
+# Required Intervention for Library 1.8.0
 
-Este documento registra o unico ajuste identificado durante a validacao do `ingestpacktest` com `contractforge 1.8.0`.
+This document records the only adjustment identified while validating `ingestpacktest` with `contractforge 1.8.0`.
 
-Status no repo principal: aplicado em `1.8.1`.
+Status in the main repository: applied in `1.8.1`.
 
-## 1. Empacotamento Do Wheel Para Databricks Serverless
+## 1. Wheel Packaging for Databricks Serverless
 
-### Sintoma
+### Symptom
 
-O primeiro run da regressao falhou antes de executar notebooks:
+The first regression run failed before executing notebooks:
 
 - job: `contractforge_regression`
-- run com falha: `850717785525210`
+- failed run: `850717785525210`
 - task: `validate_package_metadata`
-- erro: `Library installation failed`
+- error: `Library installation failed`
 
-O Databricks serverless tentou instalar o wheel e resolver dependencias externas declaradas no pacote.
+Databricks Serverless tried to install the wheel and resolve external dependencies declared by the package.
 
-### Causa
+### Cause
 
-O `pyproject.toml` da lib real neste repositório declara:
+The real library `pyproject.toml` declared Spark and Delta as mandatory dependencies:
 
 ```toml
 dependencies = [
@@ -29,11 +29,11 @@ dependencies = [
 ]
 ```
 
-Em Databricks serverless, Spark e Delta ja fazem parte do runtime. Quando o wheel declara `pyspark` e `delta-spark` como dependencias obrigatorias, o instalador tenta buscar/resolver esses pacotes e pode falhar antes de iniciar o notebook.
+In Databricks Serverless, Spark and Delta are already part of the runtime. When a wheel declares `pyspark` and `delta-spark` as mandatory dependencies, the installer may try to fetch or resolve those packages before the notebook starts.
 
-### Ajuste aplicado neste projeto de testes
+### Adjustment Applied in the Test Project
 
-Na copia vendorizada usada pelo harness, o wheel foi ajustado para manter apenas `PyYAML` como dependencia obrigatoria e mover Spark/Delta para extra opcional:
+The vendored copy used by the harness kept only `PyYAML` as a mandatory dependency and moved Spark/Delta to an optional extra:
 
 ```toml
 dependencies = [
@@ -45,27 +45,27 @@ databricks = ["databricks-sdk>=0.20"]
 spark = ["pyspark>=3.4,<4", "delta-spark>=3.0,<4"]
 ```
 
-Depois disso:
+After that:
 
 - `databricks bundle deploy --target dev --auto-approve`: `Deployment complete`
 - `contractforge_regression`: `SUCCESS`
 - `contractforge_medallion`: `SUCCESS`
 
-### Recomendacao para o repo principal
+### Recommendation for the Main Repository
 
-Aplicar o mesmo ajuste no `pyproject.toml` da lib principal.
+Apply the same packaging model in the main library `pyproject.toml`.
 
-Motivo: isso nao altera comportamento runtime da lib no Databricks, apenas evita que o wheel tente instalar dependencias que o runtime ja fornece.
+Reason: this does not change runtime behavior in Databricks; it only prevents the wheel from trying to install dependencies that the runtime already provides.
 
-### Impacto esperado
+### Expected Impact
 
-- Serverless: instalacao do wheel deixa de falhar por resolucao de `pyspark`/`delta-spark`.
-- Desenvolvimento local: quem precisar de Spark local pode instalar com extra `spark`.
-- Publicacao PyPI/GitHub: metadata fica mais adequado para Databricks.
+- Serverless: wheel installation no longer fails because of `pyspark`/`delta-spark` resolution.
+- Local development: users who need local Spark can install the `spark` extra.
+- PyPI/GitHub releases: package metadata becomes more appropriate for Databricks usage.
 
-## 2. Status Da Validacao Depois Do Ajuste
+## 2. Validation Status After the Adjustment
 
-Validacoes locais:
+Local validation:
 
 ```text
 pytest -q
@@ -75,16 +75,16 @@ databricks bundle validate --target dev
 Validation OK
 ```
 
-Validacoes Databricks:
+Databricks validation:
 
 ```text
 contractforge_regression
 run_id: 574848419724760
-resultado: SUCCESS
+result: SUCCESS
 failed_assertions: 0
 
 contractforge_medallion
 run_id: 565114273939624
-resultado: SUCCESS
+result: SUCCESS
 failed_assertions: 0
 ```

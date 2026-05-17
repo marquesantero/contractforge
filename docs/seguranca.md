@@ -1,6 +1,6 @@
-# Segurança e Secrets
+# Security and Secrets
 
-Este guia resume onde dados sensíveis podem aparecer e quais práticas devem ser usadas ao operar o ContractForge.
+This guide summarizes where sensitive data may appear and which practices should be used when operating ContractForge.
 
 ## Secrets
 
@@ -16,15 +16,15 @@ source:
     password: "{{ secret:erp/password }}"
 ```
 
-Resolução:
+Resolution order:
 
-- Primeiro tenta variável de ambiente `CONTRACTFORGE_SECRET_<SCOPE>_<KEY>`.
-- Se não existir, tenta Databricks Secrets via `dbutils.secrets.get(scope, key)`.
-- Estruturas gravadas em logs/ctrl tables são redigidas antes de persistir.
+- First, ContractForge tries the environment variable `CONTRACTFORGE_SECRET_<SCOPE>_<KEY>`.
+- If it does not exist, it tries Databricks Secrets through `dbutils.secrets.get(scope, key)`.
+- Structures written to logs and control tables are redacted before persistence.
 
-## Campos redigidos
+## Redacted Fields
 
-São tratados como sensíveis quando a chave contém termos como:
+Keys are treated as sensitive when they contain terms such as:
 
 - `authorization`
 - `password`
@@ -34,57 +34,56 @@ São tratados como sensíveis quando a chave contém termos como:
 - `apikey`
 - `key`
 
-Também são redigidos valores no formato `{{ secret:scope/key }}`.
+Values in the `{{ secret:scope/key }}` format are also redacted.
 
-Tracebacks e mensagens de erro também passam por redação antes de irem para logs, retorno de `ingest()`, `ctrl_ingestion_runs`, `ctrl_ingestion_errors` e `ctrl_ingestion_state`. O stack trace completo continua disponível para diagnóstico, mas com padrões sensíveis substituídos por `***REDACTED***`.
+Tracebacks and error messages are redacted before they are written to logs, `ingest()` results, `ctrl_ingestion_runs`, `ctrl_ingestion_errors` and `ctrl_ingestion_state`. The full stack trace remains available for diagnostics, but sensitive patterns are replaced by `***REDACTED***`.
 
-## Redação em texto livre
+## Free-text Redaction
 
-Além de estruturas `dict`, o ContractForge redige padrões sensíveis em texto livre antes de persistir auditoria. Isso cobre principalmente `ctrl_ingestion_explain` e `ctrl_ingestion_lineage`, onde conectores Spark podem incluir opções no plano físico ou em métricas operacionais.
+In addition to structured dictionaries, ContractForge redacts sensitive patterns in free text before writing audit data. This mainly protects `ctrl_ingestion_explain` and `ctrl_ingestion_lineage`, where Spark connectors may include options in physical plans or operational metrics.
 
-Padrões cobertos:
+Covered patterns include:
 
-- Placeholders `{{ secret:scope/key }}`.
-- Headers `Bearer <token>` e `Basic <token>`.
-- URLs com usuário/senha, como `jdbc:postgresql://user:password@host/db`.
-- Query strings ou parâmetros JDBC como `?password=...`, `;token=...`, `&api_key=...`.
-- Atribuições em texto como `password=...`, `token=...`, `client_secret=...`, `authorization=...`.
+- `{{ secret:scope/key }}` placeholders.
+- `Bearer <token>` and `Basic <token>` headers.
+- URLs with user/password, such as `jdbc:postgresql://user:password@host/db`.
+- Query strings or JDBC parameters such as `?password=...`, `;token=...`, `&api_key=...`.
+- Text assignments such as `password=...`, `token=...`, `client_secret=...`, `authorization=...`.
 
-## Explain e lineage
+## Explain and Lineage
 
-- `explain_mode` deve ser usado para diagnóstico, não como logging permanente em produção.
-- Evite colocar SQL com literais sensíveis em `source.query`, `filter_expression`, `dedup_order_expr` ou quality expressions.
-- Eventos OpenLineage devem carregar metadados operacionais, não credenciais ou payloads de negócio. O evento é redigido antes de ser salvo, mas não use OpenLineage como canal para payloads sensíveis.
-- Se um conector externo exigir opções sensíveis com nomes não padronizados, prefira nomes contendo `secret`, `token`, `password` ou `key` para garantir redação automática.
-- Metadados de conectores, incluindo `source_path`, `source_table`, labels e opções serializadas, passam por redação antes de serem gravados em ctrl tables.
+- Use `explain_mode` for diagnostics, not as permanent production logging.
+- Avoid sensitive literals in `source.query`, `filter_expression`, `dedup_order_expr` or quality expressions.
+- OpenLineage events should carry operational metadata, not credentials or business payloads. Events are redacted before persistence, but OpenLineage should not be used as a sensitive payload channel.
+- If an external connector requires sensitive options with non-standard names, prefer names containing `secret`, `token`, `password` or `key` so automatic redaction applies.
+- Connector metadata, including `source_path`, `source_table`, labels and serialized options, is redacted before being written to control tables.
 
-## Auditoria de Redação
+## Redaction Audit
 
-A suíte de testes cobre:
+The test suite covers:
 
-- Redação recursiva de `dict`, listas e tuplas.
-- Placeholders `{{ secret:scope/key }}`.
-- Headers `Bearer`/`Basic`.
-- URLs com usuário/senha.
-- Query strings e parâmetros JDBC com `password`, `token`, `api_key` e equivalentes.
-- Metadados de conectores REST/JDBC antes de persistência em `ctrl_ingestion_runs`.
+- Recursive redaction of dictionaries, lists and tuples.
+- `{{ secret:scope/key }}` placeholders.
+- `Bearer` and `Basic` headers.
+- URLs with user/password.
+- Query strings and JDBC parameters with `password`, `token`, `api_key` and similar names.
+- REST/JDBC connector metadata before persistence in `ctrl_ingestion_runs`.
 
-Se criar um conector customizado, não grave credenciais em `metadata` diretamente. Retorne metadados operacionais e use nomes sensíveis padronizados para qualquer campo que precise ser redigido.
+When creating a custom connector, do not write credentials directly to `metadata`. Return operational metadata and use standard sensitive names for any field that must be redacted.
 
-## Ctrl tables
+## Control Tables
 
-Restrinja acesso ao schema `ops`:
+Restrict access to the `ops` schema:
 
-- `ctrl_ingestion_runs` contém nomes de fontes, targets, parâmetros redigidos e mensagens de erro.
-- `ctrl_ingestion_errors` pode conter stack trace completo.
-- `ctrl_ingestion_quarantine` pode conter payloads rejeitados e deve seguir a mesma política de acesso dos dados de origem.
-- `ctrl_ingestion_lineage` pode revelar topologia de dados.
+- `ctrl_ingestion_runs` contains source names, targets, redacted parameters and error messages.
+- `ctrl_ingestion_errors` may contain full stack traces.
+- `ctrl_ingestion_quarantine` may contain rejected payloads and should follow the same access policy as the source data.
+- `ctrl_ingestion_lineage` can reveal data topology.
 
 ## Checklist
 
-- Use Databricks Secrets ou variáveis de ambiente, nunca segredo literal em YAML.
-- Revise `source.query` e expressões para evitar literais sensíveis.
-- Aplique grants restritos no schema `ops`.
-- Trate quarentena como dado sensível.
-- Use `annotations.columns.<col>.pii` para marcar PII e facilitar auditoria.
-
+- Use Databricks Secrets or environment variables; never store literal secrets in YAML.
+- Review `source.query` and expressions to avoid sensitive literals.
+- Apply restricted grants to the `ops` schema.
+- Treat quarantine data as sensitive.
+- Use `annotations.columns.<column>.pii` to mark PII and support audits.

@@ -4,11 +4,11 @@ target:
   table: s_devices
 
 table:
-  description: Estado atual de dispositivos com soft delete.
+  description: Current device state with soft delete.
   tags:
     domain: iot
     pattern: snapshot_soft_delete
 
 columns:
   device_id:
-    description: Identificador único do dispositivo.
+    description: Unique device identifier.
