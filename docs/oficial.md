@@ -406,7 +406,7 @@ O `IngestionPlan` é uma dataclass **frozen** (imutável após construção). To
 
 | Parâmetro | Tipo | Default | Usado por | Descrição |
 |-----------|------|---------|-----------|-----------|
-| `merge_keys` | `str \| List[str]` | `[]` | `scd1_upsert`, `scd2_historical`, `snapshot_soft_delete` | Chave(s) natural(is) do MERGE |
+| `merge_keys` | `str \| List[str]` | `[]` | `scd1_upsert`, `scd2_historical`, `snapshot_soft_delete` | Chave(s) natural(is) do MERGE; a source deve ter no máximo uma linha por combinação de chaves |
 | `hash_keys` | `str \| List[str]` | `[]` | `scd1_hash_diff` | Chave(s) para comparar versão mais recente no target |
 | `hash_exclude_columns` | `str \| List[str]` | `[]` | `scd1_hash_diff` | Colunas ignoradas no cálculo de hash (ex.: timestamps voláteis) |
 | `dedup_order_expr` | `str \| None` | `None` | Todos com chave | Expressão SQL de `ORDER BY` para desempate. Ex.: `"updated_at DESC NULLS LAST"` |
@@ -1169,7 +1169,7 @@ source:
 
 Use placeholders `{{ secret:scope/key }}` em `options`, `request`, `auth`, `pagination`, `response` ou `limits`. A resolução tenta primeiro a variável de ambiente `CONTRACTFORGE_SECRET_SCOPE_KEY`; se não existir, usa Databricks Secrets via `dbutils.secrets.get(scope, key)`.
 
-Os valores sensíveis são redigidos em logs e ctrl tables. A auditoria de execução persiste configurações redigidas em:
+Os valores sensíveis são redigidos em logs, mensagens de erro e ctrl tables. A auditoria de execução persiste configurações redigidas em:
 
 - `source_options_json`
 - `source_read_json`
@@ -3468,7 +3468,7 @@ resources:
 | `snapshot_soft_delete exige snapshot completo` | Combinou `snapshot_soft_delete` com `watermark_columns`/`filter_expression` | Remova o filtro/watermark ou use `scd1_upsert` |
 | `Regras abortivas não são quarentenáveis` | `unique_key`/`min_rows`/`required_columns` falhou com `on_quality_fail="quarantine"` | Use `on_quality_fail="warn"` ou corrija os dados |
 | Watermark não avança | Execução falhou ou dados sem watermark | Verifique `ctrl_ingestion_state` e logs; corrija a falha primeiro |
-| `MERGE source has multiple matches` | Duplicidade nas `merge_keys` | Use `dedup_order_expr` + `unique_key` nos quality gates |
+| `linhas duplicadas em ... grupos de merge_keys` | Duplicidade nas `merge_keys` detectada antes do MERGE | Corrija a chave composta, declare `quality_rules.unique_key` ou aplique `dedup_order_expr` |
 | SCD2 gera versões demais | `scd2_change_columns` muito amplo ou hash incluindo colunas voláteis | Restrinja às colunas de negócio que realmente definem mudança |
 | Explain vazio ou incompleto | Limitação de captura em serverless | Consulte Spark UI e `DESCRIBE HISTORY` complementarmente |
 
