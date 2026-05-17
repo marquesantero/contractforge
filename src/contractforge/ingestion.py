@@ -71,7 +71,7 @@ from .state import (
     upsert_state,
     with_retry,
 )
-from .sources import resolve_batch_source
+from .sources import redact_text, resolve_batch_source
 from .watermark import apply_watermark, compute_watermark, get_watermark
 from .writers import (
     affected_partition_values,
@@ -111,6 +111,13 @@ def _short_error_message(error: Optional[str]) -> Optional[str]:
         if not _GENERIC_STACK_FRAME_RE.search(line):
             return safe_truncate(line, 2000)
     return safe_truncate(lines[-1] if lines else error, 2000)
+
+
+def _redact_error_text(error: Optional[str]) -> Optional[str]:
+    """Remove secrets de mensagens/tracebacks antes de logar ou persistir."""
+    if not error:
+        return None
+    return redact_text(error)
 
 
 def _lock_owner(plan: IngestionPlan) -> str:
@@ -455,6 +462,63 @@ def _validate_merge_key_nulls(df: DataFrame, keys: list[str], row_count: int, mo
             "merge_keys contém valores nulos; revise quality_rules.not_null para evitar matches inesperados. "
             f"mode={mode}, null_counts={nullable_keys}, rows={row_count}"
         )
+
+
+def _has_equivalent_unique_key_rule(plan: IngestionPlan) -> bool:
+    keys = list(plan.merge_keys or [])
+    unique_key = list(plan.quality_rules.unique_key or [])
+    return bool(keys) and len(keys) == len(unique_key) and set(keys) == set(unique_key)
+
+
+def _validate_merge_key_duplicates(
+    df: DataFrame,
+    keys: list[str],
+    row_count: int,
+    mode: str,
+    *,
+    skip_if_already_proven_unique: bool = False,
+) -> None:
+    """Protege MERGE contra múltiplas linhas da source para a mesma chave."""
+    if skip_if_already_proven_unique or not keys or row_count <= 1:
+        return
+    grouped = df.groupBy(*keys).count().where(F.col("count") > 1)
+    row = grouped.agg(
+        F.count(F.lit(1)).alias("__duplicate_key_count"),
+        F.sum(F.col("count")).alias("__duplicate_row_count"),
+    ).first()
+    if row is None:
+        return
+    duplicate_key_count = int(row["__duplicate_key_count"] or 0)
+    duplicate_row_count = int(row["__duplicate_row_count"] or 0)
+    if duplicate_key_count:
+        raise ValueError(
+            f"mode={mode} recebeu {duplicate_row_count} linhas duplicadas em "
+            f"{duplicate_key_count} grupos de merge_keys. keys={keys}. "
+            "Corrija a chave composta, declare quality_rules.unique_key ou aplique dedup_order_expr."
+        )
+
+
+def _validate_merge_source_safety(
+    plan: IngestionPlan,
+    df: DataFrame,
+    row_count: int,
+    quality_status: str,
+    *,
+    after_write_hook: bool = False,
+) -> None:
+    if plan.mode not in {"scd1_upsert", "snapshot_soft_delete", "scd2_historical"}:
+        return
+    _validate_merge_key_nulls(df, plan.merge_keys, row_count, plan.mode)
+    skip_duplicates = (
+        not after_write_hook and quality_status == "PASSED" and _has_equivalent_unique_key_rule(plan)
+    )
+    _validate_merge_key_duplicates(
+        df,
+        plan.merge_keys,
+        row_count,
+        plan.mode,
+        skip_if_already_proven_unique=skip_duplicates,
+    )
 
 
 def _validate_plan(
@@ -987,8 +1051,7 @@ def ingest_plan(plan: IngestionPlan) -> Dict[str, Any]:
             if quality_status == "FAILED" and plan.on_quality_fail == "quarantine"
             else rows_read
         )
-        if plan.mode in {"scd1_upsert", "snapshot_soft_delete", "scd2_historical"}:
-            _validate_merge_key_nulls(prepared_df, plan.merge_keys, effective_rows, plan.mode)
+        _validate_merge_source_safety(plan, prepared_df, effective_rows, quality_status)
 
         if plan.dry_run:
             return _build_dry_run_result(
@@ -1005,6 +1068,13 @@ def ingest_plan(plan: IngestionPlan) -> Dict[str, Any]:
             if not isinstance(prepared_df, DataFrame):
                 raise ValueError("hooks.before_write deve retornar um DataFrame")
             effective_rows = prepared_df.count()
+            _validate_merge_source_safety(
+                plan,
+                prepared_df,
+                effective_rows,
+                quality_status,
+                after_write_hook=True,
+            )
         rows_written = with_retry(
             lambda: execute_write_mode(plan, prepared_df, target, effective_rows),
             attempts=plan.retry_attempts or CONFIG.default_retry_attempts,
@@ -1098,8 +1168,8 @@ def ingest_plan(plan: IngestionPlan) -> Dict[str, Any]:
     except Exception as exc:
         status = "FAILED"
         error_type = type(exc).__name__
-        error = "".join(traceback.format_exception(type(exc), exc, exc.__traceback__))
-        logger.error("Ingestão falhou: %s", exc)
+        error = _redact_error_text("".join(traceback.format_exception(type(exc), exc, exc.__traceback__)))
+        logger.error("Ingestão falhou: %s", _short_error_message(error) or error_type)
         if not plan.dry_run:
             try:
                 upsert_state(

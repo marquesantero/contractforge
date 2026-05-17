@@ -36,6 +36,8 @@ São tratados como sensíveis quando a chave contém termos como:
 
 Também são redigidos valores no formato `{{ secret:scope/key }}`.
 
+Tracebacks e mensagens de erro também passam por redação antes de irem para logs, retorno de `ingest()`, `ctrl_ingestion_runs`, `ctrl_ingestion_errors` e `ctrl_ingestion_state`. O stack trace completo continua disponível para diagnóstico, mas com padrões sensíveis substituídos por `***REDACTED***`.
+
 ## Redação em texto livre
 
 Além de estruturas `dict`, o ContractForge redige padrões sensíveis em texto livre antes de persistir auditoria. Isso cobre principalmente `ctrl_ingestion_explain` e `ctrl_ingestion_lineage`, onde conectores Spark podem incluir opções no plano físico ou em métricas operacionais.

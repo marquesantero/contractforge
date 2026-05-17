@@ -27,6 +27,7 @@ Links principais:
 - Registra observabilidade em ctrl tables: runs, erros, qualidade, quarentena, lineage, streaming, schema changes, annotations, operations e access.
 - Integra governança declarativa com `*.annotations.yaml`, `*.operations.yaml` e `*.access.yaml`.
 - Resolve fontes declarativas via conectores: tabelas, SQL, arquivos, HTTP files, object storage, JDBC, REST API, Auto Loader `available_now`, Snowflake e BigQuery.
+- Protege MERGE contra `merge_keys` duplicadas na source e redige secrets também em tracebacks/erros persistidos.
 
 ## Posicionamento
 

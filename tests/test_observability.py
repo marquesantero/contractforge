@@ -2,7 +2,7 @@ from datetime import datetime, timezone
 
 import contractforge.lineage as lineage_module
 from contractforge.config import CTRL_SCHEMA_VERSION, FRAMEWORK_VERSION
-from contractforge.ingestion import _short_error_message
+from contractforge.ingestion import _redact_error_text, _short_error_message
 from contractforge.lineage import write_openlineage_event
 from contractforge.plan import build_plan_from_kwargs
 from contractforge.writers import logical_row_metrics, normalize_rows_written, resolve_write_metrics
@@ -46,7 +46,7 @@ def test_short_error_message_prefers_caused_by_database_exception():
 
 
 def test_framework_and_ctrl_schema_versions_are_current():
-    assert FRAMEWORK_VERSION == "2.6.8"
+    assert FRAMEWORK_VERSION == "2.6.9"
     assert CTRL_SCHEMA_VERSION == 11
 
 
@@ -146,3 +146,21 @@ def test_openlineage_event_redacts_sensitive_operation_metrics(monkeypatch):
     assert "topsecret" not in payload
     assert "***REDACTED***" in payload
     assert "INSERT INTO" in captured["sql"]
+
+
+def test_error_redaction_removes_secrets_from_stack_trace_and_short_message():
+    raw_error = (
+        "RuntimeError: failed with jdbc:postgresql://user:s3cr3t@host/db?password=topsecret\n"
+        "Authorization=Bearer raw-token\n"
+        "Caused by: org.postgresql.util.PSQLException: password=innersecret"
+    )
+
+    redacted = _redact_error_text(raw_error)
+    short = _short_error_message(redacted)
+    payload = f"{redacted}\n{short}"
+
+    assert "s3cr3t" not in payload
+    assert "topsecret" not in payload
+    assert "raw-token" not in payload
+    assert "innersecret" not in payload
+    assert "***REDACTED***" in payload

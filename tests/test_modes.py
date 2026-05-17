@@ -482,6 +482,19 @@ def test_merge_keys_all_null_fail_before_merge(spark, make_df, unique_name):
     assert "merge_keys totalmente nulas" in (res["error_message"] or "")
 
 
+def test_duplicate_merge_keys_fail_before_merge_write(spark, make_df, unique_name):
+    table = f"{unique_name}_dupkeys"
+    df = make_df([(1, "a"), (1, "b"), (2, "c")], "id long, val string")
+
+    res = ingest(source=df, mode="scd1_upsert", merge_keys="id", **_common(table))
+
+    assert res["status"] == "FAILED"
+    assert "linhas duplicadas" in (res["error_message"] or "")
+    full = f"spark_catalog.silver.{table}"
+    if spark.catalog.tableExists(full):
+        assert spark.table(full).count() == 0
+
+
 def test_delta_properties_are_applied_on_table_creation(spark, make_df, unique_name):
     table = f"{unique_name}_props"
     full = f"spark_catalog.bronze.{table}"
