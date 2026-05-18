@@ -11,14 +11,19 @@
 <body data-page="examples">
 <button class="nav-toggle" type="button" aria-label="Open navigation" data-nav-toggle>☰</button>
 <div class="site-shell">
-<aside class="sidebar" data-sidebar><div class="brand-panel"><a class="brand" href="index.html"><img src="assets/logo/contractforge-mark.png" alt="" class="brand-mark"><span class="brand-text">ContractForge</span></a><span class="brand-meta">Contract-first ingestion for Delta Lake</span></div><nav class="side-nav" aria-label="Documentation"><span class="nav-label">Start</span><a href="index.html" data-nav="home">Overview</a><a href="quickstart.html" data-nav="quickstart">Quick start</a><a href="concepts.html" data-nav="concepts">Core concepts</a><a href="contracts.html" data-nav="contracts">Contracts</a><a href="write-modes.html" data-nav="write-modes">Write modes</a><a href="transformations.html" data-nav="transformations">Transformations</a><span class="nav-label">Connectors</span><a href="connectors/index.html" data-nav="connectors">Connector overview</a><a href="connectors/table-sql.html">Table and SQL</a><a href="connectors/files.html">Files</a><a href="connectors/http-file.html">HTTP file</a><a href="connectors/object-storage.html">Object storage</a><a href="connectors/s3.html">S3</a><a href="connectors/azure-blob.html">Azure Blob</a><a href="connectors/jdbc.html">JDBC</a><a href="connectors/rest-api.html">REST API</a><a href="connectors/autoloader.html">Auto Loader</a><a href="connectors/external-spark.html">Snowflake and BigQuery</a><span class="nav-label">Operate</span><a href="governance.html" data-nav="governance">Governance</a><a href="operations.html" data-nav="operations">Operations</a><a href="examples.html" data-nav="examples">Examples</a><a href="reference.html" data-nav="reference">Reference</a></nav><div class="sidebar-footer"><a href="pt/index.html">Português</a><a href="https://github.com/marquesantero/contractforge" target="_blank" rel="noopener">GitHub</a></div></aside>
+<aside class="sidebar" data-sidebar><div class="brand-panel"><a class="brand" href="index.html"><img src="assets/logo/contractforge-mark.png" alt="" class="brand-mark"><span class="brand-text">ContractForge</span></a><span class="brand-meta">Contract-first ingestion for Delta Lake</span></div><nav class="side-nav" aria-label="Documentation">
+    <span class="nav-label">Start</span><a href="index.html" data-nav="home">Overview</a><a href="quickstart.html" data-nav="quickstart">Quick start</a><a href="concepts.html" data-nav="concepts">Core concepts</a>
+    <span class="nav-label">Contracts</span><a href="contracts.html" data-nav="contracts">Contract overview</a><a href="contract-ingestion.html">Ingestion</a><a href="contract-annotations.html">Annotations</a><a href="contract-operations.html">Operations</a><a href="contract-access.html">Access</a><a href="write-modes.html" data-nav="write-modes">Write modes</a><a href="transformations.html" data-nav="transformations">Transformations</a>
+    <span class="nav-label">Connectors</span><a href="connectors/index.html" data-nav="connectors">Connector overview</a><a href="connectors/table-sql.html">Table and SQL</a><a href="connectors/files.html">Files</a><a href="connectors/http-file.html">HTTP file</a><a href="connectors/object-storage.html">Object storage</a><a href="connectors/s3.html">S3</a><a href="connectors/azure-blob.html">Azure Blob</a><a href="connectors/jdbc.html">JDBC</a><a href="connectors/rest-api.html">REST API</a><a href="connectors/autoloader.html">Auto Loader</a><a href="connectors/external-spark.html">Snowflake and BigQuery</a>
+    <span class="nav-label">Operate</span><a href="governance.html" data-nav="governance">Governance</a><a href="operations.html" data-nav="operations">Operations</a><a href="examples.html" data-nav="examples">Examples</a><a href="reference.html" data-nav="reference">Reference</a>
+  </nav><div class="sidebar-footer"><a href="pt/index.html">Português</a><a href="https://github.com/marquesantero/contractforge" target="_blank" rel="noopener">GitHub</a></div></aside>
 <main class="content">
-  <header class="page-header"><p class="eyebrow">Examples</p><h1>Patterns validated with real ingestion projects.</h1><p class="lead">Examples should demonstrate library features, not hide gaps behind notebook workarounds. If an example needs custom code that should be declarative, it belongs in the backlog.</p></header>
+  <header class="page-header"><p class="eyebrow">Examples</p><h1>Practical ingestion patterns for common data sources.</h1><p class="lead">Examples should demonstrate ContractForge capabilities without hiding recurring behavior behind notebook workarounds. If a pattern is broadly useful, prefer a declarative contract or a reusable template.</p></header>
   <section class="section">
     <div class="page-grid">
       <article class="page-card"><h3>Public CSV over HTTP</h3><p>Uses <code>http_file</code>, explicit CSV options, source completeness and overwrite mode.</p></article>
       <article class="page-card"><h3>NASA EONET REST API</h3><p>Uses <code>rest_api</code> raw response mode and <code>transform.shape.parse_json</code> to model nested arrays.</p></article>
-      <article class="page-card"><h3>Azure Blob / ADLS files</h3><p>Uses object storage paths, schemas, partitioned folders, recursive lookup and multi-format validation.</p></article>
+      <article class="page-card"><h3>Azure Blob / ADLS files</h3><p>Uses object storage paths, schemas, partitioned folders, recursive lookup and multiple file formats.</p></article>
       <article class="page-card"><h3>RDS/Aurora JDBC</h3><p>Uses JDBC partitioning, pushdown, RDS IAM token generation and hash diff writes.</p></article>
     </div>
   </section>
@@ -28,12 +33,12 @@
 contractforge validate-project contracts/</code></pre>
   </section>
   <section class="section">
-    <h2>Validated scenarios and what they prove</h2>
-    <div class="table-wrap"><table><tr><th>Scenario</th><th>Runtime</th><th>What it exercised</th></tr><tr><td>CDC public CSV over HTTP</td><td>Databricks serverless</td><td><code>http_file</code>, explicit CSV options, overwrite, source metadata, serverless-safe download path.</td></tr><tr><td>Azure Blob SAS files</td><td>Azure Databricks single-node classic</td><td>Direct object storage credentials, recursive folders, schemas, multiple file formats and cluster-level storage configuration.</td></tr><tr><td>Auto Loader on Blob/ADLS</td><td>Databricks</td><td><code>cloudFiles</code>, checkpoints, <code>available_now</code>, child run metrics and stream aggregation.</td></tr><tr><td>Supabase/Postgres JDBC</td><td>Databricks</td><td>JDBC driver, pushdown, partitioned reads, watermarking, SCD1/hash diff patterns.</td></tr><tr><td>AWS S3 from Azure Databricks</td><td>Classic single-node</td><td>S3A credential setup, explicit region/session token behavior and cross-cloud object storage constraints.</td></tr><tr><td>RDS/Aurora IAM</td><td>Classic cluster</td><td>JDBC <code>auth.type=rds_iam</code>, botocore/default credential chain and network prerequisite diagnosis.</td></tr></table></div>
+    <h2>Scenario catalog</h2>
+    <div class="table-wrap"><table><tr><th>Scenario</th><th>Typical runtime</th><th>What it demonstrates</th></tr><tr><td>Public CSV over HTTP</td><td>Databricks serverless</td><td><code>http_file</code>, explicit CSV options, overwrite, source metadata and a serverless-safe download path.</td></tr><tr><td>Azure Blob SAS files</td><td>Azure Databricks single-node classic</td><td>Direct object storage credentials, recursive folders, schemas, multiple file formats and cluster-level storage configuration.</td></tr><tr><td>Auto Loader on Blob/ADLS</td><td>Databricks</td><td><code>cloudFiles</code>, checkpoints, <code>available_now</code>, child run metrics and stream aggregation.</td></tr><tr><td>Supabase/Postgres JDBC</td><td>Databricks</td><td>JDBC driver, pushdown, partitioned reads, watermarking, SCD1/hash diff patterns.</td></tr><tr><td>AWS S3 from Azure Databricks</td><td>Classic single-node</td><td>S3A credential setup, explicit region/session token behavior and cross-cloud object storage constraints.</td></tr><tr><td>RDS/Aurora IAM</td><td>Classic cluster</td><td>JDBC <code>auth.type=rds_iam</code>, botocore/default credential chain and network prerequisite diagnosis.</td></tr></table></div>
   </section>
   <section class="section">
     <h2>Template families</h2>
-    <p>The validated examples were converted into reusable templates so new contracts can start from known-good patterns instead of blank YAML files.</p>
+    <p>Templates provide opinionated starting points for common connector, transform and write-mode combinations.</p>
     <pre><code>contractforge templates list
 contractforge templates wizard --layer silver --source jdbc --mode scd1_hash_diff
 contractforge templates write jdbc_hash_diff --output contracts/silver/s_orders</code></pre>
@@ -47,9 +52,10 @@ contractforge templates write jdbc_hash_diff --output contracts/silver/s_orders<
   <section class="section">
     <h2>Example design rule</h2>
     <p>Examples are not allowed to hide framework gaps with ad-hoc Spark code. If a real source requires common behavior, prefer improving the library or documenting a reusable pattern.</p>
-    <div class="note success"><strong>Outcome from real tests</strong><p>Validated examples already drove improvements in HTTP file ingestion, raw REST JSON handling, stream metric aggregation, JDBC/RDS auth, source schema aliases, merge safety and error summarization.</p></div>
+    <div class="note success"><strong>Design principle</strong><p>Reusable source behavior belongs in connectors, reusable shaping belongs in <code>transform.shape</code>, and source-specific business logic belongs in project code or downstream transformations.</p></div>
   </section>
 </main>
 </div>
 </body>
 </html>
+

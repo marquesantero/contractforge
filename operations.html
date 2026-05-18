@@ -1,86 +1,504 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="ContractForge operational control table reference, run diagnostics, useful SQL queries and maintenance guidance.">
   <title>Operations | ContractForge</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Serif:wght@600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css"><link rel="icon" type="image/png" href="assets/logo/contractforge-mark.png">
-  <script defer src="js/vendor/highlight.min.js"></script><script defer src="js/vendor/highlight-languages/sql.min.js"></script><script defer src="js/vendor/highlight-languages/bash.min.js"></script><script defer src="js/main.js"></script>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" type="image/png" href="assets/logo/contractforge-mark.png">
+  <script defer src="js/vendor/highlight.min.js"></script>
+  <script defer src="js/vendor/highlight-languages/sql.min.js"></script>
+  <script defer src="js/vendor/highlight-languages/bash.min.js"></script>
+  <script defer src="js/main.js"></script>
 </head>
 <body data-page="operations">
 <button class="nav-toggle" type="button" aria-label="Open navigation" data-nav-toggle>☰</button>
 <div class="site-shell">
-<aside class="sidebar" data-sidebar><div class="brand-panel"><a class="brand" href="index.html"><img src="assets/logo/contractforge-mark.png" alt="" class="brand-mark"><span class="brand-text">ContractForge</span></a><span class="brand-meta">Contract-first ingestion for Delta Lake</span></div><nav class="side-nav" aria-label="Documentation"><span class="nav-label">Start</span><a href="index.html" data-nav="home">Overview</a><a href="quickstart.html" data-nav="quickstart">Quick start</a><a href="concepts.html" data-nav="concepts">Core concepts</a><a href="contracts.html" data-nav="contracts">Contracts</a><a href="write-modes.html" data-nav="write-modes">Write modes</a><a href="transformations.html" data-nav="transformations">Transformations</a><span class="nav-label">Connectors</span><a href="connectors/index.html" data-nav="connectors">Connector overview</a><a href="connectors/table-sql.html">Table and SQL</a><a href="connectors/files.html">Files</a><a href="connectors/http-file.html">HTTP file</a><a href="connectors/object-storage.html">Object storage</a><a href="connectors/s3.html">S3</a><a href="connectors/azure-blob.html">Azure Blob</a><a href="connectors/jdbc.html">JDBC</a><a href="connectors/rest-api.html">REST API</a><a href="connectors/autoloader.html">Auto Loader</a><a href="connectors/external-spark.html">Snowflake and BigQuery</a><span class="nav-label">Operate</span><a href="governance.html" data-nav="governance">Governance</a><a href="operations.html" data-nav="operations">Operations</a><a href="examples.html" data-nav="examples">Examples</a><a href="reference.html" data-nav="reference">Reference</a></nav><div class="sidebar-footer"><a href="pt/index.html">Português</a><a href="https://github.com/marquesantero/contractforge" target="_blank" rel="noopener">GitHub</a></div></aside>
+<aside class="sidebar" data-sidebar><div class="brand-panel"><a class="brand" href="index.html"><img src="assets/logo/contractforge-mark.png" alt="" class="brand-mark"><span class="brand-text">ContractForge</span></a><span class="brand-meta">Contract-first ingestion for Delta Lake</span></div><nav class="side-nav" aria-label="Documentation">
+    <span class="nav-label">Start</span><a href="index.html" data-nav="home">Overview</a><a href="quickstart.html" data-nav="quickstart">Quick start</a><a href="concepts.html" data-nav="concepts">Core concepts</a>
+    <span class="nav-label">Contracts</span><a href="contracts.html" data-nav="contracts">Contract overview</a><a href="contract-ingestion.html">Ingestion</a><a href="contract-annotations.html">Annotations</a><a href="contract-operations.html">Operations</a><a href="contract-access.html">Access</a><a href="write-modes.html" data-nav="write-modes">Write modes</a><a href="transformations.html" data-nav="transformations">Transformations</a>
+    <span class="nav-label">Connectors</span><a href="connectors/index.html" data-nav="connectors">Connector overview</a><a href="connectors/table-sql.html">Table and SQL</a><a href="connectors/files.html">Files</a><a href="connectors/http-file.html">HTTP file</a><a href="connectors/object-storage.html">Object storage</a><a href="connectors/s3.html">S3</a><a href="connectors/azure-blob.html">Azure Blob</a><a href="connectors/jdbc.html">JDBC</a><a href="connectors/rest-api.html">REST API</a><a href="connectors/autoloader.html">Auto Loader</a><a href="connectors/external-spark.html">Snowflake and BigQuery</a>
+    <span class="nav-label">Operate</span><a href="governance.html" data-nav="governance">Governance</a><a href="operations.html" data-nav="operations">Operations</a><a href="examples.html" data-nav="examples">Examples</a><a href="reference.html" data-nav="reference">Reference</a>
+  </nav><div class="sidebar-footer"><a href="pt/index.html">Português</a><a href="https://github.com/marquesantero/contractforge" target="_blank" rel="noopener">GitHub</a></div></aside>
+
 <main class="content">
-  <header class="page-header"><p class="eyebrow">Operations</p><h1>Operate ingestion through evidence, not notebook logs.</h1><p class="lead">Every run should leave enough data to answer what ran, what changed, what failed and how expensive it was operationally.</p></header>
+  <header class="page-header">
+    <p class="eyebrow">Operations</p>
+    <h1>Operate ingestion through control-table evidence.</h1>
+    <p class="lead">ContractForge writes operational evidence to Delta control tables so teams can diagnose failures, track freshness, audit governance, inspect streaming batches, estimate runtime cost and verify framework versions without depending on notebook output.</p>
+  </header>
+
   <section class="section">
-    <h2>Control table groups</h2>
-    <div class="page-grid">
-      <article class="page-card"><h3>Run lifecycle</h3><p><code>ctrl_ingestion_runs</code>, <code>ctrl_ingestion_errors</code>, <code>ctrl_ingestion_state</code>, <code>ctrl_ingestion_locks</code>.</p></article>
-      <article class="page-card"><h3>Quality and schema</h3><p><code>ctrl_ingestion_quality</code>, <code>ctrl_ingestion_quarantine</code>, <code>ctrl_ingestion_schema_changes</code>.</p></article>
-      <article class="page-card"><h3>Governance</h3><p><code>ctrl_ingestion_annotations</code>, <code>ctrl_ingestion_operations</code>, <code>ctrl_ingestion_access</code>.</p></article>
-      <article class="page-card"><h3>Lineage and streams</h3><p><code>ctrl_ingestion_lineage</code>, <code>ctrl_ingestion_streams</code>, <code>ctrl_ingestion_explain</code>.</p></article>
+    <h2>Control schema model</h2>
+    <p>Control tables are created by <code>ensure_ctrl_tables()</code> in the configured control catalog and schema. They are additive: framework upgrades add known columns when missing and do not remove existing columns automatically.</p>
+    <div class="info-grid">
+      <article class="info-card"><span>Default names</span><h3>Stable table names</h3><p>The default prefix is <code>ctrl_ingestion_*</code>. Names can be changed through <code>FrameworkConfig</code>, but dashboards should preferably resolve names from the configured control schema.</p></article>
+      <article class="info-card"><span>Versioning</span><h3>Framework and control schema</h3><p>Most operational tables include <code>framework_version</code> and <code>ctrl_schema_version</code>. Use them to detect mixed wheel versions and outdated metadata layouts.</p></article>
+      <article class="info-card"><span>Partitions</span><h3>Date-partitioned high-volume tables</h3><p><code>ctrl_ingestion_runs</code> and <code>ctrl_ingestion_errors</code> are partitioned by date. Use date filters in dashboards and retention jobs.</p></article>
+      <article class="info-card"><span>JSON payloads</span><h3>Flexible operational details</h3><p>Connector options, source metadata, stage durations, schema changes and operation metrics are stored as JSON strings to keep the table schema stable.</p></article>
     </div>
   </section>
+
   <section class="section">
-    <h2>Recent run health</h2>
-    <pre><code>SELECT
+    <h2>Table map</h2>
+    <div class="table-wrap">
+      <table>
+        <tr><th>Table</th><th>Purpose</th><th>Primary operational questions</th></tr>
+        <tr><td><code>ctrl_ingestion_runs</code></td><td>One batch execution row per run, including source, target, status, metrics, runtime, schema and governance summaries.</td><td>What ran? Did it succeed? How many rows moved? Which connector, mode, runtime and version were used?</td></tr>
+        <tr><td><code>ctrl_ingestion_state</code></td><td>Latest state per target table, including watermark, last success, last error and last Delta version.</td><td>What is the current watermark? When did the table last succeed? Did the state advance?</td></tr>
+        <tr><td><code>ctrl_ingestion_quality</code></td><td>Quality rule results for failed, warned, quarantined or aborting rules.</td><td>Which rules failed? How many records failed? Was the run aborted or quarantined?</td></tr>
+        <tr><td><code>ctrl_ingestion_quarantine</code></td><td>Quarantined row payloads with rule and reason.</td><td>Which records were isolated and why?</td></tr>
+        <tr><td><code>ctrl_ingestion_errors</code></td><td>Full failure details and stack traces.</td><td>What is the real exception behind a short run error?</td></tr>
+        <tr><td><code>ctrl_ingestion_schema_changes</code></td><td>Detected and applied schema evolution events.</td><td>Which columns were added? Which type changes were detected or rejected?</td></tr>
+        <tr><td><code>ctrl_ingestion_streams</code></td><td>Outer streaming or Auto Loader execution row with aggregated micro-batch metrics.</td><td>How many batches ran? Did the aggregate match child run totals?</td></tr>
+        <tr><td><code>ctrl_ingestion_locks</code></td><td>Best-effort lock state per target.</td><td>Is a target currently locked? Who owns the lock? Has it expired?</td></tr>
+        <tr><td><code>ctrl_ingestion_explain</code></td><td>Captured Spark explain plan when enabled.</td><td>What Spark plan was used in a dry run, CI check or diagnostic run?</td></tr>
+        <tr><td><code>ctrl_ingestion_lineage</code></td><td>OpenLineage-compatible event payloads.</td><td>Which source produced which target, and what lineage event was emitted?</td></tr>
+        <tr><td><code>ctrl_ingestion_metadata</code></td><td>Control-plane framework metadata.</td><td>Which framework version and control schema version are installed?</td></tr>
+        <tr><td><code>ctrl_ingestion_annotations</code></td><td>Catalog comments, tags, aliases, PII and deprecation annotation actions.</td><td>Which metadata was applied, skipped, warned or failed?</td></tr>
+        <tr><td><code>ctrl_ingestion_operations</code></td><td>Declared ownership, SLA, criticality, alerting and support metadata snapshots.</td><td>Who owns the table? What is the expected freshness? Which runbook applies?</td></tr>
+        <tr><td><code>ctrl_ingestion_access</code></td><td>Access contract validation/application evidence for grants, row filters and masks.</td><td>Which access changes were applied or deferred? Was drift detected?</td></tr>
+      </table>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>Field reference</h2>
+    <p>Use this section as the operational data dictionary for dashboards, alert rules and support queries. JSON fields are stored as strings; parse them with <code>from_json</code>, <code>get_json_object</code> or SQL JSON functions when building curated operational views.</p>
+
+    <details class="note" open>
+      <summary><strong><code>ctrl_ingestion_runs</code></strong> — batch execution ledger</summary>
+      <p>Central fact table for batch ingestion. Join it to errors, quality, schema changes, annotations and access by <code>run_id</code>.</p>
+      <div class="table-wrap"><table>
+        <tr><th>Field</th><th>Meaning</th></tr>
+        <tr><td><code>run_id</code></td><td>Unique execution identifier for this batch run.</td></tr>
+        <tr><td><code>run_ts_utc</code></td><td>Run timestamp used as the logical event time for the row.</td></tr>
+        <tr><td><code>run_date</code></td><td>Date partition derived from the run timestamp.</td></tr>
+        <tr><td><code>notebook_name</code></td><td>Notebook or caller name when available.</td></tr>
+        <tr><td><code>layer</code></td><td>Logical layer declared by the contract, such as bronze, silver, gold, stage or a custom value.</td></tr>
+        <tr><td><code>source_table</code></td><td>Legacy or resolved source table identifier when the source is table-like.</td></tr>
+        <tr><td><code>source_type</code></td><td>Source category, for example table, sql, path, connector or stream.</td></tr>
+        <tr><td><code>source_connector</code></td><td>Connector name, such as jdbc, s3, azure_blob, rest_api, http_file or autoloader.</td></tr>
+        <tr><td><code>source_name</code></td><td>Logical source name from the source contract.</td></tr>
+        <tr><td><code>source_provider</code></td><td>Provider or platform for the source, when declared.</td></tr>
+        <tr><td><code>source_format</code></td><td>Input format such as csv, json, parquet, avro, delta, xml, text or jdbc.</td></tr>
+        <tr><td><code>source_path</code></td><td>Path or URL used by file/object-storage connectors.</td></tr>
+        <tr><td><code>source_options_json</code></td><td>Redacted connector options.</td></tr>
+        <tr><td><code>source_read_json</code></td><td>Read configuration, such as schema, glob filters, recursion, partitioning or connector-specific read options.</td></tr>
+        <tr><td><code>source_request_json</code></td><td>Request configuration for HTTP/REST sources.</td></tr>
+        <tr><td><code>source_auth_json</code></td><td>Redacted authentication configuration.</td></tr>
+        <tr><td><code>source_pagination_json</code></td><td>Pagination configuration for REST-style sources.</td></tr>
+        <tr><td><code>source_response_json</code></td><td>Response extraction configuration for REST-style sources.</td></tr>
+        <tr><td><code>source_incremental_json</code></td><td>Incremental source settings, when present.</td></tr>
+        <tr><td><code>source_limits_json</code></td><td>Connector safety limits such as timeout, page count or payload size limits.</td></tr>
+        <tr><td><code>source_capabilities_json</code></td><td>Declared or inferred connector capabilities.</td></tr>
+        <tr><td><code>source_metrics_json</code></td><td>Connector-side read metrics, when available.</td></tr>
+        <tr><td><code>target_table</code></td><td>Fully qualified target table.</td></tr>
+        <tr><td><code>mode</code></td><td>Write mode, such as scd0_append, scd0_overwrite, scd1_upsert, scd1_hash_diff, scd2 or snapshot_soft_delete.</td></tr>
+        <tr><td><code>status</code></td><td>Final run status: SUCCESS, FAILED, ABORTED or SKIPPED.</td></tr>
+        <tr><td><code>rows_read</code></td><td>Logical number of source rows processed by the framework.</td></tr>
+        <tr><td><code>rows_written</code></td><td>Logical number of rows written to the target.</td></tr>
+        <tr><td><code>rows_inserted</code></td><td>Logical inserted row count when the mode can report it.</td></tr>
+        <tr><td><code>rows_updated</code></td><td>Logical updated row count when the mode can report it.</td></tr>
+        <tr><td><code>rows_deleted</code></td><td>Logical deleted or soft-deleted row count when applicable.</td></tr>
+        <tr><td><code>rows_quarantined</code></td><td>Rows written to quarantine instead of the target.</td></tr>
+        <tr><td><code>watermark_column</code></td><td>Watermark column used for incremental reads.</td></tr>
+        <tr><td><code>watermark_previous</code></td><td>Previous committed watermark value.</td></tr>
+        <tr><td><code>watermark_current</code></td><td>New committed watermark value for successful runs.</td></tr>
+        <tr><td><code>started_at_utc</code></td><td>Run start timestamp.</td></tr>
+        <tr><td><code>finished_at_utc</code></td><td>Run finish timestamp.</td></tr>
+        <tr><td><code>duration_seconds</code></td><td>Total elapsed execution time in seconds.</td></tr>
+        <tr><td><code>quality_status</code></td><td>Quality summary: NOT_CONFIGURED, PASSED, WARNED, QUARANTINED or FAILED.</td></tr>
+        <tr><td><code>schema_policy</code></td><td>Schema policy used by the run.</td></tr>
+        <tr><td><code>schema_changes_json</code></td><td>Structured schema-change summary returned by schema validation/evolution.</td></tr>
+        <tr><td><code>stage_durations_json</code></td><td>Per-stage timings such as read, quality, write, state and lineage.</td></tr>
+        <tr><td><code>contract_description</code></td><td>Contract-level description snapshot.</td></tr>
+        <tr><td><code>contract_owner</code></td><td>Contract-level owner snapshot.</td></tr>
+        <tr><td><code>contract_domain</code></td><td>Business or data domain snapshot.</td></tr>
+        <tr><td><code>contract_tags_json</code></td><td>Contract tags serialized as JSON.</td></tr>
+        <tr><td><code>contract_sla</code></td><td>Contract SLA value, if declared in the ingestion contract.</td></tr>
+        <tr><td><code>runtime_parameters_json</code></td><td>Runtime parameters snapshot.</td></tr>
+        <tr><td><code>operation_metrics_json</code></td><td>Delta and logical write metrics serialized as JSON.</td></tr>
+        <tr><td><code>write_started_at_utc</code></td><td>Write stage start timestamp.</td></tr>
+        <tr><td><code>write_finished_at_utc</code></td><td>Write stage finish timestamp.</td></tr>
+        <tr><td><code>delta_version_before</code></td><td>Delta table version before the write, when known.</td></tr>
+        <tr><td><code>delta_version_after</code></td><td>Delta table version after the write, when known.</td></tr>
+        <tr><td><code>write_committed</code></td><td>Whether the write reached the target commit path.</td></tr>
+        <tr><td><code>error_message</code></td><td>Short diagnostic message. Use <code>ctrl_ingestion_errors</code> for full stack traces.</td></tr>
+        <tr><td><code>parent_run_id</code></td><td>Parent stream run identifier for micro-batch child runs.</td></tr>
+        <tr><td><code>run_group_id</code></td><td>Optional group identifier for related runs.</td></tr>
+        <tr><td><code>master_job_id</code></td><td>Databricks job id when available.</td></tr>
+        <tr><td><code>master_run_id</code></td><td>Databricks run id when available.</td></tr>
+        <tr><td><code>idempotency_key</code></td><td>User-provided idempotency key.</td></tr>
+        <tr><td><code>idempotency_policy</code></td><td>Policy used for duplicate execution handling.</td></tr>
+        <tr><td><code>skip_reason</code></td><td>Reason for SKIPPED runs.</td></tr>
+        <tr><td><code>skipped_by_run_id</code></td><td>Prior run that caused the skip.</td></tr>
+        <tr><td><code>metrics_source</code></td><td>Metric origin: logical, delta or mixed.</td></tr>
+        <tr><td><code>framework_version</code></td><td>ContractForge package version used by the run.</td></tr>
+        <tr><td><code>ctrl_schema_version</code></td><td>Control schema version used by the run.</td></tr>
+        <tr><td><code>runtime_type</code></td><td>Runtime classification, such as classic or serverless.</td></tr>
+        <tr><td><code>spark_version</code></td><td>Spark runtime version.</td></tr>
+        <tr><td><code>python_version</code></td><td>Python runtime version.</td></tr>
+        <tr><td><code>annotations_status</code></td><td>Annotation application summary for the run.</td></tr>
+        <tr><td><code>annotations_result_json</code></td><td>Detailed annotation result payload.</td></tr>
+        <tr><td><code>ownership_json</code></td><td>Ownership metadata snapshot from the operations contract.</td></tr>
+        <tr><td><code>operations_json</code></td><td>Operations contract snapshot.</td></tr>
+      </table></div>
+    </details>
+
+    <details class="note">
+      <summary><strong><code>ctrl_ingestion_state</code></strong> — latest target state</summary>
+      <p>Current operational state by target table. Watermark and Delta version updates happen only when the execution commits successfully.</p>
+      <div class="table-wrap"><table>
+        <tr><th>Field</th><th>Meaning</th></tr>
+        <tr><td><code>target_table</code></td><td>Fully qualified target table and logical key for the state row.</td></tr>
+        <tr><td><code>watermark_column</code></td><td>Watermark column currently tracked for the target.</td></tr>
+        <tr><td><code>watermark_value</code></td><td>Last committed watermark value.</td></tr>
+        <tr><td><code>last_success_at_utc</code></td><td>Timestamp of the latest successful run.</td></tr>
+        <tr><td><code>last_run_id</code></td><td>Most recent run id touching this target.</td></tr>
+        <tr><td><code>last_status</code></td><td>Status of the most recent run touching this target.</td></tr>
+        <tr><td><code>last_rows_written</code></td><td>Rows written by the most recent run.</td></tr>
+        <tr><td><code>last_error_message</code></td><td>Short error from the most recent failed run.</td></tr>
+        <tr><td><code>parent_run_id</code></td><td>Parent stream run when the latest state update came from a micro-batch.</td></tr>
+        <tr><td><code>run_group_id</code></td><td>Group id for related runs.</td></tr>
+        <tr><td><code>master_job_id</code></td><td>Databricks job id when available.</td></tr>
+        <tr><td><code>master_run_id</code></td><td>Databricks run id when available.</td></tr>
+        <tr><td><code>last_delta_version</code></td><td>Last known target Delta version after successful write.</td></tr>
+        <tr><td><code>last_write_completed_at_utc</code></td><td>Timestamp when the last write finished.</td></tr>
+        <tr><td><code>last_watermark_candidate</code></td><td>Candidate watermark observed during the last run.</td></tr>
+        <tr><td><code>last_updated_at_utc</code></td><td>Timestamp when this state row was updated.</td></tr>
+      </table></div>
+    </details>
+
+    <details class="note">
+      <summary><strong>Quality, quarantine and schema tables</strong></summary>
+      <div class="table-wrap"><table>
+        <tr><th>Table</th><th>Field</th><th>Meaning</th></tr>
+        <tr><td><code>ctrl_ingestion_quality</code></td><td><code>run_id</code></td><td>Run that produced the quality result.</td></tr>
+        <tr><td><code>ctrl_ingestion_quality</code></td><td><code>target_table</code></td><td>Target table evaluated by the rule.</td></tr>
+        <tr><td><code>ctrl_ingestion_quality</code></td><td><code>rule_name</code></td><td>Rule identifier, built-in rule name or expression name.</td></tr>
+        <tr><td><code>ctrl_ingestion_quality</code></td><td><code>status</code></td><td>Rule outcome.</td></tr>
+        <tr><td><code>ctrl_ingestion_quality</code></td><td><code>severity</code></td><td>Configured action: warn, quarantine or abort.</td></tr>
+        <tr><td><code>ctrl_ingestion_quality</code></td><td><code>failed_count</code></td><td>Number of rows or checks that failed.</td></tr>
+        <tr><td><code>ctrl_ingestion_quality</code></td><td><code>checked_at_utc</code></td><td>Timestamp of quality evaluation.</td></tr>
+        <tr><td><code>ctrl_ingestion_quality</code></td><td><code>message</code></td><td>Rule message, generated or custom.</td></tr>
+        <tr><td><code>ctrl_ingestion_quality</code></td><td><code>details_json</code></td><td>Additional rule details.</td></tr>
+        <tr><td><code>ctrl_ingestion_quarantine</code></td><td><code>run_id</code></td><td>Run that quarantined the row.</td></tr>
+        <tr><td><code>ctrl_ingestion_quarantine</code></td><td><code>target_table</code></td><td>Target table the row was intended for.</td></tr>
+        <tr><td><code>ctrl_ingestion_quarantine</code></td><td><code>rule_name</code></td><td>Rule that caused quarantine.</td></tr>
+        <tr><td><code>ctrl_ingestion_quarantine</code></td><td><code>error_reason</code></td><td>Human-readable quarantine reason.</td></tr>
+        <tr><td><code>ctrl_ingestion_quarantine</code></td><td><code>record_payload</code></td><td>Quarantined record serialized as JSON.</td></tr>
+        <tr><td><code>ctrl_ingestion_quarantine</code></td><td><code>quarantined_at_utc</code></td><td>Quarantine timestamp.</td></tr>
+        <tr><td><code>ctrl_ingestion_schema_changes</code></td><td><code>run_id</code></td><td>Run that detected the schema change.</td></tr>
+        <tr><td><code>ctrl_ingestion_schema_changes</code></td><td><code>change_ts_utc</code></td><td>Change detection timestamp.</td></tr>
+        <tr><td><code>ctrl_ingestion_schema_changes</code></td><td><code>target_table</code></td><td>Target table affected by the change.</td></tr>
+        <tr><td><code>ctrl_ingestion_schema_changes</code></td><td><code>change_type</code></td><td>Change class, such as add_column or type_change.</td></tr>
+        <tr><td><code>ctrl_ingestion_schema_changes</code></td><td><code>column_name</code></td><td>Column affected by the change.</td></tr>
+        <tr><td><code>ctrl_ingestion_schema_changes</code></td><td><code>source_type</code></td><td>Source data type observed.</td></tr>
+        <tr><td><code>ctrl_ingestion_schema_changes</code></td><td><code>target_type</code></td><td>Target data type observed.</td></tr>
+        <tr><td><code>ctrl_ingestion_schema_changes</code></td><td><code>applied</code></td><td>Whether the change was applied to the Delta table.</td></tr>
+        <tr><td><code>ctrl_ingestion_schema_changes</code></td><td><code>details_json</code></td><td>Full change payload.</td></tr>
+        <tr><td><code>ctrl_ingestion_schema_changes</code></td><td><code>framework_version</code></td><td>Framework version that logged the change.</td></tr>
+        <tr><td><code>ctrl_ingestion_schema_changes</code></td><td><code>ctrl_schema_version</code></td><td>Control schema version.</td></tr>
+      </table></div>
+    </details>
+
+    <details class="note">
+      <summary><strong>Diagnostics, lineage and streaming tables</strong></summary>
+      <div class="table-wrap"><table>
+        <tr><th>Table</th><th>Fields</th><th>Meaning</th></tr>
+        <tr><td><code>ctrl_ingestion_errors</code></td><td><code>run_id</code>, <code>error_ts_utc</code>, <code>error_date</code></td><td>Failure identity and date partition.</td></tr>
+        <tr><td><code>ctrl_ingestion_errors</code></td><td><code>target_table</code>, <code>source_table</code>, <code>mode</code>, <code>status</code></td><td>Context for the failed execution.</td></tr>
+        <tr><td><code>ctrl_ingestion_errors</code></td><td><code>error_type</code>, <code>error_message</code>, <code>stack_trace</code></td><td>Exception type, short message and full traceback.</td></tr>
+        <tr><td><code>ctrl_ingestion_errors</code></td><td><code>framework_version</code>, <code>ctrl_schema_version</code>, <code>runtime_type</code>, <code>spark_version</code>, <code>python_version</code></td><td>Runtime and version context.</td></tr>
+        <tr><td><code>ctrl_ingestion_streams</code></td><td><code>stream_run_id</code>, <code>parent_run_id</code>, <code>run_group_id</code></td><td>Outer stream identity and grouping.</td></tr>
+        <tr><td><code>ctrl_ingestion_streams</code></td><td><code>idempotency_key</code>, <code>idempotency_policy</code>, <code>skip_reason</code>, <code>skipped_by_stream_run_id</code></td><td>Idempotency behavior for streaming executions.</td></tr>
+        <tr><td><code>ctrl_ingestion_streams</code></td><td><code>target_table</code>, <code>target_catalog</code>, <code>target_layer</code>, <code>notebook_name</code></td><td>Target and caller metadata.</td></tr>
+        <tr><td><code>ctrl_ingestion_streams</code></td><td><code>source_type</code>, <code>source_path</code>, <code>trigger</code>, <code>checkpoint_location</code></td><td>Streaming source and checkpoint configuration.</td></tr>
+        <tr><td><code>ctrl_ingestion_streams</code></td><td><code>status</code>, <code>started_at_utc</code>, <code>ended_at_utc</code>, <code>duration_seconds</code></td><td>Lifecycle timing and final status.</td></tr>
+        <tr><td><code>ctrl_ingestion_streams</code></td><td><code>batches_processed</code>, <code>total_rows_read</code>, <code>total_rows_written</code>, <code>total_rows_quarantined</code></td><td>Aggregated child micro-batch metrics.</td></tr>
+        <tr><td><code>ctrl_ingestion_streams</code></td><td><code>framework_version</code>, <code>ctrl_schema_version</code>, <code>runtime_type</code>, <code>spark_version</code>, <code>python_version</code>, <code>error_message</code>, <code>master_job_id</code>, <code>master_run_id</code></td><td>Runtime, version, failure and job context.</td></tr>
+        <tr><td><code>ctrl_ingestion_explain</code></td><td><code>run_id</code>, <code>target_table</code>, <code>source_table</code>, <code>mode</code>, <code>explain_format</code>, <code>plan_text</code>, <code>captured_at_utc</code></td><td>Captured Spark plan for diagnostic executions.</td></tr>
+        <tr><td><code>ctrl_ingestion_lineage</code></td><td><code>run_id</code>, <code>event_time_utc</code>, <code>event_type</code>, <code>target_table</code>, <code>source_table</code>, <code>namespace</code>, <code>producer</code>, <code>event_json</code></td><td>OpenLineage-compatible event evidence.</td></tr>
+        <tr><td><code>ctrl_ingestion_metadata</code></td><td><code>component</code>, <code>framework_version</code>, <code>ctrl_schema_version</code>, <code>updated_at_utc</code></td><td>Control-plane metadata row for installed framework state.</td></tr>
+      </table></div>
+    </details>
+
+    <details class="note">
+      <summary><strong>Governance and access tables</strong></summary>
+      <div class="table-wrap"><table>
+        <tr><th>Table</th><th>Fields</th><th>Meaning</th></tr>
+        <tr><td><code>ctrl_ingestion_annotations</code></td><td><code>run_id</code>, <code>target_table</code></td><td>Run and target for the metadata action.</td></tr>
+        <tr><td><code>ctrl_ingestion_annotations</code></td><td><code>annotation_scope</code>, <code>annotation_type</code>, <code>column_name</code>, <code>key</code></td><td>Annotation scope and logical field, such as table tag, column comment, PII or deprecation.</td></tr>
+        <tr><td><code>ctrl_ingestion_annotations</code></td><td><code>previous_value</code>, <code>value</code>, <code>status</code>, <code>error_message</code>, <code>applied_sql</code></td><td>Before/after evidence, outcome, diagnostic and SQL action.</td></tr>
+        <tr><td><code>ctrl_ingestion_annotations</code></td><td><code>annotation_ts_utc</code>, <code>annotation_date</code>, <code>framework_version</code>, <code>ctrl_schema_version</code></td><td>Timing and version context.</td></tr>
+        <tr><td><code>ctrl_ingestion_operations</code></td><td><code>run_id</code>, <code>target_table</code></td><td>Run and target for the operations metadata snapshot.</td></tr>
+        <tr><td><code>ctrl_ingestion_operations</code></td><td><code>criticality</code>, <code>expected_frequency</code>, <code>freshness_sla_minutes</code></td><td>SLA and severity metadata used by dashboards and alert routing.</td></tr>
+        <tr><td><code>ctrl_ingestion_operations</code></td><td><code>alert_on_failure</code>, <code>alert_on_quality_fail</code>, <code>runbook_url</code></td><td>External alerting and response metadata. ContractForge records this; alerting systems consume it.</td></tr>
+        <tr><td><code>ctrl_ingestion_operations</code></td><td><code>ownership_json</code>, <code>owners_json</code>, <code>groups_json</code>, <code>tags_json</code></td><td>Ownership, support groups and custom tags serialized as JSON.</td></tr>
+        <tr><td><code>ctrl_ingestion_operations</code></td><td><code>status</code>, <code>recorded_at_utc</code>, <code>framework_version</code>, <code>ctrl_schema_version</code></td><td>Recording outcome, timestamp and version context.</td></tr>
+        <tr><td><code>ctrl_ingestion_access</code></td><td><code>access_run_id</code>, <code>run_id</code>, <code>target_table</code></td><td>Access workflow identity and target.</td></tr>
+        <tr><td><code>ctrl_ingestion_access</code></td><td><code>access_type</code>, <code>principal</code>, <code>privilege</code></td><td>Grant, row filter, column mask or validation action and affected principal/privilege.</td></tr>
+        <tr><td><code>ctrl_ingestion_access</code></td><td><code>column_name</code>, <code>function_name</code>, <code>object_name</code></td><td>Column, function or object affected by access governance.</td></tr>
+        <tr><td><code>ctrl_ingestion_access</code></td><td><code>status</code>, <code>error_message</code>, <code>applied_sql</code></td><td>Outcome, diagnostic and SQL command.</td></tr>
+        <tr><td><code>ctrl_ingestion_access</code></td><td><code>previous_value</code>, <code>new_value</code>, <code>mode</code>, <code>drift_policy</code>, <code>revoke_unmanaged</code></td><td>Drift and reconciliation context.</td></tr>
+        <tr><td><code>ctrl_ingestion_access</code></td><td><code>access_ts_utc</code>, <code>access_date</code>, <code>framework_version</code>, <code>ctrl_schema_version</code></td><td>Timing and version context.</td></tr>
+      </table></div>
+    </details>
+
+    <details class="note">
+      <summary><strong><code>ctrl_ingestion_locks</code></strong> — best-effort coordination</summary>
+      <p>Locks reduce predictable collisions between cooperative ContractForge writers. They do not replace Delta optimistic concurrency.</p>
+      <div class="table-wrap"><table>
+        <tr><th>Field</th><th>Meaning</th></tr>
+        <tr><td><code>target_table</code></td><td>Target table protected by the lock.</td></tr>
+        <tr><td><code>run_id</code></td><td>Run currently owning or previously owning the lock.</td></tr>
+        <tr><td><code>owner</code></td><td>Logical owner or caller identity.</td></tr>
+        <tr><td><code>acquired_at_utc</code></td><td>Lock acquisition timestamp.</td></tr>
+        <tr><td><code>expires_at_utc</code></td><td>TTL expiration timestamp.</td></tr>
+        <tr><td><code>ttl_minutes</code></td><td>Configured lock TTL in minutes.</td></tr>
+        <tr><td><code>released_at_utc</code></td><td>Release timestamp, when released cleanly.</td></tr>
+        <tr><td><code>status</code></td><td>Lock status such as ACTIVE, RELEASED or EXPIRED.</td></tr>
+      </table></div>
+    </details>
+  </section>
+
+  <section class="section">
+    <h2>Useful SQL queries</h2>
+    <p>Replace <code>main.ops</code> with the catalog and schema used for control tables.</p>
+
+    <h3>Recent run health</h3>
+    <pre><code class="language-sql">SELECT
   status,
   target_table,
   mode,
+  source_connector,
+  runtime_type,
   rows_read,
   rows_written,
+  rows_quarantined,
   duration_seconds,
-  error_message
+  error_message,
+  run_id
 FROM main.ops.ctrl_ingestion_runs
-ORDER BY start_ts_utc DESC
-LIMIT 50;</code></pre>
-  </section>
-  <section class="section">
-    <h2>Maintenance commands</h2>
-    <pre><code>contractforge maintenance ctrl-retention --catalog main --ctrl-schema ops --retention-days 30
-contractforge maintenance cost-report --catalog main --ctrl-schema ops --dbu-per-hour 2 --currency-per-dbu 0.40</code></pre>
-    <p>The cost report is operational estimation from run duration and user-provided rates. It is not cloud billing.</p>
-  </section>
-  <section class="section">
-    <h2>Recommended dashboard sections</h2>
-    <div class="info-grid">
-      <article class="info-card"><span>Health</span><h3>Success rate and failure trend</h3><p>Track recent failures by target, mode, connector and runtime type. Use short errors for triage and full traceback tables for diagnosis.</p></article>
-      <article class="info-card"><span>Freshness</span><h3>SLA and watermark movement</h3><p>Compare last successful run, expected frequency and watermark progression to detect stalled pipelines.</p></article>
-      <article class="info-card"><span>Quality</span><h3>Failed and quarantined records</h3><p>Separate aborting rules from row-level quarantines. The distinction is critical for operational response.</p></article>
-      <article class="info-card"><span>Cost</span><h3>Rows per second and estimated cost</h3><p>Use stage durations and row counts to find slow connectors, expensive write modes and low-throughput tables.</p></article>
-    </div>
-  </section>
-  <section class="section">
-    <h2>Streaming and Auto Loader evidence</h2>
-    <p>Auto Loader <code>available_now</code> records an outer stream run plus child ingestion runs for each micro-batch. Aggregated metrics in <code>ctrl_ingestion_streams</code> should match child run totals.</p>
-    <pre><code>SELECT
-  stream_run_id,
-  status,
-  batches_processed,
-  total_rows_read,
-  total_rows_written,
-  total_rows_quarantined
-FROM main.ops.ctrl_ingestion_streams
-ORDER BY start_ts_utc DESC;</code></pre>
-  </section>
-  <section class="section">
-    <h2>Failure triage query</h2>
-    <pre><code>SELECT
-  r.run_id,
+WHERE run_date >= current_date() - INTERVAL 7 DAYS
+ORDER BY started_at_utc DESC
+LIMIT 100;</code></pre>
+
+    <h3>Failure triage with full stack trace</h3>
+    <pre><code class="language-sql">SELECT
+  r.started_at_utc,
   r.target_table,
   r.source_connector,
+  r.mode,
   r.runtime_type,
-  r.error_message,
+  r.error_message AS short_error,
   e.error_type,
   e.stack_trace
 FROM main.ops.ctrl_ingestion_runs r
 LEFT JOIN main.ops.ctrl_ingestion_errors e
   ON r.run_id = e.run_id
 WHERE r.status = 'FAILED'
-ORDER BY r.start_ts_utc DESC
-LIMIT 20;</code></pre>
+  AND r.run_date >= current_date() - INTERVAL 7 DAYS
+ORDER BY r.started_at_utc DESC;</code></pre>
+
+    <h3>Freshness and watermark drift</h3>
+    <pre><code class="language-sql">SELECT
+  target_table,
+  watermark_column,
+  watermark_value,
+  last_success_at_utc,
+  last_status,
+  last_rows_written,
+  last_delta_version,
+  current_timestamp() - last_success_at_utc AS time_since_success
+FROM main.ops.ctrl_ingestion_state
+ORDER BY last_success_at_utc ASC NULLS FIRST;</code></pre>
+
+    <h3>Quality rules requiring attention</h3>
+    <pre><code class="language-sql">SELECT
+  q.target_table,
+  q.rule_name,
+  q.severity,
+  q.status,
+  q.failed_count,
+  q.message,
+  r.run_id,
+  r.started_at_utc
+FROM main.ops.ctrl_ingestion_quality q
+JOIN main.ops.ctrl_ingestion_runs r
+  ON q.run_id = r.run_id
+WHERE r.run_date >= current_date() - INTERVAL 14 DAYS
+  AND q.failed_count > 0
+ORDER BY r.started_at_utc DESC, q.failed_count DESC;</code></pre>
+
+    <h3>Quarantine volume by target and rule</h3>
+    <pre><code class="language-sql">SELECT
+  target_table,
+  rule_name,
+  count(*) AS quarantined_records,
+  max(quarantined_at_utc) AS latest_quarantine
+FROM main.ops.ctrl_ingestion_quarantine
+GROUP BY target_table, rule_name
+ORDER BY quarantined_records DESC;</code></pre>
+
+    <h3>Schema changes by table</h3>
+    <pre><code class="language-sql">SELECT
+  target_table,
+  change_type,
+  column_name,
+  source_type,
+  target_type,
+  applied,
+  change_ts_utc,
+  details_json
+FROM main.ops.ctrl_ingestion_schema_changes
+ORDER BY change_ts_utc DESC;</code></pre>
+
+    <h3>Streaming aggregate versus child runs</h3>
+    <pre><code class="language-sql">WITH child AS (
+  SELECT
+    parent_run_id AS stream_run_id,
+    count(*) AS child_batches,
+    sum(coalesce(rows_read, 0)) AS child_rows_read,
+    sum(coalesce(rows_written, 0)) AS child_rows_written,
+    sum(coalesce(rows_quarantined, 0)) AS child_rows_quarantined
+  FROM main.ops.ctrl_ingestion_runs
+  WHERE parent_run_id IS NOT NULL
+  GROUP BY parent_run_id
+)
+SELECT
+  s.stream_run_id,
+  s.status,
+  s.batches_processed,
+  c.child_batches,
+  s.total_rows_read,
+  c.child_rows_read,
+  s.total_rows_written,
+  c.child_rows_written,
+  s.total_rows_quarantined,
+  c.child_rows_quarantined
+FROM main.ops.ctrl_ingestion_streams s
+LEFT JOIN child c
+  ON s.stream_run_id = c.stream_run_id
+ORDER BY s.started_at_utc DESC;</code></pre>
+
+    <h3>Slow stages from stage durations</h3>
+    <pre><code class="language-sql">SELECT
+  run_id,
+  target_table,
+  mode,
+  duration_seconds,
+  get_json_object(stage_durations_json, '$.read') AS read_seconds,
+  get_json_object(stage_durations_json, '$.quality') AS quality_seconds,
+  get_json_object(stage_durations_json, '$.write') AS write_seconds,
+  get_json_object(stage_durations_json, '$.state') AS state_seconds,
+  get_json_object(stage_durations_json, '$.lineage') AS lineage_seconds
+FROM main.ops.ctrl_ingestion_runs
+WHERE run_date >= current_date() - INTERVAL 7 DAYS
+ORDER BY duration_seconds DESC
+LIMIT 50;</code></pre>
+
+    <h3>Throughput and operational cost estimate</h3>
+    <pre><code class="language-sql">WITH rates AS (
+  SELECT 2.0 AS dbu_per_hour, 0.40 AS currency_per_dbu
+)
+SELECT
+  r.target_table,
+  r.mode,
+  r.source_connector,
+  r.rows_read,
+  r.rows_written,
+  r.duration_seconds,
+  CASE WHEN r.duration_seconds > 0 THEN r.rows_written / r.duration_seconds END AS rows_written_per_second,
+  (r.duration_seconds / 3600.0) * rates.dbu_per_hour AS estimated_dbu,
+  (r.duration_seconds / 3600.0) * rates.dbu_per_hour * rates.currency_per_dbu AS estimated_cost
+FROM main.ops.ctrl_ingestion_runs r
+CROSS JOIN rates
+WHERE r.status = 'SUCCESS'
+  AND r.run_date >= current_date() - INTERVAL 30 DAYS
+ORDER BY estimated_cost DESC;</code></pre>
+
+    <h3>Governance application status</h3>
+    <pre><code class="language-sql">SELECT
+  target_table,
+  annotation_scope,
+  annotation_type,
+  column_name,
+  key,
+  status,
+  error_message,
+  annotation_ts_utc
+FROM main.ops.ctrl_ingestion_annotations
+ORDER BY annotation_ts_utc DESC;</code></pre>
+
+    <h3>Access drift and failed security operations</h3>
+    <pre><code class="language-sql">SELECT
+  target_table,
+  access_type,
+  principal,
+  privilege,
+  column_name,
+  function_name,
+  mode,
+  drift_policy,
+  status,
+  error_message,
+  access_ts_utc
+FROM main.ops.ctrl_ingestion_access
+WHERE status <> 'APPLIED'
+ORDER BY access_ts_utc DESC;</code></pre>
+
+    <h3>Active or expired locks</h3>
+    <pre><code class="language-sql">SELECT
+  target_table,
+  run_id,
+  owner,
+  status,
+  acquired_at_utc,
+  expires_at_utc,
+  released_at_utc,
+  CASE
+    WHEN status = 'ACTIVE' AND expires_at_utc < current_timestamp() THEN 'EXPIRED_BUT_NOT_RELEASED'
+    ELSE status
+  END AS effective_status
+FROM main.ops.ctrl_ingestion_locks
+ORDER BY acquired_at_utc DESC;</code></pre>
+
+    <h3>Framework version inventory</h3>
+    <pre><code class="language-sql">SELECT
+  framework_version,
+  ctrl_schema_version,
+  runtime_type,
+  spark_version,
+  python_version,
+  count(*) AS runs
+FROM main.ops.ctrl_ingestion_runs
+WHERE run_date >= current_date() - INTERVAL 30 DAYS
+GROUP BY framework_version, ctrl_schema_version, runtime_type, spark_version, python_version
+ORDER BY runs DESC;</code></pre>
+  </section>
+
+  <section class="section">
+    <h2>Operational workflows</h2>
+    <div class="page-grid">
+      <article class="page-card"><h3>Daily health dashboard</h3><p>Base it on <code>ctrl_ingestion_runs</code>, grouped by <code>status</code>, <code>target_table</code>, <code>mode</code>, <code>source_connector</code> and <code>runtime_type</code>. Include recent error messages and links to run ids.</p></article>
+      <article class="page-card"><h3>Freshness monitoring</h3><p>Use <code>ctrl_ingestion_state.last_success_at_utc</code> plus <code>ctrl_ingestion_operations.freshness_sla_minutes</code>. Alert outside ContractForge; the library records the metadata and evidence.</p></article>
+      <article class="page-card"><h3>Quality response</h3><p>Use <code>ctrl_ingestion_quality</code> for rule-level summary and <code>ctrl_ingestion_quarantine</code> for record-level remediation. Abort rules and quarantine rules require different response paths.</p></article>
+      <article class="page-card"><h3>Runtime support</h3><p>Start with <code>ctrl_ingestion_runs.error_message</code>, then join <code>ctrl_ingestion_errors</code> for full trace, and check <code>framework_version</code>, <code>runtime_type</code> and connector metadata before changing code.</p></article>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>Maintenance commands</h2>
+    <p>Retention and cost reports are operational utilities. Cost reports estimate runtime cost from user-provided rates; they are not a substitute for cloud billing exports.</p>
+    <pre><code class="language-bash">contractforge maintenance ctrl-retention --catalog main --ctrl-schema ops --retention-days 30
+contractforge maintenance cost-report --catalog main --ctrl-schema ops --dbu-per-hour 2 --currency-per-dbu 0.40</code></pre>
+    <div class="note warning"><strong>Retention guidance</strong><p>Apply retention first to high-volume date-partitioned tables such as runs and errors. Keep quarantine and schema-change history according to the organization's audit and data-quality remediation policy.</p></div>
   </section>
 </main>
 </div>

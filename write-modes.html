@@ -13,7 +13,12 @@
 <div class="site-shell">
 <aside class="sidebar" data-sidebar>
   <div class="brand-panel"><a class="brand" href="index.html"><img src="assets/logo/contractforge-mark.png" alt="" class="brand-mark"><span class="brand-text">ContractForge</span></a><span class="brand-meta">Contract-first ingestion for Delta Lake</span></div>
-  <nav class="side-nav" aria-label="Documentation"><span class="nav-label">Start</span><a href="index.html" data-nav="home">Overview</a><a href="quickstart.html" data-nav="quickstart">Quick start</a><a href="concepts.html" data-nav="concepts">Core concepts</a><a href="contracts.html" data-nav="contracts">Contracts</a><a href="write-modes.html" data-nav="write-modes">Write modes</a><a href="transformations.html" data-nav="transformations">Transformations</a><span class="nav-label">Connectors</span><a href="connectors/index.html" data-nav="connectors">Connector overview</a><a href="connectors/table-sql.html">Table and SQL</a><a href="connectors/files.html">Files</a><a href="connectors/http-file.html">HTTP file</a><a href="connectors/object-storage.html">Object storage</a><a href="connectors/s3.html">S3</a><a href="connectors/azure-blob.html">Azure Blob</a><a href="connectors/jdbc.html">JDBC</a><a href="connectors/rest-api.html">REST API</a><a href="connectors/autoloader.html">Auto Loader</a><a href="connectors/external-spark.html">Snowflake and BigQuery</a><span class="nav-label">Operate</span><a href="governance.html" data-nav="governance">Governance</a><a href="operations.html" data-nav="operations">Operations</a><a href="examples.html" data-nav="examples">Examples</a><a href="reference.html" data-nav="reference">Reference</a></nav>
+  <nav class="side-nav" aria-label="Documentation">
+    <span class="nav-label">Start</span><a href="index.html" data-nav="home">Overview</a><a href="quickstart.html" data-nav="quickstart">Quick start</a><a href="concepts.html" data-nav="concepts">Core concepts</a>
+    <span class="nav-label">Contracts</span><a href="contracts.html" data-nav="contracts">Contract overview</a><a href="contract-ingestion.html">Ingestion</a><a href="contract-annotations.html">Annotations</a><a href="contract-operations.html">Operations</a><a href="contract-access.html">Access</a><a href="write-modes.html" data-nav="write-modes">Write modes</a><a href="transformations.html" data-nav="transformations">Transformations</a>
+    <span class="nav-label">Connectors</span><a href="connectors/index.html" data-nav="connectors">Connector overview</a><a href="connectors/table-sql.html">Table and SQL</a><a href="connectors/files.html">Files</a><a href="connectors/http-file.html">HTTP file</a><a href="connectors/object-storage.html">Object storage</a><a href="connectors/s3.html">S3</a><a href="connectors/azure-blob.html">Azure Blob</a><a href="connectors/jdbc.html">JDBC</a><a href="connectors/rest-api.html">REST API</a><a href="connectors/autoloader.html">Auto Loader</a><a href="connectors/external-spark.html">Snowflake and BigQuery</a>
+    <span class="nav-label">Operate</span><a href="governance.html" data-nav="governance">Governance</a><a href="operations.html" data-nav="operations">Operations</a><a href="examples.html" data-nav="examples">Examples</a><a href="reference.html" data-nav="reference">Reference</a>
+  </nav>
   <div class="sidebar-footer"><a href="pt/index.html">Português</a><a href="https://github.com/marquesantero/contractforge" target="_blank" rel="noopener">GitHub</a></div>
 </aside>
 <main class="content">
@@ -33,6 +38,37 @@
     <div class="table-wrap"><table><tr><th>Need</th><th>Recommended mode</th><th>Design note</th></tr><tr><td>Capture everything as received</td><td><code>scd0_append</code></td><td>Keep Bronze simple and auditable.</td></tr><tr><td>Rebuild a small aggregate</td><td><code>scd0_overwrite</code></td><td>Use when full recompute is cheaper than incremental logic.</td></tr><tr><td>Keep one row per key</td><td><code>scd1_upsert</code></td><td>Validate null and duplicate keys before MERGE.</td></tr><tr><td>Track current-state changes cheaply</td><td><code>scd1_hash_diff</code></td><td>Needs stable dedup ordering for the latest state.</td></tr><tr><td>Audit historical versions</td><td><code>scd2_historical</code></td><td>Restrict change columns to meaningful business attributes.</td></tr><tr><td>Deactivate records absent from source</td><td><code>snapshot_soft_delete</code></td><td>Do not combine with watermark or partial filters.</td></tr></table></div>
   </section>
   <section class="section">
+    <h2>Mode requirements</h2>
+    <p>The table below is the practical contract checklist. If a field is listed as required, validation should fail before the framework performs a dangerous or ambiguous write.</p>
+    <div class="table-wrap">
+      <table>
+        <tr><th>Mode</th><th>Required fields</th><th>Recommended quality rules</th><th>Do not use when</th></tr>
+        <tr><td><code>scd0_append</code></td><td>None beyond source and target.</td><td><code>required_columns</code>, <code>not_null</code> for business keys, optional expressions.</td><td>The same batch can be replayed without an idempotency key.</td></tr>
+        <tr><td><code>scd0_overwrite</code></td><td>None beyond source and target.</td><td><code>min_rows</code> and required columns to avoid replacing a table with an empty or malformed source.</td><td>The source is partial or not deterministic.</td></tr>
+        <tr><td><code>scd1_upsert</code></td><td><code>merge_keys</code>.</td><td><code>not_null</code> and <code>unique_key</code> on merge keys; deduplicate with deterministic order.</td><td>Multiple source rows can update the same target key.</td></tr>
+        <tr><td><code>scd1_hash_diff</code></td><td><code>hash_keys</code> and deterministic latest-state order when history exists.</td><td><code>not_null</code>, <code>unique_key</code> after dedup, accepted values for low-cardinality dimensions.</td><td>The target has multiple versions per key and no reliable ordering column.</td></tr>
+        <tr><td><code>scd2_historical</code></td><td><code>merge_keys</code> or mode-specific keys, plus change columns when business comparison should be scoped.</td><td>Required keys, uniqueness after dedup, non-null effective date when used.</td><td>You only need current state or the source cannot produce stable business keys.</td></tr>
+        <tr><td><code>snapshot_soft_delete</code></td><td><code>merge_keys</code> and source completeness evidence.</td><td><code>not_null</code>, <code>unique_key</code>, <code>min_rows</code> for complete snapshots.</td><td>The source is filtered, incremental, watermarked or represents only a slice of current state.</td></tr>
+      </table>
+    </div>
+  </section>
+  <section class="section">
+    <h2>Optimization and table layout</h2>
+    <p>Write semantics and physical layout are separate choices. Keep the mode focused on business state and use layout settings to improve query performance or maintenance behavior.</p>
+    <div class="table-wrap">
+      <table>
+        <tr><th>Field</th><th>Use</th><th>Guidance</th></tr>
+        <tr><td><code>partition_column</code>, <code>partition_value</code></td><td>Scope overwrite/replace patterns to a physical partition.</td><td>Only use <code>partition_value</code> with <code>partition_column</code>. Do not confuse partition filtering with source completeness.</td></tr>
+        <tr><td><code>merge_strategy</code></td><td>Select the MERGE strategy used by merge modes.</td><td>Use the default unless the target is partitioned and the contract explicitly declares the partition strategy.</td></tr>
+        <tr><td><code>merge_partition_column</code></td><td>Partition key for partition-aware merge strategies.</td><td>Required for partition merge strategies.</td></tr>
+        <tr><td><code>replace_partitions_source_complete</code></td><td>Declares that the source contains the complete partition slice being replaced.</td><td>Use for partition replacement only when the source truly covers the full affected partition.</td></tr>
+        <tr><td><code>cluster_columns</code></td><td>Liquid clustering columns for Databricks tables.</td><td>Prefer for new Databricks-managed Delta tables when query patterns are known.</td></tr>
+        <tr><td><code>zorder_columns</code></td><td>Columns for explicit ZORDER after write.</td><td>Use with <code>optimize_after_write=true</code>; do not declare it as a passive hint.</td></tr>
+        <tr><td><code>delta_properties</code></td><td>Delta table properties at creation/update time.</td><td>Use for CDF, retention, auto optimize and table-level behavior that belongs with the target contract.</td></tr>
+      </table>
+    </div>
+  </section>
+  <section class="section">
     <h2>Snapshot soft delete</h2>
     <p>This mode is intentionally defensive. The source must represent the complete current state, otherwise the framework cannot tell if a target row disappeared or was simply outside the loaded slice.</p>
     <pre><code>mode: snapshot_soft_delete
@@ -47,7 +83,7 @@ source:
   </section>
   <section class="section">
     <h2>Merge safety</h2>
-    <p>MERGE-based modes fail before writing when the source contains null or duplicate keys that would make the target update ambiguous. This behavior came from real ingestion tests and is intentionally generic, not tailored to one dataset.</p>
+    <p>MERGE-based modes fail before writing when the source contains null or duplicate keys that would make the target update ambiguous. The guardrail is generic and protects every merge target from non-deterministic updates.</p>
     <pre><code>mode: scd1_upsert
 merge_keys: [customer_id]
 quality_rules:
@@ -64,6 +100,70 @@ transform:
     <div class="table-wrap"><table><tr><th>Mode</th><th>Important metrics</th><th>Dashboard interpretation</th></tr><tr><td><code>scd0_append</code></td><td><code>rows_inserted</code>, <code>rows_written</code></td><td>Batch size and ingestion throughput.</td></tr><tr><td><code>scd1_upsert</code></td><td><code>rows_inserted</code>, <code>rows_updated</code></td><td>Change ratio in current-state tables.</td></tr><tr><td><code>scd1_hash_diff</code></td><td><code>rows_written</code>, hash-change counts when available</td><td>Whether source batches are actually changing target state.</td></tr><tr><td><code>scd2_historical</code></td><td>expired versions and inserted versions</td><td>Historical churn and slowly changing dimension behavior.</td></tr><tr><td><code>snapshot_soft_delete</code></td><td>inserted, updated, soft-deleted rows</td><td>Completeness and unexpected disappearance monitoring.</td></tr></table></div>
   </section>
   <section class="section">
+    <h2>Mode examples</h2>
+    <div class="code-tabs">
+      <div class="code-tab-list" role="tablist" aria-label="Write mode examples">
+        <button class="code-tab active" type="button" role="tab" aria-selected="true" data-code-tab="yaml">YAML</button>
+        <button class="code-tab" type="button" role="tab" aria-selected="false" data-code-tab="python">Python</button>
+      </div>
+      <div class="code-panel active" data-code-panel="yaml" role="tabpanel">
+        <pre><code class="language-yaml"># SCD1 current-state table
+source:
+  type: connector
+  connector: jdbc
+  options:
+    url: "{{ secret:crm/jdbc_url }}"
+    dbtable: public.customers
+    driver: org.postgresql.Driver
+target:
+  catalog: main
+  schema: crm_curated
+  table: s_customers
+layer: silver
+mode: scd1_upsert
+merge_keys: [customer_id]
+transform:
+  deduplicate:
+    keys: [customer_id]
+    order_by: updated_at DESC NULLS LAST
+quality_rules:
+  not_null: [customer_id]
+  unique_key: [customer_id]</code></pre>
+      </div>
+      <div class="code-panel" data-code-panel="python" role="tabpanel" hidden>
+        <pre><code class="language-python">from contractforge import ingest
+
+result = ingest(
+    source={
+        "type": "connector",
+        "connector": "jdbc",
+        "options": {
+            "url": "{{ secret:crm/jdbc_url }}",
+            "dbtable": "public.customers",
+            "driver": "org.postgresql.Driver",
+        },
+    },
+    target_catalog="main",
+    target_schema="crm_curated",
+    target_table="s_customers",
+    layer="silver",
+    mode="scd1_upsert",
+    merge_keys=["customer_id"],
+    transform={
+        "deduplicate": {
+            "keys": ["customer_id"],
+            "order_by": "updated_at DESC NULLS LAST",
+        },
+    },
+    quality_rules={
+        "not_null": ["customer_id"],
+        "unique_key": ["customer_id"],
+    },
+)</code></pre>
+      </div>
+    </div>
+  </section>
+  <section class="section">
     <h2>Raise-on-failure behavior</h2>
     <p>Failed writes are not silent payloads by default. The API writes run evidence and then raises <code>ContractForgeExecutionError</code>, so Databricks Jobs and notebooks fail naturally.</p>
     <pre><code>from contractforge import ContractForgeExecutionError, ingest
@@ -78,3 +178,4 @@ except ContractForgeExecutionError as exc:
 </div>
 </body>
 </html>
+

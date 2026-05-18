@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Complete ContractForge annotations contract reference.">
+  <title>Annotations contract | ContractForge</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Serif:wght@600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" type="image/png" href="assets/logo/contractforge-mark.png">
+  <script defer src="js/vendor/highlight.min.js"></script>
+  <script defer src="js/vendor/highlight-languages/yaml.min.js"></script>
+  <script defer src="js/main.js"></script>
+</head>
+<body data-page="contracts">
+<button class="nav-toggle" type="button" aria-label="Open navigation" data-nav-toggle>☰</button>
+<div class="site-shell">
+<aside class="sidebar" data-sidebar>
+  <div class="brand-panel"><a class="brand" href="index.html"><img src="assets/logo/contractforge-mark.png" alt="" class="brand-mark"><span class="brand-text">ContractForge</span></a><span class="brand-meta">Contract-first ingestion for Delta Lake</span></div>
+  <nav class="side-nav" aria-label="Documentation">
+    <span class="nav-label">Start</span><a href="index.html" data-nav="home">Overview</a><a href="quickstart.html" data-nav="quickstart">Quick start</a><a href="concepts.html" data-nav="concepts">Core concepts</a>
+    <span class="nav-label">Contracts</span><a href="contracts.html" data-nav="contracts">Contract overview</a><a href="contract-ingestion.html">Ingestion</a><a href="contract-annotations.html">Annotations</a><a href="contract-operations.html">Operations</a><a href="contract-access.html">Access</a><a href="write-modes.html" data-nav="write-modes">Write modes</a><a href="transformations.html" data-nav="transformations">Transformations</a>
+    <span class="nav-label">Connectors</span><a href="connectors/index.html" data-nav="connectors">Connector overview</a><a href="connectors/table-sql.html">Table and SQL</a><a href="connectors/files.html">Files</a><a href="connectors/http-file.html">HTTP file</a><a href="connectors/object-storage.html">Object storage</a><a href="connectors/s3.html">S3</a><a href="connectors/azure-blob.html">Azure Blob</a><a href="connectors/jdbc.html">JDBC</a><a href="connectors/rest-api.html">REST API</a><a href="connectors/autoloader.html">Auto Loader</a><a href="connectors/external-spark.html">Snowflake and BigQuery</a>
+    <span class="nav-label">Operate</span><a href="governance.html" data-nav="governance">Governance</a><a href="operations.html" data-nav="operations">Operations</a><a href="examples.html" data-nav="examples">Examples</a><a href="reference.html" data-nav="reference">Reference</a>
+  </nav>
+  <div class="sidebar-footer"><a href="pt/index.html">Português</a><a href="https://github.com/marquesantero/contractforge" target="_blank" rel="noopener">GitHub</a></div>
+</aside>
+
+<main class="content">
+  <header class="page-header">
+    <p class="eyebrow">Contract Reference</p>
+    <h1>Annotations contract.</h1>
+    <p class="lead">Annotations describe the table and its fields. They are catalog/governance metadata, not ingestion behavior. Use them for descriptions, aliases, tags, PII classification and lifecycle metadata.</p>
+  </header>
+
+  <section class="section">
+    <h2>Complete example</h2>
+    <div class="code-tabs">
+      <div class="code-tab-list" role="tablist" aria-label="Annotations contract example">
+        <button class="code-tab active" type="button" role="tab" aria-selected="true" data-code-tab="yaml">YAML</button>
+        <button class="code-tab" type="button" role="tab" aria-selected="false" data-code-tab="python">Python</button>
+      </div>
+      <div class="code-panel active" data-code-panel="yaml" role="tabpanel">
+        <pre><code class="language-yaml">_metadata:
+  contract_version: 1.0.0
+
+policy: warn
+target:
+  catalog: main
+  schema: crm_curated
+  table: s_customers
+table:
+  description: Curated customer dimension used by CRM analytics.
+  aliases: [clients, account holders]
+  tags:
+    domain: crm
+    data_product: customer360
+    contains_pii: "true"
+  deprecated:
+    since: "2026-05-01"
+    replacement: s_customers_v2
+    removal_date: "2026-12-31"
+columns:
+  customer_id:
+    description: Stable customer business key.
+    aliases: [client_id]
+    tags:
+      key: "true"
+      required: "true"
+  email:
+    description: Customer email used for contactability analysis.
+    pii:
+      enabled: true
+      type: email
+      sensitivity: restricted
+    tags:
+      confidentiality: restricted
+  legacy_code:
+    description: Legacy identifier kept for reconciliation.
+    deprecated:
+      since: "2026-05-01"
+      replacement: customer_id</code></pre>
+      </div>
+      <div class="code-panel" data-code-panel="python" role="tabpanel" hidden>
+        <pre><code class="language-python">from contractforge import ingest
+
+result = ingest(
+    source="main.raw.customers",
+    catalog="main",
+    target_schema="crm_curated",
+    target_table="s_customers",
+    mode="scd1_upsert",
+    merge_keys=["customer_id"],
+    annotations={
+        "policy": "warn",
+        "table": {
+            "description": "Curated customer dimension used by CRM analytics.",
+            "aliases": ["clients", "account holders"],
+            "tags": {"domain": "crm", "data_product": "customer360", "contains_pii": "true"},
+        },
+        "columns": {
+            "customer_id": {
+                "description": "Stable customer business key.",
+                "aliases": ["client_id"],
+                "tags": {"key": "true", "required": "true"},
+            },
+            "email": {
+                "description": "Customer email used for contactability analysis.",
+                "pii": {"enabled": True, "type": "email", "sensitivity": "restricted"},
+                "tags": {"confidentiality": "restricted"},
+            },
+        },
+    },
+)</code></pre>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>Fields</h2>
+    <div class="table-wrap"><table>
+      <tr><th>Field</th><th>Type</th><th>Default</th><th>Use</th></tr>
+      <tr><td><code>_metadata</code></td><td>object</td><td>{}</td><td>File metadata for audit and bundle checks.</td></tr>
+      <tr><td><code>target</code></td><td>object</td><td>optional</td><td>Optional compatibility check against the ingestion target.</td></tr>
+      <tr><td><code>target.catalog</code></td><td>string</td><td>ingestion catalog</td><td>Expected catalog.</td></tr>
+      <tr><td><code>target.schema</code></td><td>string</td><td>ingestion physical schema</td><td>Expected schema.</td></tr>
+      <tr><td><code>target.table</code></td><td>string</td><td>ingestion target table</td><td>Expected table.</td></tr>
+      <tr><td><code>policy</code></td><td><code>fail</code> | <code>warn</code> | <code>ignore</code></td><td><code>warn</code></td><td>Failure behavior when applying annotations.</td></tr>
+      <tr><td><code>table</code></td><td>object</td><td>{}</td><td>Table-level annotations.</td></tr>
+      <tr><td><code>table.description</code></td><td>string | null</td><td>null</td><td>Table comment/description.</td></tr>
+      <tr><td><code>table.aliases</code></td><td>string | list[string]</td><td>[]</td><td>Alternative business names.</td></tr>
+      <tr><td><code>table.tags</code></td><td>object[string,string]</td><td>{}</td><td>Catalog tags. Values are normalized to strings.</td></tr>
+      <tr><td><code>table.deprecated</code></td><td>object | null</td><td>null</td><td>Lifecycle metadata for a deprecated table.</td></tr>
+      <tr><td><code>columns</code></td><td>object</td><td>{}</td><td>Column annotations keyed by physical column name.</td></tr>
+      <tr><td><code>columns.*.description</code></td><td>string | null</td><td>null</td><td>Column comment/description.</td></tr>
+      <tr><td><code>columns.*.aliases</code></td><td>string | list[string]</td><td>[]</td><td>Alternative business names for the column.</td></tr>
+      <tr><td><code>columns.*.tags</code></td><td>object[string,string]</td><td>{}</td><td>Column tags. Common examples: <code>key</code>, <code>required</code>, <code>confidentiality</code>.</td></tr>
+      <tr><td><code>columns.*.pii</code></td><td>object | null</td><td>null</td><td>PII classification.</td></tr>
+      <tr><td><code>columns.*.pii.enabled</code></td><td>boolean</td><td>true when <code>pii</code> exists</td><td>Whether the column contains PII.</td></tr>
+      <tr><td><code>columns.*.pii.type</code></td><td>enum</td><td><code>unknown</code></td><td><code>address</code>, <code>bank_account</code>, <code>birth_date</code>, <code>credit_card</code>, <code>device_id</code>, <code>document</code>, <code>email</code>, <code>financial</code>, <code>health</code>, <code>ip_address</code>, <code>name</code>, <code>national_id</code>, <code>other</code>, <code>phone</code>, <code>ssn</code>, <code>tax_id</code>, <code>unknown</code>.</td></tr>
+      <tr><td><code>columns.*.pii.sensitivity</code></td><td>enum</td><td><code>internal</code></td><td><code>public</code>, <code>internal</code>, <code>restricted</code>, <code>confidential</code>.</td></tr>
+      <tr><td><code>columns.*.deprecated</code></td><td>object | null</td><td>null</td><td>Lifecycle metadata for a deprecated column.</td></tr>
+      <tr><td><code>deprecated.since</code></td><td>string</td><td>required when deprecated exists</td><td>Date or version where deprecation starts.</td></tr>
+      <tr><td><code>deprecated.replacement</code></td><td>string</td><td>required when deprecated exists</td><td>Replacement table or column.</td></tr>
+      <tr><td><code>deprecated.removal_date</code></td><td>string | null</td><td>null</td><td>Planned removal date.</td></tr>
+    </table></div>
+  </section>
+</main>
+</div>
+</body>
+</html>

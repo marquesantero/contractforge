@@ -1,16 +1,126 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>HTTP file connector | ContractForge</title><link rel="stylesheet" href="../css/style.css"><link rel="icon" type="image/png" href="../assets/logo/contractforge-mark.png"><script defer src="../js/vendor/highlight.min.js"></script><script defer src="../js/vendor/highlight-languages/yaml.min.js"></script><script defer src="../js/main.js"></script></head><body data-page="connectors"><button class="nav-toggle" type="button" data-nav-toggle>☰</button><div class="site-shell"><aside class="sidebar" data-sidebar><div class="brand-panel"><a class="brand" href="../index.html"><img src="../assets/logo/contractforge-mark.png" alt="" class="brand-mark"><span class="brand-text">ContractForge</span></a><span class="brand-meta">Contract-first ingestion for Delta Lake</span></div><nav class="side-nav"><span class="nav-label">Start</span><a href="../index.html">Overview</a><a href="../quickstart.html">Quick start</a><a href="../concepts.html">Core concepts</a><a href="../contracts.html">Contracts</a><a href="../write-modes.html">Write modes</a><a href="../transformations.html">Transformations</a><span class="nav-label">Connectors</span><a href="index.html" data-nav="connectors">Connector overview</a><a href="table-sql.html">Table and SQL</a><a href="files.html">Files</a><a href="http-file.html">HTTP file</a><a href="object-storage.html">Object storage</a><a href="s3.html">S3</a><a href="azure-blob.html">Azure Blob</a><a href="jdbc.html">JDBC</a><a href="rest-api.html">REST API</a><a href="autoloader.html">Auto Loader</a><a href="external-spark.html">Snowflake and BigQuery</a><span class="nav-label">Operate</span><a href="../governance.html">Governance</a><a href="../operations.html">Operations</a><a href="../examples.html">Examples</a><a href="../reference.html">Reference</a></nav><div class="sidebar-footer"><a href="../pt/index.html">Português</a><a href="https://github.com/marquesantero/contractforge">GitHub</a></div></aside><main class="content"><header class="page-header"><p class="eyebrow">Connector</p><h1>HTTP file</h1><p class="lead">Use <code>http_file</code> for explicit public or authenticated files served through HTTP(S), especially when Spark cannot read HTTPS paths directly.</p></header><section class="section"><h2>Example</h2><pre><code>source:
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="ContractForge HTTP file connector documentation for bounded CSV, JSON, JSONL, NDJSON and text files served over HTTP(S).">
+  <title>HTTP file connector | ContractForge</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Serif:wght@600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="icon" type="image/png" href="../assets/logo/contractforge-mark.png">
+  <script defer src="../js/vendor/highlight.min.js"></script>
+  <script defer src="../js/vendor/highlight-languages/yaml.min.js"></script>
+  <script defer src="../js/main.js"></script>
+</head>
+<body data-page="connectors">
+<button class="nav-toggle" type="button" aria-label="Open navigation" data-nav-toggle>☰</button>
+<div class="site-shell">
+<aside class="sidebar" data-sidebar>
+  <div class="brand-panel"><a class="brand" href="../index.html"><img src="../assets/logo/contractforge-mark.png" alt="" class="brand-mark"><span class="brand-text">ContractForge</span></a><span class="brand-meta">Contract-first ingestion for Delta Lake</span></div>
+  <nav class="side-nav" aria-label="Documentation">
+    <span class="nav-label">Start</span><a href="../index.html" data-nav="home">Overview</a><a href="../quickstart.html" data-nav="quickstart">Quick start</a><a href="../concepts.html" data-nav="concepts">Core concepts</a>
+    <span class="nav-label">Contracts</span><a href="../contracts.html" data-nav="contracts">Contract overview</a><a href="../contract-ingestion.html">Ingestion</a><a href="../contract-annotations.html">Annotations</a><a href="../contract-operations.html">Operations</a><a href="../contract-access.html">Access</a><a href="../write-modes.html" data-nav="write-modes">Write modes</a><a href="../transformations.html" data-nav="transformations">Transformations</a>
+    <span class="nav-label">Connectors</span><a href="index.html" data-nav="connectors">Connector overview</a><a href="table-sql.html">Table and SQL</a><a href="files.html">Files</a><a href="http-file.html">HTTP file</a><a href="object-storage.html">Object storage</a><a href="s3.html">S3</a><a href="azure-blob.html">Azure Blob</a><a href="jdbc.html">JDBC</a><a href="rest-api.html">REST API</a><a href="autoloader.html">Auto Loader</a><a href="external-spark.html">Snowflake and BigQuery</a>
+    <span class="nav-label">Operate</span><a href="../governance.html" data-nav="governance">Governance</a><a href="../operations.html" data-nav="operations">Operations</a><a href="../examples.html" data-nav="examples">Examples</a><a href="../reference.html" data-nav="reference">Reference</a>
+  </nav>
+  <div class="sidebar-footer"><a href="../pt/index.html">Português</a><a href="https://github.com/marquesantero/contractforge" target="_blank" rel="noopener">GitHub</a></div>
+</aside>
+
+<main class="content">
+  <header class="page-header">
+    <p class="eyebrow">Connector</p>
+    <h1>HTTP file</h1>
+    <p class="lead">Use <code>http_file</code> for bounded files served through HTTP(S), especially when the Spark runtime cannot read arbitrary HTTPS paths directly. The connector downloads the file on the driver, materializes it for Spark and preserves source metadata in control tables.</p>
+  </header>
+
+  <section class="section">
+    <h2>Basic CSV file</h2>
+    <div class="code-tabs">
+      <div class="code-tab-list" role="tablist" aria-label="HTTP file CSV example">
+        <button class="code-tab active" type="button" role="tab" aria-selected="true" data-code-tab="yaml">YAML</button>
+        <button class="code-tab" type="button" role="tab" aria-selected="false" data-code-tab="python">Python</button>
+      </div>
+      <div class="code-panel active" data-code-panel="yaml" role="tabpanel">
+        <pre><code class="language-yaml">source:
   type: connector
   connector: http_file
   path: https://example.org/data/orders.csv
   format: csv
   options:
     header: true
+    inferSchema: false
   read:
+    schema: "order_id STRING, order_ts TIMESTAMP, amount DOUBLE"
     source_complete: true
   limits:
     timeout_seconds: 60
     retry_attempts: 3
-    retry_backoff_seconds: 2</code></pre></section><section class="section"><h2>Formats</h2><p>Supported formats are <code>csv</code>, <code>json</code>, <code>jsonl</code>, <code>ndjson</code> and <code>text</code>. Aliases <code>http_csv</code>, <code>http_json</code> and <code>http_text</code> are available.</p></section><section class="section"><h2>Operational guidance</h2><ul class="check-list"><li>Use for small and medium files, not bulk API extraction.</li><li>The driver downloads the file before Spark materialization; protect it with byte/time limits.</li><li>For recurring high-volume files, land them in storage and use Auto Loader.</li></ul></section><section class="section"><h2>Validated use case</h2><p>The CDC public CSV example uses <code>http_file</code> because some Spark/serverless runtimes cannot read arbitrary HTTPS CSV paths directly. The connector handles bounded download and Spark materialization while preserving source metadata.</p><pre><code>source:
+    retry_backoff_seconds: 2
+
+target:
+  catalog: contractforge
+  schema: bronze_examples
+  table: b_http_orders
+
+layer: bronze
+mode: scd0_overwrite</code></pre>
+      </div>
+      <div class="code-panel" data-code-panel="python" role="tabpanel" hidden>
+        <pre><code class="language-python">from contractforge import ingest
+
+result = ingest(
+    source={
+        "type": "connector",
+        "connector": "http_file",
+        "path": "https://example.org/data/orders.csv",
+        "format": "csv",
+        "options": {"header": True, "inferSchema": False},
+        "read": {
+            "schema": "order_id STRING, order_ts TIMESTAMP, amount DOUBLE",
+            "source_complete": True,
+        },
+        "limits": {
+            "timeout_seconds": 60,
+            "retry_attempts": 3,
+            "retry_backoff_seconds": 2,
+        },
+    },
+    catalog="contractforge",
+    target_schema="bronze_examples",
+    target_table="b_http_orders",
+    layer="bronze",
+    mode="scd0_overwrite",
+)</code></pre>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>Supported formats</h2>
+    <p>Supported formats are <code>csv</code>, <code>json</code>, <code>jsonl</code>, <code>ndjson</code> and <code>text</code>. Aliases <code>http_csv</code>, <code>http_json</code> and <code>http_text</code> are available when you want the connector name to imply the file format.</p>
+  </section>
+
+  <section class="section">
+    <h2>Operational guidance</h2>
+    <ul class="check-list">
+      <li>Use this connector for small and medium files, not unbounded API extraction.</li>
+      <li>Set explicit byte, timeout and retry limits because the driver performs the download.</li>
+      <li>For recurring high-volume feeds, land files in object storage and use Auto Loader or a file connector.</li>
+    </ul>
+  </section>
+
+  <section class="section">
+    <h2>Public dataset pattern</h2>
+    <p>This pattern is useful for complete public extracts that are easier to download as one bounded file than to access through a Spark filesystem reader.</p>
+    <div class="code-tabs">
+      <div class="code-tab-list" role="tablist" aria-label="HTTP public dataset example">
+        <button class="code-tab active" type="button" role="tab" aria-selected="true" data-code-tab="yaml">YAML</button>
+        <button class="code-tab" type="button" role="tab" aria-selected="false" data-code-tab="python">Python</button>
+      </div>
+      <div class="code-panel active" data-code-panel="yaml" role="tabpanel">
+        <pre><code class="language-yaml">source:
   type: connector
   connector: http_file
   path: https://example.org/public/covid.csv
@@ -21,6 +131,52 @@
   read:
     schema: "submission_date DATE, state STRING, tot_cases BIGINT"
     source_complete: true
-limits:
-  timeout_seconds: 60
-  max_bytes: 104857600</code></pre><div class="note warning"><strong>Use bounded files only</strong><p>For high-volume recurring feeds, land files in object storage and use Auto Loader or a file connector.</p></div></section><section class="section doc-depth-marker"><h2>How this connector fits the contract</h2><p>Keep extraction concerns in <code>source</code>, structural normalization in <code>transform</code>, validation in <code>quality_rules</code> and target semantics in <code>mode</code>. This separation keeps examples portable and prevents connector-specific workarounds from becoming hidden business logic.</p><div class="kbd-row"><span>source</span><span>transform</span><span>quality_rules</span><span>mode</span><span>control tables</span></div></section></main></div></body></html>
+  limits:
+    timeout_seconds: 60
+
+target:
+  catalog: contractforge
+  schema: bronze_health
+  table: b_public_covid
+
+layer: bronze
+mode: scd0_overwrite</code></pre>
+      </div>
+      <div class="code-panel" data-code-panel="python" role="tabpanel" hidden>
+        <pre><code class="language-python">from contractforge import ingest
+
+result = ingest(
+    source={
+        "type": "connector",
+        "connector": "http_file",
+        "path": "https://example.org/public/covid.csv",
+        "format": "csv",
+        "options": {"header": True, "inferSchema": False},
+        "read": {
+            "schema": "submission_date DATE, state STRING, tot_cases BIGINT",
+            "source_complete": True,
+        },
+        "limits": {"timeout_seconds": 60},
+    },
+    catalog="contractforge",
+    target_schema="bronze_health",
+    target_table="b_public_covid",
+    layer="bronze",
+    mode="scd0_overwrite",
+)</code></pre>
+      </div>
+    </div>
+    <div class="note warning"><strong>Use bounded files only</strong><p>For high-volume recurring feeds, land files in object storage and use Auto Loader or a file connector.</p></div>
+  </section>
+
+  <section class="section doc-depth-marker">
+    <h2>How this connector fits the contract</h2>
+    <p>Keep extraction concerns in <code>source</code>, structural normalization in <code>transform</code>, validation in <code>quality_rules</code> and target semantics in <code>mode</code>. This separation keeps examples portable and prevents connector-specific workarounds from becoming hidden business logic.</p>
+    <div class="kbd-row"><span>source</span><span>transform</span><span>quality_rules</span><span>mode</span><span>control tables</span></div>
+  </section>
+</main>
+</div>
+</body>
+</html>
+
+

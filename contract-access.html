@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Complete ContractForge access contract reference.">
+  <title>Access contract | ContractForge</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Serif:wght@600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" type="image/png" href="assets/logo/contractforge-mark.png">
+  <script defer src="js/vendor/highlight.min.js"></script>
+  <script defer src="js/vendor/highlight-languages/yaml.min.js"></script>
+  <script defer src="js/main.js"></script>
+</head>
+<body data-page="contracts">
+<button class="nav-toggle" type="button" aria-label="Open navigation" data-nav-toggle>☰</button>
+<div class="site-shell">
+<aside class="sidebar" data-sidebar>
+  <div class="brand-panel"><a class="brand" href="index.html"><img src="assets/logo/contractforge-mark.png" alt="" class="brand-mark"><span class="brand-text">ContractForge</span></a><span class="brand-meta">Contract-first ingestion for Delta Lake</span></div>
+  <nav class="side-nav" aria-label="Documentation">
+    <span class="nav-label">Start</span><a href="index.html" data-nav="home">Overview</a><a href="quickstart.html" data-nav="quickstart">Quick start</a><a href="concepts.html" data-nav="concepts">Core concepts</a>
+    <span class="nav-label">Contracts</span><a href="contracts.html" data-nav="contracts">Contract overview</a><a href="contract-ingestion.html">Ingestion</a><a href="contract-annotations.html">Annotations</a><a href="contract-operations.html">Operations</a><a href="contract-access.html">Access</a><a href="write-modes.html" data-nav="write-modes">Write modes</a><a href="transformations.html" data-nav="transformations">Transformations</a>
+    <span class="nav-label">Connectors</span><a href="connectors/index.html" data-nav="connectors">Connector overview</a><a href="connectors/table-sql.html">Table and SQL</a><a href="connectors/files.html">Files</a><a href="connectors/http-file.html">HTTP file</a><a href="connectors/object-storage.html">Object storage</a><a href="connectors/s3.html">S3</a><a href="connectors/azure-blob.html">Azure Blob</a><a href="connectors/jdbc.html">JDBC</a><a href="connectors/rest-api.html">REST API</a><a href="connectors/autoloader.html">Auto Loader</a><a href="connectors/external-spark.html">Snowflake and BigQuery</a>
+    <span class="nav-label">Operate</span><a href="governance.html" data-nav="governance">Governance</a><a href="operations.html" data-nav="operations">Operations</a><a href="examples.html" data-nav="examples">Examples</a><a href="reference.html" data-nav="reference">Reference</a>
+  </nav>
+  <div class="sidebar-footer"><a href="pt/index.html">Português</a><a href="https://github.com/marquesantero/contractforge" target="_blank" rel="noopener">GitHub</a></div>
+</aside>
+
+<main class="content">
+  <header class="page-header">
+    <p class="eyebrow">Contract Reference</p>
+    <h1>Access contract.</h1>
+    <p class="lead">Access contracts describe catalog security. Keep them separate from normal ingestion because grants, row filters and column masks often require a different approval path and stronger privileges.</p>
+  </header>
+
+  <section class="section">
+    <h2>Complete example</h2>
+    <div class="code-tabs">
+      <div class="code-tab-list" role="tablist" aria-label="Access contract example">
+        <button class="code-tab active" type="button" role="tab" aria-selected="true" data-code-tab="yaml">YAML</button>
+        <button class="code-tab" type="button" role="tab" aria-selected="false" data-code-tab="python">Python</button>
+      </div>
+      <div class="code-panel active" data-code-panel="yaml" role="tabpanel">
+        <pre><code class="language-yaml">_metadata:
+  contract_version: 1.0.0
+
+target:
+  catalog: main
+  schema: crm_curated
+  table: s_customers
+access_policy:
+  mode: validate_only
+  on_drift: warn
+  revoke_unmanaged: false
+grants:
+  - principal: account users
+    privileges: [SELECT]
+  - principal: data-platform
+    privileges: [SELECT, MODIFY]
+row_filters:
+  - name: region_filter
+    function: main.security.filter_region
+    columns: [region]
+    applies_to:
+      principals: [regional-managers]
+column_masks:
+  - column: email
+    function: main.security.mask_email
+    using_columns: [email]
+    applies_to:
+      principals: [analysts]</code></pre>
+      </div>
+      <div class="code-panel" data-code-panel="python" role="tabpanel" hidden>
+        <pre><code class="language-python">from contractforge import governance_check, governance_preview, load_contract_bundle
+
+bundle = load_contract_bundle("contracts/silver/s_customers")
+preview = governance_preview(bundle)
+check = governance_check(bundle)
+
+# Access changes are normally applied with:
+# contractforge apply-access contracts/silver/s_customers</code></pre>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>Fields</h2>
+    <div class="table-wrap"><table>
+      <tr><th>Field</th><th>Type</th><th>Default</th><th>Use</th></tr>
+      <tr><td><code>_metadata</code></td><td>object</td><td>{}</td><td>File metadata for audit and bundle checks.</td></tr>
+      <tr><td><code>target</code></td><td>object</td><td>optional</td><td>Optional compatibility check against the ingestion target.</td></tr>
+      <tr><td><code>access_policy.mode</code></td><td><code>apply</code> | <code>validate_only</code> | <code>ignore</code></td><td><code>apply</code></td><td>Whether access should be applied, only validated or ignored.</td></tr>
+      <tr><td><code>access_policy.on_drift</code></td><td><code>fail</code> | <code>warn</code> | <code>reconcile</code></td><td><code>warn</code></td><td>Behavior when actual grants differ from declared grants.</td></tr>
+      <tr><td><code>access_policy.revoke_unmanaged</code></td><td>boolean</td><td>false</td><td>Whether unmanaged grants may be revoked during reconciliation.</td></tr>
+      <tr><td><code>mode</code>, <code>on_drift</code>, <code>revoke_unmanaged</code></td><td>same as policy</td><td>same</td><td>Top-level aliases for compact contracts.</td></tr>
+      <tr><td><code>grants</code></td><td>list[object]</td><td>[]</td><td>Declared grants.</td></tr>
+      <tr><td><code>grants[].principal</code></td><td>string</td><td>required</td><td>Catalog principal, user or group.</td></tr>
+      <tr><td><code>grants[].privileges</code></td><td>string | list[string]</td><td>required</td><td>Privileges such as <code>SELECT</code>, <code>MODIFY</code>, <code>MANAGE</code>, <code>READ FILES</code>, <code>WRITE FILES</code>, <code>EXECUTE</code> or <code>ALL PRIVILEGES</code>.</td></tr>
+      <tr><td><code>row_filters</code></td><td>list[object]</td><td>[]</td><td>Unity Catalog row filters.</td></tr>
+      <tr><td><code>row_filters[].name</code></td><td>string</td><td>required</td><td>Logical rule name.</td></tr>
+      <tr><td><code>row_filters[].function</code></td><td>qualified string</td><td>required</td><td>Fully qualified filter function, for example <code>catalog.schema.function</code>.</td></tr>
+      <tr><td><code>row_filters[].columns</code></td><td>string | list[string]</td><td>required</td><td>Columns passed to the filter function.</td></tr>
+      <tr><td><code>row_filters[].applies_to.principals</code></td><td>string | list[string]</td><td>[]</td><td>Principals associated with the rule for documentation/drift context.</td></tr>
+      <tr><td><code>column_masks</code></td><td>list[object] | object</td><td>[]</td><td>Unity Catalog column masks. Object form is keyed by column name.</td></tr>
+      <tr><td><code>column_masks[].column</code></td><td>string</td><td>required in list form</td><td>Masked column.</td></tr>
+      <tr><td><code>column_masks[].function</code></td><td>qualified string</td><td>required</td><td>Fully qualified mask function.</td></tr>
+      <tr><td><code>column_masks[].using_columns</code></td><td>string | list[string]</td><td>[]</td><td>Columns passed to the mask function.</td></tr>
+      <tr><td><code>column_masks[].applies_to.principals</code></td><td>string | list[string]</td><td>[]</td><td>Principals associated with the rule for documentation/drift context.</td></tr>
+    </table></div>
+  </section>
+
+  <section class="section">
+    <h2>Apply workflow</h2>
+    <p>Normal ingestion should not require access-management privileges. Use a dedicated workflow for access checks and application.</p>
+    <pre><code>contractforge validate-access contracts/silver/s_customers
+contractforge governance-check contracts/silver/s_customers
+contractforge apply-access contracts/silver/s_customers</code></pre>
+  </section>
+</main>
+</div>
+</body>
+</html>

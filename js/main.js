@@ -11,18 +11,20 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   const page = document.body.dataset.page;
-  if (page) {
-    document.querySelectorAll(`[data-nav="${page}"]`).forEach((link) => {
-      link.classList.add("active");
-    });
-  }
   const currentPath = window.location.pathname.split("/").pop() || "index.html";
+  let matchedCurrentPath = false;
   document.querySelectorAll(".side-nav a").forEach((link) => {
     const href = link.getAttribute("href") || "";
     if (href.endsWith(currentPath) && currentPath !== "index.html") {
       link.classList.add("active");
+      matchedCurrentPath = true;
     }
   });
+  if (page && !matchedCurrentPath) {
+    document.querySelectorAll(`[data-nav="${page}"]`).forEach((link) => {
+      link.classList.add("active");
+    });
+  }
 
   document.querySelectorAll(".side-nav").forEach((nav) => {
     const children = Array.from(nav.children);
@@ -69,6 +71,30 @@ document.addEventListener("DOMContentLoaded", () => {
         button.setAttribute("aria-expanded", String(nextState));
       });
     });
+  });
+
+  document.querySelectorAll(".code-tabs").forEach((tabs) => {
+    const buttons = Array.from(tabs.querySelectorAll("[data-code-tab]"));
+    const panels = Array.from(tabs.querySelectorAll("[data-code-panel]"));
+    const activate = (name) => {
+      buttons.forEach((button) => {
+        const active = button.dataset.codeTab === name;
+        button.classList.toggle("active", active);
+        button.setAttribute("aria-selected", String(active));
+      });
+      panels.forEach((panel) => {
+        const active = panel.dataset.codePanel === name;
+        panel.classList.toggle("active", active);
+        panel.hidden = !active;
+      });
+    };
+
+    buttons.forEach((button) => {
+      button.addEventListener("click", () => activate(button.dataset.codeTab));
+    });
+
+    const initial = buttons.find((button) => button.classList.contains("active")) || buttons[0];
+    if (initial?.dataset.codeTab) activate(initial.dataset.codeTab);
   });
 
   document.querySelectorAll("pre").forEach((pre) => {
@@ -128,4 +154,16 @@ document.addEventListener("DOMContentLoaded", () => {
       console.warn("Mermaid rendering failed", error);
     });
   }
+
+  document.querySelectorAll("[data-diagram-expand]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const card = button.closest(".diagram-card");
+      if (!card) return;
+      const expanded = !card.classList.contains("expanded");
+      card.classList.toggle("expanded", expanded);
+      button.textContent = expanded ? "×" : "⛶";
+      button.setAttribute("aria-label", expanded ? "Close diagram" : "Expand diagram");
+      button.setAttribute("aria-expanded", String(expanded));
+    });
+  });
 });

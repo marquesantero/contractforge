@@ -11,31 +11,91 @@
 <body data-page="governance">
 <button class="nav-toggle" type="button" aria-label="Open navigation" data-nav-toggle>☰</button>
 <div class="site-shell">
-<aside class="sidebar" data-sidebar><div class="brand-panel"><a class="brand" href="index.html"><img src="assets/logo/contractforge-mark.png" alt="" class="brand-mark"><span class="brand-text">ContractForge</span></a><span class="brand-meta">Contract-first ingestion for Delta Lake</span></div><nav class="side-nav" aria-label="Documentation"><span class="nav-label">Start</span><a href="index.html" data-nav="home">Overview</a><a href="quickstart.html" data-nav="quickstart">Quick start</a><a href="concepts.html" data-nav="concepts">Core concepts</a><a href="contracts.html" data-nav="contracts">Contracts</a><a href="write-modes.html" data-nav="write-modes">Write modes</a><a href="transformations.html" data-nav="transformations">Transformations</a><span class="nav-label">Connectors</span><a href="connectors/index.html" data-nav="connectors">Connector overview</a><a href="connectors/table-sql.html">Table and SQL</a><a href="connectors/files.html">Files</a><a href="connectors/http-file.html">HTTP file</a><a href="connectors/object-storage.html">Object storage</a><a href="connectors/s3.html">S3</a><a href="connectors/azure-blob.html">Azure Blob</a><a href="connectors/jdbc.html">JDBC</a><a href="connectors/rest-api.html">REST API</a><a href="connectors/autoloader.html">Auto Loader</a><a href="connectors/external-spark.html">Snowflake and BigQuery</a><span class="nav-label">Operate</span><a href="governance.html" data-nav="governance">Governance</a><a href="operations.html" data-nav="operations">Operations</a><a href="examples.html" data-nav="examples">Examples</a><a href="reference.html" data-nav="reference">Reference</a></nav><div class="sidebar-footer"><a href="pt/index.html">Português</a><a href="https://github.com/marquesantero/contractforge" target="_blank" rel="noopener">GitHub</a></div></aside>
+<aside class="sidebar" data-sidebar><div class="brand-panel"><a class="brand" href="index.html"><img src="assets/logo/contractforge-mark.png" alt="" class="brand-mark"><span class="brand-text">ContractForge</span></a><span class="brand-meta">Contract-first ingestion for Delta Lake</span></div><nav class="side-nav" aria-label="Documentation">
+    <span class="nav-label">Start</span><a href="index.html" data-nav="home">Overview</a><a href="quickstart.html" data-nav="quickstart">Quick start</a><a href="concepts.html" data-nav="concepts">Core concepts</a>
+    <span class="nav-label">Contracts</span><a href="contracts.html" data-nav="contracts">Contract overview</a><a href="contract-ingestion.html">Ingestion</a><a href="contract-annotations.html">Annotations</a><a href="contract-operations.html">Operations</a><a href="contract-access.html">Access</a><a href="write-modes.html" data-nav="write-modes">Write modes</a><a href="transformations.html" data-nav="transformations">Transformations</a>
+    <span class="nav-label">Connectors</span><a href="connectors/index.html" data-nav="connectors">Connector overview</a><a href="connectors/table-sql.html">Table and SQL</a><a href="connectors/files.html">Files</a><a href="connectors/http-file.html">HTTP file</a><a href="connectors/object-storage.html">Object storage</a><a href="connectors/s3.html">S3</a><a href="connectors/azure-blob.html">Azure Blob</a><a href="connectors/jdbc.html">JDBC</a><a href="connectors/rest-api.html">REST API</a><a href="connectors/autoloader.html">Auto Loader</a><a href="connectors/external-spark.html">Snowflake and BigQuery</a>
+    <span class="nav-label">Operate</span><a href="governance.html" data-nav="governance">Governance</a><a href="operations.html" data-nav="operations">Operations</a><a href="examples.html" data-nav="examples">Examples</a><a href="reference.html" data-nav="reference">Reference</a>
+  </nav><div class="sidebar-footer"><a href="pt/index.html">Português</a><a href="https://github.com/marquesantero/contractforge" target="_blank" rel="noopener">GitHub</a></div></aside>
 <main class="content">
   <header class="page-header"><p class="eyebrow">Governance</p><h1>Catalog and access governance are contracts too.</h1><p class="lead">ContractForge separates table metadata from access control because they usually have different permissions, reviewers and operational blast radius.</p></header>
   <section class="section">
     <h2>Annotations</h2>
     <p>Annotations describe the table and its fields. They can be applied after the target exists, and failures follow the configured policy.</p>
-    <pre><code>annotations:
-  policy: warn
-  table:
-    description: Current customer dimension.
-    tags:
-      domain: crm
-      contains_pii: "true"
-  columns:
-    email:
-      description: Customer email address.
-      pii:
-        enabled: true
-        type: email
-        sensitivity: restricted</code></pre>
+    <div class="code-tabs">
+      <div class="code-tab-list" role="tablist" aria-label="Annotations example">
+        <button class="code-tab active" type="button" role="tab" aria-selected="true" data-code-tab="yaml">YAML</button>
+        <button class="code-tab" type="button" role="tab" aria-selected="false" data-code-tab="python">Python</button>
+      </div>
+      <div class="code-panel active" data-code-panel="yaml" role="tabpanel">
+        <pre><code class="language-yaml"># contracts/silver/s_customers.annotations.yaml
+target:
+  catalog: main
+  schema: crm_curated
+  table: s_customers
+
+policy: warn
+table:
+  description: Current customer dimension.
+  tags:
+    domain: crm
+    contains_pii: "true"
+
+columns:
+  email:
+    description: Customer email address.
+    pii:
+      enabled: true
+      type: email
+      sensitivity: restricted</code></pre>
+      </div>
+      <div class="code-panel" data-code-panel="python" role="tabpanel" hidden>
+        <pre><code class="language-python">from contractforge import ingest
+
+result = ingest(
+    source_table="main.crm_raw.customers",
+    target_catalog="main",
+    target_schema="crm_curated",
+    target_table="s_customers",
+    mode="scd1_hash_diff",
+    hash_keys=["customer_id"],
+    annotations={
+        "policy": "warn",
+        "table": {
+            "description": "Current customer dimension.",
+            "tags": {"domain": "crm", "contains_pii": "true"},
+        },
+        "columns": {
+            "email": {
+                "description": "Customer email address.",
+                "pii": {
+                    "enabled": True,
+                    "type": "email",
+                    "sensitivity": "restricted",
+                },
+            },
+        },
+    },
+)</code></pre>
+      </div>
+    </div>
   </section>
   <section class="section">
     <h2>Operations metadata</h2>
     <p>Operations contracts feed dashboards and alerting systems without coupling the library to Slack, Teams, PagerDuty or another notification provider.</p>
-    <pre><code>operations:
+    <div class="code-tabs">
+      <div class="code-tab-list" role="tablist" aria-label="Operations metadata example">
+        <button class="code-tab active" type="button" role="tab" aria-selected="true" data-code-tab="yaml">YAML</button>
+        <button class="code-tab" type="button" role="tab" aria-selected="false" data-code-tab="python">Python</button>
+      </div>
+      <div class="code-panel active" data-code-panel="yaml" role="tabpanel">
+        <pre><code class="language-yaml"># contracts/silver/s_customers.operations.yaml
+target:
+  catalog: main
+  schema: crm_curated
+  table: s_customers
+
+operations:
   business_owner: sales-ops
   technical_owner: data-engineering
   support_group: data-platform
@@ -43,14 +103,52 @@
   expected_frequency: daily
   freshness_sla_minutes: 180
   runbook_url: https://example.com/runbooks/customers</code></pre>
+      </div>
+      <div class="code-panel" data-code-panel="python" role="tabpanel" hidden>
+        <pre><code class="language-python">from contractforge import ingest
+
+result = ingest(
+    source_table="main.crm_raw.customers",
+    target_catalog="main",
+    target_schema="crm_curated",
+    target_table="s_customers",
+    mode="scd1_hash_diff",
+    hash_keys=["customer_id"],
+    operations={
+        "business_owner": "sales-ops",
+        "technical_owner": "data-engineering",
+        "support_group": "data-platform",
+        "criticality": "high",
+        "expected_frequency": "daily",
+        "freshness_sla_minutes": 180,
+        "runbook_url": "https://example.com/runbooks/customers",
+    },
+)</code></pre>
+      </div>
+    </div>
   </section>
   <section class="section">
     <h2>Access is deferred by design</h2>
     <p>Normal ingestion should not require elevated security privileges. Access contracts are validated and applied through dedicated commands.</p>
-    <pre><code>contractforge validate-access contracts/silver/s_customers
+    <pre><code class="language-bash">contractforge validate-access contracts/silver/s_customers
 contractforge governance-check contracts/silver/s_customers
 contractforge apply-access contracts/silver/s_customers</code></pre>
     <div class="note"><strong>Why this matters</strong><p>A data writer can load a table without becoming the principal responsible for grants, row filters or column masks.</p></div>
+  </section>
+  <section class="section">
+    <h2>Policy behavior</h2>
+    <p>Governance failures are operationally different from write failures. The policy controls whether metadata/access drift should block the workflow, be recorded as warning evidence or be ignored intentionally.</p>
+    <div class="table-wrap">
+      <table>
+        <tr><th>Area</th><th>Policy</th><th>Behavior</th><th>When to use</th></tr>
+        <tr><td>Annotations</td><td><code>warn</code></td><td>Attempt to apply comments/tags; record warnings without failing the data write.</td><td>Default for gradual rollout and mixed permissions.</td></tr>
+        <tr><td>Annotations</td><td><code>fail</code></td><td>Fail the ingestion result if annotations cannot be applied.</td><td>Use when catalog metadata is part of the release contract.</td></tr>
+        <tr><td>Annotations</td><td><code>ignore</code></td><td>Skip annotation application.</td><td>Use for environments without catalog permissions.</td></tr>
+        <tr><td>Access</td><td><code>validate_only</code></td><td>Validate access contract and record preview/drift evidence without applying changes.</td><td>Pull requests, CI and separation-of-duties workflows.</td></tr>
+        <tr><td>Access</td><td><code>apply</code></td><td>Apply grants, filters and masks through a privileged workflow.</td><td>Deployment jobs owned by a security principal.</td></tr>
+        <tr><td>Access</td><td><code>ignore</code></td><td>Skip access checks and application.</td><td>Local development or non-Unity-Catalog environments.</td></tr>
+      </table>
+    </div>
   </section>
   <section class="section">
     <h2>Governance lifecycle</h2>
@@ -64,7 +162,14 @@ contractforge apply-access contracts/silver/s_customers</code></pre>
   <section class="section">
     <h2>PII as annotation, not transformation</h2>
     <p>PII classification describes the data. It should not automatically mask or mutate values during ingestion. Masking belongs in catalog access policies or downstream security functions.</p>
-    <pre><code>columns:
+    <div class="code-tabs">
+      <div class="code-tab-list" role="tablist" aria-label="PII classification example">
+        <button class="code-tab active" type="button" role="tab" aria-selected="true" data-code-tab="yaml">YAML</button>
+        <button class="code-tab" type="button" role="tab" aria-selected="false" data-code-tab="python">Python</button>
+      </div>
+      <div class="code-panel active" data-code-panel="yaml" role="tabpanel">
+        <pre><code class="language-yaml"># In *.annotations.yaml
+columns:
   national_id:
     description: Government-issued identifier.
     pii:
@@ -74,13 +179,62 @@ contractforge apply-access contracts/silver/s_customers</code></pre>
     tags:
       retention_policy: restricted
       masking_candidate: "true"</code></pre>
+      </div>
+      <div class="code-panel" data-code-panel="python" role="tabpanel" hidden>
+        <pre><code class="language-python">annotations = {
+    "columns": {
+        "national_id": {
+            "description": "Government-issued identifier.",
+            "pii": {
+                "enabled": True,
+                "type": "national_id",
+                "sensitivity": "confidential",
+            },
+            "tags": {
+                "retention_policy": "restricted",
+                "masking_candidate": "true",
+            },
+        },
+    },
+}</code></pre>
+      </div>
+    </div>
   </section>
   <section class="section">
     <h2>Drift and audit tables</h2>
     <p>Governance actions are written to control tables so teams can answer what metadata was applied, what failed and what was intentionally deferred.</p>
     <div class="table-wrap"><table><tr><th>Table</th><th>Use</th></tr><tr><td><code>ctrl_ingestion_annotations</code></td><td>Applied, warned, ignored or failed table/column annotations.</td></tr><tr><td><code>ctrl_ingestion_operations</code></td><td>Ownership, criticality, SLA and support metadata snapshots.</td></tr><tr><td><code>ctrl_ingestion_access</code></td><td>Access validation/application evidence, including drift status.</td></tr></table></div>
   </section>
+  <section class="section">
+    <h2>Useful governance queries</h2>
+    <h3>Tables with PII annotations</h3>
+    <pre><code class="language-sql">SELECT
+  target_table,
+  column_name,
+  key,
+  value,
+  status,
+  annotation_ts_utc
+FROM main.ops.ctrl_ingestion_annotations
+WHERE annotation_type = 'pii'
+ORDER BY annotation_ts_utc DESC;</code></pre>
+    <h3>Access actions that require follow-up</h3>
+    <pre><code class="language-sql">SELECT
+  target_table,
+  access_type,
+  principal,
+  privilege,
+  column_name,
+  function_name,
+  status,
+  error_message,
+  access_ts_utc
+FROM main.ops.ctrl_ingestion_access
+WHERE status <> 'APPLIED'
+ORDER BY access_ts_utc DESC;</code></pre>
+  </section>
 </main>
 </div>
 </body>
 </html>
+

@@ -33,31 +33,11 @@
         <span class="brand-meta">Contract-first ingestion for Delta Lake</span>
       </div>
       <nav class="side-nav" aria-label="Documentation">
-        <span class="nav-label">Start</span>
-        <a href="index.html" data-nav="home">Overview</a>
-        <a href="quickstart.html" data-nav="quickstart">Quick start</a>
-        <a href="concepts.html" data-nav="concepts">Core concepts</a>
-        <a href="contracts.html" data-nav="contracts">Contracts</a>
-        <a href="write-modes.html" data-nav="write-modes">Write modes</a>
-        <a href="transformations.html" data-nav="transformations">Transformations</a>
-        <span class="nav-label">Connectors</span>
-        <a href="connectors/index.html" data-nav="connectors">Connector overview</a>
-        <a href="connectors/table-sql.html">Table and SQL</a>
-        <a href="connectors/files.html">Files</a>
-        <a href="connectors/http-file.html">HTTP file</a>
-        <a href="connectors/object-storage.html">Object storage</a>
-        <a href="connectors/s3.html">S3</a>
-        <a href="connectors/azure-blob.html">Azure Blob</a>
-        <a href="connectors/jdbc.html">JDBC</a>
-        <a href="connectors/rest-api.html">REST API</a>
-        <a href="connectors/autoloader.html">Auto Loader</a>
-        <a href="connectors/external-spark.html">Snowflake and BigQuery</a>
-        <span class="nav-label">Operate</span>
-        <a href="governance.html" data-nav="governance">Governance</a>
-        <a href="operations.html" data-nav="operations">Operations</a>
-        <a href="examples.html" data-nav="examples">Examples</a>
-        <a href="reference.html" data-nav="reference">Reference</a>
-      </nav>
+    <span class="nav-label">Start</span><a href="index.html" data-nav="home">Overview</a><a href="quickstart.html" data-nav="quickstart">Quick start</a><a href="concepts.html" data-nav="concepts">Core concepts</a>
+    <span class="nav-label">Contracts</span><a href="contracts.html" data-nav="contracts">Contract overview</a><a href="contract-ingestion.html">Ingestion</a><a href="contract-annotations.html">Annotations</a><a href="contract-operations.html">Operations</a><a href="contract-access.html">Access</a><a href="write-modes.html" data-nav="write-modes">Write modes</a><a href="transformations.html" data-nav="transformations">Transformations</a>
+    <span class="nav-label">Connectors</span><a href="connectors/index.html" data-nav="connectors">Connector overview</a><a href="connectors/table-sql.html">Table and SQL</a><a href="connectors/files.html">Files</a><a href="connectors/http-file.html">HTTP file</a><a href="connectors/object-storage.html">Object storage</a><a href="connectors/s3.html">S3</a><a href="connectors/azure-blob.html">Azure Blob</a><a href="connectors/jdbc.html">JDBC</a><a href="connectors/rest-api.html">REST API</a><a href="connectors/autoloader.html">Auto Loader</a><a href="connectors/external-spark.html">Snowflake and BigQuery</a>
+    <span class="nav-label">Operate</span><a href="governance.html" data-nav="governance">Governance</a><a href="operations.html" data-nav="operations">Operations</a><a href="examples.html" data-nav="examples">Examples</a><a href="reference.html" data-nav="reference">Reference</a>
+  </nav>
       <div class="sidebar-footer">
         <a href="pt/index.html">Português</a>
         <a href="https://github.com/marquesantero/contractforge" target="_blank" rel="noopener">GitHub</a>
@@ -192,22 +172,23 @@ flowchart TB
           <h2>Run a small ingestion, then inspect the control tables.</h2>
           <p>The fastest way to understand ContractForge is to execute one minimal contract and query `ctrl_ingestion_runs`, `ctrl_ingestion_quality` and `ctrl_ingestion_errors`.</p>
         </div>
-        <a class="button primary" href="quickstart.html">Open quick start</a>
+        <a class="button primary cta-button" href="quickstart.html">Open quick start</a>
       </section>
       <section class="section">
         <div class="section-heading">
-          <p class="eyebrow">Validated patterns</p>
-          <h2>Documentation is grounded in real ingestion tests.</h2>
-          <p>The examples behind the framework cover public HTTP CSV, raw REST JSON, Azure Blob/ADLS, S3, JDBC/Postgres, RDS IAM, Auto Loader and many-file folders. Those runs shaped connector behavior, transform patterns, stream metrics and failure handling.</p>
+          <p class="eyebrow">Practical patterns</p>
+          <h2>Documentation focuses on source patterns users actually need.</h2>
+          <p>The examples cover public HTTP CSV, raw REST JSON, Azure Blob/ADLS, S3, JDBC/Postgres, RDS IAM, Auto Loader and many-file folders. They are written to show when behavior belongs in the connector, in <code>transform.shape</code>, or in downstream project logic.</p>
         </div>
         <div class="info-grid">
           <article class="info-card"><span>APIs</span><h3>Raw payloads stay raw</h3><p>REST connectors retrieve payloads; <code>transform.shape</code> parses and explodes documents declaratively.</p></article>
           <article class="info-card"><span>Storage</span><h3>Runtime-aware access</h3><p>Serverless favors External Locations and Volumes; classic clusters can use direct credentials when allowed.</p></article>
           <article class="info-card"><span>Operations</span><h3>Failed runs raise by default</h3><p>Control tables are written first, then <code>ContractForgeExecutionError</code> fails the caller naturally.</p></article>
-          <article class="info-card"><span>Templates</span><h3>Known-good starts</h3><p>Validated examples were promoted into templates for common connector, transform and write-mode combinations.</p></article>
+          <article class="info-card"><span>Templates</span><h3>Reusable starts</h3><p>Templates provide concise starting points for common connector, transform and write-mode combinations.</p></article>
         </div>
       </section>
     </main>
   </div>
 </body>
 </html>
+

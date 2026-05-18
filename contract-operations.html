@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Complete ContractForge operations contract reference.">
+  <title>Operations contract | ContractForge</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Serif:wght@600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" type="image/png" href="assets/logo/contractforge-mark.png">
+  <script defer src="js/vendor/highlight.min.js"></script>
+  <script defer src="js/vendor/highlight-languages/yaml.min.js"></script>
+  <script defer src="js/main.js"></script>
+</head>
+<body data-page="contracts">
+<button class="nav-toggle" type="button" aria-label="Open navigation" data-nav-toggle>☰</button>
+<div class="site-shell">
+<aside class="sidebar" data-sidebar>
+  <div class="brand-panel"><a class="brand" href="index.html"><img src="assets/logo/contractforge-mark.png" alt="" class="brand-mark"><span class="brand-text">ContractForge</span></a><span class="brand-meta">Contract-first ingestion for Delta Lake</span></div>
+  <nav class="side-nav" aria-label="Documentation">
+    <span class="nav-label">Start</span><a href="index.html" data-nav="home">Overview</a><a href="quickstart.html" data-nav="quickstart">Quick start</a><a href="concepts.html" data-nav="concepts">Core concepts</a>
+    <span class="nav-label">Contracts</span><a href="contracts.html" data-nav="contracts">Contract overview</a><a href="contract-ingestion.html">Ingestion</a><a href="contract-annotations.html">Annotations</a><a href="contract-operations.html">Operations</a><a href="contract-access.html">Access</a><a href="write-modes.html" data-nav="write-modes">Write modes</a><a href="transformations.html" data-nav="transformations">Transformations</a>
+    <span class="nav-label">Connectors</span><a href="connectors/index.html" data-nav="connectors">Connector overview</a><a href="connectors/table-sql.html">Table and SQL</a><a href="connectors/files.html">Files</a><a href="connectors/http-file.html">HTTP file</a><a href="connectors/object-storage.html">Object storage</a><a href="connectors/s3.html">S3</a><a href="connectors/azure-blob.html">Azure Blob</a><a href="connectors/jdbc.html">JDBC</a><a href="connectors/rest-api.html">REST API</a><a href="connectors/autoloader.html">Auto Loader</a><a href="connectors/external-spark.html">Snowflake and BigQuery</a>
+    <span class="nav-label">Operate</span><a href="governance.html" data-nav="governance">Governance</a><a href="operations.html" data-nav="operations">Operations</a><a href="examples.html" data-nav="examples">Examples</a><a href="reference.html" data-nav="reference">Reference</a>
+  </nav>
+  <div class="sidebar-footer"><a href="pt/index.html">Português</a><a href="https://github.com/marquesantero/contractforge" target="_blank" rel="noopener">GitHub</a></div>
+</aside>
+
+<main class="content">
+  <header class="page-header">
+    <p class="eyebrow">Contract Reference</p>
+    <h1>Operations contract.</h1>
+    <p class="lead">Operations metadata tells dashboards and support processes how a table should be operated. ContractForge records this information; notification delivery remains external.</p>
+  </header>
+
+  <section class="section">
+    <h2>Complete example</h2>
+    <div class="code-tabs">
+      <div class="code-tab-list" role="tablist" aria-label="Operations contract example">
+        <button class="code-tab active" type="button" role="tab" aria-selected="true" data-code-tab="yaml">YAML</button>
+        <button class="code-tab" type="button" role="tab" aria-selected="false" data-code-tab="python">Python</button>
+      </div>
+      <div class="code-panel active" data-code-panel="yaml" role="tabpanel">
+        <pre><code class="language-yaml">_metadata:
+  contract_version: 1.0.0
+
+target:
+  catalog: main
+  schema: crm_curated
+  table: s_customers
+ownership:
+  business_owner: crm-analytics
+  technical_owner: data-engineering
+  steward: data-governance
+  support_group: data-platform
+  escalation_group: data-platform-oncall
+operations:
+  criticality: high
+  expected_frequency: daily
+  freshness_sla_minutes: 180
+  alert_on_failure: true
+  alert_on_quality_fail: true
+  runbook_url: https://example.com/runbooks/s_customers
+  owners: [data-engineering]
+  groups: [data-platform, data-governance]
+  tags:
+    domain: crm
+    tier: curated</code></pre>
+      </div>
+      <div class="code-panel" data-code-panel="python" role="tabpanel" hidden>
+        <pre><code class="language-python">from contractforge import ingest
+
+result = ingest(
+    source="main.raw.customers",
+    catalog="main",
+    target_schema="crm_curated",
+    target_table="s_customers",
+    mode="scd1_upsert",
+    merge_keys=["customer_id"],
+    operations={
+        "ownership": {
+            "business_owner": "crm-analytics",
+            "technical_owner": "data-engineering",
+            "steward": "data-governance",
+            "support_group": "data-platform",
+            "escalation_group": "data-platform-oncall",
+        },
+        "operations": {
+            "criticality": "high",
+            "expected_frequency": "daily",
+            "freshness_sla_minutes": 180,
+            "alert_on_failure": True,
+            "alert_on_quality_fail": True,
+            "runbook_url": "https://example.com/runbooks/s_customers",
+            "owners": ["data-engineering"],
+            "groups": ["data-platform", "data-governance"],
+            "tags": {"domain": "crm", "tier": "curated"},
+        },
+    },
+)</code></pre>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>Fields</h2>
+    <div class="table-wrap"><table>
+      <tr><th>Field</th><th>Type</th><th>Default</th><th>Use</th></tr>
+      <tr><td><code>_metadata</code></td><td>object</td><td>{}</td><td>File metadata for audit and bundle checks.</td></tr>
+      <tr><td><code>target</code></td><td>object</td><td>optional</td><td>Optional compatibility check against the ingestion target.</td></tr>
+      <tr><td><code>ownership.business_owner</code></td><td>string | null</td><td>null</td><td>Business owner or accountable business group.</td></tr>
+      <tr><td><code>ownership.technical_owner</code></td><td>string | null</td><td>null</td><td>Technical owner or engineering group.</td></tr>
+      <tr><td><code>ownership.steward</code></td><td>string | null</td><td>null</td><td>Data steward or governance owner.</td></tr>
+      <tr><td><code>ownership.support_group</code></td><td>string | null</td><td>null</td><td>Primary support group.</td></tr>
+      <tr><td><code>ownership.escalation_group</code></td><td>string | null</td><td>null</td><td>Escalation group for incidents.</td></tr>
+      <tr><td><code>operations.criticality</code></td><td><code>low</code> | <code>medium</code> | <code>high</code> | <code>critical</code></td><td>null</td><td>Operational criticality.</td></tr>
+      <tr><td><code>operations.expected_frequency</code></td><td><code>hourly</code> | <code>daily</code> | <code>weekly</code> | <code>monthly</code> | <code>ad_hoc</code></td><td>null</td><td>Expected run cadence.</td></tr>
+      <tr><td><code>operations.freshness_sla_minutes</code></td><td>integer | null</td><td>null</td><td>Freshness SLA in minutes.</td></tr>
+      <tr><td><code>operations.alert_on_failure</code></td><td>boolean</td><td>false</td><td>Flag for external failure alerting.</td></tr>
+      <tr><td><code>operations.alert_on_quality_fail</code></td><td>boolean</td><td>false</td><td>Flag for external quality alerting.</td></tr>
+      <tr><td><code>operations.runbook_url</code></td><td>string | null</td><td>null</td><td>Runbook URL.</td></tr>
+      <tr><td><code>operations.owners</code></td><td>string | list[string]</td><td>[]</td><td>Additional owner identifiers.</td></tr>
+      <tr><td><code>operations.groups</code></td><td>string | list[string]</td><td>[]</td><td>Groups associated with the table or data product.</td></tr>
+      <tr><td><code>operations.tags</code></td><td>object[string,string]</td><td>{}</td><td>Operational tags for dashboards and cost grouping.</td></tr>
+      <tr><td><code>criticality</code>, <code>expected_frequency</code>, <code>freshness_sla_minutes</code>, <code>alert_on_failure</code>, <code>alert_on_quality_fail</code>, <code>runbook_url</code>, <code>owners</code>, <code>groups</code>, <code>tags</code></td><td>same as nested</td><td>same</td><td>Flat aliases accepted for compact files. The nested <code>operations.*</code> form is clearer.</td></tr>
+    </table></div>
+  </section>
+</main>
+</div>
+</body>
+</html>

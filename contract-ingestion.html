@@ -1,0 +1,267 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Complete ContractForge ingestion contract reference.">
+  <title>Ingestion contract | ContractForge</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Serif:wght@600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" type="image/png" href="assets/logo/contractforge-mark.png">
+  <script defer src="js/vendor/highlight.min.js"></script>
+  <script defer src="js/vendor/highlight-languages/yaml.min.js"></script>
+  <script defer src="js/main.js"></script>
+</head>
+<body data-page="contracts">
+<button class="nav-toggle" type="button" aria-label="Open navigation" data-nav-toggle>☰</button>
+<div class="site-shell">
+<aside class="sidebar" data-sidebar>
+  <div class="brand-panel"><a class="brand" href="index.html"><img src="assets/logo/contractforge-mark.png" alt="" class="brand-mark"><span class="brand-text">ContractForge</span></a><span class="brand-meta">Contract-first ingestion for Delta Lake</span></div>
+  <nav class="side-nav" aria-label="Documentation">
+    <span class="nav-label">Start</span><a href="index.html" data-nav="home">Overview</a><a href="quickstart.html" data-nav="quickstart">Quick start</a><a href="concepts.html" data-nav="concepts">Core concepts</a>
+    <span class="nav-label">Contracts</span><a href="contracts.html" data-nav="contracts">Contract overview</a><a href="contract-ingestion.html">Ingestion</a><a href="contract-annotations.html">Annotations</a><a href="contract-operations.html">Operations</a><a href="contract-access.html">Access</a><a href="write-modes.html" data-nav="write-modes">Write modes</a><a href="transformations.html" data-nav="transformations">Transformations</a>
+    <span class="nav-label">Connectors</span><a href="connectors/index.html" data-nav="connectors">Connector overview</a><a href="connectors/table-sql.html">Table and SQL</a><a href="connectors/files.html">Files</a><a href="connectors/http-file.html">HTTP file</a><a href="connectors/object-storage.html">Object storage</a><a href="connectors/s3.html">S3</a><a href="connectors/azure-blob.html">Azure Blob</a><a href="connectors/jdbc.html">JDBC</a><a href="connectors/rest-api.html">REST API</a><a href="connectors/autoloader.html">Auto Loader</a><a href="connectors/external-spark.html">Snowflake and BigQuery</a>
+    <span class="nav-label">Operate</span><a href="governance.html" data-nav="governance">Governance</a><a href="operations.html" data-nav="operations">Operations</a><a href="examples.html" data-nav="examples">Examples</a><a href="reference.html" data-nav="reference">Reference</a>
+  </nav>
+  <div class="sidebar-footer"><a href="pt/index.html">Português</a><a href="https://github.com/marquesantero/contractforge" target="_blank" rel="noopener">GitHub</a></div>
+</aside>
+
+<main class="content">
+  <header class="page-header">
+    <p class="eyebrow">Contract Reference</p>
+    <h1>Ingestion contract.</h1>
+    <p class="lead">The ingestion contract is the executable definition of a table pipeline: source, target, write mode, schema policy, quality rules, transformations, execution controls and runtime behavior.</p>
+  </header>
+
+  <section class="section">
+    <h2>Complete example</h2>
+    <div class="code-tabs">
+      <div class="code-tab-list" role="tablist" aria-label="Ingestion contract example">
+        <button class="code-tab active" type="button" role="tab" aria-selected="true" data-code-tab="yaml">YAML</button>
+        <button class="code-tab" type="button" role="tab" aria-selected="false" data-code-tab="python">Python</button>
+      </div>
+      <div class="code-panel active" data-code-panel="yaml" role="tabpanel">
+        <pre><code class="language-yaml">_metadata:
+  contract_version: 1.0.0
+
+source:
+  type: connector
+  connector: postgres
+  options:
+    url: "{{ secret:crm/postgres_url }}"
+    dbtable: public.customers
+    driver: org.postgresql.Driver
+  read:
+    partition_column: customer_id
+    lower_bound: 1
+    upper_bound: 1000000
+    num_partitions: 8
+    fetchsize: 10000
+
+target:
+  catalog: main
+  schema: crm_curated
+  table: s_customers
+
+layer: silver
+mode: scd1_hash_diff
+hash_keys: [customer_id]
+dedup_order_expr: updated_at DESC NULLS LAST
+schema_policy: additive_only
+quality_rules:
+  not_null: [customer_id]
+  unique_key: [customer_id]
+  expressions:
+    - name: valid_status
+      expression: status IN ('active', 'inactive')
+      severity: quarantine</code></pre>
+      </div>
+      <div class="code-panel" data-code-panel="python" role="tabpanel" hidden>
+        <pre><code class="language-python">from contractforge import ingest
+
+result = ingest(
+    source={
+        "type": "connector",
+        "connector": "postgres",
+        "options": {
+            "url": "{{ secret:crm/postgres_url }}",
+            "dbtable": "public.customers",
+            "driver": "org.postgresql.Driver",
+        },
+        "read": {
+            "partition_column": "customer_id",
+            "lower_bound": 1,
+            "upper_bound": 1000000,
+            "num_partitions": 8,
+            "fetchsize": 10000,
+        },
+    },
+    catalog="main",
+    target_schema="crm_curated",
+    target_table="s_customers",
+    layer="silver",
+    mode="scd1_hash_diff",
+    hash_keys=["customer_id"],
+    dedup_order_expr="updated_at DESC NULLS LAST",
+    schema_policy="additive_only",
+    quality_rules={
+        "not_null": ["customer_id"],
+        "unique_key": ["customer_id"],
+        "expressions": [
+            {"name": "valid_status", "expression": "status IN ('active', 'inactive')", "severity": "quarantine"}
+        ],
+    },
+)</code></pre>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>Top-level fields</h2>
+    <div class="table-wrap"><table>
+      <tr><th>Field</th><th>Type</th><th>Default</th><th>Use</th></tr>
+      <tr><td><code>_metadata</code></td><td>object</td><td>{}</td><td>Contract metadata removed before execution and kept for audit.</td></tr>
+      <tr><td><code>source</code></td><td>string | object</td><td>required</td><td>Source table name, Python DataFrame, connector spec or Auto Loader spec.</td></tr>
+      <tr><td><code>target</code></td><td>object</td><td>optional</td><td>Canonical target object. Prefer this over separate catalog/schema/table fields in YAML.</td></tr>
+      <tr><td><code>target.catalog</code></td><td>string</td><td><code>main</code></td><td>Target catalog.</td></tr>
+      <tr><td><code>target.schema</code></td><td>string</td><td><code>target_schema</code> or <code>layer</code></td><td>Physical target schema.</td></tr>
+      <tr><td><code>target.table</code></td><td>string</td><td>required</td><td>Target table name.</td></tr>
+      <tr><td><code>target_table</code></td><td>string</td><td>required if <code>target.table</code> is absent</td><td>Direct target table name.</td></tr>
+      <tr><td><code>catalog</code></td><td>string</td><td><code>main</code></td><td>Direct target catalog.</td></tr>
+      <tr><td><code>target_schema</code></td><td>string | null</td><td>null</td><td>Direct physical target schema. If absent, <code>layer</code> is used as schema.</td></tr>
+      <tr><td><code>layer</code></td><td>string</td><td><code>bronze</code></td><td>Logical layer. It is not restricted to bronze/silver/gold.</td></tr>
+      <tr><td><code>mode</code></td><td>enum</td><td><code>scd0_append</code></td><td>Write mode.</td></tr>
+      <tr><td><code>preset</code> / <code>presets</code></td><td>string | list[string]</td><td>unset</td><td>Preset names applied before plan validation.</td></tr>
+      <tr><td><code>applied_presets</code></td><td>list[string]</td><td>[]</td><td>Recorded preset names, usually populated by the preset engine.</td></tr>
+      <tr><td><code>source_system</code></td><td>string</td><td><code>default</code></td><td>Source system label written to technical columns and control tables.</td></tr>
+      <tr><td><code>ctrl_schema</code></td><td>string</td><td><code>ops</code></td><td>Control table schema.</td></tr>
+      <tr><td><code>notebook_name</code></td><td>string</td><td><code>unknown</code></td><td>Execution context label.</td></tr>
+      <tr><td><code>description</code>, <code>owner</code>, <code>domain</code>, <code>tags</code>, <code>sla</code></td><td>strings/list</td><td>null/[]</td><td>Lightweight metadata. Prefer annotations/operations for catalog and operational metadata.</td></tr>
+      <tr><td><code>runtime_parameters</code></td><td>object</td><td>{}</td><td>Free-form runtime values recorded with the run.</td></tr>
+    </table></div>
+  </section>
+
+  <section class="section">
+    <h2>Source object fields</h2>
+    <div class="table-wrap"><table>
+      <tr><th>Field</th><th>Type</th><th>Default</th><th>Use</th></tr>
+      <tr><td><code>source.type</code></td><td><code>connector</code> | <code>autoloader</code></td><td>required</td><td>Source resolver type.</td></tr>
+      <tr><td><code>source.connector</code></td><td>string</td><td>required for connector</td><td>Native or registered connector name.</td></tr>
+      <tr><td><code>source.name</code></td><td>string | null</td><td>null</td><td>Logical source name for metadata.</td></tr>
+      <tr><td><code>source.provider</code></td><td>string | null</td><td>null</td><td>Object storage provider: <code>adls</code>, <code>azure_blob</code>, <code>gcs</code>, <code>s3</code>.</td></tr>
+      <tr><td><code>source.format</code></td><td>string | null</td><td>null</td><td>File, HTTP or connector response format.</td></tr>
+      <tr><td><code>source.path</code></td><td>string | null</td><td>null</td><td>Filesystem path, object storage path, HTTP URL or source location.</td></tr>
+      <tr><td><code>source.account_url</code></td><td>string | null</td><td>null</td><td>Azure Blob account URL.</td></tr>
+      <tr><td><code>source.container</code></td><td>string | null</td><td>null</td><td>Azure Blob/ADLS container.</td></tr>
+      <tr><td><code>source.table</code></td><td>string | null</td><td>null</td><td>Catalog/JDBC/external connector table.</td></tr>
+      <tr><td><code>source.query</code></td><td>string | null</td><td>null</td><td>SQL query for SQL, JDBC or external Spark connectors.</td></tr>
+      <tr><td><code>source.schema</code></td><td>string</td><td>unset</td><td>Alias for <code>source.read.schema</code>.</td></tr>
+      <tr><td><code>source.options</code></td><td>object</td><td>{}</td><td>Spark/connector options.</td></tr>
+      <tr><td><code>source.read</code></td><td>object</td><td>{}</td><td>Framework-aware read controls.</td></tr>
+      <tr><td><code>source.request</code></td><td>object</td><td>{}</td><td>HTTP request settings.</td></tr>
+      <tr><td><code>source.auth</code></td><td>object</td><td>{}</td><td>Authentication settings.</td></tr>
+      <tr><td><code>source.pagination</code></td><td>object</td><td>{}</td><td>REST pagination settings.</td></tr>
+      <tr><td><code>source.response</code></td><td>object</td><td>{}</td><td>REST/HTTP response parsing settings.</td></tr>
+      <tr><td><code>source.incremental</code></td><td>object</td><td>{}</td><td>Connector-side incremental settings.</td></tr>
+      <tr><td><code>source.limits</code></td><td>object</td><td>{}</td><td>Timeout, retry, rate and byte limits.</td></tr>
+    </table></div>
+  </section>
+
+  <section class="section">
+    <h2>Connector namespaces</h2>
+    <div class="table-wrap"><table>
+      <tr><th>Namespace</th><th>Fields</th></tr>
+      <tr><td><code>source.read</code></td><td><code>schema</code>, <code>source_complete</code>, <code>full_snapshot</code>, <code>recursiveFileLookup</code>, <code>pathGlobFilter</code>, <code>file_regex</code>, <code>file_regex_scope</code>, <code>file_regex_max_listed</code>, <code>file_regex_recursive</code>, JDBC <code>partition_column</code>/<code>lower_bound</code>/<code>upper_bound</code>/<code>num_partitions</code>/<code>fetchsize</code>, JSON materialization <code>staging_path</code>/<code>json_options</code>, Auto Loader <code>schema_location</code>/<code>checkpoint_location</code>/<code>schema_hints</code>/<code>include_existing_files</code>/<code>max_files_per_trigger</code>.</td></tr>
+      <tr><td><code>source.request</code></td><td><code>url</code>, <code>method</code>, <code>headers</code>, <code>params</code>, <code>json</code>, <code>body</code>.</td></tr>
+      <tr><td><code>source.auth</code></td><td><code>type</code>, <code>token</code>, <code>header</code>, <code>value</code>/<code>key</code>, <code>username</code>/<code>user</code>, <code>password</code>, OAuth <code>token_url</code>/<code>client_id</code>/<code>client_secret</code>/<code>scope</code>, AWS <code>access_key_id</code>/<code>secret_access_key</code>/<code>session_token</code>/<code>region</code>/<code>credential_provider</code>, Azure <code>sas_token</code>.</td></tr>
+      <tr><td><code>source.pagination</code></td><td><code>type</code>, <code>max_pages</code>, <code>page_param</code>, <code>start_page</code>, <code>offset_param</code>, <code>limit_param</code>, <code>page_size</code>, <code>next_cursor_path</code>, <code>cursor_param</code>.</td></tr>
+      <tr><td><code>source.response</code></td><td><code>mode</code>, <code>raw_column</code>, <code>records_path</code>, <code>format</code>, <code>encoding</code>.</td></tr>
+      <tr><td><code>source.incremental</code></td><td><code>watermark_column</code>, <code>initial_value</code>, JDBC <code>predicate</code>, REST <code>watermark_param</code>/<code>watermark_header</code>/<code>watermark_body_field</code>.</td></tr>
+      <tr><td><code>source.limits</code></td><td><code>timeout_seconds</code>, <code>retry_attempts</code>, <code>retry_backoff_seconds</code>, <code>rate_limit_per_minute</code>, <code>max_pages</code>, <code>max_page_bytes</code>, <code>max_total_bytes</code>.</td></tr>
+    </table></div>
+  </section>
+
+  <section class="section">
+    <h2>Selection, transform and filtering</h2>
+    <div class="table-wrap"><table>
+      <tr><th>Field</th><th>Type</th><th>Default</th><th>Use</th></tr>
+      <tr><td><code>select_columns</code></td><td>string | list[string]</td><td>[]</td><td>Keep only selected source columns.</td></tr>
+      <tr><td><code>column_mapping</code></td><td>object[string,string]</td><td>{}</td><td>Rename source columns before framework technical columns are added.</td></tr>
+      <tr><td><code>filter_expression</code></td><td>string | null</td><td>null</td><td>Spark SQL filter. Do not combine with full snapshot soft delete.</td></tr>
+      <tr><td><code>watermark_columns</code></td><td>string | list[string]</td><td>[]</td><td>Incremental filter/state columns.</td></tr>
+      <tr><td><code>shape</code></td><td>object | null</td><td>null</td><td>Direct shape namespace. Prefer <code>transform.shape</code>.</td></tr>
+      <tr><td><code>transform.shape</code></td><td>object | null</td><td>null</td><td>Declarative parse, flatten, array and projection operations. See <a href="transformations.html">Transformations</a>.</td></tr>
+      <tr><td><code>transform.deduplicate.keys</code></td><td>string | list[string]</td><td>required when deduplicate exists</td><td>Deduplication keys.</td></tr>
+      <tr><td><code>transform.deduplicate.order_by</code></td><td>string</td><td>required when deduplicate exists</td><td>SQL order fragment such as <code>updated_at DESC NULLS LAST</code>.</td></tr>
+    </table></div>
+  </section>
+
+  <section class="section">
+    <h2>Write and optimization</h2>
+    <div class="table-wrap"><table>
+      <tr><th>Field</th><th>Type</th><th>Default</th><th>Use</th></tr>
+      <tr><td><code>merge_keys</code></td><td>string | list[string]</td><td>[]</td><td>Keys for upsert, SCD2 and snapshot modes.</td></tr>
+      <tr><td><code>hash_keys</code></td><td>string | list[string]</td><td>[]</td><td>Keys for <code>scd1_hash_diff</code>.</td></tr>
+      <tr><td><code>hash_exclude_columns</code></td><td>string | list[string]</td><td>[]</td><td>Columns excluded from row hash.</td></tr>
+      <tr><td><code>custom_keys</code></td><td>object</td><td>{}</td><td>Mode/custom writer key groups.</td></tr>
+      <tr><td><code>dedup_order_expr</code></td><td>string | null</td><td>null</td><td>Deterministic ordering for source/target deduplication.</td></tr>
+      <tr><td><code>partition_column</code></td><td>string | null</td><td>null</td><td>Target partition column.</td></tr>
+      <tr><td><code>partition_value</code></td><td>string | null</td><td>null</td><td>Single partition value; requires <code>partition_column</code>.</td></tr>
+      <tr><td><code>merge_strategy</code></td><td>enum</td><td><code>delta</code></td><td><code>delta</code>, <code>delta_by_partition</code> or <code>replace_partitions</code>.</td></tr>
+      <tr><td><code>merge_partition_column</code></td><td>string | null</td><td>null</td><td>Partition column for <code>delta_by_partition</code>.</td></tr>
+      <tr><td><code>replace_partitions_source_complete</code></td><td>boolean</td><td>false</td><td>Evidence required for partition replacement.</td></tr>
+      <tr><td><code>cluster_columns</code></td><td>string | list[string]</td><td>[]</td><td>Liquid/table clustering columns where supported.</td></tr>
+      <tr><td><code>zorder_columns</code></td><td>string | list[string]</td><td>[]</td><td>ZORDER columns where supported.</td></tr>
+      <tr><td><code>optimize_after_write</code></td><td>boolean</td><td>false</td><td>Run post-write optimization.</td></tr>
+      <tr><td><code>delta_properties</code></td><td>object[string,string]</td><td>{}</td><td>Delta table properties.</td></tr>
+    </table></div>
+  </section>
+
+  <section class="section">
+    <h2>Schema, quality and runtime</h2>
+    <div class="table-wrap"><table>
+      <tr><th>Field</th><th>Type</th><th>Default</th><th>Use</th></tr>
+      <tr><td><code>schema_policy</code></td><td><code>permissive</code> | <code>additive_only</code> | <code>strict</code></td><td><code>permissive</code></td><td>Target schema handling.</td></tr>
+      <tr><td><code>allow_type_widening</code></td><td>boolean</td><td>false</td><td>Allow supported widening changes.</td></tr>
+      <tr><td><code>quality_rules.required_columns</code></td><td>string | list[string]</td><td>[]</td><td>Required schema columns.</td></tr>
+      <tr><td><code>quality_rules.not_null</code></td><td>string | list[string]</td><td>[]</td><td>Row-level not-null checks.</td></tr>
+      <tr><td><code>quality_rules.unique_key</code></td><td>string | list[string]</td><td>[]</td><td>Set-level uniqueness check.</td></tr>
+      <tr><td><code>quality_rules.accepted_values</code></td><td>object[string,list]</td><td>{}</td><td>Allowed values by column.</td></tr>
+      <tr><td><code>quality_rules.min_rows</code></td><td>integer</td><td>unset</td><td>Minimum row count.</td></tr>
+      <tr><td><code>quality_rules.max_null_ratio</code></td><td>object[string,number]</td><td>{}</td><td>Maximum null ratio by column.</td></tr>
+      <tr><td><code>quality_rules.expressions</code></td><td>list[object]</td><td>[]</td><td>SQL boolean rules with <code>name</code>, <code>expression</code>, <code>severity</code> and optional <code>message</code>.</td></tr>
+      <tr><td><code>quality_rules.custom</code></td><td>object</td><td>{}</td><td>Registered custom quality rules.</td></tr>
+      <tr><td><code>on_quality_fail</code></td><td><code>fail</code> | <code>warn</code> | <code>quarantine</code></td><td><code>fail</code></td><td>Global legacy action for built-in quality failures.</td></tr>
+      <tr><td><code>scd2_change_columns</code></td><td>string | list[string]</td><td>[]</td><td>SCD2 comparison columns.</td></tr>
+      <tr><td><code>scd2_effective_from_column</code></td><td>string | null</td><td>null</td><td>SCD2 effective-from source column.</td></tr>
+      <tr><td><code>fix_encoding</code>, <code>encoding</code>, <code>encoding_columns</code></td><td>boolean/string/list</td><td>false/<code>Windows-1252</code>/[]</td><td>Optional encoding repair.</td></tr>
+      <tr><td><code>dry_run</code></td><td>boolean</td><td>false</td><td>Validate without committing writes/control side effects.</td></tr>
+      <tr><td><code>explain_mode</code>, <code>explain_format</code></td><td>boolean/enum</td><td>false/<code>formatted</code></td><td>Capture Spark explain plans.</td></tr>
+      <tr><td><code>openlineage_enabled</code>, <code>openlineage_namespace</code>, <code>openlineage_producer</code></td><td>boolean/string/string</td><td>false/null/<code>contractforge</code></td><td>OpenLineage event metadata.</td></tr>
+      <tr><td><code>use_cache</code></td><td>boolean</td><td>true</td><td>Allow framework caching.</td></tr>
+      <tr><td><code>lock_enabled</code></td><td>boolean</td><td>false</td><td>Acquire framework lock.</td></tr>
+      <tr><td><code>idempotency_key</code>, <code>idempotency_policy</code></td><td>string/enum</td><td>null/<code>always_run</code></td><td>Idempotent execution policy.</td></tr>
+      <tr><td><code>retry_attempts</code>, <code>retry_backoff_seconds</code></td><td>integer | null</td><td>global config</td><td>Retry behavior override.</td></tr>
+      <tr><td><code>parent_run_id</code>, <code>run_group_id</code></td><td>string | null</td><td>null</td><td>Parent/group IDs for stream or window child runs.</td></tr>
+    </table></div>
+  </section>
+
+  <section class="section">
+    <h2>Execution window and catchup</h2>
+    <div class="table-wrap"><table>
+      <tr><th>Field</th><th>Type</th><th>Default</th><th>Use</th></tr>
+      <tr><td><code>execution.window.column</code></td><td>string</td><td>required</td><td>Column filtered by each explicit window.</td></tr>
+      <tr><td><code>execution.window.windows[].start</code>, <code>end</code>, <code>label</code></td><td>string/string/string</td><td>required/required/null</td><td>Explicit window boundaries and label.</td></tr>
+      <tr><td><code>execution.window.start</code>, <code>end</code>, <code>every</code></td><td>string</td><td>unset</td><td>Generated windows such as every <code>1 day</code>.</td></tr>
+      <tr><td><code>execution.window.stop_on_failure</code></td><td>boolean</td><td>true</td><td>Stop later windows after a failure.</td></tr>
+      <tr><td><code>execution.catchup.enabled</code></td><td>boolean</td><td>false</td><td>Generate catchup windows from saved state/watermark.</td></tr>
+      <tr><td><code>execution.catchup.column</code>, <code>start</code>, <code>end</code>, <code>every</code>, <code>stop_on_failure</code></td><td>mixed</td><td>null/null/null/null/true</td><td>Catchup window generation settings.</td></tr>
+    </table></div>
+  </section>
+</main>
+</div>
+</body>
+</html>
+

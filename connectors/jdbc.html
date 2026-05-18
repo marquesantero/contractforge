@@ -21,9 +21,10 @@
 <aside class="sidebar" data-sidebar>
   <div class="brand-panel"><a class="brand" href="../index.html"><img src="../assets/logo/contractforge-mark.png" alt="" class="brand-mark"><span class="brand-text">ContractForge</span></a><span class="brand-meta">Contract-first ingestion for Delta Lake</span></div>
   <nav class="side-nav" aria-label="Documentation">
-    <span class="nav-label">Start</span><a href="../index.html">Overview</a><a href="../quickstart.html">Quick start</a><a href="../concepts.html">Core concepts</a><a href="../contracts.html">Contracts</a><a href="../write-modes.html">Write modes</a><a href="../transformations.html">Transformations</a>
+    <span class="nav-label">Start</span><a href="../index.html" data-nav="home">Overview</a><a href="../quickstart.html" data-nav="quickstart">Quick start</a><a href="../concepts.html" data-nav="concepts">Core concepts</a>
+    <span class="nav-label">Contracts</span><a href="../contracts.html" data-nav="contracts">Contract overview</a><a href="../contract-ingestion.html">Ingestion</a><a href="../contract-annotations.html">Annotations</a><a href="../contract-operations.html">Operations</a><a href="../contract-access.html">Access</a><a href="../write-modes.html" data-nav="write-modes">Write modes</a><a href="../transformations.html" data-nav="transformations">Transformations</a>
     <span class="nav-label">Connectors</span><a href="index.html" data-nav="connectors">Connector overview</a><a href="table-sql.html">Table and SQL</a><a href="files.html">Files</a><a href="http-file.html">HTTP file</a><a href="object-storage.html">Object storage</a><a href="s3.html">S3</a><a href="azure-blob.html">Azure Blob</a><a href="jdbc.html">JDBC</a><a href="rest-api.html">REST API</a><a href="autoloader.html">Auto Loader</a><a href="external-spark.html">Snowflake and BigQuery</a>
-    <span class="nav-label">Operate</span><a href="../governance.html">Governance</a><a href="../operations.html">Operations</a><a href="../examples.html">Examples</a><a href="../reference.html">Reference</a>
+    <span class="nav-label">Operate</span><a href="../governance.html" data-nav="governance">Governance</a><a href="../operations.html" data-nav="operations">Operations</a><a href="../examples.html" data-nav="examples">Examples</a><a href="../reference.html" data-nav="reference">Reference</a>
   </nav>
   <div class="sidebar-footer"><a href="../pt/index.html">Português</a><a href="https://github.com/marquesantero/contractforge" target="_blank" rel="noopener">GitHub</a></div>
 </aside>
@@ -221,13 +222,13 @@ quality_rules:
   run_id,
   source_connector,
   source_provider,
-  source_options_redacted_json,
+  source_options_json,
   source_auth_redacted_json,
   source_read_redacted_json,
   source_metrics_json
 FROM main.ops.ctrl_ingestion_runs
 WHERE source_connector IN ('jdbc', 'postgres', 'mysql', 'sqlserver', 'oracle')
-ORDER BY start_ts_utc DESC;</code></pre>
+ORDER BY started_at_utc DESC;</code></pre>
   </section>
 
   <section class="section">
@@ -247,3 +248,5 @@ ORDER BY start_ts_utc DESC;</code></pre>
 </div>
 </body>
 </html>
+
+
