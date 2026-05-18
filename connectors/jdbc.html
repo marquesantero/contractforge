@@ -75,6 +75,29 @@
   </header>
 
   <section class="section">
+    <h2>When to use it</h2>
+    <div class="info-grid">
+      <article class="info-card"><span>Operational databases</span><h3>Relational extraction</h3><p>Use JDBC for PostgreSQL, MySQL, SQL Server, Oracle and compatible managed services.</p></article>
+      <article class="info-card"><span>Incremental loads</span><h3>Watermark columns</h3><p>Combine source predicates, ContractForge watermarks and deterministic deduplication before merge.</p></article>
+      <article class="info-card"><span>Large tables</span><h3>Partitioned reads</h3><p>Use partition columns, bounds, partitions and fetch size to avoid single-threaded extraction.</p></article>
+      <article class="info-card"><span>Cloud databases</span><h3>Network first</h3><p>Validate routes, firewalls, security groups, drivers and credentials before tuning the contract.</p></article>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>Runtime requirements</h2>
+    <div class="table-wrap">
+      <table>
+        <tr><th>Requirement</th><th>Details</th></tr>
+        <tr><td>JDBC driver</td><td>The matching database driver must be installed or available to Spark.</td></tr>
+        <tr><td>Network route</td><td>The runtime must reach the database host and port.</td></tr>
+        <tr><td>Credentials</td><td>Use Databricks secrets or runtime-managed identity. Do not commit database credentials in contracts.</td></tr>
+        <tr><td>Source permissions</td><td>The source user must be allowed to read the selected table/query and metadata needed by the driver.</td></tr>
+      </table>
+    </div>
+  </section>
+
+  <section class="section">
     <h2>Supported aliases</h2>
     <div class="table-wrap">
       <table>

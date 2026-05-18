@@ -86,7 +86,20 @@
   </section>
 
   <section class="section">
-    <h2>Record extraction mode</h2>
+    <h2>Runtime requirements</h2>
+    <div class="table-wrap">
+      <table>
+        <tr><th>Requirement</th><th>Details</th></tr>
+        <tr><td>Driver egress</td><td>The Python driver must reach the API endpoint, including DNS, proxy, firewall and allowlist configuration.</td></tr>
+        <tr><td>API limits</td><td>Use explicit page, record, byte, timeout and retry limits.</td></tr>
+        <tr><td>Authentication</td><td>Store tokens, keys and headers in secrets. Redacted metadata is written to control tables.</td></tr>
+        <tr><td>Payload model</td><td>Use record mode for tabular arrays and raw mode for complex or evolving JSON documents.</td></tr>
+      </table>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>Basic example</h2>
     <p>Use record extraction when the response contains a clear list of records and the JSON shape is already close to tabular.</p>
     <pre><code>source:
   type: connector

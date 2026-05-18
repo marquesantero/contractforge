@@ -75,7 +75,7 @@
   </header>
 
   <section class="section">
-    <h2>Access patterns</h2>
+    <h2>When to use it</h2>
     <div class="table-wrap">
       <table>
         <tr><th>Runtime</th><th>Recommended access</th><th>Why</th></tr>
@@ -88,7 +88,19 @@
   </section>
 
   <section class="section">
-    <h2>Serverless External Location pattern</h2>
+    <h2>Runtime requirements</h2>
+    <div class="table-wrap">
+      <table>
+        <tr><th>Runtime</th><th>Access model</th><th>Use when</th></tr>
+        <tr><td>Databricks serverless</td><td>Unity Catalog External Location or Volume</td><td>The platform blocks direct Hadoop/S3A credential configuration.</td></tr>
+        <tr><td>Classic cluster</td><td>S3A credentials, instance profile or assumed role</td><td>You control cluster libraries and Spark/Hadoop configuration.</td></tr>
+        <tr><td>Local Spark</td><td>Local AWS profile, environment variables or explicit credentials</td><td>Development and compatibility tests outside Databricks.</td></tr>
+      </table>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>Basic example</h2>
     <p>When the workspace already exposes S3 through Unity Catalog, the contract should simply reference the governed path.</p>
     <div class="code-tabs">
       <div class="code-tab-list" role="tablist" aria-label="S3 External Location example">

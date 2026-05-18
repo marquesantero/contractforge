@@ -75,7 +75,7 @@
   </header>
 
   <section class="section">
-    <h2>Access patterns</h2>
+    <h2>When to use it</h2>
     <div class="table-wrap">
       <table>
         <tr><th>Runtime</th><th>Recommended access</th><th>Notes</th></tr>
@@ -88,7 +88,19 @@
   </section>
 
   <section class="section">
-    <h2>External Location / Volume pattern</h2>
+    <h2>Runtime requirements</h2>
+    <div class="table-wrap">
+      <table>
+        <tr><th>Runtime</th><th>Access model</th><th>Use when</th></tr>
+        <tr><td>Databricks serverless</td><td>Unity Catalog External Location or Volume</td><td>Direct SAS/Hadoop configuration is blocked or managed by platform policy.</td></tr>
+        <tr><td>Classic cluster</td><td>SAS token, ABFS/SAS configuration or service principal setup</td><td>You control cluster-level Spark/Hadoop configuration.</td></tr>
+        <tr><td>Local Spark</td><td>ABFS/WASBS configuration or local credential provider</td><td>Development and compatibility tests outside Databricks.</td></tr>
+      </table>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>Basic example</h2>
     <p>When the path is already governed by Unity Catalog, the contract should reference the readable ABFS path or Volume path. Credential setup belongs to the platform.</p>
     <div class="code-tabs">
       <div class="code-tab-list" role="tablist" aria-label="Azure External Location example">
@@ -414,6 +426,19 @@ result = ingest(
 FROM main.ops.ctrl_ingestion_runs
 WHERE source_connector = 'azure_blob'
 ORDER BY started_at_utc DESC;</code></pre>
+  </section>
+
+  <section class="section">
+    <h2>Common issues</h2>
+    <div class="table-wrap">
+      <table>
+        <tr><th>Symptom</th><th>Likely cause</th><th>Action</th></tr>
+        <tr><td>Access denied on serverless</td><td>Direct SAS/Hadoop config is blocked by the runtime.</td><td>Use External Location, Volume or workspace network policy.</td></tr>
+        <tr><td>Credential validation fails</td><td>The storage credential cannot read/write the validation path.</td><td>Grant the required Azure Storage role to the service principal or managed identity.</td></tr>
+        <tr><td>Path lists no files</td><td>Wrong container, prefix or recursive lookup setting.</td><td>Validate the path with a minimal listing and check folder casing.</td></tr>
+        <tr><td>Format parsing fails</td><td>Schema/options do not match the file format.</td><td>Start with a small sample and explicit schema.</td></tr>
+      </table>
+    </div>
   </section>
 </main>
 </div>

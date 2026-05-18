@@ -74,7 +74,30 @@
   </header>
 
   <section class="section">
-    <h2>Basic CSV file</h2>
+    <h2>When to use it</h2>
+    <div class="info-grid">
+      <article class="info-card"><span>Public datasets</span><h3>Direct file download</h3><p>Use this for bounded CSV, JSON, JSONL, NDJSON or text files exposed over HTTP(S).</p></article>
+      <article class="info-card"><span>Runtime fallback</span><h3>Spark cannot read HTTPS</h3><p>The driver downloads the file and then hands a materialized local/staged file to Spark.</p></article>
+      <article class="info-card"><span>Small/medium files</span><h3>Controlled payloads</h3><p>Use explicit timeout, retry and size limits. Move large recurring feeds to object storage.</p></article>
+      <article class="info-card"><span>Connector boundary</span><h3>No business parsing</h3><p>Use <code>transform.shape</code> or downstream contracts for nested payload normalization.</p></article>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>Runtime requirements</h2>
+    <div class="table-wrap">
+      <table>
+        <tr><th>Requirement</th><th>Details</th></tr>
+        <tr><td>Driver egress</td><td>The Databricks driver or local Spark process must reach the HTTP(S) endpoint.</td></tr>
+        <tr><td>Payload limits</td><td>Configure timeout/retry and avoid unbounded downloads.</td></tr>
+        <tr><td>Format support</td><td>Spark must support the declared file format after the file is materialized.</td></tr>
+        <tr><td>Authentication</td><td>Use secret-backed headers or URLs for authenticated files.</td></tr>
+      </table>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>Basic example</h2>
     <div class="code-tabs">
       <div class="code-tab-list" role="tablist" aria-label="HTTP file CSV example">
         <button class="code-tab active" type="button" role="tab" aria-selected="true" data-code-tab="yaml">YAML</button>
@@ -205,6 +228,35 @@ result = ingest(
       </div>
     </div>
     <div class="note warning"><strong>Use bounded files only</strong><p>For high-volume recurring feeds, land files in object storage and use Auto Loader or a file connector.</p></div>
+  </section>
+
+  <section class="section">
+    <h2>Operational validation</h2>
+    <pre><code class="language-sql">SELECT
+  run_id,
+  status,
+  source_connector,
+  source_format,
+  source_path,
+  rows_read,
+  rows_written,
+  source_metrics_json
+FROM main.ops.ctrl_ingestion_runs
+WHERE source_connector IN ('http_file', 'http_csv', 'http_json', 'http_text')
+ORDER BY started_at_utc DESC;</code></pre>
+  </section>
+
+  <section class="section">
+    <h2>Common issues</h2>
+    <div class="table-wrap">
+      <table>
+        <tr><th>Symptom</th><th>Likely cause</th><th>Action</th></tr>
+        <tr><td>DNS or connection failure</td><td>The driver cannot reach the host.</td><td>Validate egress, DNS, proxy and endpoint allowlists from the runtime.</td></tr>
+        <tr><td>Timeout</td><td>File is too large or endpoint is slow.</td><td>Increase limits cautiously or move the feed to object storage.</td></tr>
+        <tr><td>Unexpected schema</td><td>File format changed or schema inference was used.</td><td>Declare explicit schema and reader options.</td></tr>
+        <tr><td>Memory pressure</td><td>Payload is too large for driver-side download.</td><td>Use object storage ingestion or Auto Loader for large feeds.</td></tr>
+      </table>
+    </div>
   </section>
 
   <section class="section doc-depth-marker">

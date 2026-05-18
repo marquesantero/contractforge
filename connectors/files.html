@@ -79,6 +79,29 @@
   </header>
 
   <section class="section">
+    <h2>When to use it</h2>
+    <div class="info-grid">
+      <article class="info-card"><span>Landing zones</span><h3>Finite file sets</h3><p>Use file connectors for bounded folders, one-time backfills, exports and public datasets that Spark can read directly.</p></article>
+      <article class="info-card"><span>Typed ingestion</span><h3>Schema-first reads</h3><p>Declare Spark DDL schemas for repeatable ingestion instead of relying on inference in scheduled jobs.</p></article>
+      <article class="info-card"><span>Nested files</span><h3>Shape after reading</h3><p>Use <code>transform.shape</code> to parse, flatten or explode nested JSON/struct/array content after extraction.</p></article>
+      <article class="info-card"><span>Large folders</span><h3>Filter deliberately</h3><p>Use glob filters, recursive lookup and regex file selection only when the runtime can list the path efficiently.</p></article>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>Runtime requirements</h2>
+    <div class="table-wrap">
+      <table>
+        <tr><th>Requirement</th><th>Details</th></tr>
+        <tr><td>Path access</td><td>The Spark runtime must be able to list/read the path through local filesystem, DBFS, Volume, External Location or cloud storage configuration.</td></tr>
+        <tr><td>Format support</td><td>CSV, JSON, Parquet, Delta, ORC and text are usually built in. Avro and XML may require extra runtime libraries.</td></tr>
+        <tr><td>Schema stability</td><td>Production contracts should provide explicit schema for ambiguous formats such as CSV, JSON and XML.</td></tr>
+        <tr><td>Listing scale</td><td>Regex filtering requires file listing. Use safety limits for very large folders.</td></tr>
+      </table>
+    </div>
+  </section>
+
+  <section class="section">
     <h2>Supported formats</h2>
     <p>ContractForge delegates file parsing to Spark readers and adds contract validation, source metadata, regex file selection and consistent operational logging.</p>
     <div class="table-wrap">
@@ -716,6 +739,36 @@ result = ingest(
       <li>Prefer governed paths such as Volumes or External Locations on Databricks serverless.</li>
       <li>Keep direct cloud credentials for classic/job clusters or local Spark runtimes that allow Hadoop filesystem configuration.</li>
     </ul>
+  </section>
+
+  <section class="section">
+    <h2>Operational validation</h2>
+    <pre><code class="language-sql">SELECT
+  run_id,
+  status,
+  source_connector,
+  source_format,
+  source_path,
+  rows_read,
+  rows_written,
+  source_metrics_json
+FROM main.ops.ctrl_ingestion_runs
+WHERE source_connector IN ('csv', 'json', 'jsonl', 'ndjson', 'parquet', 'delta', 'orc', 'avro', 'xml', 'text')
+ORDER BY started_at_utc DESC;</code></pre>
+  </section>
+
+  <section class="section">
+    <h2>Common issues</h2>
+    <div class="table-wrap">
+      <table>
+        <tr><th>Symptom</th><th>Likely cause</th><th>Action</th></tr>
+        <tr><td>Wrong column types</td><td>Schema inference changed between files or runs.</td><td>Declare an explicit Spark DDL schema.</td></tr>
+        <tr><td>Zero rows</td><td>Wrong path, glob filter or regex selection.</td><td>Validate file listing and inspect <code>source_metrics_json</code>.</td></tr>
+        <tr><td>XML/Avro reader missing</td><td>Runtime library is not installed.</td><td>Install the required Spark format package on the cluster/runtime.</td></tr>
+        <tr><td>Duplicate merge keys</td><td>Folder contains multiple versions per business key.</td><td>Use <code>transform.deduplicate</code> before merge modes.</td></tr>
+        <tr><td>Slow startup</td><td>Large folder listing or schema inference.</td><td>Use explicit schema, partitioned paths, glob filters or Auto Loader.</td></tr>
+      </table>
+    </div>
   </section>
 
   <section class="section">
