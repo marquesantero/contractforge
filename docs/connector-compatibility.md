@@ -34,6 +34,7 @@ This matrix describes the connector contract supported by ContractForge. Drivers
 - For large JDBC tables, configure `partition_column`, `lower_bound`, `upper_bound`, `num_partitions` and `fetchsize`.
 - For Amazon RDS/Aurora, network connectivity is not solved by the library: use the same VPC, VPC peering, Transit Gateway, PrivateLink/NLB or a traditional public endpoint. Aurora created by Express Configuration may use Internet Access Gateway with IAM token, but still requires IAM permission and TCP reachability from the runtime.
 - For Snowflake/BigQuery, validate the Spark connector in the runtime before using the contract in production.
+- For Snowflake/BigQuery query reads, prefer top-level `source.query` for readability. ContractForge passes it to the underlying Spark connector as the connector `query` option.
 - For connectors that use credentials, use `{{ secret:scope/key }}` and verify that `contractforge validate`/`connectors doctor` do not print literal secrets.
 - For Azure Blob with SAS, store only the SAS token in the secret scope and declare `account_url`, `container` and `path` separately in the contract.
 - For Azure Blob on Databricks serverless, prefer Unity Catalog External Location/Volume and `abfss://...` or `/Volumes/...` paths; direct SAS through `fs.azure.sas...` may be blocked by Spark Connect.
@@ -50,6 +51,41 @@ contractforge validate contracts/bronze/b_orders.ingestion.yaml
 ```
 
 `connectors doctor` does not open network connections, create a SparkSession or validate credentials. It shows static connector requirements such as JDBC drivers, external Spark connectors, Auto Loader or cloud runtime configuration. Use it in PRs and diagnostic notebooks before running real ingestion jobs.
+
+## External Spark Connector Query Example
+
+Snowflake and BigQuery are delegated to external Spark connectors installed in the runtime. ContractForge validates the contract shape, resolves secrets, records source metadata and passes the read options through to `spark.read.format(...)`.
+
+Use top-level `source.query` when the remote engine should execute the SQL and return only the result set to Spark:
+
+```yaml
+source:
+  type: connector
+  connector: bigquery
+  query: |
+    SELECT order_id, customer_id, order_ts, amount, status
+    FROM `project.dataset.orders`
+    WHERE amount >= 100
+  options:
+    credentialsFile: /tmp/contractforge_bigquery_reader.json
+    parentProject: "{{ secret:gcp/project_id }}"
+    viewsEnabled: "true"
+    materializationProject: "{{ secret:gcp/project_id }}"
+    materializationDataset: contractforge_spark_materialization
+  read:
+    source_complete: true
+
+target:
+  catalog: main
+  schema: bronze_external
+  table: b_bigquery_orders_query
+
+layer: bronze
+mode: scd0_overwrite
+source_system: bigquery
+```
+
+For BigQuery specifically, the Spark BigQuery connector may require a materialization dataset for query reads. Keep the materialization dataset in the same BigQuery location as the queried tables and grant the service account permission to create/read temporary materialized results. The query can also be supplied as `source.options.query` when a connector-specific option block is generated programmatically, but top-level `source.query` is the recommended contract form.
 
 ## HTTP File CSV Example
 

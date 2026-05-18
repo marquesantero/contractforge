@@ -237,13 +237,13 @@ BUILTIN_CONNECTOR_METADATA: Dict[str, Dict[str, Any]] = {
     "snowflake": {
         "family": "external",
         "description": "Fonte Snowflake via Spark Snowflake connector.",
-        "required": ["connection options", "options.dbtable ou options.query"],
+        "required": ["connection options", "source.query, options.dbtable ou options.query"],
         "incremental": False,
     },
     "bigquery": {
         "family": "external",
         "description": "Fonte BigQuery via Spark BigQuery connector.",
-        "required": ["table, options.table ou options.query"],
+        "required": ["table, source.query, options.table ou options.query"],
         "incremental": False,
     },
     "rest_api": {
@@ -643,6 +643,7 @@ def _request_headers(
 
 
 def _connector_metadata(spec: ConnectorSpec, capabilities: ConnectorCapabilities) -> Dict[str, Any]:
+    source_query = bool(spec.query or spec.options.get("query"))
     return {
         "source_type": spec.type,
         "source_connector": spec.connector,
@@ -651,7 +652,7 @@ def _connector_metadata(spec: ConnectorSpec, capabilities: ConnectorCapabilities
         "source_format": spec.format,
         "source_path": _redact_optional_text(spec.path),
         "source_table": _redact_optional_text(spec.table),
-        "source_query": bool(spec.query),
+        "source_query": source_query,
         "source_options_redacted": redact_secrets(spec.options),
         "source_read_redacted": redact_secrets(spec.read),
         "source_request_redacted": redact_secrets(spec.request),

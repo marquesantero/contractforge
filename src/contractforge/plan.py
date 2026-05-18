@@ -313,10 +313,15 @@ def _validate_native_connector_contract(spec: "ConnectorSpec") -> None:
             )
         return
     if connector in _SPARK_FORMAT_CONNECTORS:
-        if "query" not in spec.options and "dbtable" not in spec.options and "table" not in spec.options and not spec.table:
+        if (
+            not _connector_value(spec, "query")
+            and "dbtable" not in spec.options
+            and "table" not in spec.options
+            and not spec.table
+        ):
             raise ValueError(
                 f"connector={connector} requer source.table, source.options.table, "
-                "source.options.dbtable ou source.options.query"
+                "source.options.dbtable, source.query ou source.options.query"
             )
         return
     if connector == "rest_api":

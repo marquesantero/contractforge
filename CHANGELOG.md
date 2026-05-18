@@ -6,11 +6,13 @@ This project follows semantic versioning while the library evolves:
 - `MINOR`: compatible feature or planned contract hardening.
 - `MAJOR`: incompatible change after stable adoption.
 
-## Unreleased
+## 2.12.1 - 2026-05-18
 
 - Makes ingestion APIs fail fast for callers by default: `ingest()`, `ingest_plan()`, `ingest_stream_plan()` and `ingest_bundle()` now raise `ContractForgeExecutionError` when the final result status is `FAILED` or `ABORTED`.
 - Adds `raise_on_failure=False` as an explicit runtime option for tests, notebooks or orchestration code that need to inspect failed result payloads directly.
 - Keeps control-table logging, error persistence and stream/execution aggregation before raising to the caller.
+- Allows Spark-format connectors such as BigQuery and Snowflake to use top-level `source.query`, matching the resolver behavior that maps it into connector read options.
+- Normalizes connector observability metadata so `source.source_query=true` when the effective read uses either top-level `source.query` or `source.options.query`.
 
 ## 2.12.0 - 2026-05-17
 

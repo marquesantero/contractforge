@@ -137,6 +137,24 @@ def test_build_plan_accepts_target_block_alias():
     assert target_full_table_name(plan) == "main.custom_schema.orders"
 
 
+def test_validate_plan_shape_accepts_spark_format_source_query():
+    plan = build_plan_from_kwargs(
+        source={
+            "type": "connector",
+            "connector": "bigquery",
+            "query": "SELECT * FROM `project.dataset.orders`",
+            "options": {
+                "viewsEnabled": "true",
+                "materializationDataset": "scratch",
+            },
+        },
+        target_table="b_orders",
+    )
+
+    validate_plan_shape(plan)
+    assert plan.source.query == "SELECT * FROM `project.dataset.orders`"
+
+
 def test_build_plan_rejects_conflicting_target_block():
     with pytest.raises(ValueError, match="conflita"):
         build_plan_from_kwargs(
