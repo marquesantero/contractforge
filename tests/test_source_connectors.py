@@ -1438,6 +1438,82 @@ def test_spark_format_connector_uses_table_from_source(monkeypatch):
     assert resolved.metadata["source_options_redacted"]["api_key"] == "***REDACTED***"
 
 
+def test_spark_format_connector_uses_query_from_source(monkeypatch):
+    captured = {}
+
+    class Reader:
+        def format(self, value):
+            captured["format"] = value
+            return self
+
+        def options(self, **kwargs):
+            captured.update(kwargs)
+            return self
+
+        def load(self):
+            return "df"
+
+    class FakeSpark:
+        read = Reader()
+
+    monkeypatch.setattr(sources_module, "spark", FakeSpark())
+    spec = ConnectorSpec(
+        connector="bigquery",
+        query="SELECT * FROM `project.dataset.orders` WHERE amount >= 100",
+        options={"viewsEnabled": "true", "materializationDataset": "scratch"},
+    )
+
+    resolved = SparkFormatConnector("bigquery", table_option="table").resolve_batch(
+        spec,
+        build_plan_from_kwargs(source="x", target_table="t"),
+    )
+
+    assert resolved.df == "df"
+    assert captured["format"] == "bigquery"
+    assert captured["query"] == "SELECT * FROM `project.dataset.orders` WHERE amount >= 100"
+    assert resolved.metadata["source_query"] is True
+    assert resolved.metadata["source_metrics"]["source_query"] is True
+
+
+def test_spark_format_connector_marks_options_query_as_source_query(monkeypatch):
+    captured = {}
+
+    class Reader:
+        def format(self, value):
+            captured["format"] = value
+            return self
+
+        def options(self, **kwargs):
+            captured.update(kwargs)
+            return self
+
+        def load(self):
+            return "df"
+
+    class FakeSpark:
+        read = Reader()
+
+    monkeypatch.setattr(sources_module, "spark", FakeSpark())
+    spec = ConnectorSpec(
+        connector="bigquery",
+        options={
+            "query": "SELECT * FROM `project.dataset.orders` WHERE amount >= 100",
+            "viewsEnabled": "true",
+            "materializationDataset": "scratch",
+        },
+    )
+
+    resolved = SparkFormatConnector("bigquery", table_option="table").resolve_batch(
+        spec,
+        build_plan_from_kwargs(source="x", target_table="t"),
+    )
+
+    assert resolved.df == "df"
+    assert captured["query"] == "SELECT * FROM `project.dataset.orders` WHERE amount >= 100"
+    assert resolved.metadata["source_query"] is True
+    assert resolved.metadata["source_metrics"]["source_query"] is True
+
+
 def test_diagnose_source_connectors_reports_runtime_requirements():
     diagnostics = diagnose_source_connectors(["rest_api", "snowflake", "s3"])
     by_name = {item["name"]: item for item in diagnostics}

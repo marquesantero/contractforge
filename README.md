@@ -225,6 +225,35 @@ contractforge connectors show rest_api http_file postgres s3 autoloader
 contractforge connectors doctor rest_api http_file postgres s3 autoloader
 ```
 
+External Spark connectors can use top-level `source.query` when the remote engine should execute the SQL and Spark should ingest only the result set:
+
+```yaml
+source:
+  type: connector
+  connector: bigquery
+  query: |
+    SELECT order_id, customer_id, order_ts, amount, status
+    FROM `project.dataset.orders`
+    WHERE amount >= 100
+  options:
+    credentialsFile: /tmp/contractforge_bigquery_reader.json
+    parentProject: "{{ secret:gcp/project_id }}"
+    viewsEnabled: "true"
+    materializationProject: "{{ secret:gcp/project_id }}"
+    materializationDataset: contractforge_spark_materialization
+  read:
+    source_complete: true
+
+target:
+  catalog: main
+  schema: bronze_external
+  table: b_bigquery_orders_query
+
+layer: bronze
+mode: scd0_overwrite
+source_system: bigquery
+```
+
 ## Object Storage Guidance
 
 On Databricks serverless/Spark Connect, prefer Unity Catalog External Locations or Volumes for Azure Blob, ADLS and S3. Credentials and network access are then governed by Unity Catalog.
