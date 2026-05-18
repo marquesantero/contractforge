@@ -6,6 +6,12 @@ This project follows semantic versioning while the library evolves:
 - `MINOR`: compatible feature or planned contract hardening.
 - `MAJOR`: incompatible change after stable adoption.
 
+## 2.12.2 - 2026-05-18
+
+- Resolves Databricks secret placeholders embedded inside larger strings, not only placeholders that occupy the full value.
+- Keeps recursive secret resolution for nested connector options while preserving explicit errors for malformed placeholders.
+- Fixes connector configurations such as Snowflake URLs composed from a secret account identifier plus a static domain suffix.
+
 ## 2.12.1 - 2026-05-18
 
 - Makes ingestion APIs fail fast for callers by default: `ingest()`, `ingest_plan()`, `ingest_stream_plan()` and `ingest_bundle()` now raise `ContractForgeExecutionError` when the final result status is `FAILED` or `ABORTED`.

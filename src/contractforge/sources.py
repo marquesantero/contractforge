@@ -725,13 +725,9 @@ def _dbutils() -> Any:
         raise RuntimeError("Não foi possível resolver dbutils para acessar Databricks Secrets") from exc
 
 
-def _secret_from_placeholder(value: str) -> str:
-    raw = value.strip()
-    if not (raw.startswith("{{") and raw.endswith("}}")):
-        return value
-    token = raw[2:-2].strip()
+def _resolve_secret_token(token: str) -> str:
     if not token.startswith("secret:"):
-        return value
+        return "{{ " + token + " }}"
     ref = token[len("secret:"):].strip()
     if "/" not in ref:
         raise ValueError("Placeholder de secret deve usar formato {{ secret:scope/key }}")
@@ -742,6 +738,16 @@ def _secret_from_placeholder(value: str) -> str:
     if env_name in os.environ:
         return os.environ[env_name]
     return _dbutils().secrets.get(scope=scope, key=key)
+
+
+def _secret_from_placeholder(value: str) -> str:
+    def replace(match: re.Match[str]) -> str:
+        token = match.group(0)[2:-2].strip()
+        return _resolve_secret_token(token)
+
+    if not _SECRET_PLACEHOLDER_RE.search(value):
+        return value
+    return _SECRET_PLACEHOLDER_RE.sub(replace, value)
 
 
 def resolve_secrets(value: Any) -> Any:

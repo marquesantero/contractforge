@@ -19,6 +19,7 @@ from contractforge.sources import (
     redact_secrets,
     redact_text,
     register_source_resolver,
+    resolve_secrets,
     resolve_batch_source,
 )
 
@@ -163,6 +164,45 @@ def test_redact_text_covers_free_form_secret_patterns():
     assert "{{ secret:scope/key }}" not in redacted
     assert "api_key=plain" not in redacted
     assert redacted.count("***REDACTED***") >= 6
+
+
+def test_resolve_secrets_supports_exact_and_embedded_placeholders(monkeypatch):
+    class Secrets:
+        def get(self, scope, key):
+            return f"{scope}:{key}:value"
+
+    class Dbutils:
+        secrets = Secrets()
+
+    monkeypatch.setattr(sources_module, "_dbutils", lambda: Dbutils())
+
+    payload = {
+        "exact": "{{ secret:scope/key }}",
+        "embedded": "https://{{ secret:scope/host }}/api",
+        "multiple": "{{ secret:a/one }}:{{ secret:b/two }}",
+        "nested": ["prefix-{{ secret:x/y }}", {"url": "{{ secret:db/host }}.snowflakecomputing.com"}],
+    }
+
+    assert resolve_secrets(payload) == {
+        "exact": "scope:key:value",
+        "embedded": "https://scope:host:value/api",
+        "multiple": "a:one:value:b:two:value",
+        "nested": ["prefix-x:y:value", {"url": "db:host:value.snowflakecomputing.com"}],
+    }
+
+
+def test_resolve_secrets_rejects_malformed_embedded_placeholder(monkeypatch):
+    class Secrets:
+        def get(self, scope, key):  # pragma: no cover - malformed placeholder fails before lookup
+            return f"{scope}:{key}:value"
+
+    class Dbutils:
+        secrets = Secrets()
+
+    monkeypatch.setattr(sources_module, "_dbutils", lambda: Dbutils())
+
+    with pytest.raises(ValueError, match="scope/key"):
+        resolve_secrets("prefix-{{ secret:missing_slash }}")
 
 
 def test_connector_metadata_redacts_sensitive_identifiers_and_paths(monkeypatch):
