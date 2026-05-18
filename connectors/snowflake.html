@@ -1,0 +1,369 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="ContractForge Snowflake connector documentation with table reads, query reads, key-pair authentication, PAT authentication, runtime requirements and operational guidance.">
+  <title>Snowflake connector | ContractForge</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Serif:wght@600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="icon" type="image/png" href="../assets/logo/contractforge-mark.png">
+  <script defer src="../js/vendor/highlight.min.js"></script>
+  <script defer src="../js/vendor/highlight-languages/yaml.min.js"></script>
+  <script defer src="../js/vendor/highlight-languages/python.min.js"></script>
+  <script defer src="../js/vendor/highlight-languages/sql.min.js"></script>
+  <script defer src="../js/main.js"></script>
+</head>
+<body data-page="connectors">
+<button class="nav-toggle" type="button" aria-label="Open navigation" data-nav-toggle>☰</button>
+<div class="site-shell">
+<aside class="sidebar" data-sidebar><div class="brand-panel"><a class="brand" href="../index.html"><img src="../assets/logo/contractforge-mark.png" alt="" class="brand-mark"><span class="brand-text">ContractForge</span></a><span class="brand-meta">Contract-first ingestion for Delta Lake</span></div><nav class="side-nav" aria-label="Documentation">
+  <span class="nav-label">Start</span>
+  <a href="../index.html" data-nav="home">Overview</a>
+  <a href="../quickstart.html" data-nav="quickstart">Quick start</a>
+  <a href="../concepts.html" data-nav="concepts">Core concepts</a>
+  <span class="nav-label">Contracts</span>
+  <a href="../contracts.html" data-nav="contracts">Contract overview</a>
+  <a href="../full-contract.html" data-nav="full-contract">Full contract example</a>
+  <a href="../contract-ingestion.html">Ingestion</a>
+  <a href="../contract-annotations.html">Annotations</a>
+  <a href="../contract-operations.html">Operations</a>
+  <a href="../contract-access.html">Access</a>
+  <span class="nav-label">Core behavior</span>
+  <a href="../write-modes.html" data-nav="write-modes">Write modes</a>
+  <a href="../merge-strategies.html" data-nav="merge-strategies">Merge strategies</a>
+  <a href="../transformations.html" data-nav="transformations">Transformations</a>
+  <a href="../quality.html" data-nav="quality">Quality gates</a>
+  <a href="../schema-policy.html" data-nav="schema-policy">Schema policy</a>
+  <a href="../watermarks.html" data-nav="watermarks">Watermarks & backfill</a>
+  <a href="../idempotency.html" data-nav="idempotency">Idempotency & retry</a>
+  <span class="nav-label">Connectors</span>
+  <a href="../connectors/index.html" data-nav="connectors">Connector overview</a>
+  <a href="../connectors/table-sql.html">Table and SQL</a>
+  <a href="../connectors/files.html">Files</a>
+  <a href="../connectors/http-file.html">HTTP file</a>
+  <a href="../connectors/object-storage.html">Object storage</a>
+  <a href="../connectors/s3.html">S3</a>
+  <a href="../connectors/azure-blob.html">Azure Blob</a>
+  <a href="../connectors/jdbc.html">JDBC</a>
+  <a href="../connectors/rest-api.html">REST API</a>
+  <a href="../connectors/autoloader.html">Auto Loader</a>
+  <a href="../connectors/snowflake.html">Snowflake</a>
+  <a href="../connectors/bigquery.html">BigQuery</a>
+  <span class="nav-label">Operations</span>
+  <a href="../governance.html" data-nav="governance">Governance</a>
+  <a href="../operations.html" data-nav="operations">Operations</a>
+  <a href="../compatibility.html" data-nav="compatibility">Runtime compatibility</a>
+  <a href="../troubleshooting.html" data-nav="troubleshooting">Troubleshooting</a>
+  <a href="../examples.html" data-nav="examples">Examples</a>
+  <span class="nav-label">Develop</span>
+  <a href="../api-result.html" data-nav="api-result">API & result payload</a>
+  <a href="../extending.html" data-nav="extending">Extending</a>
+  <a href="../reference.html" data-nav="reference">Reference</a>
+  </nav><div class="sidebar-footer"><a href="../pt/index.html">Português</a><a href="https://github.com/marquesantero/contractforge" target="_blank" rel="noopener">GitHub</a></div></aside>
+<main class="content">
+  <header class="page-header">
+    <p class="eyebrow">Connector</p>
+    <h1>Snowflake</h1>
+    <p class="lead">Read Snowflake tables and SQL queries through the Spark Snowflake connector while keeping authentication, extraction, transformation, quality and target semantics explicit in the contract.</p>
+  </header>
+
+  <section class="section">
+    <h2>When to use it</h2>
+    <div class="info-grid">
+      <article class="info-card"><span>Bronze ingestion</span><h3>Copy source tables</h3><p>Land Snowflake data into Delta using overwrite, append or partition replacement when the source extract is complete.</p></article>
+      <article class="info-card"><span>Incremental feeds</span><h3>Use source timestamps</h3><p>Combine Snowflake queries with ContractForge watermarks, deduplication and SCD1/SCD2 write modes.</p></article>
+      <article class="info-card"><span>Governed targets</span><h3>Apply annotations</h3><p>Use annotations and operations contracts to document ownership, PII, criticality and support metadata on the Delta target.</p></article>
+      <article class="info-card"><span>External systems</span><h3>Delegate to Spark</h3><p>ContractForge validates and records the source contract. The actual Snowflake read is performed by the installed Spark connector.</p></article>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>Runtime requirements</h2>
+    <div class="table-wrap">
+      <table>
+        <tr><th>Requirement</th><th>Details</th></tr>
+        <tr><td>Spark connector</td><td>The runtime must have the Snowflake Spark connector available for <code>spark.read.format("snowflake")</code>.</td></tr>
+        <tr><td>JDBC driver</td><td>The Snowflake JDBC driver is required by the Spark connector. Validate connector/JDBC versions when authentication features behave differently.</td></tr>
+        <tr><td>Network route</td><td>The Databricks runtime must reach <code>*.snowflakecomputing.com</code> or the account PrivateLink endpoint.</td></tr>
+        <tr><td>Warehouse</td><td><code>sfWarehouse</code> must point to a running or auto-resumable warehouse.</td></tr>
+        <tr><td>Role permissions</td><td>The role must have warehouse usage, database/schema usage and table/query read privileges.</td></tr>
+        <tr><td>Secrets</td><td>Passwords, private keys, PATs and account identifiers should be injected through Databricks secrets or the runtime secret manager.</td></tr>
+      </table>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>Basic table read</h2>
+    <div class="code-tabs">
+      <div class="tab-list" role="tablist">
+        <button class="active" type="button" data-code-tab="yaml">YAML</button>
+        <button type="button" data-code-tab="python">Python</button>
+      </div>
+      <div data-code-panel="yaml">
+        <pre><code class="language-yaml">source:
+  type: connector
+  connector: snowflake
+  table: CF_CUSTOMERS
+  options:
+    sfURL: "{{ secret:contractforge-snowflake/sf_account }}.snowflakecomputing.com"
+    sfUser: "{{ secret:contractforge-snowflake/sf_user }}"
+    sfPassword: "{{ secret:contractforge-snowflake/sf_password }}"
+    sfWarehouse: "{{ secret:contractforge-snowflake/sf_warehouse }}"
+    sfDatabase: "{{ secret:contractforge-snowflake/sf_database }}"
+    sfSchema: "{{ secret:contractforge-snowflake/sf_schema }}"
+    sfRole: "{{ secret:contractforge-snowflake/sf_role }}"
+  read:
+    source_complete: true
+
+catalog: main
+target_schema: bronze_ext
+target_table: b_snowflake_customers
+ctrl_schema: ops
+layer: bronze
+mode: scd0_overwrite
+source_system: snowflake
+schema_policy: permissive
+quality_rules:
+  min_rows: 1
+  required_columns: [CUSTOMER_ID, CUSTOMER_CODE, FULL_NAME, UPDATED_AT]
+  not_null: [CUSTOMER_ID, CUSTOMER_CODE, UPDATED_AT]
+  unique_key: [CUSTOMER_ID]
+on_quality_fail: fail</code></pre>
+      </div>
+      <div data-code-panel="python" hidden>
+        <pre><code class="language-python">from contractforge import ingest
+
+result = ingest(
+    source={
+        "type": "connector",
+        "connector": "snowflake",
+        "table": "CF_CUSTOMERS",
+        "options": {
+            "sfURL": "{{ secret:contractforge-snowflake/sf_account }}.snowflakecomputing.com",
+            "sfUser": "{{ secret:contractforge-snowflake/sf_user }}",
+            "sfPassword": "{{ secret:contractforge-snowflake/sf_password }}",
+            "sfWarehouse": "{{ secret:contractforge-snowflake/sf_warehouse }}",
+            "sfDatabase": "{{ secret:contractforge-snowflake/sf_database }}",
+            "sfSchema": "{{ secret:contractforge-snowflake/sf_schema }}",
+            "sfRole": "{{ secret:contractforge-snowflake/sf_role }}",
+        },
+        "read": {"source_complete": True},
+    },
+    catalog="main",
+    target_schema="bronze_ext",
+    target_table="b_snowflake_customers",
+    ctrl_schema="ops",
+    layer="bronze",
+    mode="scd0_overwrite",
+    source_system="snowflake",
+    quality_rules={
+        "min_rows": 1,
+        "required_columns": ["CUSTOMER_ID", "CUSTOMER_CODE", "FULL_NAME", "UPDATED_AT"],
+        "not_null": ["CUSTOMER_ID", "CUSTOMER_CODE", "UPDATED_AT"],
+        "unique_key": ["CUSTOMER_ID"],
+    },
+)</code></pre>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>Query read</h2>
+    <p>Use top-level <code>source.query</code> for reviewed SQL extracts. ContractForge passes it to the Spark connector as a query read and marks <code>source_query=true</code> in source metadata.</p>
+    <div class="code-tabs">
+      <div class="tab-list" role="tablist">
+        <button class="active" type="button" data-code-tab="yaml">YAML</button>
+        <button type="button" data-code-tab="python">Python</button>
+      </div>
+      <div data-code-panel="yaml">
+        <pre><code class="language-yaml">source:
+  type: connector
+  connector: snowflake
+  query: |
+    SELECT
+      ORDER_ID,
+      CUSTOMER_ID,
+      ORDER_STATUS,
+      TOTAL_AMOUNT,
+      UPDATED_AT
+    FROM CF_ORDERS
+    WHERE UPDATED_AT &gt;= TO_TIMESTAMP_NTZ('2026-01-01')
+  options:
+    sfURL: "{{ secret:contractforge-snowflake/sf_account }}.snowflakecomputing.com"
+    sfUser: "{{ secret:contractforge-snowflake/sf_user }}"
+    sfPassword: "{{ secret:contractforge-snowflake/sf_password }}"
+    sfWarehouse: "{{ secret:contractforge-snowflake/sf_warehouse }}"
+    sfDatabase: "{{ secret:contractforge-snowflake/sf_database }}"
+    sfSchema: "{{ secret:contractforge-snowflake/sf_schema }}"
+    sfRole: "{{ secret:contractforge-snowflake/sf_role }}"
+
+mode: scd1_upsert
+merge_keys: [ORDER_ID]
+watermark_columns: [UPDATED_AT]
+transform:
+  deduplicate:
+    keys: [ORDER_ID]
+    order_by: UPDATED_AT DESC NULLS LAST</code></pre>
+      </div>
+      <div data-code-panel="python" hidden>
+        <pre><code class="language-python">from contractforge import ingest
+
+result = ingest(
+    source={
+        "type": "connector",
+        "connector": "snowflake",
+        "query": """
+            SELECT ORDER_ID, CUSTOMER_ID, ORDER_STATUS, TOTAL_AMOUNT, UPDATED_AT
+            FROM CF_ORDERS
+            WHERE UPDATED_AT &gt;= TO_TIMESTAMP_NTZ('2026-01-01')
+        """,
+        "options": {
+            "sfURL": "{{ secret:contractforge-snowflake/sf_account }}.snowflakecomputing.com",
+            "sfUser": "{{ secret:contractforge-snowflake/sf_user }}",
+            "sfPassword": "{{ secret:contractforge-snowflake/sf_password }}",
+            "sfWarehouse": "{{ secret:contractforge-snowflake/sf_warehouse }}",
+            "sfDatabase": "{{ secret:contractforge-snowflake/sf_database }}",
+            "sfSchema": "{{ secret:contractforge-snowflake/sf_schema }}",
+            "sfRole": "{{ secret:contractforge-snowflake/sf_role }}",
+        },
+    },
+    catalog="main",
+    target_schema="silver_sales",
+    target_table="s_snowflake_orders",
+    ctrl_schema="ops",
+    layer="silver",
+    mode="scd1_upsert",
+    merge_keys=["ORDER_ID"],
+    watermark_columns=["UPDATED_AT"],
+    transform={"deduplicate": {"keys": ["ORDER_ID"], "order_by": "UPDATED_AT DESC NULLS LAST"}},
+)</code></pre>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>Authentication options</h2>
+    <div class="table-wrap">
+      <table>
+        <tr><th>Method</th><th>Contract shape</th><th>Operational notes</th></tr>
+        <tr><td>Password</td><td><code>sfUser</code> + <code>sfPassword</code></td><td>Simple for development. Avoid personal users for scheduled ingestion.</td></tr>
+        <tr><td>Key-pair / JWT</td><td><code>sfAuthenticator: SNOWFLAKE_JWT</code>, <code>pem_private_key</code>, <code>sfUser</code></td><td>Recommended for service users when supported by the installed connector/JDBC stack.</td></tr>
+        <tr><td>Programmatic Access Token</td><td><code>sfUser</code> + PAT value in <code>sfPassword</code></td><td>Use a service user, <code>ROLE_RESTRICTION</code> and Snowflake network policy. Do not add <code>sfAuthenticator=programmatic_access_token</code> unless your connector version explicitly supports it.</td></tr>
+      </table>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>Key-pair authentication</h2>
+    <p>Keep the private key in a secret. Depending on how the key is stored, your runtime may need a small setup notebook to normalize newlines before passing it to the connector.</p>
+    <pre><code class="language-yaml">source:
+  type: connector
+  connector: snowflake
+  table: CF_CUSTOMERS
+  options:
+    sfURL: "{{ secret:contractforge-snowflake/sf_account }}.snowflakecomputing.com"
+    sfUser: "{{ secret:contractforge-snowflake/sf_user }}"
+    sfAuthenticator: SNOWFLAKE_JWT
+    pem_private_key: "{{ secret:contractforge-snowflake/sf_private_key }}"
+    sfWarehouse: "{{ secret:contractforge-snowflake/sf_warehouse }}"
+    sfDatabase: "{{ secret:contractforge-snowflake/sf_database }}"
+    sfSchema: "{{ secret:contractforge-snowflake/sf_schema }}"
+    sfRole: "{{ secret:contractforge-snowflake/sf_role }}"</code></pre>
+  </section>
+
+  <section class="section">
+    <h2>Programmatic Access Token</h2>
+    <p>Snowflake PAT works as a password-like secret for the Spark connector path. Generate it for the service user and restrict it to the ingestion role.</p>
+    <pre><code class="language-sql">USE ROLE ACCOUNTADMIN;
+
+ALTER USER IF EXISTS CFINGESTSVC
+  ADD PROGRAMMATIC ACCESS TOKEN CONTRACTFORGE_DATABRICKS_PAT
+  ROLE_RESTRICTION = 'CONTRACTFORGE_INGEST_ROLE'
+  DAYS_TO_EXPIRY = 30;</code></pre>
+    <pre><code class="language-yaml">source:
+  type: connector
+  connector: snowflake
+  table: CF_CUSTOMERS
+  options:
+    sfURL: "{{ secret:contractforge-snowflake/sf_account }}.snowflakecomputing.com"
+    sfUser: "{{ secret:contractforge-snowflake/sf_user }}"
+    sfPassword: "{{ secret:contractforge-snowflake/sf_pat }}"
+    sfWarehouse: "{{ secret:contractforge-snowflake/sf_warehouse }}"
+    sfDatabase: "{{ secret:contractforge-snowflake/sf_database }}"
+    sfSchema: "{{ secret:contractforge-snowflake/sf_schema }}"
+    sfRole: "{{ secret:contractforge-snowflake/sf_role }}"</code></pre>
+    <div class="note warning"><strong>Network policy</strong><p>Snowflake can require a network policy for PAT authentication. Allow the Databricks egress IP, PrivateLink path or approved CIDR for the service user. If the SQL API accepts the PAT but Spark fails, inspect the installed Snowflake connector/JDBC versions.</p></div>
+  </section>
+
+  <section class="section">
+    <h2>Nested payloads from Snowflake</h2>
+    <p>Snowflake can expose VARIANT or JSON-like payloads as strings through Spark. Keep the connector focused on extraction and parse or flatten data with <code>transform.shape</code>.</p>
+    <pre><code class="language-yaml">source:
+  type: connector
+  connector: snowflake
+  query: |
+    SELECT EVENT_ID, EVENT_TS, EVENT_PAYLOAD
+    FROM CF_EVENTS
+  options:
+    sfURL: "{{ secret:contractforge-snowflake/sf_account }}.snowflakecomputing.com"
+    sfUser: "{{ secret:contractforge-snowflake/sf_user }}"
+    sfPassword: "{{ secret:contractforge-snowflake/sf_pat }}"
+    sfWarehouse: "{{ secret:contractforge-snowflake/sf_warehouse }}"
+    sfDatabase: "{{ secret:contractforge-snowflake/sf_database }}"
+    sfSchema: "{{ secret:contractforge-snowflake/sf_schema }}"
+    sfRole: "{{ secret:contractforge-snowflake/sf_role }}"
+
+transform:
+  shape:
+    parse_json:
+      EVENT_PAYLOAD:
+        schema: "STRUCT&lt;device:STRING, severity:STRING, metrics:STRUCT&lt;temperature:DOUBLE,battery:DOUBLE&gt;&gt;"
+        target_column: payload
+    flatten:
+      - path: payload.metrics
+        prefix: metric_</code></pre>
+  </section>
+
+  <section class="section">
+    <h2>Operational validation</h2>
+    <ul class="check-list">
+      <li>Validate the Snowflake account URL and role outside the ingestion contract first.</li>
+      <li>Run a small table read before enabling SCD or hash-diff semantics.</li>
+      <li>Use <code>raise_on_failure=True</code> defaults in jobs so failed contracts fail the Databricks task.</li>
+      <li>Inspect <code>ctrl_ingestion_runs.source_options_json</code> to confirm options are redacted and <code>source_connector=snowflake</code>.</li>
+      <li>Use <code>ctrl_ingestion_errors</code> for full connector stack traces when Databricks job output is truncated.</li>
+    </ul>
+    <pre><code class="language-sql">SELECT
+  run_id,
+  status,
+  target_table,
+  source_connector,
+  rows_read,
+  rows_written,
+  quality_status,
+  error_message
+FROM main.ops.ctrl_ingestion_runs
+WHERE source_connector = 'snowflake'
+ORDER BY started_at_utc DESC;</code></pre>
+  </section>
+
+  <section class="section">
+    <h2>Common issues</h2>
+    <div class="table-wrap">
+      <table>
+        <tr><th>Symptom</th><th>Likely cause</th><th>Action</th></tr>
+        <tr><td><code>Connection string is invalid</code></td><td>Malformed <code>sfURL</code> or unresolved embedded secret.</td><td>Use <code>{{ secret:scope/key }}.snowflakecomputing.com</code> and inspect redacted source options.</td></tr>
+        <tr><td><code>Incorrect username or password</code></td><td>Wrong password/PAT/private key or token generated for a different user.</td><td>Validate with Snowflake SQL API or connector outside the ingestion flow.</td></tr>
+        <tr><td><code>Network policy is required</code></td><td>Snowflake policy requires allowlisting before PAT login.</td><td>Attach a network policy to the service user with the Databricks egress path.</td></tr>
+        <tr><td>Connector class not found</td><td>Spark Snowflake connector or JDBC driver is missing.</td><td>Install the connector package/JAR on the runtime.</td></tr>
+        <tr><td>Query works in Snowflake but not in Spark</td><td>Connector option, warehouse role or SQL dialect edge case.</td><td>Start with a minimal query and add options incrementally.</td></tr>
+      </table>
+    </div>
+  </section>
+</main>
+</div>
+</body>
+</html>

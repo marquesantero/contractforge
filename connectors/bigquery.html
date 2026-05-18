@@ -1,0 +1,344 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="ContractForge BigQuery connector documentation with table reads, query reads, service-account credentials, materialization settings and operational guidance.">
+  <title>BigQuery connector | ContractForge</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Serif:wght@600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="icon" type="image/png" href="../assets/logo/contractforge-mark.png">
+  <script defer src="../js/vendor/highlight.min.js"></script>
+  <script defer src="../js/vendor/highlight-languages/yaml.min.js"></script>
+  <script defer src="../js/vendor/highlight-languages/python.min.js"></script>
+  <script defer src="../js/vendor/highlight-languages/sql.min.js"></script>
+  <script defer src="../js/main.js"></script>
+</head>
+<body data-page="connectors">
+<button class="nav-toggle" type="button" aria-label="Open navigation" data-nav-toggle>☰</button>
+<div class="site-shell">
+<aside class="sidebar" data-sidebar><div class="brand-panel"><a class="brand" href="../index.html"><img src="../assets/logo/contractforge-mark.png" alt="" class="brand-mark"><span class="brand-text">ContractForge</span></a><span class="brand-meta">Contract-first ingestion for Delta Lake</span></div><nav class="side-nav" aria-label="Documentation">
+  <span class="nav-label">Start</span>
+  <a href="../index.html" data-nav="home">Overview</a>
+  <a href="../quickstart.html" data-nav="quickstart">Quick start</a>
+  <a href="../concepts.html" data-nav="concepts">Core concepts</a>
+  <span class="nav-label">Contracts</span>
+  <a href="../contracts.html" data-nav="contracts">Contract overview</a>
+  <a href="../full-contract.html" data-nav="full-contract">Full contract example</a>
+  <a href="../contract-ingestion.html">Ingestion</a>
+  <a href="../contract-annotations.html">Annotations</a>
+  <a href="../contract-operations.html">Operations</a>
+  <a href="../contract-access.html">Access</a>
+  <span class="nav-label">Core behavior</span>
+  <a href="../write-modes.html" data-nav="write-modes">Write modes</a>
+  <a href="../merge-strategies.html" data-nav="merge-strategies">Merge strategies</a>
+  <a href="../transformations.html" data-nav="transformations">Transformations</a>
+  <a href="../quality.html" data-nav="quality">Quality gates</a>
+  <a href="../schema-policy.html" data-nav="schema-policy">Schema policy</a>
+  <a href="../watermarks.html" data-nav="watermarks">Watermarks & backfill</a>
+  <a href="../idempotency.html" data-nav="idempotency">Idempotency & retry</a>
+  <span class="nav-label">Connectors</span>
+  <a href="../connectors/index.html" data-nav="connectors">Connector overview</a>
+  <a href="../connectors/table-sql.html">Table and SQL</a>
+  <a href="../connectors/files.html">Files</a>
+  <a href="../connectors/http-file.html">HTTP file</a>
+  <a href="../connectors/object-storage.html">Object storage</a>
+  <a href="../connectors/s3.html">S3</a>
+  <a href="../connectors/azure-blob.html">Azure Blob</a>
+  <a href="../connectors/jdbc.html">JDBC</a>
+  <a href="../connectors/rest-api.html">REST API</a>
+  <a href="../connectors/autoloader.html">Auto Loader</a>
+  <a href="../connectors/snowflake.html">Snowflake</a>
+  <a href="../connectors/bigquery.html">BigQuery</a>
+  <span class="nav-label">Operations</span>
+  <a href="../governance.html" data-nav="governance">Governance</a>
+  <a href="../operations.html" data-nav="operations">Operations</a>
+  <a href="../compatibility.html" data-nav="compatibility">Runtime compatibility</a>
+  <a href="../troubleshooting.html" data-nav="troubleshooting">Troubleshooting</a>
+  <a href="../examples.html" data-nav="examples">Examples</a>
+  <span class="nav-label">Develop</span>
+  <a href="../api-result.html" data-nav="api-result">API & result payload</a>
+  <a href="../extending.html" data-nav="extending">Extending</a>
+  <a href="../reference.html" data-nav="reference">Reference</a>
+  </nav><div class="sidebar-footer"><a href="../pt/index.html">Português</a><a href="https://github.com/marquesantero/contractforge" target="_blank" rel="noopener">GitHub</a></div></aside>
+<main class="content">
+  <header class="page-header">
+    <p class="eyebrow">Connector</p>
+    <h1>BigQuery</h1>
+    <p class="lead">Read BigQuery tables and SQL queries through the Spark BigQuery connector, then use ContractForge contracts for quality, transformations, idempotency, governance and Delta write semantics.</p>
+  </header>
+
+  <section class="section">
+    <h2>When to use it</h2>
+    <div class="info-grid">
+      <article class="info-card"><span>Cross-cloud ingestion</span><h3>GCP to Lakehouse</h3><p>Extract BigQuery datasets into Delta tables while keeping the target operational model consistent with other ContractForge sources.</p></article>
+      <article class="info-card"><span>SQL extracts</span><h3>Reviewed source SQL</h3><p>Use top-level <code>source.query</code> for curated subsets, joins or filtered windows that belong to the source system.</p></article>
+      <article class="info-card"><span>Cost control</span><h3>Push down early</h3><p>Use table selection, predicates and query projection to avoid unnecessary BigQuery scan cost.</p></article>
+      <article class="info-card"><span>Data products</span><h3>Govern the target</h3><p>Apply annotations, operations metadata and access contracts to the Delta table created from BigQuery data.</p></article>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>Runtime requirements</h2>
+    <div class="table-wrap">
+      <table>
+        <tr><th>Requirement</th><th>Details</th></tr>
+        <tr><td>Spark connector</td><td>The runtime must have the Spark BigQuery connector available for <code>spark.read.format("bigquery")</code>.</td></tr>
+        <tr><td>Credentials</td><td>Use a service account through runtime identity, a credentials file path or connector-supported credential options.</td></tr>
+        <tr><td>BigQuery permissions</td><td>The principal needs read permissions on source tables and job permissions on the billed/project parent project.</td></tr>
+        <tr><td>Materialization dataset</td><td>Query reads can require a materialization project/dataset depending on connector and BigQuery view/query behavior.</td></tr>
+        <tr><td>Location alignment</td><td>Materialization dataset location must be compatible with the queried tables.</td></tr>
+        <tr><td>Network</td><td>The runtime must reach Google APIs. In locked-down environments, configure egress/private access before ingestion.</td></tr>
+      </table>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>Basic table read</h2>
+    <div class="code-tabs">
+      <div class="tab-list" role="tablist">
+        <button class="active" type="button" data-code-tab="yaml">YAML</button>
+        <button type="button" data-code-tab="python">Python</button>
+      </div>
+      <div data-code-panel="yaml">
+        <pre><code class="language-yaml">source:
+  type: connector
+  connector: bigquery
+  table: test-big.contractforge_demo.orders
+  options:
+    parentProject: "{{ secret:gcp/project_id }}"
+    credentialsFile: /dbfs/FileStore/contractforge/secrets/bigquery-reader.json
+  read:
+    source_complete: true
+
+catalog: main
+target_schema: bronze_gcp
+target_table: b_bigquery_orders
+ctrl_schema: ops
+layer: bronze
+mode: scd0_overwrite
+source_system: bigquery
+schema_policy: permissive
+quality_rules:
+  min_rows: 1
+  required_columns: [order_id, customer_id, order_status, updated_at]
+  not_null: [order_id, customer_id, updated_at]
+  unique_key: [order_id]
+on_quality_fail: fail</code></pre>
+      </div>
+      <div data-code-panel="python" hidden>
+        <pre><code class="language-python">from contractforge import ingest
+
+result = ingest(
+    source={
+        "type": "connector",
+        "connector": "bigquery",
+        "table": "test-big.contractforge_demo.orders",
+        "options": {
+            "parentProject": "{{ secret:gcp/project_id }}",
+            "credentialsFile": "/dbfs/FileStore/contractforge/secrets/bigquery-reader.json",
+        },
+        "read": {"source_complete": True},
+    },
+    catalog="main",
+    target_schema="bronze_gcp",
+    target_table="b_bigquery_orders",
+    ctrl_schema="ops",
+    layer="bronze",
+    mode="scd0_overwrite",
+    source_system="bigquery",
+    quality_rules={
+        "min_rows": 1,
+        "required_columns": ["order_id", "customer_id", "order_status", "updated_at"],
+        "not_null": ["order_id", "customer_id", "updated_at"],
+        "unique_key": ["order_id"],
+    },
+)</code></pre>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>Query read</h2>
+    <p>Prefer top-level <code>source.query</code> for contract readability. Connector-specific generated contracts may also use <code>source.options.query</code>; ContractForge treats both as query reads in source metadata.</p>
+    <div class="code-tabs">
+      <div class="tab-list" role="tablist">
+        <button class="active" type="button" data-code-tab="yaml">YAML</button>
+        <button type="button" data-code-tab="python">Python</button>
+      </div>
+      <div data-code-panel="yaml">
+        <pre><code class="language-yaml">source:
+  type: connector
+  connector: bigquery
+  query: |
+    SELECT
+      order_id,
+      customer_id,
+      order_status,
+      total_amount,
+      updated_at
+    FROM `test-big.contractforge_demo.orders`
+    WHERE updated_at &gt;= TIMESTAMP('2026-01-01')
+  options:
+    parentProject: "{{ secret:gcp/project_id }}"
+    credentialsFile: /dbfs/FileStore/contractforge/secrets/bigquery-reader.json
+    viewsEnabled: "true"
+    materializationProject: "{{ secret:gcp/project_id }}"
+    materializationDataset: contractforge_spark_materialization
+
+catalog: main
+target_schema: silver_gcp
+target_table: s_bigquery_orders
+ctrl_schema: ops
+layer: silver
+mode: scd1_upsert
+merge_keys: [order_id]
+watermark_columns: [updated_at]
+transform:
+  deduplicate:
+    keys: [order_id]
+    order_by: updated_at DESC NULLS LAST</code></pre>
+      </div>
+      <div data-code-panel="python" hidden>
+        <pre><code class="language-python">from contractforge import ingest
+
+result = ingest(
+    source={
+        "type": "connector",
+        "connector": "bigquery",
+        "query": """
+            SELECT order_id, customer_id, order_status, total_amount, updated_at
+            FROM `test-big.contractforge_demo.orders`
+            WHERE updated_at &gt;= TIMESTAMP('2026-01-01')
+        """,
+        "options": {
+            "parentProject": "{{ secret:gcp/project_id }}",
+            "credentialsFile": "/dbfs/FileStore/contractforge/secrets/bigquery-reader.json",
+            "viewsEnabled": "true",
+            "materializationProject": "{{ secret:gcp/project_id }}",
+            "materializationDataset": "contractforge_spark_materialization",
+        },
+    },
+    catalog="main",
+    target_schema="silver_gcp",
+    target_table="s_bigquery_orders",
+    ctrl_schema="ops",
+    layer="silver",
+    mode="scd1_upsert",
+    merge_keys=["order_id"],
+    watermark_columns=["updated_at"],
+    transform={"deduplicate": {"keys": ["order_id"], "order_by": "updated_at DESC NULLS LAST"}},
+)</code></pre>
+      </div>
+    </div>
+    <div class="note"><strong>Materialization</strong><p>Query reads and view reads can require <code>viewsEnabled</code>, <code>materializationProject</code> and <code>materializationDataset</code>. Keep the dataset in a compatible BigQuery location and grant the service account the required permissions.</p></div>
+  </section>
+
+  <section class="section">
+    <h2>Credentials</h2>
+    <p>Credential handling is delegated to the Spark BigQuery connector. ContractForge stores the declarative source options and redacts secrets, but it does not replace the connector's authentication model.</p>
+    <div class="table-wrap">
+      <table>
+        <tr><th>Approach</th><th>Use when</th><th>Contract option</th></tr>
+        <tr><td>Credentials file</td><td>The runtime can access a mounted or workspace-staged service-account JSON file.</td><td><code>credentialsFile</code></td></tr>
+        <tr><td>Runtime identity</td><td>The platform provides Google credentials to Spark without an explicit file.</td><td>Connector/runtime specific</td></tr>
+        <tr><td>Secret-backed file creation</td><td>The service-account JSON is stored as a secret and materialized by setup code before ingestion.</td><td><code>credentialsFile</code> points to the materialized file</td></tr>
+      </table>
+    </div>
+    <div class="note warning"><strong>Do not inline service-account JSON in contracts</strong><p>Store sensitive values in the secret manager and pass a runtime path or connector-supported secret reference. Control tables redact ContractForge metadata, but Spark connector internals may emit their own messages.</p></div>
+  </section>
+
+  <section class="section">
+    <h2>Incremental pattern</h2>
+    <p>BigQuery extraction can be filtered by query while ContractForge persists target-side watermark state and handles idempotent writes. Keep the query deterministic and deduplicate before merge.</p>
+    <pre><code class="language-yaml">source:
+  type: connector
+  connector: bigquery
+  query: |
+    SELECT *
+    FROM `test-big.contractforge_demo.customers`
+    WHERE updated_at &gt;= TIMESTAMP('{{ runtime:last_watermark }}')
+  options:
+    parentProject: "{{ secret:gcp/project_id }}"
+    credentialsFile: /dbfs/FileStore/contractforge/secrets/bigquery-reader.json
+    materializationProject: "{{ secret:gcp/project_id }}"
+    materializationDataset: contractforge_spark_materialization
+
+mode: scd1_hash_diff
+hash_keys: [customer_id]
+watermark_columns: [updated_at]
+dedup_order_expr: updated_at DESC NULLS LAST
+quality_rules:
+  not_null: [customer_id, updated_at]
+  unique_key: [customer_id]</code></pre>
+  </section>
+
+  <section class="section">
+    <h2>Nested records</h2>
+    <p>BigQuery supports STRUCT and ARRAY types. Depending on connector behavior and target expectations, keep nested data as columns, flatten selected structs or explode arrays with <code>transform.shape</code>.</p>
+    <pre><code class="language-yaml">transform:
+  shape:
+    flatten:
+      - path: shipping_address
+        prefix: shipping_
+    explode:
+      - path: items
+        outer: true
+        prefix: item_
+    project:
+      - order_id
+      - customer_id
+      - shipping_city
+      - shipping_country
+      - item_sku
+      - item_quantity
+      - updated_at</code></pre>
+  </section>
+
+  <section class="section">
+    <h2>Cost and performance</h2>
+    <ul class="check-list">
+      <li>Project only the columns needed by the target contract.</li>
+      <li>Use source-side predicates in BigQuery SQL for bounded extracts.</li>
+      <li>Avoid exploratory full-table reads from scheduled jobs.</li>
+      <li>Use <code>source_complete: true</code> only when the extract really represents the full source slice needed by the write mode.</li>
+      <li>Prefer explicit schemas and quality gates when downstream contracts depend on stable column types.</li>
+    </ul>
+  </section>
+
+  <section class="section">
+    <h2>Operational validation</h2>
+    <pre><code class="language-sql">SELECT
+  run_id,
+  status,
+  target_table,
+  source_connector,
+  get_json_object(source_metrics_json, '$.source_query') AS source_query,
+  rows_read,
+  rows_written,
+  source_metrics_json
+FROM main.ops.ctrl_ingestion_runs
+WHERE source_connector = 'bigquery'
+ORDER BY started_at_utc DESC;</code></pre>
+    <p>For query reads, the source metrics should indicate that the effective read used a query, regardless of whether the query was declared at top level or inside connector options.</p>
+  </section>
+
+  <section class="section">
+    <h2>Common issues</h2>
+    <div class="table-wrap">
+      <table>
+        <tr><th>Symptom</th><th>Likely cause</th><th>Action</th></tr>
+        <tr><td>Connector class not found</td><td>Spark BigQuery connector is not installed.</td><td>Install a connector package compatible with the Spark/Scala runtime.</td></tr>
+        <tr><td>Permission denied</td><td>Service account lacks BigQuery read/job/materialization permissions.</td><td>Grant dataset read permissions and project job permissions.</td></tr>
+        <tr><td>Query/view read fails</td><td>Materialization dataset is missing, wrong location or not writable.</td><td>Configure <code>viewsEnabled</code>, <code>materializationProject</code> and <code>materializationDataset</code>.</td></tr>
+        <tr><td>Unexpected high cost</td><td>Full table scan or too broad query.</td><td>Push down projection and predicates; validate bytes processed in BigQuery.</td></tr>
+        <tr><td>MERGE duplicate key error</td><td>Source query returns multiple versions per key.</td><td>Use <code>transform.deduplicate</code> with deterministic ordering.</td></tr>
+      </table>
+    </div>
+  </section>
+</main>
+</div>
+</body>
+</html>
