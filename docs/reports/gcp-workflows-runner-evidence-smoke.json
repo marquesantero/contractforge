@@ -6,7 +6,7 @@
   "maturity_gate": "GCP-BQ-15C4",
   "status": "PASS",
   "executed_at": "2026-06-16T19:07:29Z",
-  "project_id": "midyear-system-499521-p3",
+  "project_id": "gcp-project-redacted",
   "workflow": {
     "name": "cf-gcp-workflows-smoke-runner",
     "location": "us-central1",
@@ -29,24 +29,24 @@
     "target_row_counts": [
       {
         "step_name": "bronze_orders",
-        "target_table": "midyear-system-499521-p3.contractforge_gcp_smoke.workflow_bronze_orders",
+        "target_table": "gcp-project-redacted.contractforge_gcp_smoke.workflow_bronze_orders",
         "row_count": 3
       },
       {
         "step_name": "gold_orders_by_status",
-        "target_table": "midyear-system-499521-p3.contractforge_gcp_smoke.workflow_gold_orders_by_status",
+        "target_table": "gcp-project-redacted.contractforge_gcp_smoke.workflow_gold_orders_by_status",
         "row_count": 2
       }
     ],
     "run_evidence_by_target": [
       {
-        "target_table": "midyear-system-499521-p3.contractforge_gcp_smoke.workflow_bronze_orders",
+        "target_table": "gcp-project-redacted.contractforge_gcp_smoke.workflow_bronze_orders",
         "run_rows": 1,
         "succeeded_rows": 1,
         "failed_rows": 0
       },
       {
-        "target_table": "midyear-system-499521-p3.contractforge_gcp_smoke.workflow_gold_orders_by_status",
+        "target_table": "gcp-project-redacted.contractforge_gcp_smoke.workflow_gold_orders_by_status",
         "run_rows": 1,
         "succeeded_rows": 1,
         "failed_rows": 0
@@ -79,3 +79,4 @@
     "remaining_before_runner_promotion": []
   }
 }
+

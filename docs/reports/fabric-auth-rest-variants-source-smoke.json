@@ -8,14 +8,14 @@
   "project": "examples/source-expansion/fabric-auth-rest-variants/project.yaml",
   "environment": "examples/source-expansion/fabric-auth-rest-variants/environments/fabric.environment.yaml",
   "workspace": {
-    "id": "061fd0c8-c248-4628-a332-6adf16623533",
+    "id": "00000000-0000-0000-0000-000000000000",
     "name": "Manager",
-    "capacity_id": "2139f1ea-2676-46bf-ab4f-ab248c768056",
+    "capacity_id": "00000000-0000-0000-0000-000000000000",
     "capacity_sku": "FTL4",
     "capacity_region": "Brazil South"
   },
   "lakehouse": {
-    "id": "07067d3f-d5e2-48c1-b526-634620e57d4b",
+    "id": "00000000-0000-0000-0000-000000000000",
     "name": "contractforge_lh"
   },
   "source_infrastructure": {
@@ -70,8 +70,8 @@
       "name": "authenticated_rest_bearer",
       "contract": "contracts/01_authenticated_rest_bearer.ingestion.yaml",
       "notebook": "cf_workspace_cf_fabric_source_expansion_auth_rest_bearer",
-      "item_id": "404e6a71-ef0f-42f7-913b-365563450074",
-      "job_instance_id": "28512777-2c82-4d4d-9d72-bbe3217473be",
+      "item_id": "00000000-0000-0000-0000-000000000000",
+      "job_instance_id": "00000000-0000-0000-0000-000000000000",
       "job_status": "Completed",
       "started_at_utc": "2026-06-12T01:16:37.5237062",
       "ended_at_utc": "2026-06-12T01:20:18.7223336"
@@ -80,8 +80,8 @@
       "name": "authenticated_rest_api_key",
       "contract": "contracts/02_authenticated_rest_api_key.ingestion.yaml",
       "notebook": "cf_workspace_cf_fabric_source_expansion_auth_rest_api_key",
-      "item_id": "a7f7d2c4-d49a-49f5-b8a0-530d3e31de6b",
-      "job_instance_id": "60eaf32d-6de0-4586-a270-6a726b224049",
+      "item_id": "00000000-0000-0000-0000-000000000000",
+      "job_instance_id": "00000000-0000-0000-0000-000000000000",
       "job_status": "Completed",
       "started_at_utc": "2026-06-12T01:21:21.2444461",
       "ended_at_utc": "2026-06-12T01:24:57.786591"
@@ -90,8 +90,8 @@
       "name": "authenticated_rest_variants_evidence_probe",
       "contract": "contracts/03_authenticated_rest_variants_evidence_probe.ingestion.yaml",
       "notebook": "cf_workspace_cf_fabric_source_expansion_auth_rest_variants_evidence_probe",
-      "item_id": "4712af8c-1a61-43a8-a2f5-e08b1c877b24",
-      "job_instance_id": "408e837e-3a4f-40da-ba80-1ba08696b187",
+      "item_id": "00000000-0000-0000-0000-000000000000",
+      "job_instance_id": "00000000-0000-0000-0000-000000000000",
       "job_status": "Completed",
       "started_at_utc": "2026-06-12T01:25:33.4632555",
       "ended_at_utc": "2026-06-12T01:29:20.6805846"
@@ -102,3 +102,4 @@
     "The endpoint echoes headers for validation and is not a production authorization model."
   ]
 }
+

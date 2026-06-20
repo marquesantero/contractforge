@@ -14,13 +14,13 @@
   },
   "contract_fixture": "examples/source-expansion/gcp-confluent-kafka-dataflow/contracts/01_confluent_kafka_available_now_orders.ingestion.yaml",
   "environment_fixture": "examples/source-expansion/gcp-confluent-kafka-dataflow/environments/gcp.environment.yaml",
-  "target_table": "midyear-system-499521-p3.contractforge_gcp_streaming_smoke_usc.confluent_orders",
-  "dlq_table": "midyear-system-499521-p3.contractforge_gcp_streaming_smoke_usc.confluent_orders_dlq",
+  "target_table": "gcp-project-redacted.contractforge_gcp_streaming_smoke_usc.confluent_orders",
+  "dlq_table": "gcp-project-redacted.contractforge_gcp_streaming_smoke_usc.confluent_orders_dlq",
   "confluent_topic": "cf-fabric-orders",
-  "confluent_bootstrap": "pkc-619z3.us-east1.gcp.confluent.cloud:9092",
+  "confluent_bootstrap": "pkc-redacted.region.confluent.cloud:9092",
   "secret_binding": {
-    "username": "projects/midyear-system-499521-p3/secrets/contractforge-confluent-kafka-api-key/versions/latest",
-    "password": "projects/midyear-system-499521-p3/secrets/contractforge-confluent-kafka-api-secret/versions/latest",
+    "username": "projects/gcp-project-redacted/secrets/contractforge-confluent-kafka-api-key/versions/latest",
+    "password": "projects/gcp-project-redacted/secrets/contractforge-confluent-kafka-api-secret/versions/latest",
     "values_logged": false
   },
   "validated": {
@@ -41,7 +41,7 @@
   },
   "runtime_parameters": {
     "consumerGroupId": "contractforge-gcp-dataflow-confluent-orders-20260617h",
-    "checkpoint_location": "gs://contractforge-gcp-smoke-midyear-system-499521-p3/dataflow/checkpoints/confluent-orders-20260617h/",
+    "checkpoint_location": "gs://contractforge-gcp-smoke-gcp-project-redacted/dataflow/checkpoints/confluent-orders-20260617h/",
     "enableCommitOffsets": "true",
     "kafkaReadOffset": "earliest",
     "messageFormat": "JSON",
@@ -168,3 +168,4 @@
     "https://cloud.google.com/dataflow/docs/guides/common-errors#worker-pool-failure"
   ]
 }
+

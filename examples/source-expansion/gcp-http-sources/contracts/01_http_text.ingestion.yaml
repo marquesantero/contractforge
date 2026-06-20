@@ -7,7 +7,7 @@ source:
       - name: line_text
         type: STRING
 target:
-  catalog: midyear-system-499521-p3
+  catalog: gcp-project-redacted
   schema: contractforge_gcp_smoke
   table: cf_http_text_countries
 mode: overwrite

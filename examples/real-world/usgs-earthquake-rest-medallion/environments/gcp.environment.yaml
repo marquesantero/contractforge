@@ -6,7 +6,7 @@ evidence:
   dataset: contractforge_gcp_usgs_rest_ops
 parameters:
   gcp:
-    project_id: midyear-system-499521-p3
+    project_id: gcp-project-redacted
     location: US
     dataset: contractforge_gcp_usgs_rest_bronze
-    staging_bucket: gs://contractforge-gcp-smoke-midyear-system-499521-p3
+    staging_bucket: gs://contractforge-gcp-smoke-gcp-project-redacted

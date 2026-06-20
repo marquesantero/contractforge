@@ -7,9 +7,9 @@ evidence:
   schema: contractforge
 parameters:
   fabric:
-    tenant_id: 3fb3492c-48be-4ac6-ae3a-fec6a63cf4d1
+    tenant_id: 00000000-0000-0000-0000-000000000000
     tenant_domain: ticomcafe.com.br
-    workspace_id: 061fd0c8-c248-4628-a332-6adf16623533
+    workspace_id: 00000000-0000-0000-0000-000000000000
     workspace_name: Manager
-    lakehouse_id: 07067d3f-d5e2-48c1-b526-634620e57d4b
+    lakehouse_id: 00000000-0000-0000-0000-000000000000
     lakehouse_name: contractforge_lh

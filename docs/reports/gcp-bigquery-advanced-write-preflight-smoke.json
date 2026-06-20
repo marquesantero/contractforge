@@ -6,7 +6,7 @@
   "maturity_gate": "GCP-BQ-12C1",
   "status": "PASS_WITH_REVIEW_BOUNDARY",
   "executed_at": "2026-06-16",
-  "project_id": "midyear-system-499521-p3",
+  "project_id": "gcp-project-redacted",
   "location": "us-east1",
   "datasets": {
     "target": "contractforge_gcp_advanced_write_smoke",
@@ -93,3 +93,4 @@
   },
   "decision": "GCP-BQ-12C1 closes hash_diff_upsert changed-row replay plus null/duplicate merge-key preflight failure evidence. GCP-BQ-12C now accepts hash_diff_upsert cross-adapter production parity using GCP, AWS, Snowflake and Fabric evidence. Historical and snapshot production parity remains tracked separately."
 }
+

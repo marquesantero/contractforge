@@ -8,11 +8,11 @@
   "project": "examples/source-expansion/fabric-auth-rest/project.yaml",
   "environment": "examples/source-expansion/fabric-auth-rest/environments/fabric.environment.yaml",
   "workspace": {
-    "workspace_id": "061fd0c8-c248-4628-a332-6adf16623533",
+    "workspace_id": "00000000-0000-0000-0000-000000000000",
     "workspace_name": "Manager",
-    "capacity_id": "2139f1ea-2676-46bf-ab4f-ab248c768056",
+    "capacity_id": "00000000-0000-0000-0000-000000000000",
     "capacity_region": "Brazil South",
-    "lakehouse_id": "07067d3f-d5e2-48c1-b526-634620e57d4b",
+    "lakehouse_id": "00000000-0000-0000-0000-000000000000",
     "lakehouse_name": "contractforge_lh"
   },
   "command": "uv run python -m contractforge_fabric.cli smoke-project examples/source-expansion/fabric-auth-rest/project.yaml --environment-key fabric --max-attempts 35 --retry-after-seconds 30",
@@ -57,8 +57,8 @@
       "name": "authenticated_rest_basic",
       "contract": "contracts/01_authenticated_rest_basic.ingestion.yaml",
       "notebook": "cf_workspace_cf_fabric_source_expansion_auth_rest_basic",
-      "item_id": "63924a92-6a03-45db-9364-6aa8d6782e80",
-      "job_instance_id": "d13f58e3-9604-41ef-a1e9-97647104e12d",
+      "item_id": "00000000-0000-0000-0000-000000000000",
+      "job_instance_id": "00000000-0000-0000-0000-000000000000",
       "start_time_utc": "2026-06-11T22:59:18.4212754",
       "end_time_utc": "2026-06-11T23:02:49.708882",
       "status": "SUCCEEDED"
@@ -67,8 +67,8 @@
       "name": "authenticated_rest_evidence_probe",
       "contract": "contracts/02_authenticated_rest_evidence_probe.ingestion.yaml",
       "notebook": "cf_workspace_cf_fabric_source_expansion_auth_rest_evidence_probe",
-      "item_id": "c9058759-2a03-4b0a-b6f3-c1dc09e73af2",
-      "job_instance_id": "911f2be4-a4b9-4c8d-a29f-38c92923e161",
+      "item_id": "00000000-0000-0000-0000-000000000000",
+      "job_instance_id": "00000000-0000-0000-0000-000000000000",
       "start_time_utc": "2026-06-11T23:03:38.6889544",
       "end_time_utc": "2026-06-11T23:07:18.1494699",
       "status": "SUCCEEDED"
@@ -80,3 +80,4 @@
     "This evidence is part of the stable F11 source surface; out-of-scope source families are excluded by docs/reports/fabric-source-expansion-stable-scope-decision.json."
   ]
 }
+

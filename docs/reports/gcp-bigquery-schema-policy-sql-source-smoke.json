@@ -6,11 +6,11 @@
   "maturity_gate": "GCP-BQ-07G",
   "status": "PASS",
   "executed_at": "2026-06-16",
-  "project": "midyear-system-499521-p3",
+  "project": "gcp-project-redacted",
   "location": "us-east1",
   "contract": {
     "source": "inline_sql",
-    "target": "midyear-system-499521-p3.contractforge_gcp_schema_policy_smoke.schema_policy_sql_source_target",
+    "target": "gcp-project-redacted.contractforge_gcp_schema_policy_smoke.schema_policy_sql_source_target",
     "mode": "append",
     "schema_policy": "permissive"
   },
@@ -26,7 +26,7 @@
       "source_inspection": "zero-row SQL schema probe in evidence dataset",
       "probe_cleanup": "VALIDATED",
       "commands": [
-        "ALTER TABLE `midyear-system-499521-p3.contractforge_gcp_schema_policy_smoke.schema_policy_sql_source_target` ADD COLUMN `status` STRING"
+        "ALTER TABLE `gcp-project-redacted.contractforge_gcp_schema_policy_smoke.schema_policy_sql_source_target` ADD COLUMN `status` STRING"
       ],
       "schema_changes": {
         "added_columns": [
@@ -101,3 +101,4 @@
     "Automatic BigQuery type widening or mutation is review-required outside the stable runtime path and recorded in docs/reports/gcp-schema-policy-type-mutation-decision.json."
   ]
 }
+

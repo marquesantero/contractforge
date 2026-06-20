@@ -721,12 +721,12 @@ def test_gcp_workflows_certified_runner_smoke_report_closes_15c() -> None:
             {
                 "row_count": "3",
                 "step_name": "bronze_orders",
-                "target_table": "midyear-system-499521-p3.contractforge_gcp_smoke.workflow_bronze_orders",
+                "target_table": "gcp-project-redacted.contractforge_gcp_smoke.workflow_bronze_orders",
             },
             {
                 "row_count": "2",
                 "step_name": "gold_orders_by_status",
-                "target_table": "midyear-system-499521-p3.contractforge_gcp_smoke.workflow_gold_orders_by_status",
+                "target_table": "gcp-project-redacted.contractforge_gcp_smoke.workflow_gold_orders_by_status",
             },
         ]
         assert len(run["run_evidence"]) == 2
@@ -782,12 +782,12 @@ def test_gcp_workflows_command_readback_smoke_report_records_live_readback_comma
     assert payload["readback"]["target_row_counts"] == [
         {
             "step_name": "bronze_orders",
-            "target_table": "midyear-system-499521-p3.contractforge_gcp_smoke.workflow_bronze_orders",
+            "target_table": "gcp-project-redacted.contractforge_gcp_smoke.workflow_bronze_orders",
             "row_count": 3,
         },
         {
             "step_name": "gold_orders_by_status",
-            "target_table": "midyear-system-499521-p3.contractforge_gcp_smoke.workflow_gold_orders_by_status",
+            "target_table": "gcp-project-redacted.contractforge_gcp_smoke.workflow_gold_orders_by_status",
             "row_count": 2,
         },
     ]
@@ -816,13 +816,13 @@ def test_gcp_workflows_runner_evidence_smoke_report_records_run_quality_evidence
     assert payload["validated"]["schema_evidence_for_schema_policy_contracts"] is False
     assert payload["readback"]["run_evidence_by_target"] == [
         {
-            "target_table": "midyear-system-499521-p3.contractforge_gcp_smoke.workflow_bronze_orders",
+            "target_table": "gcp-project-redacted.contractforge_gcp_smoke.workflow_bronze_orders",
             "run_rows": 1,
             "succeeded_rows": 1,
             "failed_rows": 0,
         },
         {
-            "target_table": "midyear-system-499521-p3.contractforge_gcp_smoke.workflow_gold_orders_by_status",
+            "target_table": "gcp-project-redacted.contractforge_gcp_smoke.workflow_gold_orders_by_status",
             "run_rows": 1,
             "succeeded_rows": 1,
             "failed_rows": 0,
@@ -869,7 +869,7 @@ def test_gcp_workflows_schema_evidence_smoke_report_records_schema_evidence() ->
     assert {row["schema_policy"] for row in rows} == {"permissive"}
     assert {row["status"] for row in rows} == {"SUCCEEDED"}
     assert all(":schema_evidence" in row["run_id"] for row in rows)
-    assert all(row["run_id"].startswith("workflows:4557a249-509f-416c-a032-23694e99466b:") for row in rows)
+    assert all(row["run_id"].startswith("workflows:00000000-0000-0000-0000-000000000000:") for row in rows)
     assert all(row["type_changes_json"] == "[]" for row in rows)
     assert all("planned_no_runtime_drift" in row["schema_changes_json"] for row in rows)
     assert payload["review_boundary"]["superseded_by_certified_runner_smoke"] == (
@@ -900,7 +900,7 @@ def test_gcp_workflows_cleanup_command_smoke_report_records_cleanup_surface() ->
         "workflows",
         "delete",
         "cf-gcp-workflows-smoke-runner",
-        "--project=midyear-system-499521-p3",
+        "--project=gcp-project-redacted",
         "--location=us-central1",
         "--quiet",
     ]
@@ -935,7 +935,7 @@ def test_gcp_workflows_write_failure_evidence_smoke_report_records_failed_run_ev
     assert payload["validated"]["transient_retry_behavior"] is False
     assert payload["validated"]["full_schema_drift_enforcement"] is False
     row = payload["readback"]["run_evidence_rows"][0]
-    assert row["run_id"].startswith("workflows:d8d78a62-5f77-4aa0-b513-e5f2c045ba22:")
+    assert row["run_id"].startswith("workflows:00000000-0000-0000-0000-000000000000:")
     assert row["status"] == "FAILED"
     assert row["statement_type"] == "QUERY"
     assert row["error_message"] == "BigQuery Job failed."
@@ -1027,11 +1027,11 @@ def test_gcp_workflows_execution_runid_smoke_report_records_execution_scoped_ids
     assert payload["positive_workflow"]["execution_state"] == "SUCCEEDED"
     assert payload["negative_workflow"]["execution_state"] == "FAILED"
     assert payload["positive_workflow"]["run_evidence"][0]["run_id"].startswith(
-        "workflows:a320ba50-a07c-48cc-bf02-d53fc031938d:"
+        "workflows:00000000-0000-0000-0000-000000000000:"
     )
     assert payload["negative_workflow"]["quality_evidence"] == [
         {
-            "run_id": "workflows:c982289e-df34-4614-829e-47ea653dfb0f:bronze_orders_quality_failure:quality",
+            "run_id": "workflows:00000000-0000-0000-0000-000000000000:bronze_orders_quality_failure:quality",
             "contract_name": "workflow_bronze_orders_quality_failure",
             "status": "FAILED",
             "failed_rows": 1,
@@ -1218,7 +1218,7 @@ def test_gcp_authenticated_rest_http_secret_manager_variants_blocker_report() ->
     assert payload["superseded_by"] == "docs/reports/gcp-auth-rest-http-secret-manager-variants-smoke.json"
     assert payload["blocker"]["code"] == "GCLOUD_REAUTH_REQUIRED"
     assert payload["blocker"]["active_account"] == "marco@intentus.dev"
-    assert payload["blocker"]["project"] == "midyear-system-499521-p3"
+    assert payload["blocker"]["project"] == "gcp-project-redacted"
     assert set(payload["attempted_variants"]) == {
         "rest_api bearer_token",
         "rest_api api_key",
@@ -1302,7 +1302,7 @@ def test_gcp_http_text_bigquery_smoke_blocker_report_is_superseded() -> None:
     assert payload["status"] == "SUPERSEDED"
     assert payload["superseded_by"] == "docs/reports/gcp-http-sources-bigquery-smoke.json"
     assert payload["blocker"]["code"] == "GCLOUD_REAUTH_REQUIRED"
-    assert payload["blocker"]["project"] == "midyear-system-499521-p3"
+    assert payload["blocker"]["project"] == "gcp-project-redacted"
     assert payload["no_workaround_code_used"] is True
     assert "gmail.com" not in report.lower()
     assert "antero" not in report.lower()

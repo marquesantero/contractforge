@@ -25,7 +25,7 @@ Upload them before running the AWS project:
 
 ```powershell
 $AWS_REGION = "us-east-1"
-$AWS_BUCKET = "contractforge-aws-smoke-449112696824-us-east-1"
+$AWS_BUCKET = "contractforge-aws-smoke-000000000000-us-east-1"
 
 aws s3 cp `
   examples/real-world/s3-file-medallion/data/orders/ `

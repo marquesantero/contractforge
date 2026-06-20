@@ -13,12 +13,12 @@ source:
         ELSE 'low'
       END AS amount_band,
       CURRENT_TIMESTAMP() AS normalized_at_utc
-    FROM `midyear-system-499521-p3.contractforge_gcp_azure_sql_bronze.b_azure_sql_orders`
+    FROM `gcp-project-redacted.contractforge_gcp_azure_sql_bronze.b_azure_sql_orders`
   read:
     source_complete: true
 
 target:
-  catalog: midyear-system-499521-p3
+  catalog: gcp-project-redacted
   schema: contractforge_gcp_azure_sql_silver
   table: s_azure_sql_orders_current
 

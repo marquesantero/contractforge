@@ -144,9 +144,9 @@
     }
   },
   "retained_artifacts": {
-    "source_table": "midyear-system-499521-p3.contractforge_gcp_hashdiff_prod.customers_hashdiff_source",
-    "target_table": "midyear-system-499521-p3.contractforge_gcp_hashdiff_prod.customers_hashdiff_target",
-    "evidence_dataset": "midyear-system-499521-p3.contractforge_gcp_hashdiff_prod_ops"
+    "source_table": "gcp-project-redacted.contractforge_gcp_hashdiff_prod.customers_hashdiff_source",
+    "target_table": "gcp-project-redacted.contractforge_gcp_hashdiff_prod.customers_hashdiff_target",
+    "evidence_dataset": "gcp-project-redacted.contractforge_gcp_hashdiff_prod_ops"
   },
   "cleanup_status": "RETAINED_FOR_AUDIT",
   "benchmark_project": "examples/benchmarks/hash-diff-production/project.yaml",
@@ -161,3 +161,4 @@
     "https://docs.cloud.google.com/bigquery/docs/reference/standard-sql/data-manipulation-language"
   ]
 }
+

@@ -76,7 +76,7 @@ def test_missing_source_contract_renders_protected_failure_path() -> None:
     job = next(body for name, body in artifacts.items() if name.endswith(".glue_job.py"))
 
     compile(job, "missing_s3_source.glue_job.py", "exec")
-    assert "s3://contractforge-aws-smoke-449112696824-us-east-1/data/aws-failure-paths/missing/orders.csv" in job
+    assert "s3://contractforge-aws-smoke-000000000000-us-east-1/data/aws-failure-paths/missing/orders.csv" in job
     assert "ctrl_ingestion_errors" in job
     assert "# Persist failed run evidence after error evidence is recorded." in job
     assert "'status': 'FAILED'" in job
@@ -88,10 +88,10 @@ def test_failure_path_environment_binds_artifacts_and_evidence() -> None:
     environment = _load_yaml(PROJECT / "environments/aws.environment.yaml")
 
     assert environment["evidence"]["database"] == "contractforge_cf_aws_failure_paths_ops"
-    assert environment["artifacts"]["uri"].startswith("s3://contractforge-aws-smoke-449112696824-us-east-1/")
+    assert environment["artifacts"]["uri"].startswith("s3://contractforge-aws-smoke-000000000000-us-east-1/")
     assert (
         environment["parameters"]["aws"]["iceberg"]["warehouse"]
-        == "s3://contractforge-aws-smoke-449112696824-us-east-1/warehouse/aws-failure-paths/"
+        == "s3://contractforge-aws-smoke-000000000000-us-east-1/warehouse/aws-failure-paths/"
     )
 
 

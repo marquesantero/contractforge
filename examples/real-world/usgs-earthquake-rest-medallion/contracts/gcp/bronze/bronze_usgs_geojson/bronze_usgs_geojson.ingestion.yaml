@@ -20,7 +20,7 @@ source:
     max_records: 1
 
 target:
-  catalog: midyear-system-499521-p3
+  catalog: gcp-project-redacted
   schema: contractforge_gcp_usgs_rest_bronze
   table: b_usgs_earthquake_geojson
 

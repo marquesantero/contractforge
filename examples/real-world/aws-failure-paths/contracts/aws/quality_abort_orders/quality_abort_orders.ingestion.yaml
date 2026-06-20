@@ -1,7 +1,7 @@
 source:
   type: csv
   system: s3_failure_fixtures
-  path: s3://contractforge-aws-smoke-449112696824-us-east-1/data/aws-failure-paths/orders/orders_failure.csv
+  path: s3://contractforge-aws-smoke-000000000000-us-east-1/data/aws-failure-paths/orders/orders_failure.csv
   format: csv
   options:
     header: true
@@ -33,5 +33,5 @@ quality_rules:
 extensions:
   aws:
     iceberg:
-      warehouse: s3://contractforge-aws-smoke-449112696824-us-east-1/warehouse/aws-failure-paths/
+      warehouse: s3://contractforge-aws-smoke-000000000000-us-east-1/warehouse/aws-failure-paths/
 

@@ -217,6 +217,27 @@ specific file suffix:
 The ZIP alias must contain the same bytes as the wheel. It is a runtime delivery
 format, not a different package build.
 
+## PyPI Trusted Publishing
+
+ContractForge releases must use PyPI Trusted Publishing rather than long-lived
+API tokens. Each PyPI project should configure the same trusted publisher:
+
+| Field | Value |
+| --- | --- |
+| Repository owner | `marquesantero` |
+| Repository name | `contractforge` |
+| Workflow path | `.github/workflows/release.yml` |
+| GitHub environment | `pypi` |
+
+The workflow uses `permissions: id-token: write` in the publish job and
+`pypa/gh-action-pypi-publish@release/v1` without a password. That allows PyPI
+to mint a short-lived token for the workflow run through OpenID Connect.
+
+Any PyPI API token previously used for these packages should be revoked in PyPI
+before the next release. Do not add `PYPI_API_TOKEN` or `TEST_PYPI_API_TOKEN`
+back to the repository secrets unless a documented emergency release procedure
+requires it.
+
 ## Acceptance Criteria
 
 A release is publishable only when:
@@ -230,3 +251,4 @@ A release is publishable only when:
 - docs describe installation and usage for core-only and core-plus-adapter flows.
 - release workflow assets include wheel, source distribution and ZIP alias
   outputs for runtime delivery.
+- PyPI publishing uses trusted publishing, not a stored API token.

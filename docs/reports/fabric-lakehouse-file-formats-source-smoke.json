@@ -13,13 +13,13 @@
   "project": "examples/source-expansion/fabric-lakehouse-file-formats/project.yaml",
   "environment": "examples/source-expansion/fabric-lakehouse-file-formats/environments/fabric.environment.yaml",
   "workspace": {
-    "id": "061fd0c8-c248-4628-a332-6adf16623533",
+    "id": "00000000-0000-0000-0000-000000000000",
     "name": "Manager",
-    "capacity_id": "2139f1ea-2676-46bf-ab4f-ab248c768056",
+    "capacity_id": "00000000-0000-0000-0000-000000000000",
     "capacity_region": "Brazil South"
   },
   "lakehouse": {
-    "id": "07067d3f-d5e2-48c1-b526-634620e57d4b",
+    "id": "00000000-0000-0000-0000-000000000000",
     "name": "contractforge_lh"
   },
   "source_infrastructure": {
@@ -31,8 +31,8 @@
     },
     "fixture_rows_per_format": 2,
     "seed_notebook": "cf_seed_lakehouse_file_formats_1781283819",
-    "seed_notebook_id": "287013bc-7441-4415-ac00-27829a62a09d",
-    "seed_job_instance_id": "58337813-533b-4670-b3a2-e14996317a23",
+    "seed_notebook_id": "00000000-0000-0000-0000-000000000000",
+    "seed_job_instance_id": "00000000-0000-0000-0000-000000000000",
     "seed_status": "Completed"
   },
   "commands": [
@@ -84,8 +84,8 @@
       "name": "lakehouse_orc_orders",
       "contract": "contracts/01_lakehouse_orc_orders.ingestion.yaml",
       "notebook": "cf_workspace_cf_fabric_source_expansion_lakehouse_orc_orders",
-      "item_id": "d3efecd2-976b-4494-8514-f93d65d15da2",
-      "job_instance_id": "3131319a-46eb-4f7f-b6f8-588d8a392c45",
+      "item_id": "00000000-0000-0000-0000-000000000000",
+      "job_instance_id": "00000000-0000-0000-0000-000000000000",
       "job_status": "Completed",
       "started_at_utc": "2026-06-12T17:08:04.7392169",
       "ended_at_utc": "2026-06-12T17:11:46.3428316"
@@ -94,8 +94,8 @@
       "name": "lakehouse_avro_orders",
       "contract": "contracts/02_lakehouse_avro_orders.ingestion.yaml",
       "notebook": "cf_workspace_cf_fabric_source_expansion_lakehouse_avro_orders",
-      "item_id": "5f3dbec3-f947-4000-b17d-4b32eaa3029e",
-      "job_instance_id": "89ef3b71-9513-452a-bc84-37f549b06be6",
+      "item_id": "00000000-0000-0000-0000-000000000000",
+      "job_instance_id": "00000000-0000-0000-0000-000000000000",
       "job_status": "Completed",
       "started_at_utc": "2026-06-12T17:12:51.013303",
       "ended_at_utc": "2026-06-12T17:15:53.2076504"
@@ -104,8 +104,8 @@
       "name": "lakehouse_xml_orders",
       "contract": "contracts/03_lakehouse_xml_orders.ingestion.yaml",
       "notebook": "cf_workspace_cf_fabric_source_expansion_lakehouse_xml_orders",
-      "item_id": "d469dac3-96ae-46d5-a2c4-9d70f4b443bd",
-      "job_instance_id": "e3c967cf-e570-44f2-bf6d-578b2808f3bf",
+      "item_id": "00000000-0000-0000-0000-000000000000",
+      "job_instance_id": "00000000-0000-0000-0000-000000000000",
       "job_status": "Completed",
       "started_at_utc": "2026-06-12T17:16:39.3319979",
       "ended_at_utc": "2026-06-12T17:20:24.7954141"
@@ -114,8 +114,8 @@
       "name": "lakehouse_file_formats_evidence_probe",
       "contract": "contracts/04_lakehouse_file_formats_evidence_probe.ingestion.yaml",
       "notebook": "cf_workspace_cf_fabric_source_expansion_lakehouse_file_formats_evidence_probe",
-      "item_id": "96d0a337-7bc5-471e-ad08-c0aa6152f020",
-      "job_instance_id": "d8fb70b9-4ccd-44d2-8e47-639f9a4695ec",
+      "item_id": "00000000-0000-0000-0000-000000000000",
+      "job_instance_id": "00000000-0000-0000-0000-000000000000",
       "job_status": "Completed",
       "started_at_utc": "2026-06-12T17:21:28.8019719",
       "ended_at_utc": "2026-06-12T17:24:55.9666426"
@@ -127,3 +127,4 @@
     "Fabric stable_final is true for the documented notebook-first surface. Source families outside this stable scope are excluded by docs/reports/fabric-source-expansion-stable-scope-decision.json. Explicit Fabric-native OneLake row and column policy apply is covered separately by docs/reports/fabric-onelake-row-column-policy-smoke.json, and deployment-pipeline stage promotion is covered by docs/reports/fabric-deployment-pipeline-stage-promotion-smoke.json."
   ]
 }
+

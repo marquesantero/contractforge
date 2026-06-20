@@ -7,7 +7,7 @@ source:
     skip_leading_rows: 1
     autodetect: true
 target:
-  catalog: midyear-system-499521-p3
+  catalog: gcp-project-redacted
   schema: contractforge_gcp_smoke
   table: cf_http_file_csv_countries
 mode: overwrite

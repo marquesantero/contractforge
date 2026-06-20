@@ -1,7 +1,7 @@
 source:
   type: incremental_files
   system: benchmark_customers_s3
-  path: s3://contractforge-aws-smoke-449112696824-us-east-1/data/hashdiff-production/customers/
+  path: s3://contractforge-aws-smoke-000000000000-us-east-1/data/hashdiff-production/customers/
   format: csv
   options:
     header: true
@@ -42,4 +42,4 @@ quality_rules:
 extensions:
   aws:
     iceberg:
-      warehouse: s3://contractforge-aws-smoke-449112696824-us-east-1/warehouse/hashdiff-production/
+      warehouse: s3://contractforge-aws-smoke-000000000000-us-east-1/warehouse/hashdiff-production/

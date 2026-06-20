@@ -8,8 +8,8 @@ source:
       User-Agent: ContractForge Fabric OAuth REST source smoke
   auth:
     type: oauth_client_credentials
-    tenant_id: 3fb3492c-48be-4ac6-ae3a-fec6a63cf4d1
-    client_id: e2ff9b6c-36d7-411b-acb0-7e950fc1260f
+    tenant_id: 00000000-0000-0000-0000-000000000000
+    client_id: 00000000-0000-0000-0000-000000000000
     client_secret: "{{ secret:fabric/oauth-client-secret }}"
     scope: https://management.azure.com/.default
   response:

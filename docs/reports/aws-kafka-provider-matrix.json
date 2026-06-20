@@ -6,9 +6,9 @@
   "maturity_gate": "AWS-KAFKA-PROVIDER-MATRIX",
   "status": "PASS",
   "executed_at": "2026-06-10",
-  "account_id": "449112696824",
+  "account_id": "000000000000",
   "region": "us-east-1",
-  "command": "uv run --with boto3 --with \"botocore[crt]\" contractforge-aws smoke-kafka-provider-matrix --account-id 449112696824 --region us-east-1 --msk-cluster-arn arn:aws:kafka:us-east-1:449112696824:cluster/cf-msk-serverless-validation-20260609/29b14912-8ac0-4fdc-b638-986c3cb910b9-s1 --confluent-bootstrap-servers pkc-619z3.us-east1.gcp.confluent.cloud:9092 --confluent-secret-arn arn:aws:secretsmanager:us-east-1:449112696824:secret:contractforge/confluent/kafka-MhIMbL --execute",
+  "command": "uv run --with boto3 --with \"botocore[crt]\" contractforge-aws smoke-kafka-provider-matrix --account-id 000000000000 --region us-east-1 --msk-cluster-arn arn:aws:kafka:us-east-1:000000000000:cluster/cf-msk-serverless-validation-20260609/00000000-0000-0000-0000-000000000000-s1 --confluent-bootstrap-servers pkc-redacted.region.confluent.cloud:9092 --confluent-secret-arn arn:aws:secretsmanager:us-east-1:000000000000:secret:contractforge/confluent/kafka-MhIMbL --execute",
   "result": {
     "status": "PASS",
     "maturity_scope": {
@@ -27,7 +27,7 @@
       },
       "msk": {
         "status": "PASS",
-        "cluster_arn": "arn:aws:kafka:us-east-1:449112696824:cluster/cf-msk-serverless-validation-20260609/29b14912-8ac0-4fdc-b638-986c3cb910b9-s1",
+        "cluster_arn": "arn:aws:kafka:us-east-1:000000000000:cluster/cf-msk-serverless-validation-20260609/00000000-0000-0000-0000-000000000000-s1",
         "cluster_name": "cf-msk-serverless-validation-20260609",
         "cluster_type": "SERVERLESS",
         "state": "ACTIVE",
@@ -57,7 +57,7 @@
             "batches": 1,
             "target_row_count": 3,
             "glue_dpu_seconds": 326.0,
-            "cost_query_execution_id": "7c5003dd-bdcb-46ec-b2ae-daffeb723c50"
+            "cost_query_execution_id": "00000000-0000-0000-0000-000000000000"
           },
           {
             "purpose": "no_input_checkpoint_rerun",
@@ -65,12 +65,12 @@
             "glue_run_id": "jr_248f65d48f32bd192123c596ddac499920d4483b14ca7ac0c7ccc47f2e3e3270",
             "target_row_count_after_rerun": 3,
             "glue_dpu_seconds": 294.0,
-            "cost_query_execution_id": "20f5a246-26f4-48b3-8760-3a4e8c985ee9"
+            "cost_query_execution_id": "00000000-0000-0000-0000-000000000000"
           }
         ],
         "athena_evidence": {
-          "target_count_query_execution_id": "3b6b800d-687b-4bbd-a7de-b124fa41ea2e",
-          "stream_summary_query_execution_id": "70d7d777-2441-4d98-a226-1f6d4ed7b3f2",
+          "target_count_query_execution_id": "00000000-0000-0000-0000-000000000000",
+          "stream_summary_query_execution_id": "00000000-0000-0000-0000-000000000000",
           "audit_status": "AUDITED",
           "success_runs": 2,
           "redacted_failure_rows": 1,
@@ -87,8 +87,8 @@
       "confluent_compatible": {
         "status": "OPTIONAL_READY_TO_RUN",
         "scope": "OPTIONAL_COMPATIBILITY",
-        "bootstrap_servers": "pkc-619z3.us-east1.gcp.confluent.cloud:9092",
-        "secret_arn": "arn:aws:secretsmanager:us-east-1:449112696824:secret:contractforge/confluent/kafka-MhIMbL",
+        "bootstrap_servers": "pkc-redacted.region.confluent.cloud:9092",
+        "secret_arn": "arn:aws:secretsmanager:us-east-1:000000000000:secret:contractforge/confluent/kafka-MhIMbL",
         "blockers": [],
         "notes": [
           "Not required for AWS Kafka maturity because the required provider is Amazon MSK.",
@@ -113,3 +113,4 @@
     "Record Confluent-compatible Glue run ids, stream evidence rows, checkpoint state, cost rows and redacted failure evidence when that optional compatibility claim is made."
   ]
 }
+

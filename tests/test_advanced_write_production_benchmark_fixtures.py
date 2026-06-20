@@ -71,8 +71,8 @@ def test_gcp_advanced_write_production_contracts_render_review_required_sql() ->
 
     historical_artifacts = render_gcp_contract(historical, environment=environment).artifacts
     snapshot_artifacts = render_gcp_contract(snapshot, environment=environment).artifacts
-    historical_prefix = "midyear-system-499521-p3_contractforge_gcp_advanced_prod_customers_historical_target"
-    snapshot_prefix = "midyear-system-499521-p3_contractforge_gcp_advanced_prod_customers_snapshot_target"
+    historical_prefix = "gcp-project-redacted_contractforge_gcp_advanced_prod_customers_historical_target"
+    snapshot_prefix = "gcp-project-redacted_contractforge_gcp_advanced_prod_customers_snapshot_target"
     historical_review = json.loads(historical_artifacts[f"{historical_prefix}.gcp.advanced_write_mode_review.json"])
     snapshot_review = json.loads(snapshot_artifacts[f"{snapshot_prefix}.gcp.advanced_write_mode_review.json"])
     historical_sql = historical_artifacts[f"{historical_prefix}.gcp.write.sql"]

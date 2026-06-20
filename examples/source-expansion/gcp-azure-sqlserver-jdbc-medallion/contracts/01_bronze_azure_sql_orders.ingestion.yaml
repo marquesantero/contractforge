@@ -9,20 +9,20 @@ source:
       CAST(amount AS FLOAT) AS amount
     FROM dbo.cf_fabric_jdbc_orders
   driver_jars:
-    - gs://contractforge-gcp-smoke-midyear-system-499521-p3/drivers/mssql-jdbc-12.10.1.jre11.jar
+    - gs://contractforge-gcp-smoke-gcp-project-redacted/drivers/mssql-jdbc-12.10.1.jre11.jar
   auth:
     type: basic
-    username_secret_id: projects/midyear-system-499521-p3/secrets/contractforge-azure-sqlserver-user/versions/latest
-    password_secret_id: projects/midyear-system-499521-p3/secrets/contractforge-azure-sqlserver-password/versions/latest
+    username_secret_id: projects/gcp-project-redacted/secrets/contractforge-azure-sqlserver-user/versions/latest
+    password_secret_id: projects/gcp-project-redacted/secrets/contractforge-azure-sqlserver-password/versions/latest
   output:
-    table: midyear-system-499521-p3:contractforge_gcp_azure_sql_bronze.b_azure_sql_orders
+    table: gcp-project-redacted:contractforge_gcp_azure_sql_bronze.b_azure_sql_orders
     create_disposition: CREATE_IF_NEEDED
-    schema_path: gs://contractforge-gcp-smoke-midyear-system-499521-p3/schemas/gcp-azure-sqlserver-jdbc/orders.schema.json
+    schema_path: gs://contractforge-gcp-smoke-gcp-project-redacted/schemas/gcp-azure-sqlserver-jdbc/orders.schema.json
   dataflow:
-    project_id: midyear-system-499521-p3
+    project_id: gcp-project-redacted
     location: us-central1
-    temp_location: gs://contractforge-gcp-smoke-midyear-system-499521-p3/dataflow/temp/azure-sqlserver-jdbc/
-    staging_location: gs://contractforge-gcp-smoke-midyear-system-499521-p3/dataflow/staging/azure-sqlserver-jdbc/
+    temp_location: gs://contractforge-gcp-smoke-gcp-project-redacted/dataflow/temp/azure-sqlserver-jdbc/
+    staging_location: gs://contractforge-gcp-smoke-gcp-project-redacted/dataflow/staging/azure-sqlserver-jdbc/
     network: default
     subnetwork: regions/us-central1/subnetworks/default
     disable_public_ips: true
@@ -33,7 +33,7 @@ source:
     fetch_size: 100
 
 target:
-  catalog: midyear-system-499521-p3
+  catalog: gcp-project-redacted
   schema: contractforge_gcp_azure_sql_bronze
   table: b_azure_sql_orders
 

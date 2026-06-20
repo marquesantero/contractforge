@@ -459,12 +459,12 @@ def test_snowflake_publish_accepts_connection_factory() -> None:
     result = publish_snowflake_contract(
         _append_contract(),
         environment={"artifacts": {"uri": "@CONTRACTFORGE_ARTIFACTS/dev"}},
-        connect_options={"account": "IW11590", "user": "CFINGESTSVC"},
+        connect_options={"account": "TEST_ACCOUNT", "user": "CFINGESTSVC"},
         connection_factory=factory,
     )
 
     assert result.manifest_uri == "@CONTRACTFORGE_ARTIFACTS/dev/snowflake.publish_manifest.json"
-    assert observed["options"] == {"account": "IW11590", "user": "CFINGESTSVC"}
+    assert observed["options"] == {"account": "TEST_ACCOUNT", "user": "CFINGESTSVC"}
     assert connection.closed
 
 
@@ -2069,7 +2069,7 @@ def test_snowflake_cli_run_uses_connector_session(tmp_path, monkeypatch: pytest.
     contract_path = tmp_path / "contract.json"
     options_path = tmp_path / "connect.yaml"
     contract_path.write_text(json.dumps(_append_contract()), encoding="utf-8")
-    options_path.write_text("account: IW11590\nuser: CFINGESTSVC\n", encoding="utf-8")
+    options_path.write_text("account: TEST_ACCOUNT\nuser: CFINGESTSVC\n", encoding="utf-8")
     connection = _FakeSnowflakeConnection()
     observed: dict[str, object] = {}
 
@@ -2092,20 +2092,20 @@ def test_snowflake_cli_run_uses_connector_session(tmp_path, monkeypatch: pytest.
     output = json.loads(capsys.readouterr().out)
     assert exit_code == 0
     assert output["status"] == "SUCCESS"
-    assert observed["options"] == {"account": "IW11590", "user": "CFINGESTSVC"}
+    assert observed["options"] == {"account": "TEST_ACCOUNT", "user": "CFINGESTSVC"}
     assert observed["contract_uri"] == str(contract_path)
     assert connection.closed
 
 
 def test_snowflake_connector_options_reject_unknown_keys() -> None:
     with pytest.raises(ValueError, match="Unsupported Snowflake connector option"):
-        validate_connect_options({"account": "IW11590", "unsafe_extra": "value"})
+        validate_connect_options({"account": "TEST_ACCOUNT", "unsafe_extra": "value"})
 
 
 def test_snowflake_connector_options_accept_known_keys() -> None:
     options = validate_connect_options(
         {
-            "account": "IW11590",
+            "account": "TEST_ACCOUNT",
             "user": "CFINGESTSVC",
             "warehouse": "CF_WH",
             "session_parameters": {"QUERY_TAG": "contractforge"},
@@ -2113,7 +2113,7 @@ def test_snowflake_connector_options_accept_known_keys() -> None:
     )
 
     assert options == {
-        "account": "IW11590",
+        "account": "TEST_ACCOUNT",
         "user": "CFINGESTSVC",
         "warehouse": "CF_WH",
         "session_parameters": {"QUERY_TAG": "contractforge"},
@@ -2254,14 +2254,14 @@ def test_snowflake_deploy_project_accepts_connection_factory(tmp_path) -> None:
 
     result = deploy_snowflake_project(
         project_file,
-        connect_options={"account": "IW11590", "warehouse": "CF_WH"},
+        connect_options={"account": "TEST_ACCOUNT", "warehouse": "CF_WH"},
         connection_factory=factory,
     )
 
     assert result.dry_run is False
     assert len(result.steps) == 2
     assert len(observed_options) == 3
-    assert all(options == {"account": "IW11590", "warehouse": "CF_WH"} for options in observed_options)
+    assert all(options == {"account": "TEST_ACCOUNT", "warehouse": "CF_WH"} for options in observed_options)
     assert all(connection.closed for connection in connections)
 
 
@@ -2477,12 +2477,12 @@ def test_snowflake_run_project_accepts_connection_factory(tmp_path) -> None:
 
     result = run_snowflake_project(
         project_file,
-        connect_options={"account": "IW11590", "role": "CONTRACTFORGE_ROLE"},
+        connect_options={"account": "TEST_ACCOUNT", "role": "CONTRACTFORGE_ROLE"},
         connection_factory=factory,
     )
 
     assert result.dry_run is False
-    assert observed["options"] == {"account": "IW11590", "role": "CONTRACTFORGE_ROLE"}
+    assert observed["options"] == {"account": "TEST_ACCOUNT", "role": "CONTRACTFORGE_ROLE"}
     assert connection.closed
     assert connection.commands == ['EXECUTE TASK "CONTRACTFORGE"."CF_TASKS"."bronze_customers"']
 
@@ -2937,3 +2937,4 @@ def _snowflake_project_dependency_lines(include_dependencies: bool) -> list[str]
         "    depends_on:",
         "      - bronze_customers",
     ] if include_dependencies else []
+

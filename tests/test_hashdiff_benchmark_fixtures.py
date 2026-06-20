@@ -112,7 +112,7 @@ def test_gcp_hashdiff_benchmark_contract_renders_review_required_bundle() -> Non
     environment = _yaml(BENCHMARK / "environments" / "gcp.environment.yaml")
 
     rendered = render_gcp_contract(contract, environment=environment).artifacts
-    prefix = "midyear-system-499521-p3_contractforge_gcp_hashdiff_prod_customers_hashdiff_target"
+    prefix = "gcp-project-redacted_contractforge_gcp_hashdiff_prod_customers_hashdiff_target"
     review = json.loads(rendered[f"{prefix}.gcp.advanced_write_mode_review.json"])
     deployment = json.loads(rendered[f"{prefix}.gcp.deployment_manifest.json"])
     write_sql = rendered[f"{prefix}.gcp.write.sql"]
@@ -130,4 +130,4 @@ def test_gcp_hashdiff_benchmark_contract_renders_review_required_bundle() -> Non
     assert deployment["execution_ready"] is False
     assert "CONTRACTFORGE_NULL_MERGE_KEY" in write_sql
     assert "CONTRACTFORGE_DUPLICATE_MERGE_KEYS" in write_sql
-    assert "MERGE `midyear-system-499521-p3.contractforge_gcp_hashdiff_prod.customers_hashdiff_target`" in write_sql
+    assert "MERGE `gcp-project-redacted.contractforge_gcp_hashdiff_prod.customers_hashdiff_target`" in write_sql

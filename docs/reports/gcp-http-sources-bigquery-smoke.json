@@ -16,28 +16,28 @@
       "ok": true,
       "result": {
         "artifacts": [
-          "midyear-system-499521-p3_contractforge_gcp_smoke_cf_http_text_countries.gcp.capabilities.json",
-          "midyear-system-499521-p3_contractforge_gcp_smoke_cf_http_text_countries.gcp.contract.json",
-          "midyear-system-499521-p3_contractforge_gcp_smoke_cf_http_text_countries.gcp.dataplex_data_quality.json",
-          "midyear-system-499521-p3_contractforge_gcp_smoke_cf_http_text_countries.gcp.dataplex_data_quality_execution.json",
-          "midyear-system-499521-p3_contractforge_gcp_smoke_cf_http_text_countries.gcp.deployment_manifest.json",
-          "midyear-system-499521-p3_contractforge_gcp_smoke_cf_http_text_countries.gcp.evidence_ddl.sql",
-          "midyear-system-499521-p3_contractforge_gcp_smoke_cf_http_text_countries.gcp.manifest.json",
-          "midyear-system-499521-p3_contractforge_gcp_smoke_cf_http_text_countries.gcp.quality.sql",
-          "midyear-system-499521-p3_contractforge_gcp_smoke_cf_http_text_countries.gcp.review.md",
-          "midyear-system-499521-p3_contractforge_gcp_smoke_cf_http_text_countries.gcp.schema_policy.json",
-          "midyear-system-499521-p3_contractforge_gcp_smoke_cf_http_text_countries.gcp.source_materialization.json",
-          "midyear-system-499521-p3_contractforge_gcp_smoke_cf_http_text_countries.gcp.source_review.json",
-          "midyear-system-499521-p3_contractforge_gcp_smoke_cf_http_text_countries.gcp.source_review.md",
-          "midyear-system-499521-p3_contractforge_gcp_smoke_cf_http_text_countries.gcp.source_support.json",
-          "midyear-system-499521-p3_contractforge_gcp_smoke_cf_http_text_countries.gcp.write.sql"
+          "gcp-project-redacted_contractforge_gcp_smoke_cf_http_text_countries.gcp.capabilities.json",
+          "gcp-project-redacted_contractforge_gcp_smoke_cf_http_text_countries.gcp.contract.json",
+          "gcp-project-redacted_contractforge_gcp_smoke_cf_http_text_countries.gcp.dataplex_data_quality.json",
+          "gcp-project-redacted_contractforge_gcp_smoke_cf_http_text_countries.gcp.dataplex_data_quality_execution.json",
+          "gcp-project-redacted_contractforge_gcp_smoke_cf_http_text_countries.gcp.deployment_manifest.json",
+          "gcp-project-redacted_contractforge_gcp_smoke_cf_http_text_countries.gcp.evidence_ddl.sql",
+          "gcp-project-redacted_contractforge_gcp_smoke_cf_http_text_countries.gcp.manifest.json",
+          "gcp-project-redacted_contractforge_gcp_smoke_cf_http_text_countries.gcp.quality.sql",
+          "gcp-project-redacted_contractforge_gcp_smoke_cf_http_text_countries.gcp.review.md",
+          "gcp-project-redacted_contractforge_gcp_smoke_cf_http_text_countries.gcp.schema_policy.json",
+          "gcp-project-redacted_contractforge_gcp_smoke_cf_http_text_countries.gcp.source_materialization.json",
+          "gcp-project-redacted_contractforge_gcp_smoke_cf_http_text_countries.gcp.source_review.json",
+          "gcp-project-redacted_contractforge_gcp_smoke_cf_http_text_countries.gcp.source_review.md",
+          "gcp-project-redacted_contractforge_gcp_smoke_cf_http_text_countries.gcp.source_support.json",
+          "gcp-project-redacted_contractforge_gcp_smoke_cf_http_text_countries.gcp.write.sql"
         ],
         "blockers": [],
         "executed": true,
         "ok": true,
         "operations": [
           {
-            "artifact": "midyear-system-499521-p3_contractforge_gcp_smoke_cf_http_text_countries.gcp.evidence_ddl.sql",
+            "artifact": "gcp-project-redacted_contractforge_gcp_smoke_cf_http_text_countries.gcp.evidence_ddl.sql",
             "executed": true,
             "job": {
               "deleted_rows": null,
@@ -53,27 +53,27 @@
                   "query": {
                     "destinationTable": {
                       "datasetId": "contractforge_gcp_smoke_ops",
-                      "projectId": "midyear-system-499521-p3",
+                      "projectId": "gcp-project-redacted",
                       "tableId": "contractforge_lineage_evidence"
                     },
                     "priority": "INTERACTIVE",
-                    "query": "CREATE TABLE IF NOT EXISTS `midyear-system-499521-p3.contractforge_gcp_smoke_ops.contractforge_lineage_evidence` ( run_id STRING NOT NULL, target_table STRING NOT NULL, source_name STRING NOT NULL, event_json STRING NOT NULL, event_time TIMESTAMP, adapter STRING NOT NULL )",
+                    "query": "CREATE TABLE IF NOT EXISTS `gcp-project-redacted.contractforge_gcp_smoke_ops.contractforge_lineage_evidence` ( run_id STRING NOT NULL, target_table STRING NOT NULL, source_name STRING NOT NULL, event_json STRING NOT NULL, event_time TIMESTAMP, adapter STRING NOT NULL )",
                     "useLegacySql": false
                   }
                 },
                 "etag": "ny7SfpMfiiiAu3cOkHJj4A==",
-                "id": "midyear-system-499521-p3:us-east1.cf_gcp_smoke_query_f858fc61aa1644e9ab44",
+                "id": "gcp-project-redacted:us-east1.cf_gcp_smoke_query_f858fc61aa1644e9ab44",
                 "jobCreationReason": {
                   "code": "REQUESTED"
                 },
                 "jobReference": {
                   "jobId": "cf_gcp_smoke_query_f858fc61aa1644e9ab44",
                   "location": "us-east1",
-                  "projectId": "midyear-system-499521-p3"
+                  "projectId": "gcp-project-redacted"
                 },
                 "kind": "bigquery#job",
                 "principal_subject": "REDACTED",
-                "selfLink": "https://bigquery.googleapis.com/bigquery/v2/projects/midyear-system-499521-p3/jobs/cf_gcp_smoke_query_f858fc61aa1644e9ab44?location=us-east1",
+                "selfLink": "https://bigquery.googleapis.com/bigquery/v2/projects/gcp-project-redacted/jobs/cf_gcp_smoke_query_f858fc61aa1644e9ab44?location=us-east1",
                 "statistics": {
                   "creationTime": "1781695285458",
                   "endTime": "1781695285632",
@@ -83,7 +83,7 @@
                     "ddlOperationPerformed": "SKIP",
                     "ddlTargetTable": {
                       "datasetId": "contractforge_gcp_smoke_ops",
-                      "projectId": "midyear-system-499521-p3",
+                      "projectId": "gcp-project-redacted",
                       "tableId": "contractforge_lineage_evidence"
                     },
                     "performanceInsights": {},
@@ -149,7 +149,7 @@
             "name": "prepare_evidence"
           },
           {
-            "artifact": "midyear-system-499521-p3_contractforge_gcp_smoke_cf_http_text_countries.gcp.source_materialization.json",
+            "artifact": "gcp-project-redacted_contractforge_gcp_smoke_cf_http_text_countries.gcp.source_materialization.json",
             "executed": true,
             "job": {
               "deleted_rows": null,
@@ -165,7 +165,7 @@
                   "load": {
                     "destinationTable": {
                       "datasetId": "contractforge_gcp_smoke",
-                      "projectId": "midyear-system-499521-p3",
+                      "projectId": "gcp-project-redacted",
                       "tableId": "cf_http_text_countries"
                     },
                     "schema": {
@@ -181,18 +181,18 @@
                   }
                 },
                 "etag": "mZYbEg8a+GYcLeaNmlttLw==",
-                "id": "midyear-system-499521-p3:us-east1.cf_gcp_smoke_load_file_1f9c52885a5140e287b7",
+                "id": "gcp-project-redacted:us-east1.cf_gcp_smoke_load_file_1f9c52885a5140e287b7",
                 "jobCreationReason": {
                   "code": "REQUESTED"
                 },
                 "jobReference": {
                   "jobId": "cf_gcp_smoke_load_file_1f9c52885a5140e287b7",
                   "location": "us-east1",
-                  "projectId": "midyear-system-499521-p3"
+                  "projectId": "gcp-project-redacted"
                 },
                 "kind": "bigquery#job",
                 "principal_subject": "REDACTED",
-                "selfLink": "https://bigquery.googleapis.com/bigquery/v2/projects/midyear-system-499521-p3/jobs/cf_gcp_smoke_load_file_1f9c52885a5140e287b7?location=us-east1",
+                "selfLink": "https://bigquery.googleapis.com/bigquery/v2/projects/gcp-project-redacted/jobs/cf_gcp_smoke_load_file_1f9c52885a5140e287b7?location=us-east1",
                 "statistics": {
                   "creationTime": "1781695295749",
                   "endTime": "1781695297340",
@@ -259,27 +259,27 @@
                   "query": {
                     "destinationTable": {
                       "datasetId": "contractforge_gcp_smoke_ops",
-                      "projectId": "midyear-system-499521-p3",
+                      "projectId": "gcp-project-redacted",
                       "tableId": "contractforge_run_evidence"
                     },
                     "priority": "INTERACTIVE",
-                    "query": "INSERT INTO `midyear-system-499521-p3.contractforge_gcp_smoke_ops.contractforge_run_evidence` (`run_id`, `contract_name`, `target_table`, `adapter`, `status`, `started_at`, `finished_at`, `total_bytes_processed`, `total_bytes_billed`, `total_slot_ms`, `job_id`, `statement_type`, `inserted_rows`, `updated_rows`, `deleted_rows`, `error_message`) VALUES ('cf_gcp_smoke_load_file_1f9c52885a5140e287b7', 'cf_http_text_countries', 'midyear-system-499521-p3.contractforge_gcp_smoke.cf_http_text_countries', 'gcp_bigquery', 'SUCCEEDED', TIMESTAMP_MILLIS(1781695295873), TIMESTAMP_MILLIS(1781695297340), NULL, NULL, 122, 'cf_gcp_smoke_load_file_1f9c52885a5140e287b7', 'LOAD', NULL, NULL, NULL, NULL);",
+                    "query": "INSERT INTO `gcp-project-redacted.contractforge_gcp_smoke_ops.contractforge_run_evidence` (`run_id`, `contract_name`, `target_table`, `adapter`, `status`, `started_at`, `finished_at`, `total_bytes_processed`, `total_bytes_billed`, `total_slot_ms`, `job_id`, `statement_type`, `inserted_rows`, `updated_rows`, `deleted_rows`, `error_message`) VALUES ('cf_gcp_smoke_load_file_1f9c52885a5140e287b7', 'cf_http_text_countries', 'gcp-project-redacted.contractforge_gcp_smoke.cf_http_text_countries', 'gcp_bigquery', 'SUCCEEDED', TIMESTAMP_MILLIS(1781695295873), TIMESTAMP_MILLIS(1781695297340), NULL, NULL, 122, 'cf_gcp_smoke_load_file_1f9c52885a5140e287b7', 'LOAD', NULL, NULL, NULL, NULL);",
                     "useLegacySql": false
                   }
                 },
                 "etag": "DQq0hdXBewpFn438BnCMaQ==",
-                "id": "midyear-system-499521-p3:us-east1.cf_gcp_smoke_query_0af0295e10bd4925a743",
+                "id": "gcp-project-redacted:us-east1.cf_gcp_smoke_query_0af0295e10bd4925a743",
                 "jobCreationReason": {
                   "code": "REQUESTED"
                 },
                 "jobReference": {
                   "jobId": "cf_gcp_smoke_query_0af0295e10bd4925a743",
                   "location": "us-east1",
-                  "projectId": "midyear-system-499521-p3"
+                  "projectId": "gcp-project-redacted"
                 },
                 "kind": "bigquery#job",
                 "principal_subject": "REDACTED",
-                "selfLink": "https://bigquery.googleapis.com/bigquery/v2/projects/midyear-system-499521-p3/jobs/cf_gcp_smoke_query_0af0295e10bd4925a743?location=us-east1",
+                "selfLink": "https://bigquery.googleapis.com/bigquery/v2/projects/gcp-project-redacted/jobs/cf_gcp_smoke_query_0af0295e10bd4925a743?location=us-east1",
                 "statistics": {
                   "creationTime": "1781695304802",
                   "endTime": "1781695306296",
@@ -333,7 +333,7 @@
                             "kind": "COMPUTE",
                             "substeps": [
                               "$1 := 'cf_http_text_countries'",
-                              "$2 := 'midyear-system-499521-p3.contractforge_gcp_smoke.cf_http_text_countries'",
+                              "$2 := 'gcp-project-redacted.contractforge_gcp_smoke.cf_http_text_countries'",
                               "$3 := 'gcp_bigquery'",
                               "$4 := 'SUCCEEDED'",
                               "$5 := 1781695295.873000000",
@@ -465,7 +465,7 @@
                     "referencedTables": [
                       {
                         "datasetId": "contractforge_gcp_smoke_ops",
-                        "projectId": "midyear-system-499521-p3",
+                        "projectId": "gcp-project-redacted",
                         "tableId": "contractforge_run_evidence"
                       }
                     ],
@@ -523,27 +523,27 @@
                   "query": {
                     "destinationTable": {
                       "datasetId": "contractforge_gcp_smoke_ops",
-                      "projectId": "midyear-system-499521-p3",
+                      "projectId": "gcp-project-redacted",
                       "tableId": "contractforge_lineage_evidence"
                     },
                     "priority": "INTERACTIVE",
-                    "query": "INSERT INTO `midyear-system-499521-p3.contractforge_gcp_smoke_ops.contractforge_lineage_evidence` (`run_id`, `target_table`, `source_name`, `event_json`, `event_time`, `adapter`) VALUES ('cf_gcp_smoke_load_file_1f9c52885a5140e287b7', 'midyear-system-499521-p3.contractforge_gcp_smoke.cf_http_text_countries', 'midyear-system-499521-p3.contractforge_gcp_smoke._staging_cf_http_text_countries', '{\"eventTime\":\"2026-06-17T11:21:37.340000+00:00\",\"eventType\":\"COMPLETE\",\"facets\":{\"contractforge\":{\"_producer\":\"contractforge-gcp\",\"_schemaURL\":\"https://openlineage.io/spec/facets/1-0-0/RunFacet.json\",\"finishedAt\":\"2026-06-17T11:21:37.340000+00:00\",\"layer\":\"bronze\",\"mode\":\"scd0_overwrite\",\"operationMetrics\":{\"jobId\":\"cf_gcp_smoke_load_file_1f9c52885a5140e287b7\",\"jobType\":\"LOAD\",\"outputRows\":195,\"totalSlotMs\":122},\"rowsRead\":195,\"rowsWritten\":195,\"startedAt\":\"2026-06-17T11:21:35.873000+00:00\"}},\"inputs\":[{\"facets\":{\"schema\":{\"_producer\":\"contractforge-gcp\",\"_schemaURL\":\"https://openlineage.io/spec/facets/1-0-0/SchemaDatasetFacet.json\",\"fields\":[]}},\"name\":\"midyear-system-499521-p3.contractforge_gcp_smoke._staging_cf_http_text_countries\",\"namespace\":\"bigquery://midyear-system-499521-p3\"}],\"job\":{\"facets\":{},\"name\":\"bronze.cf_http_text_countries.scd0_overwrite\",\"namespace\":\"bigquery://midyear-system-499521-p3\"},\"outputs\":[{\"facets\":{\"dataQualityMetrics\":{\"_producer\":\"contractforge-gcp\",\"_schemaURL\":\"https://openlineage.io/spec/facets/1-0-0/DataQualityMetricsOutputDatasetFacet.json\",\"rowCount\":195},\"schema\":{\"_producer\":\"contractforge-gcp\",\"_schemaURL\":\"https://openlineage.io/spec/facets/1-0-0/SchemaDatasetFacet.json\",\"fields\":[]}},\"name\":\"midyear-system-499521-p3.contractforge_gcp_smoke.cf_http_text_countries\",\"namespace\":\"bigquery://midyear-system-499521-p3\"}],\"producer\":\"contractforge-gcp\",\"run\":{\"facets\":{\"processing_engine\":{\"_producer\":\"contractforge-gcp\",\"_schemaURL\":\"https://openlineage.io/spec/facets/1-0-0/ProcessingEngineRunFacet.json\",\"name\":\"bigquery\"}},\"runId\":\"cf_gcp_smoke_load_file_1f9c52885a5140e287b7\"},\"schemaURL\":\"https://openlineage.io/spec/1-0-5/OpenLineage.json\"}', TIMESTAMP '2026-06-17T11:21:37.340000+00:00', 'gcp_bigquery');",
+                    "query": "INSERT INTO `gcp-project-redacted.contractforge_gcp_smoke_ops.contractforge_lineage_evidence` (`run_id`, `target_table`, `source_name`, `event_json`, `event_time`, `adapter`) VALUES ('cf_gcp_smoke_load_file_1f9c52885a5140e287b7', 'gcp-project-redacted.contractforge_gcp_smoke.cf_http_text_countries', 'gcp-project-redacted.contractforge_gcp_smoke._staging_cf_http_text_countries', '{\"eventTime\":\"2026-06-17T11:21:37.340000+00:00\",\"eventType\":\"COMPLETE\",\"facets\":{\"contractforge\":{\"_producer\":\"contractforge-gcp\",\"_schemaURL\":\"https://openlineage.io/spec/facets/1-0-0/RunFacet.json\",\"finishedAt\":\"2026-06-17T11:21:37.340000+00:00\",\"layer\":\"bronze\",\"mode\":\"scd0_overwrite\",\"operationMetrics\":{\"jobId\":\"cf_gcp_smoke_load_file_1f9c52885a5140e287b7\",\"jobType\":\"LOAD\",\"outputRows\":195,\"totalSlotMs\":122},\"rowsRead\":195,\"rowsWritten\":195,\"startedAt\":\"2026-06-17T11:21:35.873000+00:00\"}},\"inputs\":[{\"facets\":{\"schema\":{\"_producer\":\"contractforge-gcp\",\"_schemaURL\":\"https://openlineage.io/spec/facets/1-0-0/SchemaDatasetFacet.json\",\"fields\":[]}},\"name\":\"gcp-project-redacted.contractforge_gcp_smoke._staging_cf_http_text_countries\",\"namespace\":\"bigquery://gcp-project-redacted\"}],\"job\":{\"facets\":{},\"name\":\"bronze.cf_http_text_countries.scd0_overwrite\",\"namespace\":\"bigquery://gcp-project-redacted\"},\"outputs\":[{\"facets\":{\"dataQualityMetrics\":{\"_producer\":\"contractforge-gcp\",\"_schemaURL\":\"https://openlineage.io/spec/facets/1-0-0/DataQualityMetricsOutputDatasetFacet.json\",\"rowCount\":195},\"schema\":{\"_producer\":\"contractforge-gcp\",\"_schemaURL\":\"https://openlineage.io/spec/facets/1-0-0/SchemaDatasetFacet.json\",\"fields\":[]}},\"name\":\"gcp-project-redacted.contractforge_gcp_smoke.cf_http_text_countries\",\"namespace\":\"bigquery://gcp-project-redacted\"}],\"producer\":\"contractforge-gcp\",\"run\":{\"facets\":{\"processing_engine\":{\"_producer\":\"contractforge-gcp\",\"_schemaURL\":\"https://openlineage.io/spec/facets/1-0-0/ProcessingEngineRunFacet.json\",\"name\":\"bigquery\"}},\"runId\":\"cf_gcp_smoke_load_file_1f9c52885a5140e287b7\"},\"schemaURL\":\"https://openlineage.io/spec/1-0-5/OpenLineage.json\"}', TIMESTAMP '2026-06-17T11:21:37.340000+00:00', 'gcp_bigquery');",
                     "useLegacySql": false
                   }
                 },
                 "etag": "Wm1ifLZTFrRfC/J9o6JV6w==",
-                "id": "midyear-system-499521-p3:us-east1.cf_gcp_smoke_query_429e3ed937fd46e39ea3",
+                "id": "gcp-project-redacted:us-east1.cf_gcp_smoke_query_429e3ed937fd46e39ea3",
                 "jobCreationReason": {
                   "code": "REQUESTED"
                 },
                 "jobReference": {
                   "jobId": "cf_gcp_smoke_query_429e3ed937fd46e39ea3",
                   "location": "us-east1",
-                  "projectId": "midyear-system-499521-p3"
+                  "projectId": "gcp-project-redacted"
                 },
                 "kind": "bigquery#job",
                 "principal_subject": "REDACTED",
-                "selfLink": "https://bigquery.googleapis.com/bigquery/v2/projects/midyear-system-499521-p3/jobs/cf_gcp_smoke_query_429e3ed937fd46e39ea3?location=us-east1",
+                "selfLink": "https://bigquery.googleapis.com/bigquery/v2/projects/gcp-project-redacted/jobs/cf_gcp_smoke_query_429e3ed937fd46e39ea3?location=us-east1",
                 "statistics": {
                   "creationTime": "1781695313962",
                   "endTime": "1781695315369",
@@ -597,9 +597,9 @@
                             "kind": "COMPUTE",
                             "substeps": [
                               "$1 := 'cf_gcp_smoke_load_file_1f9c52885a5140e287b7'",
-                              "$2 := 'midyear-system-499521-p3.contractforge_gcp_smoke.cf_http_text_countries'",
-                              "$3 := 'midyear-system-499521-p3.contractforge_gcp_smoke._staging_cf_http_text_countries'",
-                              "$4 := '{\"eventTime\":\"2026-06-17T11:21:37.340000+00:00\",\"eventType\":\"COMPLETE\",\"facets\":{\"contractforge\":{\"_producer\":\"contractforge-gcp\",\"_schemaURL\":\"https://openlineage.io/spec/facets/1-0-0/RunFacet.json\",\"finishedAt\":\"2026-06-17T11:21:37.340000+00:00\",\"layer\":\"bronze\",\"mode\":\"scd0_overwrite\",\"operationMetrics\":{\"jobId\":\"cf_gcp_smoke_load_file_1f9c52885a5140e287b7\",\"jobType\":\"LOAD\",\"outputRows\":195,\"totalSlotMs\":122},\"rowsRead\":195,\"rowsWritten\":195,\"startedAt\":\"2026-06-17T11:21:35.873000+00:00\"}},\"inputs\":[{\"facets\":{\"schema\":{\"_producer\":\"contractforge-gcp\",\"_schemaURL\":\"https://openlineage.io/spec/facets/1-0-0/SchemaDatasetFacet.json\",\"fields\":[]}},\"name\":\"midyear-system-499521-p3.contractforge_gcp_smoke._staging_cf_http_text_countries\",\"namespace\":\"bigquery://midyear-system-499521-p3\"}],\"job\":{\"facets\":{},\"name\":\"bronze.cf_http_text_countries.scd0_overwrite\",\"namespace\":\"bigquery://midyear-system-499521-p3\"},\"outputs\":[{\"facets\":{\"dataQualityMetrics\":{\"_producer\":\"contractforge-gcp\",\"_schemaURL\":\"https://openlineage.io/spec/facets/1-0-0/DataQualityMetricsOutputDatasetFacet.json\",\"rowCount\":195},\"schema\":{\"_producer\":\"contractforge-gcp\",\"_schemaURL\":\"https://openlineage.io/spec/facets/1-0-0/SchemaDatasetFacet.json\",\"fields\":[]}},\"name\":\"midyear-system-499521-p3.contractforge_gcp_smoke.cf_http_text_countries\",\"namespace\":\"bigquery://midyear-system-499521-p3\"}],\"producer\":\"contractforge-gcp\",\"run\":{\"facets\":{\"processing_engine\":{\"_producer\":\"contractforge-gcp\",\"_schemaURL\":\"https://openlineage.io/spec/facets/1-0-0/ProcessingEngineRunFacet.json\",\"name\":\"bigquery\"}},\"runId\":\"cf_gcp_smoke_load_file_1f9c52885a5140e287b7\"},\"schemaURL\":\"https://openlineage.io/spec/1-0-5/OpenLineage.json\"}'",
+                              "$2 := 'gcp-project-redacted.contractforge_gcp_smoke.cf_http_text_countries'",
+                              "$3 := 'gcp-project-redacted.contractforge_gcp_smoke._staging_cf_http_text_countries'",
+                              "$4 := '{\"eventTime\":\"2026-06-17T11:21:37.340000+00:00\",\"eventType\":\"COMPLETE\",\"facets\":{\"contractforge\":{\"_producer\":\"contractforge-gcp\",\"_schemaURL\":\"https://openlineage.io/spec/facets/1-0-0/RunFacet.json\",\"finishedAt\":\"2026-06-17T11:21:37.340000+00:00\",\"layer\":\"bronze\",\"mode\":\"scd0_overwrite\",\"operationMetrics\":{\"jobId\":\"cf_gcp_smoke_load_file_1f9c52885a5140e287b7\",\"jobType\":\"LOAD\",\"outputRows\":195,\"totalSlotMs\":122},\"rowsRead\":195,\"rowsWritten\":195,\"startedAt\":\"2026-06-17T11:21:35.873000+00:00\"}},\"inputs\":[{\"facets\":{\"schema\":{\"_producer\":\"contractforge-gcp\",\"_schemaURL\":\"https://openlineage.io/spec/facets/1-0-0/SchemaDatasetFacet.json\",\"fields\":[]}},\"name\":\"gcp-project-redacted.contractforge_gcp_smoke._staging_cf_http_text_countries\",\"namespace\":\"bigquery://gcp-project-redacted\"}],\"job\":{\"facets\":{},\"name\":\"bronze.cf_http_text_countries.scd0_overwrite\",\"namespace\":\"bigquery://gcp-project-redacted\"},\"outputs\":[{\"facets\":{\"dataQualityMetrics\":{\"_producer\":\"contractforge-gcp\",\"_schemaURL\":\"https://openlineage.io/spec/facets/1-0-0/DataQualityMetricsOutputDatasetFacet.json\",\"rowCount\":195},\"schema\":{\"_producer\":\"contractforge-gcp\",\"_schemaURL\":\"https://openlineage.io/spec/facets/1-0-0/SchemaDatasetFacet.json\",\"fields\":[]}},\"name\":\"gcp-project-redacted.contractforge_gcp_smoke.cf_http_text_countries\",\"namespace\":\"bigquery://gcp-project-redacted\"}],\"producer\":\"contractforge-gcp\",\"run\":{\"facets\":{\"processing_engine\":{\"_producer\":\"contractforge-gcp\",\"_schemaURL\":\"https://openlineage.io/spec/facets/1-0-0/ProcessingEngineRunFacet.json\",\"name\":\"bigquery\"}},\"runId\":\"cf_gcp_smoke_load_file_1f9c52885a5140e287b7\"},\"schemaURL\":\"https://openlineage.io/spec/1-0-5/OpenLineage.json\"}'",
                               "$5 := 1781695297.340000000",
                               "$6 := 'gcp_bigquery'"
                             ]
@@ -724,7 +724,7 @@
                     "referencedTables": [
                       {
                         "datasetId": "contractforge_gcp_smoke_ops",
-                        "projectId": "midyear-system-499521-p3",
+                        "projectId": "gcp-project-redacted",
                         "tableId": "contractforge_lineage_evidence"
                       }
                     ],
@@ -766,7 +766,7 @@
             "name": "persist_lineage_evidence"
           },
           {
-            "artifact": "midyear-system-499521-p3_contractforge_gcp_smoke_cf_http_text_countries.gcp.quality.sql",
+            "artifact": "gcp-project-redacted_contractforge_gcp_smoke_cf_http_text_countries.gcp.quality.sql",
             "executed": true,
             "job": {
               "deleted_rows": null,
@@ -782,28 +782,28 @@
                   "query": {
                     "destinationTable": {
                       "datasetId": "_7566643d7ecc0c17bfb144ec0d63d8182baae0ba",
-                      "projectId": "midyear-system-499521-p3",
+                      "projectId": "gcp-project-redacted",
                       "tableId": "anon95e6b90c32ab3ac4c53e4ee70acdb4118df75d91fd35220610556eda6ea900ee"
                     },
                     "priority": "INTERACTIVE",
-                    "query": "SELECT COUNT(*) AS failed_rows FROM `midyear-system-499521-p3.contractforge_gcp_smoke.cf_http_text_countries` WHERE `line_text` IS NULL",
+                    "query": "SELECT COUNT(*) AS failed_rows FROM `gcp-project-redacted.contractforge_gcp_smoke.cf_http_text_countries` WHERE `line_text` IS NULL",
                     "useLegacySql": false,
                     "writeDisposition": "WRITE_TRUNCATE"
                   }
                 },
                 "etag": "58fehub1f4awF8gew3d+CA==",
-                "id": "midyear-system-499521-p3:us-east1.cf_gcp_smoke_query_67ca758d7d674d38bc97",
+                "id": "gcp-project-redacted:us-east1.cf_gcp_smoke_query_67ca758d7d674d38bc97",
                 "jobCreationReason": {
                   "code": "REQUESTED"
                 },
                 "jobReference": {
                   "jobId": "cf_gcp_smoke_query_67ca758d7d674d38bc97",
                   "location": "us-east1",
-                  "projectId": "midyear-system-499521-p3"
+                  "projectId": "gcp-project-redacted"
                 },
                 "kind": "bigquery#job",
                 "principal_subject": "REDACTED",
-                "selfLink": "https://bigquery.googleapis.com/bigquery/v2/projects/midyear-system-499521-p3/jobs/cf_gcp_smoke_query_67ca758d7d674d38bc97?location=us-east1",
+                "selfLink": "https://bigquery.googleapis.com/bigquery/v2/projects/gcp-project-redacted/jobs/cf_gcp_smoke_query_67ca758d7d674d38bc97?location=us-east1",
                 "statistics": {
                   "creationTime": "1781695322799",
                   "endTime": "1781695323049",
@@ -818,7 +818,7 @@
                           "explanation": "Table does not have CMETA.",
                           "tableReference": {
                             "datasetId": "contractforge_gcp_smoke",
-                            "projectId": "midyear-system-499521-p3",
+                            "projectId": "gcp-project-redacted",
                             "tableId": "cf_http_text_countries"
                           },
                           "unusedReason": "OTHER_REASON"
@@ -868,7 +868,7 @@
                             "kind": "READ",
                             "substeps": [
                               "$1:line_text",
-                              "FROM midyear-system-499521-p3.contractforge_gcp_smoke.cf_http_text_countries",
+                              "FROM gcp-project-redacted.contractforge_gcp_smoke.cf_http_text_countries",
                               "WHERE is_null($1)"
                             ]
                           },
@@ -905,7 +905,7 @@
                     "referencedTables": [
                       {
                         "datasetId": "contractforge_gcp_smoke",
-                        "projectId": "midyear-system-499521-p3",
+                        "projectId": "gcp-project-redacted",
                         "tableId": "cf_http_text_countries"
                       }
                     ],
@@ -974,27 +974,27 @@
                   "query": {
                     "destinationTable": {
                       "datasetId": "contractforge_gcp_smoke_ops",
-                      "projectId": "midyear-system-499521-p3",
+                      "projectId": "gcp-project-redacted",
                       "tableId": "contractforge_quality_evidence"
                     },
                     "priority": "INTERACTIVE",
-                    "query": "INSERT INTO `midyear-system-499521-p3.contractforge_gcp_smoke_ops.contractforge_quality_evidence` (`run_id`, `contract_name`, `rule_name`, `rule_type`, `status`, `failed_rows`, `evaluated_at`) VALUES ('cf_gcp_smoke_query_67ca758d7d674d38bc97', 'cf_http_text_countries', 'line_text_not_null', 'not_null', 'PASSED', 0, TIMESTAMP_MILLIS(1781695323049));",
+                    "query": "INSERT INTO `gcp-project-redacted.contractforge_gcp_smoke_ops.contractforge_quality_evidence` (`run_id`, `contract_name`, `rule_name`, `rule_type`, `status`, `failed_rows`, `evaluated_at`) VALUES ('cf_gcp_smoke_query_67ca758d7d674d38bc97', 'cf_http_text_countries', 'line_text_not_null', 'not_null', 'PASSED', 0, TIMESTAMP_MILLIS(1781695323049));",
                     "useLegacySql": false
                   }
                 },
                 "etag": "/NyMOTQYMUxcKe9ZsJoD+g==",
-                "id": "midyear-system-499521-p3:us-east1.cf_gcp_smoke_query_43dbec6ab0bc4087afee",
+                "id": "gcp-project-redacted:us-east1.cf_gcp_smoke_query_43dbec6ab0bc4087afee",
                 "jobCreationReason": {
                   "code": "REQUESTED"
                 },
                 "jobReference": {
                   "jobId": "cf_gcp_smoke_query_43dbec6ab0bc4087afee",
                   "location": "us-east1",
-                  "projectId": "midyear-system-499521-p3"
+                  "projectId": "gcp-project-redacted"
                 },
                 "kind": "bigquery#job",
                 "principal_subject": "REDACTED",
-                "selfLink": "https://bigquery.googleapis.com/bigquery/v2/projects/midyear-system-499521-p3/jobs/cf_gcp_smoke_query_43dbec6ab0bc4087afee?location=us-east1",
+                "selfLink": "https://bigquery.googleapis.com/bigquery/v2/projects/gcp-project-redacted/jobs/cf_gcp_smoke_query_43dbec6ab0bc4087afee?location=us-east1",
                 "statistics": {
                   "creationTime": "1781695330470",
                   "endTime": "1781695331966",
@@ -1176,7 +1176,7 @@
                     "referencedTables": [
                       {
                         "datasetId": "contractforge_gcp_smoke_ops",
-                        "projectId": "midyear-system-499521-p3",
+                        "projectId": "gcp-project-redacted",
                         "tableId": "contractforge_quality_evidence"
                       }
                     ],
@@ -1246,28 +1246,28 @@
       "ok": true,
       "result": {
         "artifacts": [
-          "midyear-system-499521-p3_contractforge_gcp_smoke_cf_http_file_text_countries.gcp.capabilities.json",
-          "midyear-system-499521-p3_contractforge_gcp_smoke_cf_http_file_text_countries.gcp.contract.json",
-          "midyear-system-499521-p3_contractforge_gcp_smoke_cf_http_file_text_countries.gcp.dataplex_data_quality.json",
-          "midyear-system-499521-p3_contractforge_gcp_smoke_cf_http_file_text_countries.gcp.dataplex_data_quality_execution.json",
-          "midyear-system-499521-p3_contractforge_gcp_smoke_cf_http_file_text_countries.gcp.deployment_manifest.json",
-          "midyear-system-499521-p3_contractforge_gcp_smoke_cf_http_file_text_countries.gcp.evidence_ddl.sql",
-          "midyear-system-499521-p3_contractforge_gcp_smoke_cf_http_file_text_countries.gcp.manifest.json",
-          "midyear-system-499521-p3_contractforge_gcp_smoke_cf_http_file_text_countries.gcp.quality.sql",
-          "midyear-system-499521-p3_contractforge_gcp_smoke_cf_http_file_text_countries.gcp.review.md",
-          "midyear-system-499521-p3_contractforge_gcp_smoke_cf_http_file_text_countries.gcp.schema_policy.json",
-          "midyear-system-499521-p3_contractforge_gcp_smoke_cf_http_file_text_countries.gcp.source_materialization.json",
-          "midyear-system-499521-p3_contractforge_gcp_smoke_cf_http_file_text_countries.gcp.source_review.json",
-          "midyear-system-499521-p3_contractforge_gcp_smoke_cf_http_file_text_countries.gcp.source_review.md",
-          "midyear-system-499521-p3_contractforge_gcp_smoke_cf_http_file_text_countries.gcp.source_support.json",
-          "midyear-system-499521-p3_contractforge_gcp_smoke_cf_http_file_text_countries.gcp.write.sql"
+          "gcp-project-redacted_contractforge_gcp_smoke_cf_http_file_text_countries.gcp.capabilities.json",
+          "gcp-project-redacted_contractforge_gcp_smoke_cf_http_file_text_countries.gcp.contract.json",
+          "gcp-project-redacted_contractforge_gcp_smoke_cf_http_file_text_countries.gcp.dataplex_data_quality.json",
+          "gcp-project-redacted_contractforge_gcp_smoke_cf_http_file_text_countries.gcp.dataplex_data_quality_execution.json",
+          "gcp-project-redacted_contractforge_gcp_smoke_cf_http_file_text_countries.gcp.deployment_manifest.json",
+          "gcp-project-redacted_contractforge_gcp_smoke_cf_http_file_text_countries.gcp.evidence_ddl.sql",
+          "gcp-project-redacted_contractforge_gcp_smoke_cf_http_file_text_countries.gcp.manifest.json",
+          "gcp-project-redacted_contractforge_gcp_smoke_cf_http_file_text_countries.gcp.quality.sql",
+          "gcp-project-redacted_contractforge_gcp_smoke_cf_http_file_text_countries.gcp.review.md",
+          "gcp-project-redacted_contractforge_gcp_smoke_cf_http_file_text_countries.gcp.schema_policy.json",
+          "gcp-project-redacted_contractforge_gcp_smoke_cf_http_file_text_countries.gcp.source_materialization.json",
+          "gcp-project-redacted_contractforge_gcp_smoke_cf_http_file_text_countries.gcp.source_review.json",
+          "gcp-project-redacted_contractforge_gcp_smoke_cf_http_file_text_countries.gcp.source_review.md",
+          "gcp-project-redacted_contractforge_gcp_smoke_cf_http_file_text_countries.gcp.source_support.json",
+          "gcp-project-redacted_contractforge_gcp_smoke_cf_http_file_text_countries.gcp.write.sql"
         ],
         "blockers": [],
         "executed": true,
         "ok": true,
         "operations": [
           {
-            "artifact": "midyear-system-499521-p3_contractforge_gcp_smoke_cf_http_file_text_countries.gcp.evidence_ddl.sql",
+            "artifact": "gcp-project-redacted_contractforge_gcp_smoke_cf_http_file_text_countries.gcp.evidence_ddl.sql",
             "executed": true,
             "job": {
               "deleted_rows": null,
@@ -1283,27 +1283,27 @@
                   "query": {
                     "destinationTable": {
                       "datasetId": "contractforge_gcp_smoke_ops",
-                      "projectId": "midyear-system-499521-p3",
+                      "projectId": "gcp-project-redacted",
                       "tableId": "contractforge_lineage_evidence"
                     },
                     "priority": "INTERACTIVE",
-                    "query": "CREATE TABLE IF NOT EXISTS `midyear-system-499521-p3.contractforge_gcp_smoke_ops.contractforge_lineage_evidence` ( run_id STRING NOT NULL, target_table STRING NOT NULL, source_name STRING NOT NULL, event_json STRING NOT NULL, event_time TIMESTAMP, adapter STRING NOT NULL )",
+                    "query": "CREATE TABLE IF NOT EXISTS `gcp-project-redacted.contractforge_gcp_smoke_ops.contractforge_lineage_evidence` ( run_id STRING NOT NULL, target_table STRING NOT NULL, source_name STRING NOT NULL, event_json STRING NOT NULL, event_time TIMESTAMP, adapter STRING NOT NULL )",
                     "useLegacySql": false
                   }
                 },
                 "etag": "MQyVsZsVlCJKeUvBqP0osA==",
-                "id": "midyear-system-499521-p3:us-east1.cf_gcp_smoke_query_5f7a83d3dbc546938b2b",
+                "id": "gcp-project-redacted:us-east1.cf_gcp_smoke_query_5f7a83d3dbc546938b2b",
                 "jobCreationReason": {
                   "code": "REQUESTED"
                 },
                 "jobReference": {
                   "jobId": "cf_gcp_smoke_query_5f7a83d3dbc546938b2b",
                   "location": "us-east1",
-                  "projectId": "midyear-system-499521-p3"
+                  "projectId": "gcp-project-redacted"
                 },
                 "kind": "bigquery#job",
                 "principal_subject": "REDACTED",
-                "selfLink": "https://bigquery.googleapis.com/bigquery/v2/projects/midyear-system-499521-p3/jobs/cf_gcp_smoke_query_5f7a83d3dbc546938b2b?location=us-east1",
+                "selfLink": "https://bigquery.googleapis.com/bigquery/v2/projects/gcp-project-redacted/jobs/cf_gcp_smoke_query_5f7a83d3dbc546938b2b?location=us-east1",
                 "statistics": {
                   "creationTime": "1781695384135",
                   "endTime": "1781695384482",
@@ -1313,7 +1313,7 @@
                     "ddlOperationPerformed": "SKIP",
                     "ddlTargetTable": {
                       "datasetId": "contractforge_gcp_smoke_ops",
-                      "projectId": "midyear-system-499521-p3",
+                      "projectId": "gcp-project-redacted",
                       "tableId": "contractforge_lineage_evidence"
                     },
                     "performanceInsights": {},
@@ -1379,7 +1379,7 @@
             "name": "prepare_evidence"
           },
           {
-            "artifact": "midyear-system-499521-p3_contractforge_gcp_smoke_cf_http_file_text_countries.gcp.source_materialization.json",
+            "artifact": "gcp-project-redacted_contractforge_gcp_smoke_cf_http_file_text_countries.gcp.source_materialization.json",
             "executed": true,
             "job": {
               "deleted_rows": null,
@@ -1395,7 +1395,7 @@
                   "load": {
                     "destinationTable": {
                       "datasetId": "contractforge_gcp_smoke",
-                      "projectId": "midyear-system-499521-p3",
+                      "projectId": "gcp-project-redacted",
                       "tableId": "cf_http_file_text_countries"
                     },
                     "schema": {
@@ -1411,18 +1411,18 @@
                   }
                 },
                 "etag": "/sfieJHLk8fW3vzyp5ZYQg==",
-                "id": "midyear-system-499521-p3:us-east1.cf_gcp_smoke_load_file_9ef119a1a3924f0a8ad9",
+                "id": "gcp-project-redacted:us-east1.cf_gcp_smoke_load_file_9ef119a1a3924f0a8ad9",
                 "jobCreationReason": {
                   "code": "REQUESTED"
                 },
                 "jobReference": {
                   "jobId": "cf_gcp_smoke_load_file_9ef119a1a3924f0a8ad9",
                   "location": "us-east1",
-                  "projectId": "midyear-system-499521-p3"
+                  "projectId": "gcp-project-redacted"
                 },
                 "kind": "bigquery#job",
                 "principal_subject": "REDACTED",
-                "selfLink": "https://bigquery.googleapis.com/bigquery/v2/projects/midyear-system-499521-p3/jobs/cf_gcp_smoke_load_file_9ef119a1a3924f0a8ad9?location=us-east1",
+                "selfLink": "https://bigquery.googleapis.com/bigquery/v2/projects/gcp-project-redacted/jobs/cf_gcp_smoke_load_file_9ef119a1a3924f0a8ad9?location=us-east1",
                 "statistics": {
                   "completionRatio": 1,
                   "creationTime": "1781695394024",
@@ -1491,27 +1491,27 @@
                   "query": {
                     "destinationTable": {
                       "datasetId": "contractforge_gcp_smoke_ops",
-                      "projectId": "midyear-system-499521-p3",
+                      "projectId": "gcp-project-redacted",
                       "tableId": "contractforge_run_evidence"
                     },
                     "priority": "INTERACTIVE",
-                    "query": "INSERT INTO `midyear-system-499521-p3.contractforge_gcp_smoke_ops.contractforge_run_evidence` (`run_id`, `contract_name`, `target_table`, `adapter`, `status`, `started_at`, `finished_at`, `total_bytes_processed`, `total_bytes_billed`, `total_slot_ms`, `job_id`, `statement_type`, `inserted_rows`, `updated_rows`, `deleted_rows`, `error_message`) VALUES ('cf_gcp_smoke_load_file_9ef119a1a3924f0a8ad9', 'cf_http_file_text_countries', 'midyear-system-499521-p3.contractforge_gcp_smoke.cf_http_file_text_countries', 'gcp_bigquery', 'SUCCEEDED', TIMESTAMP_MILLIS(1781695394129), TIMESTAMP_MILLIS(1781695395467), NULL, NULL, 73, 'cf_gcp_smoke_load_file_9ef119a1a3924f0a8ad9', 'LOAD', NULL, NULL, NULL, NULL);",
+                    "query": "INSERT INTO `gcp-project-redacted.contractforge_gcp_smoke_ops.contractforge_run_evidence` (`run_id`, `contract_name`, `target_table`, `adapter`, `status`, `started_at`, `finished_at`, `total_bytes_processed`, `total_bytes_billed`, `total_slot_ms`, `job_id`, `statement_type`, `inserted_rows`, `updated_rows`, `deleted_rows`, `error_message`) VALUES ('cf_gcp_smoke_load_file_9ef119a1a3924f0a8ad9', 'cf_http_file_text_countries', 'gcp-project-redacted.contractforge_gcp_smoke.cf_http_file_text_countries', 'gcp_bigquery', 'SUCCEEDED', TIMESTAMP_MILLIS(1781695394129), TIMESTAMP_MILLIS(1781695395467), NULL, NULL, 73, 'cf_gcp_smoke_load_file_9ef119a1a3924f0a8ad9', 'LOAD', NULL, NULL, NULL, NULL);",
                     "useLegacySql": false
                   }
                 },
                 "etag": "RiVOvQuZv5qSUesaKq8ZUQ==",
-                "id": "midyear-system-499521-p3:us-east1.cf_gcp_smoke_query_b13105ab1ba64d5db2b8",
+                "id": "gcp-project-redacted:us-east1.cf_gcp_smoke_query_b13105ab1ba64d5db2b8",
                 "jobCreationReason": {
                   "code": "REQUESTED"
                 },
                 "jobReference": {
                   "jobId": "cf_gcp_smoke_query_b13105ab1ba64d5db2b8",
                   "location": "us-east1",
-                  "projectId": "midyear-system-499521-p3"
+                  "projectId": "gcp-project-redacted"
                 },
                 "kind": "bigquery#job",
                 "principal_subject": "REDACTED",
-                "selfLink": "https://bigquery.googleapis.com/bigquery/v2/projects/midyear-system-499521-p3/jobs/cf_gcp_smoke_query_b13105ab1ba64d5db2b8?location=us-east1",
+                "selfLink": "https://bigquery.googleapis.com/bigquery/v2/projects/gcp-project-redacted/jobs/cf_gcp_smoke_query_b13105ab1ba64d5db2b8?location=us-east1",
                 "statistics": {
                   "creationTime": "1781695403559",
                   "endTime": "1781695405127",
@@ -1565,7 +1565,7 @@
                             "kind": "COMPUTE",
                             "substeps": [
                               "$1 := 'cf_http_file_text_countries'",
-                              "$2 := 'midyear-system-499521-p3.contractforge_gcp_smoke.cf_http_file_text_countries'",
+                              "$2 := 'gcp-project-redacted.contractforge_gcp_smoke.cf_http_file_text_countries'",
                               "$3 := 'gcp_bigquery'",
                               "$4 := 'SUCCEEDED'",
                               "$5 := 1781695394.129000000",
@@ -1697,7 +1697,7 @@
                     "referencedTables": [
                       {
                         "datasetId": "contractforge_gcp_smoke_ops",
-                        "projectId": "midyear-system-499521-p3",
+                        "projectId": "gcp-project-redacted",
                         "tableId": "contractforge_run_evidence"
                       }
                     ],
@@ -1763,27 +1763,27 @@
                   "query": {
                     "destinationTable": {
                       "datasetId": "contractforge_gcp_smoke_ops",
-                      "projectId": "midyear-system-499521-p3",
+                      "projectId": "gcp-project-redacted",
                       "tableId": "contractforge_lineage_evidence"
                     },
                     "priority": "INTERACTIVE",
-                    "query": "INSERT INTO `midyear-system-499521-p3.contractforge_gcp_smoke_ops.contractforge_lineage_evidence` (`run_id`, `target_table`, `source_name`, `event_json`, `event_time`, `adapter`) VALUES ('cf_gcp_smoke_load_file_9ef119a1a3924f0a8ad9', 'midyear-system-499521-p3.contractforge_gcp_smoke.cf_http_file_text_countries', 'midyear-system-499521-p3.contractforge_gcp_smoke._staging_cf_http_file_text_countries', '{\"eventTime\":\"2026-06-17T11:23:15.467000+00:00\",\"eventType\":\"COMPLETE\",\"facets\":{\"contractforge\":{\"_producer\":\"contractforge-gcp\",\"_schemaURL\":\"https://openlineage.io/spec/facets/1-0-0/RunFacet.json\",\"finishedAt\":\"2026-06-17T11:23:15.467000+00:00\",\"layer\":\"bronze\",\"mode\":\"scd0_overwrite\",\"operationMetrics\":{\"jobId\":\"cf_gcp_smoke_load_file_9ef119a1a3924f0a8ad9\",\"jobType\":\"LOAD\",\"outputRows\":195,\"totalSlotMs\":73},\"rowsRead\":195,\"rowsWritten\":195,\"startedAt\":\"2026-06-17T11:23:14.129000+00:00\"}},\"inputs\":[{\"facets\":{\"schema\":{\"_producer\":\"contractforge-gcp\",\"_schemaURL\":\"https://openlineage.io/spec/facets/1-0-0/SchemaDatasetFacet.json\",\"fields\":[]}},\"name\":\"midyear-system-499521-p3.contractforge_gcp_smoke._staging_cf_http_file_text_countries\",\"namespace\":\"bigquery://midyear-system-499521-p3\"}],\"job\":{\"facets\":{},\"name\":\"bronze.cf_http_file_text_countries.scd0_overwrite\",\"namespace\":\"bigquery://midyear-system-499521-p3\"},\"outputs\":[{\"facets\":{\"dataQualityMetrics\":{\"_producer\":\"contractforge-gcp\",\"_schemaURL\":\"https://openlineage.io/spec/facets/1-0-0/DataQualityMetricsOutputDatasetFacet.json\",\"rowCount\":195},\"schema\":{\"_producer\":\"contractforge-gcp\",\"_schemaURL\":\"https://openlineage.io/spec/facets/1-0-0/SchemaDatasetFacet.json\",\"fields\":[]}},\"name\":\"midyear-system-499521-p3.contractforge_gcp_smoke.cf_http_file_text_countries\",\"namespace\":\"bigquery://midyear-system-499521-p3\"}],\"producer\":\"contractforge-gcp\",\"run\":{\"facets\":{\"processing_engine\":{\"_producer\":\"contractforge-gcp\",\"_schemaURL\":\"https://openlineage.io/spec/facets/1-0-0/ProcessingEngineRunFacet.json\",\"name\":\"bigquery\"}},\"runId\":\"cf_gcp_smoke_load_file_9ef119a1a3924f0a8ad9\"},\"schemaURL\":\"https://openlineage.io/spec/1-0-5/OpenLineage.json\"}', TIMESTAMP '2026-06-17T11:23:15.467000+00:00', 'gcp_bigquery');",
+                    "query": "INSERT INTO `gcp-project-redacted.contractforge_gcp_smoke_ops.contractforge_lineage_evidence` (`run_id`, `target_table`, `source_name`, `event_json`, `event_time`, `adapter`) VALUES ('cf_gcp_smoke_load_file_9ef119a1a3924f0a8ad9', 'gcp-project-redacted.contractforge_gcp_smoke.cf_http_file_text_countries', 'gcp-project-redacted.contractforge_gcp_smoke._staging_cf_http_file_text_countries', '{\"eventTime\":\"2026-06-17T11:23:15.467000+00:00\",\"eventType\":\"COMPLETE\",\"facets\":{\"contractforge\":{\"_producer\":\"contractforge-gcp\",\"_schemaURL\":\"https://openlineage.io/spec/facets/1-0-0/RunFacet.json\",\"finishedAt\":\"2026-06-17T11:23:15.467000+00:00\",\"layer\":\"bronze\",\"mode\":\"scd0_overwrite\",\"operationMetrics\":{\"jobId\":\"cf_gcp_smoke_load_file_9ef119a1a3924f0a8ad9\",\"jobType\":\"LOAD\",\"outputRows\":195,\"totalSlotMs\":73},\"rowsRead\":195,\"rowsWritten\":195,\"startedAt\":\"2026-06-17T11:23:14.129000+00:00\"}},\"inputs\":[{\"facets\":{\"schema\":{\"_producer\":\"contractforge-gcp\",\"_schemaURL\":\"https://openlineage.io/spec/facets/1-0-0/SchemaDatasetFacet.json\",\"fields\":[]}},\"name\":\"gcp-project-redacted.contractforge_gcp_smoke._staging_cf_http_file_text_countries\",\"namespace\":\"bigquery://gcp-project-redacted\"}],\"job\":{\"facets\":{},\"name\":\"bronze.cf_http_file_text_countries.scd0_overwrite\",\"namespace\":\"bigquery://gcp-project-redacted\"},\"outputs\":[{\"facets\":{\"dataQualityMetrics\":{\"_producer\":\"contractforge-gcp\",\"_schemaURL\":\"https://openlineage.io/spec/facets/1-0-0/DataQualityMetricsOutputDatasetFacet.json\",\"rowCount\":195},\"schema\":{\"_producer\":\"contractforge-gcp\",\"_schemaURL\":\"https://openlineage.io/spec/facets/1-0-0/SchemaDatasetFacet.json\",\"fields\":[]}},\"name\":\"gcp-project-redacted.contractforge_gcp_smoke.cf_http_file_text_countries\",\"namespace\":\"bigquery://gcp-project-redacted\"}],\"producer\":\"contractforge-gcp\",\"run\":{\"facets\":{\"processing_engine\":{\"_producer\":\"contractforge-gcp\",\"_schemaURL\":\"https://openlineage.io/spec/facets/1-0-0/ProcessingEngineRunFacet.json\",\"name\":\"bigquery\"}},\"runId\":\"cf_gcp_smoke_load_file_9ef119a1a3924f0a8ad9\"},\"schemaURL\":\"https://openlineage.io/spec/1-0-5/OpenLineage.json\"}', TIMESTAMP '2026-06-17T11:23:15.467000+00:00', 'gcp_bigquery');",
                     "useLegacySql": false
                   }
                 },
                 "etag": "Uk7kJQr83e11COBuE1wEAg==",
-                "id": "midyear-system-499521-p3:us-east1.cf_gcp_smoke_query_4f03566a10a34ab58f84",
+                "id": "gcp-project-redacted:us-east1.cf_gcp_smoke_query_4f03566a10a34ab58f84",
                 "jobCreationReason": {
                   "code": "REQUESTED"
                 },
                 "jobReference": {
                   "jobId": "cf_gcp_smoke_query_4f03566a10a34ab58f84",
                   "location": "us-east1",
-                  "projectId": "midyear-system-499521-p3"
+                  "projectId": "gcp-project-redacted"
                 },
                 "kind": "bigquery#job",
                 "principal_subject": "REDACTED",
-                "selfLink": "https://bigquery.googleapis.com/bigquery/v2/projects/midyear-system-499521-p3/jobs/cf_gcp_smoke_query_4f03566a10a34ab58f84?location=us-east1",
+                "selfLink": "https://bigquery.googleapis.com/bigquery/v2/projects/gcp-project-redacted/jobs/cf_gcp_smoke_query_4f03566a10a34ab58f84?location=us-east1",
                 "statistics": {
                   "creationTime": "1781695412778",
                   "endTime": "1781695414291",
@@ -1837,9 +1837,9 @@
                             "kind": "COMPUTE",
                             "substeps": [
                               "$1 := 'cf_gcp_smoke_load_file_9ef119a1a3924f0a8ad9'",
-                              "$2 := 'midyear-system-499521-p3.contractforge_gcp_smoke.cf_http_file_text_countries'",
-                              "$3 := 'midyear-system-499521-p3.contractforge_gcp_smoke._staging_cf_http_file_text_countries'",
-                              "$4 := '{\"eventTime\":\"2026-06-17T11:23:15.467000+00:00\",\"eventType\":\"COMPLETE\",\"facets\":{\"contractforge\":{\"_producer\":\"contractforge-gcp\",\"_schemaURL\":\"https://openlineage.io/spec/facets/1-0-0/RunFacet.json\",\"finishedAt\":\"2026-06-17T11:23:15.467000+00:00\",\"layer\":\"bronze\",\"mode\":\"scd0_overwrite\",\"operationMetrics\":{\"jobId\":\"cf_gcp_smoke_load_file_9ef119a1a3924f0a8ad9\",\"jobType\":\"LOAD\",\"outputRows\":195,\"totalSlotMs\":73},\"rowsRead\":195,\"rowsWritten\":195,\"startedAt\":\"2026-06-17T11:23:14.129000+00:00\"}},\"inputs\":[{\"facets\":{\"schema\":{\"_producer\":\"contractforge-gcp\",\"_schemaURL\":\"https://openlineage.io/spec/facets/1-0-0/SchemaDatasetFacet.json\",\"fields\":[]}},\"name\":\"midyear-system-499521-p3.contractforge_gcp_smoke._staging_cf_http_file_text_countries\",\"namespace\":\"bigquery://midyear-system-499521-p3\"}],\"job\":{\"facets\":{},\"name\":\"bronze.cf_http_file_text_countries.scd0_overwrite\",\"namespace\":\"bigquery://midyear-system-499521-p3\"},\"outputs\":[{\"facets\":{\"dataQualityMetrics\":{\"_producer\":\"contractforge-gcp\",\"_schemaURL\":\"https://openlineage.io/spec/facets/1-0-0/DataQualityMetricsOutputDatasetFacet.json\",\"rowCount\":195},\"schema\":{\"_producer\":\"contractforge-gcp\",\"_schemaURL\":\"https://openlineage.io/spec/facets/1-0-0/SchemaDatasetFacet.json\",\"fields\":[]}},\"name\":\"midyear-system-499521-p3.contractforge_gcp_smoke.cf_http_file_text_countries\",\"namespace\":\"bigquery://midyear-system-499521-p3\"}],\"producer\":\"contractforge-gcp\",\"run\":{\"facets\":{\"processing_engine\":{\"_producer\":\"contractforge-gcp\",\"_schemaURL\":\"https://openlineage.io/spec/facets/1-0-0/ProcessingEngineRunFacet.json\",\"name\":\"bigquery\"}},\"runId\":\"cf_gcp_smoke_load_file_9ef119a1a3924f0a8ad9\"},\"schemaURL\":\"https://openlineage.io/spec/1-0-5/OpenLineage.json\"}'",
+                              "$2 := 'gcp-project-redacted.contractforge_gcp_smoke.cf_http_file_text_countries'",
+                              "$3 := 'gcp-project-redacted.contractforge_gcp_smoke._staging_cf_http_file_text_countries'",
+                              "$4 := '{\"eventTime\":\"2026-06-17T11:23:15.467000+00:00\",\"eventType\":\"COMPLETE\",\"facets\":{\"contractforge\":{\"_producer\":\"contractforge-gcp\",\"_schemaURL\":\"https://openlineage.io/spec/facets/1-0-0/RunFacet.json\",\"finishedAt\":\"2026-06-17T11:23:15.467000+00:00\",\"layer\":\"bronze\",\"mode\":\"scd0_overwrite\",\"operationMetrics\":{\"jobId\":\"cf_gcp_smoke_load_file_9ef119a1a3924f0a8ad9\",\"jobType\":\"LOAD\",\"outputRows\":195,\"totalSlotMs\":73},\"rowsRead\":195,\"rowsWritten\":195,\"startedAt\":\"2026-06-17T11:23:14.129000+00:00\"}},\"inputs\":[{\"facets\":{\"schema\":{\"_producer\":\"contractforge-gcp\",\"_schemaURL\":\"https://openlineage.io/spec/facets/1-0-0/SchemaDatasetFacet.json\",\"fields\":[]}},\"name\":\"gcp-project-redacted.contractforge_gcp_smoke._staging_cf_http_file_text_countries\",\"namespace\":\"bigquery://gcp-project-redacted\"}],\"job\":{\"facets\":{},\"name\":\"bronze.cf_http_file_text_countries.scd0_overwrite\",\"namespace\":\"bigquery://gcp-project-redacted\"},\"outputs\":[{\"facets\":{\"dataQualityMetrics\":{\"_producer\":\"contractforge-gcp\",\"_schemaURL\":\"https://openlineage.io/spec/facets/1-0-0/DataQualityMetricsOutputDatasetFacet.json\",\"rowCount\":195},\"schema\":{\"_producer\":\"contractforge-gcp\",\"_schemaURL\":\"https://openlineage.io/spec/facets/1-0-0/SchemaDatasetFacet.json\",\"fields\":[]}},\"name\":\"gcp-project-redacted.contractforge_gcp_smoke.cf_http_file_text_countries\",\"namespace\":\"bigquery://gcp-project-redacted\"}],\"producer\":\"contractforge-gcp\",\"run\":{\"facets\":{\"processing_engine\":{\"_producer\":\"contractforge-gcp\",\"_schemaURL\":\"https://openlineage.io/spec/facets/1-0-0/ProcessingEngineRunFacet.json\",\"name\":\"bigquery\"}},\"runId\":\"cf_gcp_smoke_load_file_9ef119a1a3924f0a8ad9\"},\"schemaURL\":\"https://openlineage.io/spec/1-0-5/OpenLineage.json\"}'",
                               "$5 := 1781695395.467000000",
                               "$6 := 'gcp_bigquery'"
                             ]
@@ -1964,7 +1964,7 @@
                     "referencedTables": [
                       {
                         "datasetId": "contractforge_gcp_smoke_ops",
-                        "projectId": "midyear-system-499521-p3",
+                        "projectId": "gcp-project-redacted",
                         "tableId": "contractforge_lineage_evidence"
                       }
                     ],
@@ -2006,7 +2006,7 @@
             "name": "persist_lineage_evidence"
           },
           {
-            "artifact": "midyear-system-499521-p3_contractforge_gcp_smoke_cf_http_file_text_countries.gcp.quality.sql",
+            "artifact": "gcp-project-redacted_contractforge_gcp_smoke_cf_http_file_text_countries.gcp.quality.sql",
             "executed": true,
             "job": {
               "deleted_rows": null,
@@ -2022,28 +2022,28 @@
                   "query": {
                     "destinationTable": {
                       "datasetId": "_7566643d7ecc0c17bfb144ec0d63d8182baae0ba",
-                      "projectId": "midyear-system-499521-p3",
+                      "projectId": "gcp-project-redacted",
                       "tableId": "anon1f86d7a37ae38edc2f8e282d8e2e61e55c642f1a3657b79935fa63ce9c01a2da"
                     },
                     "priority": "INTERACTIVE",
-                    "query": "SELECT COUNT(*) AS failed_rows FROM `midyear-system-499521-p3.contractforge_gcp_smoke.cf_http_file_text_countries` WHERE `payload_line` IS NULL",
+                    "query": "SELECT COUNT(*) AS failed_rows FROM `gcp-project-redacted.contractforge_gcp_smoke.cf_http_file_text_countries` WHERE `payload_line` IS NULL",
                     "useLegacySql": false,
                     "writeDisposition": "WRITE_TRUNCATE"
                   }
                 },
                 "etag": "hS4PCi9QyTvsqNX5aKPc6Q==",
-                "id": "midyear-system-499521-p3:us-east1.cf_gcp_smoke_query_b902b4da41af46019d5e",
+                "id": "gcp-project-redacted:us-east1.cf_gcp_smoke_query_b902b4da41af46019d5e",
                 "jobCreationReason": {
                   "code": "REQUESTED"
                 },
                 "jobReference": {
                   "jobId": "cf_gcp_smoke_query_b902b4da41af46019d5e",
                   "location": "us-east1",
-                  "projectId": "midyear-system-499521-p3"
+                  "projectId": "gcp-project-redacted"
                 },
                 "kind": "bigquery#job",
                 "principal_subject": "REDACTED",
-                "selfLink": "https://bigquery.googleapis.com/bigquery/v2/projects/midyear-system-499521-p3/jobs/cf_gcp_smoke_query_b902b4da41af46019d5e?location=us-east1",
+                "selfLink": "https://bigquery.googleapis.com/bigquery/v2/projects/gcp-project-redacted/jobs/cf_gcp_smoke_query_b902b4da41af46019d5e?location=us-east1",
                 "statistics": {
                   "creationTime": "1781695421518",
                   "endTime": "1781695421834",
@@ -2058,7 +2058,7 @@
                           "explanation": "Table does not have CMETA.",
                           "tableReference": {
                             "datasetId": "contractforge_gcp_smoke",
-                            "projectId": "midyear-system-499521-p3",
+                            "projectId": "gcp-project-redacted",
                             "tableId": "cf_http_file_text_countries"
                           },
                           "unusedReason": "OTHER_REASON"
@@ -2108,7 +2108,7 @@
                             "kind": "READ",
                             "substeps": [
                               "$1:payload_line",
-                              "FROM midyear-system-499521-p3.contractforge_gcp_smoke.cf_http_file_text_countries",
+                              "FROM gcp-project-redacted.contractforge_gcp_smoke.cf_http_file_text_countries",
                               "WHERE is_null($1)"
                             ]
                           },
@@ -2145,7 +2145,7 @@
                     "referencedTables": [
                       {
                         "datasetId": "contractforge_gcp_smoke",
-                        "projectId": "midyear-system-499521-p3",
+                        "projectId": "gcp-project-redacted",
                         "tableId": "cf_http_file_text_countries"
                       }
                     ],
@@ -2207,27 +2207,27 @@
                   "query": {
                     "destinationTable": {
                       "datasetId": "contractforge_gcp_smoke_ops",
-                      "projectId": "midyear-system-499521-p3",
+                      "projectId": "gcp-project-redacted",
                       "tableId": "contractforge_quality_evidence"
                     },
                     "priority": "INTERACTIVE",
-                    "query": "INSERT INTO `midyear-system-499521-p3.contractforge_gcp_smoke_ops.contractforge_quality_evidence` (`run_id`, `contract_name`, `rule_name`, `rule_type`, `status`, `failed_rows`, `evaluated_at`) VALUES ('cf_gcp_smoke_query_b902b4da41af46019d5e', 'cf_http_file_text_countries', 'payload_line_not_null', 'not_null', 'PASSED', 0, TIMESTAMP_MILLIS(1781695421834));",
+                    "query": "INSERT INTO `gcp-project-redacted.contractforge_gcp_smoke_ops.contractforge_quality_evidence` (`run_id`, `contract_name`, `rule_name`, `rule_type`, `status`, `failed_rows`, `evaluated_at`) VALUES ('cf_gcp_smoke_query_b902b4da41af46019d5e', 'cf_http_file_text_countries', 'payload_line_not_null', 'not_null', 'PASSED', 0, TIMESTAMP_MILLIS(1781695421834));",
                     "useLegacySql": false
                   }
                 },
                 "etag": "eWnboQcx80WSCEuVpyq+LA==",
-                "id": "midyear-system-499521-p3:us-east1.cf_gcp_smoke_query_b68088717123478db0c5",
+                "id": "gcp-project-redacted:us-east1.cf_gcp_smoke_query_b68088717123478db0c5",
                 "jobCreationReason": {
                   "code": "REQUESTED"
                 },
                 "jobReference": {
                   "jobId": "cf_gcp_smoke_query_b68088717123478db0c5",
                   "location": "us-east1",
-                  "projectId": "midyear-system-499521-p3"
+                  "projectId": "gcp-project-redacted"
                 },
                 "kind": "bigquery#job",
                 "principal_subject": "REDACTED",
-                "selfLink": "https://bigquery.googleapis.com/bigquery/v2/projects/midyear-system-499521-p3/jobs/cf_gcp_smoke_query_b68088717123478db0c5?location=us-east1",
+                "selfLink": "https://bigquery.googleapis.com/bigquery/v2/projects/gcp-project-redacted/jobs/cf_gcp_smoke_query_b68088717123478db0c5?location=us-east1",
                 "statistics": {
                   "creationTime": "1781695429754",
                   "endTime": "1781695431139",
@@ -2409,7 +2409,7 @@
                     "referencedTables": [
                       {
                         "datasetId": "contractforge_gcp_smoke_ops",
-                        "projectId": "midyear-system-499521-p3",
+                        "projectId": "gcp-project-redacted",
                         "tableId": "contractforge_quality_evidence"
                       }
                     ],
@@ -2479,28 +2479,28 @@
       "ok": true,
       "result": {
         "artifacts": [
-          "midyear-system-499521-p3_contractforge_gcp_smoke_cf_http_file_json_todo.gcp.capabilities.json",
-          "midyear-system-499521-p3_contractforge_gcp_smoke_cf_http_file_json_todo.gcp.contract.json",
-          "midyear-system-499521-p3_contractforge_gcp_smoke_cf_http_file_json_todo.gcp.dataplex_data_quality.json",
-          "midyear-system-499521-p3_contractforge_gcp_smoke_cf_http_file_json_todo.gcp.dataplex_data_quality_execution.json",
-          "midyear-system-499521-p3_contractforge_gcp_smoke_cf_http_file_json_todo.gcp.deployment_manifest.json",
-          "midyear-system-499521-p3_contractforge_gcp_smoke_cf_http_file_json_todo.gcp.evidence_ddl.sql",
-          "midyear-system-499521-p3_contractforge_gcp_smoke_cf_http_file_json_todo.gcp.manifest.json",
-          "midyear-system-499521-p3_contractforge_gcp_smoke_cf_http_file_json_todo.gcp.quality.sql",
-          "midyear-system-499521-p3_contractforge_gcp_smoke_cf_http_file_json_todo.gcp.review.md",
-          "midyear-system-499521-p3_contractforge_gcp_smoke_cf_http_file_json_todo.gcp.schema_policy.json",
-          "midyear-system-499521-p3_contractforge_gcp_smoke_cf_http_file_json_todo.gcp.source_materialization.json",
-          "midyear-system-499521-p3_contractforge_gcp_smoke_cf_http_file_json_todo.gcp.source_review.json",
-          "midyear-system-499521-p3_contractforge_gcp_smoke_cf_http_file_json_todo.gcp.source_review.md",
-          "midyear-system-499521-p3_contractforge_gcp_smoke_cf_http_file_json_todo.gcp.source_support.json",
-          "midyear-system-499521-p3_contractforge_gcp_smoke_cf_http_file_json_todo.gcp.write.sql"
+          "gcp-project-redacted_contractforge_gcp_smoke_cf_http_file_json_todo.gcp.capabilities.json",
+          "gcp-project-redacted_contractforge_gcp_smoke_cf_http_file_json_todo.gcp.contract.json",
+          "gcp-project-redacted_contractforge_gcp_smoke_cf_http_file_json_todo.gcp.dataplex_data_quality.json",
+          "gcp-project-redacted_contractforge_gcp_smoke_cf_http_file_json_todo.gcp.dataplex_data_quality_execution.json",
+          "gcp-project-redacted_contractforge_gcp_smoke_cf_http_file_json_todo.gcp.deployment_manifest.json",
+          "gcp-project-redacted_contractforge_gcp_smoke_cf_http_file_json_todo.gcp.evidence_ddl.sql",
+          "gcp-project-redacted_contractforge_gcp_smoke_cf_http_file_json_todo.gcp.manifest.json",
+          "gcp-project-redacted_contractforge_gcp_smoke_cf_http_file_json_todo.gcp.quality.sql",
+          "gcp-project-redacted_contractforge_gcp_smoke_cf_http_file_json_todo.gcp.review.md",
+          "gcp-project-redacted_contractforge_gcp_smoke_cf_http_file_json_todo.gcp.schema_policy.json",
+          "gcp-project-redacted_contractforge_gcp_smoke_cf_http_file_json_todo.gcp.source_materialization.json",
+          "gcp-project-redacted_contractforge_gcp_smoke_cf_http_file_json_todo.gcp.source_review.json",
+          "gcp-project-redacted_contractforge_gcp_smoke_cf_http_file_json_todo.gcp.source_review.md",
+          "gcp-project-redacted_contractforge_gcp_smoke_cf_http_file_json_todo.gcp.source_support.json",
+          "gcp-project-redacted_contractforge_gcp_smoke_cf_http_file_json_todo.gcp.write.sql"
         ],
         "blockers": [],
         "executed": true,
         "ok": true,
         "operations": [
           {
-            "artifact": "midyear-system-499521-p3_contractforge_gcp_smoke_cf_http_file_json_todo.gcp.evidence_ddl.sql",
+            "artifact": "gcp-project-redacted_contractforge_gcp_smoke_cf_http_file_json_todo.gcp.evidence_ddl.sql",
             "executed": true,
             "job": {
               "deleted_rows": null,
@@ -2516,27 +2516,27 @@
                   "query": {
                     "destinationTable": {
                       "datasetId": "contractforge_gcp_smoke_ops",
-                      "projectId": "midyear-system-499521-p3",
+                      "projectId": "gcp-project-redacted",
                       "tableId": "contractforge_lineage_evidence"
                     },
                     "priority": "INTERACTIVE",
-                    "query": "CREATE TABLE IF NOT EXISTS `midyear-system-499521-p3.contractforge_gcp_smoke_ops.contractforge_lineage_evidence` ( run_id STRING NOT NULL, target_table STRING NOT NULL, source_name STRING NOT NULL, event_json STRING NOT NULL, event_time TIMESTAMP, adapter STRING NOT NULL )",
+                    "query": "CREATE TABLE IF NOT EXISTS `gcp-project-redacted.contractforge_gcp_smoke_ops.contractforge_lineage_evidence` ( run_id STRING NOT NULL, target_table STRING NOT NULL, source_name STRING NOT NULL, event_json STRING NOT NULL, event_time TIMESTAMP, adapter STRING NOT NULL )",
                     "useLegacySql": false
                   }
                 },
                 "etag": "G5DZUb7gpH+zfOcbXMPIvw==",
-                "id": "midyear-system-499521-p3:us-east1.cf_gcp_smoke_query_825df05dfe35465c83f5",
+                "id": "gcp-project-redacted:us-east1.cf_gcp_smoke_query_825df05dfe35465c83f5",
                 "jobCreationReason": {
                   "code": "REQUESTED"
                 },
                 "jobReference": {
                   "jobId": "cf_gcp_smoke_query_825df05dfe35465c83f5",
                   "location": "us-east1",
-                  "projectId": "midyear-system-499521-p3"
+                  "projectId": "gcp-project-redacted"
                 },
                 "kind": "bigquery#job",
                 "principal_subject": "REDACTED",
-                "selfLink": "https://bigquery.googleapis.com/bigquery/v2/projects/midyear-system-499521-p3/jobs/cf_gcp_smoke_query_825df05dfe35465c83f5?location=us-east1",
+                "selfLink": "https://bigquery.googleapis.com/bigquery/v2/projects/gcp-project-redacted/jobs/cf_gcp_smoke_query_825df05dfe35465c83f5?location=us-east1",
                 "statistics": {
                   "creationTime": "1781695487772",
                   "endTime": "1781695487953",
@@ -2546,7 +2546,7 @@
                     "ddlOperationPerformed": "SKIP",
                     "ddlTargetTable": {
                       "datasetId": "contractforge_gcp_smoke_ops",
-                      "projectId": "midyear-system-499521-p3",
+                      "projectId": "gcp-project-redacted",
                       "tableId": "contractforge_lineage_evidence"
                     },
                     "performanceInsights": {},
@@ -2612,7 +2612,7 @@
             "name": "prepare_evidence"
           },
           {
-            "artifact": "midyear-system-499521-p3_contractforge_gcp_smoke_cf_http_file_json_todo.gcp.source_materialization.json",
+            "artifact": "gcp-project-redacted_contractforge_gcp_smoke_cf_http_file_json_todo.gcp.source_materialization.json",
             "executed": true,
             "job": {
               "deleted_rows": null,
@@ -2628,7 +2628,7 @@
                   "load": {
                     "destinationTable": {
                       "datasetId": "contractforge_gcp_smoke",
-                      "projectId": "midyear-system-499521-p3",
+                      "projectId": "gcp-project-redacted",
                       "tableId": "cf_http_file_json_todo"
                     },
                     "schema": {
@@ -2656,18 +2656,18 @@
                   }
                 },
                 "etag": "LhSMyILhDXhxuaYA8Bl2ZA==",
-                "id": "midyear-system-499521-p3:us-east1.cf_gcp_smoke_load_file_01b0a80c1c204d96b1d7",
+                "id": "gcp-project-redacted:us-east1.cf_gcp_smoke_load_file_01b0a80c1c204d96b1d7",
                 "jobCreationReason": {
                   "code": "REQUESTED"
                 },
                 "jobReference": {
                   "jobId": "cf_gcp_smoke_load_file_01b0a80c1c204d96b1d7",
                   "location": "us-east1",
-                  "projectId": "midyear-system-499521-p3"
+                  "projectId": "gcp-project-redacted"
                 },
                 "kind": "bigquery#job",
                 "principal_subject": "REDACTED",
-                "selfLink": "https://bigquery.googleapis.com/bigquery/v2/projects/midyear-system-499521-p3/jobs/cf_gcp_smoke_load_file_01b0a80c1c204d96b1d7?location=us-east1",
+                "selfLink": "https://bigquery.googleapis.com/bigquery/v2/projects/gcp-project-redacted/jobs/cf_gcp_smoke_load_file_01b0a80c1c204d96b1d7?location=us-east1",
                 "statistics": {
                   "completionRatio": 0,
                   "creationTime": "1781695498471",
@@ -2735,27 +2735,27 @@
                   "query": {
                     "destinationTable": {
                       "datasetId": "contractforge_gcp_smoke_ops",
-                      "projectId": "midyear-system-499521-p3",
+                      "projectId": "gcp-project-redacted",
                       "tableId": "contractforge_run_evidence"
                     },
                     "priority": "INTERACTIVE",
-                    "query": "INSERT INTO `midyear-system-499521-p3.contractforge_gcp_smoke_ops.contractforge_run_evidence` (`run_id`, `contract_name`, `target_table`, `adapter`, `status`, `started_at`, `finished_at`, `total_bytes_processed`, `total_bytes_billed`, `total_slot_ms`, `job_id`, `statement_type`, `inserted_rows`, `updated_rows`, `deleted_rows`, `error_message`) VALUES ('cf_gcp_smoke_load_file_01b0a80c1c204d96b1d7', 'cf_http_file_json_todo', 'midyear-system-499521-p3.contractforge_gcp_smoke.cf_http_file_json_todo', 'gcp_bigquery', 'SUCCEEDED', TIMESTAMP_MILLIS(1781695498577), TIMESTAMP_MILLIS(1781695500347), NULL, NULL, 761, 'cf_gcp_smoke_load_file_01b0a80c1c204d96b1d7', 'LOAD', NULL, NULL, NULL, NULL);",
+                    "query": "INSERT INTO `gcp-project-redacted.contractforge_gcp_smoke_ops.contractforge_run_evidence` (`run_id`, `contract_name`, `target_table`, `adapter`, `status`, `started_at`, `finished_at`, `total_bytes_processed`, `total_bytes_billed`, `total_slot_ms`, `job_id`, `statement_type`, `inserted_rows`, `updated_rows`, `deleted_rows`, `error_message`) VALUES ('cf_gcp_smoke_load_file_01b0a80c1c204d96b1d7', 'cf_http_file_json_todo', 'gcp-project-redacted.contractforge_gcp_smoke.cf_http_file_json_todo', 'gcp_bigquery', 'SUCCEEDED', TIMESTAMP_MILLIS(1781695498577), TIMESTAMP_MILLIS(1781695500347), NULL, NULL, 761, 'cf_gcp_smoke_load_file_01b0a80c1c204d96b1d7', 'LOAD', NULL, NULL, NULL, NULL);",
                     "useLegacySql": false
                   }
                 },
                 "etag": "aWqoeHABdqCOe/aseHzyfQ==",
-                "id": "midyear-system-499521-p3:us-east1.cf_gcp_smoke_query_8446d02e71294c468d22",
+                "id": "gcp-project-redacted:us-east1.cf_gcp_smoke_query_8446d02e71294c468d22",
                 "jobCreationReason": {
                   "code": "REQUESTED"
                 },
                 "jobReference": {
                   "jobId": "cf_gcp_smoke_query_8446d02e71294c468d22",
                   "location": "us-east1",
-                  "projectId": "midyear-system-499521-p3"
+                  "projectId": "gcp-project-redacted"
                 },
                 "kind": "bigquery#job",
                 "principal_subject": "REDACTED",
-                "selfLink": "https://bigquery.googleapis.com/bigquery/v2/projects/midyear-system-499521-p3/jobs/cf_gcp_smoke_query_8446d02e71294c468d22?location=us-east1",
+                "selfLink": "https://bigquery.googleapis.com/bigquery/v2/projects/gcp-project-redacted/jobs/cf_gcp_smoke_query_8446d02e71294c468d22?location=us-east1",
                 "statistics": {
                   "creationTime": "1781695508372",
                   "endTime": "1781695509829",
@@ -2809,7 +2809,7 @@
                             "kind": "COMPUTE",
                             "substeps": [
                               "$1 := 'cf_http_file_json_todo'",
-                              "$2 := 'midyear-system-499521-p3.contractforge_gcp_smoke.cf_http_file_json_todo'",
+                              "$2 := 'gcp-project-redacted.contractforge_gcp_smoke.cf_http_file_json_todo'",
                               "$3 := 'gcp_bigquery'",
                               "$4 := 'SUCCEEDED'",
                               "$5 := 1781695498.577000000",
@@ -2941,7 +2941,7 @@
                     "referencedTables": [
                       {
                         "datasetId": "contractforge_gcp_smoke_ops",
-                        "projectId": "midyear-system-499521-p3",
+                        "projectId": "gcp-project-redacted",
                         "tableId": "contractforge_run_evidence"
                       }
                     ],
@@ -3007,27 +3007,27 @@
                   "query": {
                     "destinationTable": {
                       "datasetId": "contractforge_gcp_smoke_ops",
-                      "projectId": "midyear-system-499521-p3",
+                      "projectId": "gcp-project-redacted",
                       "tableId": "contractforge_lineage_evidence"
                     },
                     "priority": "INTERACTIVE",
-                    "query": "INSERT INTO `midyear-system-499521-p3.contractforge_gcp_smoke_ops.contractforge_lineage_evidence` (`run_id`, `target_table`, `source_name`, `event_json`, `event_time`, `adapter`) VALUES ('cf_gcp_smoke_load_file_01b0a80c1c204d96b1d7', 'midyear-system-499521-p3.contractforge_gcp_smoke.cf_http_file_json_todo', 'midyear-system-499521-p3.contractforge_gcp_smoke._staging_cf_http_file_json_todo', '{\"eventTime\":\"2026-06-17T11:25:00.347000+00:00\",\"eventType\":\"COMPLETE\",\"facets\":{\"contractforge\":{\"_producer\":\"contractforge-gcp\",\"_schemaURL\":\"https://openlineage.io/spec/facets/1-0-0/RunFacet.json\",\"finishedAt\":\"2026-06-17T11:25:00.347000+00:00\",\"layer\":\"bronze\",\"mode\":\"scd0_overwrite\",\"operationMetrics\":{\"jobId\":\"cf_gcp_smoke_load_file_01b0a80c1c204d96b1d7\",\"jobType\":\"LOAD\",\"outputRows\":1,\"totalSlotMs\":761},\"rowsRead\":1,\"rowsWritten\":1,\"startedAt\":\"2026-06-17T11:24:58.577000+00:00\"}},\"inputs\":[{\"facets\":{\"schema\":{\"_producer\":\"contractforge-gcp\",\"_schemaURL\":\"https://openlineage.io/spec/facets/1-0-0/SchemaDatasetFacet.json\",\"fields\":[]}},\"name\":\"midyear-system-499521-p3.contractforge_gcp_smoke._staging_cf_http_file_json_todo\",\"namespace\":\"bigquery://midyear-system-499521-p3\"}],\"job\":{\"facets\":{},\"name\":\"bronze.cf_http_file_json_todo.scd0_overwrite\",\"namespace\":\"bigquery://midyear-system-499521-p3\"},\"outputs\":[{\"facets\":{\"dataQualityMetrics\":{\"_producer\":\"contractforge-gcp\",\"_schemaURL\":\"https://openlineage.io/spec/facets/1-0-0/DataQualityMetricsOutputDatasetFacet.json\",\"rowCount\":1},\"schema\":{\"_producer\":\"contractforge-gcp\",\"_schemaURL\":\"https://openlineage.io/spec/facets/1-0-0/SchemaDatasetFacet.json\",\"fields\":[]}},\"name\":\"midyear-system-499521-p3.contractforge_gcp_smoke.cf_http_file_json_todo\",\"namespace\":\"bigquery://midyear-system-499521-p3\"}],\"producer\":\"contractforge-gcp\",\"run\":{\"facets\":{\"processing_engine\":{\"_producer\":\"contractforge-gcp\",\"_schemaURL\":\"https://openlineage.io/spec/facets/1-0-0/ProcessingEngineRunFacet.json\",\"name\":\"bigquery\"}},\"runId\":\"cf_gcp_smoke_load_file_01b0a80c1c204d96b1d7\"},\"schemaURL\":\"https://openlineage.io/spec/1-0-5/OpenLineage.json\"}', TIMESTAMP '2026-06-17T11:25:00.347000+00:00', 'gcp_bigquery');",
+                    "query": "INSERT INTO `gcp-project-redacted.contractforge_gcp_smoke_ops.contractforge_lineage_evidence` (`run_id`, `target_table`, `source_name`, `event_json`, `event_time`, `adapter`) VALUES ('cf_gcp_smoke_load_file_01b0a80c1c204d96b1d7', 'gcp-project-redacted.contractforge_gcp_smoke.cf_http_file_json_todo', 'gcp-project-redacted.contractforge_gcp_smoke._staging_cf_http_file_json_todo', '{\"eventTime\":\"2026-06-17T11:25:00.347000+00:00\",\"eventType\":\"COMPLETE\",\"facets\":{\"contractforge\":{\"_producer\":\"contractforge-gcp\",\"_schemaURL\":\"https://openlineage.io/spec/facets/1-0-0/RunFacet.json\",\"finishedAt\":\"2026-06-17T11:25:00.347000+00:00\",\"layer\":\"bronze\",\"mode\":\"scd0_overwrite\",\"operationMetrics\":{\"jobId\":\"cf_gcp_smoke_load_file_01b0a80c1c204d96b1d7\",\"jobType\":\"LOAD\",\"outputRows\":1,\"totalSlotMs\":761},\"rowsRead\":1,\"rowsWritten\":1,\"startedAt\":\"2026-06-17T11:24:58.577000+00:00\"}},\"inputs\":[{\"facets\":{\"schema\":{\"_producer\":\"contractforge-gcp\",\"_schemaURL\":\"https://openlineage.io/spec/facets/1-0-0/SchemaDatasetFacet.json\",\"fields\":[]}},\"name\":\"gcp-project-redacted.contractforge_gcp_smoke._staging_cf_http_file_json_todo\",\"namespace\":\"bigquery://gcp-project-redacted\"}],\"job\":{\"facets\":{},\"name\":\"bronze.cf_http_file_json_todo.scd0_overwrite\",\"namespace\":\"bigquery://gcp-project-redacted\"},\"outputs\":[{\"facets\":{\"dataQualityMetrics\":{\"_producer\":\"contractforge-gcp\",\"_schemaURL\":\"https://openlineage.io/spec/facets/1-0-0/DataQualityMetricsOutputDatasetFacet.json\",\"rowCount\":1},\"schema\":{\"_producer\":\"contractforge-gcp\",\"_schemaURL\":\"https://openlineage.io/spec/facets/1-0-0/SchemaDatasetFacet.json\",\"fields\":[]}},\"name\":\"gcp-project-redacted.contractforge_gcp_smoke.cf_http_file_json_todo\",\"namespace\":\"bigquery://gcp-project-redacted\"}],\"producer\":\"contractforge-gcp\",\"run\":{\"facets\":{\"processing_engine\":{\"_producer\":\"contractforge-gcp\",\"_schemaURL\":\"https://openlineage.io/spec/facets/1-0-0/ProcessingEngineRunFacet.json\",\"name\":\"bigquery\"}},\"runId\":\"cf_gcp_smoke_load_file_01b0a80c1c204d96b1d7\"},\"schemaURL\":\"https://openlineage.io/spec/1-0-5/OpenLineage.json\"}', TIMESTAMP '2026-06-17T11:25:00.347000+00:00', 'gcp_bigquery');",
                     "useLegacySql": false
                   }
                 },
                 "etag": "Y2/ouQx0zztNBcGoNCP4+g==",
-                "id": "midyear-system-499521-p3:us-east1.cf_gcp_smoke_query_cb308a91bed54deb8a6f",
+                "id": "gcp-project-redacted:us-east1.cf_gcp_smoke_query_cb308a91bed54deb8a6f",
                 "jobCreationReason": {
                   "code": "REQUESTED"
                 },
                 "jobReference": {
                   "jobId": "cf_gcp_smoke_query_cb308a91bed54deb8a6f",
                   "location": "us-east1",
-                  "projectId": "midyear-system-499521-p3"
+                  "projectId": "gcp-project-redacted"
                 },
                 "kind": "bigquery#job",
                 "principal_subject": "REDACTED",
-                "selfLink": "https://bigquery.googleapis.com/bigquery/v2/projects/midyear-system-499521-p3/jobs/cf_gcp_smoke_query_cb308a91bed54deb8a6f?location=us-east1",
+                "selfLink": "https://bigquery.googleapis.com/bigquery/v2/projects/gcp-project-redacted/jobs/cf_gcp_smoke_query_cb308a91bed54deb8a6f?location=us-east1",
                 "statistics": {
                   "creationTime": "1781695517819",
                   "endTime": "1781695519068",
@@ -3081,9 +3081,9 @@
                             "kind": "COMPUTE",
                             "substeps": [
                               "$1 := 'cf_gcp_smoke_load_file_01b0a80c1c204d96b1d7'",
-                              "$2 := 'midyear-system-499521-p3.contractforge_gcp_smoke.cf_http_file_json_todo'",
-                              "$3 := 'midyear-system-499521-p3.contractforge_gcp_smoke._staging_cf_http_file_json_todo'",
-                              "$4 := '{\"eventTime\":\"2026-06-17T11:25:00.347000+00:00\",\"eventType\":\"COMPLETE\",\"facets\":{\"contractforge\":{\"_producer\":\"contractforge-gcp\",\"_schemaURL\":\"https://openlineage.io/spec/facets/1-0-0/RunFacet.json\",\"finishedAt\":\"2026-06-17T11:25:00.347000+00:00\",\"layer\":\"bronze\",\"mode\":\"scd0_overwrite\",\"operationMetrics\":{\"jobId\":\"cf_gcp_smoke_load_file_01b0a80c1c204d96b1d7\",\"jobType\":\"LOAD\",\"outputRows\":1,\"totalSlotMs\":761},\"rowsRead\":1,\"rowsWritten\":1,\"startedAt\":\"2026-06-17T11:24:58.577000+00:00\"}},\"inputs\":[{\"facets\":{\"schema\":{\"_producer\":\"contractforge-gcp\",\"_schemaURL\":\"https://openlineage.io/spec/facets/1-0-0/SchemaDatasetFacet.json\",\"fields\":[]}},\"name\":\"midyear-system-499521-p3.contractforge_gcp_smoke._staging_cf_http_file_json_todo\",\"namespace\":\"bigquery://midyear-system-499521-p3\"}],\"job\":{\"facets\":{},\"name\":\"bronze.cf_http_file_json_todo.scd0_overwrite\",\"namespace\":\"bigquery://midyear-system-499521-p3\"},\"outputs\":[{\"facets\":{\"dataQualityMetrics\":{\"_producer\":\"contractforge-gcp\",\"_schemaURL\":\"https://openlineage.io/spec/facets/1-0-0/DataQualityMetricsOutputDatasetFacet.json\",\"rowCount\":1},\"schema\":{\"_producer\":\"contractforge-gcp\",\"_schemaURL\":\"https://openlineage.io/spec/facets/1-0-0/SchemaDatasetFacet.json\",\"fields\":[]}},\"name\":\"midyear-system-499521-p3.contractforge_gcp_smoke.cf_http_file_json_todo\",\"namespace\":\"bigquery://midyear-system-499521-p3\"}],\"producer\":\"contractforge-gcp\",\"run\":{\"facets\":{\"processing_engine\":{\"_producer\":\"contractforge-gcp\",\"_schemaURL\":\"https://openlineage.io/spec/facets/1-0-0/ProcessingEngineRunFacet.json\",\"name\":\"bigquery\"}},\"runId\":\"cf_gcp_smoke_load_file_01b0a80c1c204d96b1d7\"},\"schemaURL\":\"https://openlineage.io/spec/1-0-5/OpenLineage.json\"}'",
+                              "$2 := 'gcp-project-redacted.contractforge_gcp_smoke.cf_http_file_json_todo'",
+                              "$3 := 'gcp-project-redacted.contractforge_gcp_smoke._staging_cf_http_file_json_todo'",
+                              "$4 := '{\"eventTime\":\"2026-06-17T11:25:00.347000+00:00\",\"eventType\":\"COMPLETE\",\"facets\":{\"contractforge\":{\"_producer\":\"contractforge-gcp\",\"_schemaURL\":\"https://openlineage.io/spec/facets/1-0-0/RunFacet.json\",\"finishedAt\":\"2026-06-17T11:25:00.347000+00:00\",\"layer\":\"bronze\",\"mode\":\"scd0_overwrite\",\"operationMetrics\":{\"jobId\":\"cf_gcp_smoke_load_file_01b0a80c1c204d96b1d7\",\"jobType\":\"LOAD\",\"outputRows\":1,\"totalSlotMs\":761},\"rowsRead\":1,\"rowsWritten\":1,\"startedAt\":\"2026-06-17T11:24:58.577000+00:00\"}},\"inputs\":[{\"facets\":{\"schema\":{\"_producer\":\"contractforge-gcp\",\"_schemaURL\":\"https://openlineage.io/spec/facets/1-0-0/SchemaDatasetFacet.json\",\"fields\":[]}},\"name\":\"gcp-project-redacted.contractforge_gcp_smoke._staging_cf_http_file_json_todo\",\"namespace\":\"bigquery://gcp-project-redacted\"}],\"job\":{\"facets\":{},\"name\":\"bronze.cf_http_file_json_todo.scd0_overwrite\",\"namespace\":\"bigquery://gcp-project-redacted\"},\"outputs\":[{\"facets\":{\"dataQualityMetrics\":{\"_producer\":\"contractforge-gcp\",\"_schemaURL\":\"https://openlineage.io/spec/facets/1-0-0/DataQualityMetricsOutputDatasetFacet.json\",\"rowCount\":1},\"schema\":{\"_producer\":\"contractforge-gcp\",\"_schemaURL\":\"https://openlineage.io/spec/facets/1-0-0/SchemaDatasetFacet.json\",\"fields\":[]}},\"name\":\"gcp-project-redacted.contractforge_gcp_smoke.cf_http_file_json_todo\",\"namespace\":\"bigquery://gcp-project-redacted\"}],\"producer\":\"contractforge-gcp\",\"run\":{\"facets\":{\"processing_engine\":{\"_producer\":\"contractforge-gcp\",\"_schemaURL\":\"https://openlineage.io/spec/facets/1-0-0/ProcessingEngineRunFacet.json\",\"name\":\"bigquery\"}},\"runId\":\"cf_gcp_smoke_load_file_01b0a80c1c204d96b1d7\"},\"schemaURL\":\"https://openlineage.io/spec/1-0-5/OpenLineage.json\"}'",
                               "$5 := 1781695500.347000000",
                               "$6 := 'gcp_bigquery'"
                             ]
@@ -3208,7 +3208,7 @@
                     "referencedTables": [
                       {
                         "datasetId": "contractforge_gcp_smoke_ops",
-                        "projectId": "midyear-system-499521-p3",
+                        "projectId": "gcp-project-redacted",
                         "tableId": "contractforge_lineage_evidence"
                       }
                     ],
@@ -3258,7 +3258,7 @@
             "name": "persist_lineage_evidence"
           },
           {
-            "artifact": "midyear-system-499521-p3_contractforge_gcp_smoke_cf_http_file_json_todo.gcp.quality.sql",
+            "artifact": "gcp-project-redacted_contractforge_gcp_smoke_cf_http_file_json_todo.gcp.quality.sql",
             "executed": true,
             "job": {
               "deleted_rows": null,
@@ -3274,28 +3274,28 @@
                   "query": {
                     "destinationTable": {
                       "datasetId": "_7566643d7ecc0c17bfb144ec0d63d8182baae0ba",
-                      "projectId": "midyear-system-499521-p3",
+                      "projectId": "gcp-project-redacted",
                       "tableId": "anon11577b37ff059b4325af69e66745f08d596598d0e4c9882db776cbe762cbdbb6"
                     },
                     "priority": "INTERACTIVE",
-                    "query": "SELECT COUNT(*) AS failed_rows FROM `midyear-system-499521-p3.contractforge_gcp_smoke.cf_http_file_json_todo` WHERE `title` IS NULL",
+                    "query": "SELECT COUNT(*) AS failed_rows FROM `gcp-project-redacted.contractforge_gcp_smoke.cf_http_file_json_todo` WHERE `title` IS NULL",
                     "useLegacySql": false,
                     "writeDisposition": "WRITE_TRUNCATE"
                   }
                 },
                 "etag": "aJLktbLiwJ6IvciVh3O8pQ==",
-                "id": "midyear-system-499521-p3:us-east1.cf_gcp_smoke_query_c4a718f8d8ca4e70b450",
+                "id": "gcp-project-redacted:us-east1.cf_gcp_smoke_query_c4a718f8d8ca4e70b450",
                 "jobCreationReason": {
                   "code": "REQUESTED"
                 },
                 "jobReference": {
                   "jobId": "cf_gcp_smoke_query_c4a718f8d8ca4e70b450",
                   "location": "us-east1",
-                  "projectId": "midyear-system-499521-p3"
+                  "projectId": "gcp-project-redacted"
                 },
                 "kind": "bigquery#job",
                 "principal_subject": "REDACTED",
-                "selfLink": "https://bigquery.googleapis.com/bigquery/v2/projects/midyear-system-499521-p3/jobs/cf_gcp_smoke_query_c4a718f8d8ca4e70b450?location=us-east1",
+                "selfLink": "https://bigquery.googleapis.com/bigquery/v2/projects/gcp-project-redacted/jobs/cf_gcp_smoke_query_c4a718f8d8ca4e70b450?location=us-east1",
                 "statistics": {
                   "creationTime": "1781695535221",
                   "endTime": "1781695535512",
@@ -3310,7 +3310,7 @@
                           "explanation": "Table does not have CMETA.",
                           "tableReference": {
                             "datasetId": "contractforge_gcp_smoke",
-                            "projectId": "midyear-system-499521-p3",
+                            "projectId": "gcp-project-redacted",
                             "tableId": "cf_http_file_json_todo"
                           },
                           "unusedReason": "OTHER_REASON"
@@ -3360,7 +3360,7 @@
                             "kind": "READ",
                             "substeps": [
                               "$1:title",
-                              "FROM midyear-system-499521-p3.contractforge_gcp_smoke.cf_http_file_json_todo",
+                              "FROM gcp-project-redacted.contractforge_gcp_smoke.cf_http_file_json_todo",
                               "WHERE is_null($1)"
                             ]
                           },
@@ -3397,7 +3397,7 @@
                     "referencedTables": [
                       {
                         "datasetId": "contractforge_gcp_smoke",
-                        "projectId": "midyear-system-499521-p3",
+                        "projectId": "gcp-project-redacted",
                         "tableId": "cf_http_file_json_todo"
                       }
                     ],
@@ -3462,27 +3462,27 @@
                   "query": {
                     "destinationTable": {
                       "datasetId": "contractforge_gcp_smoke_ops",
-                      "projectId": "midyear-system-499521-p3",
+                      "projectId": "gcp-project-redacted",
                       "tableId": "contractforge_quality_evidence"
                     },
                     "priority": "INTERACTIVE",
-                    "query": "INSERT INTO `midyear-system-499521-p3.contractforge_gcp_smoke_ops.contractforge_quality_evidence` (`run_id`, `contract_name`, `rule_name`, `rule_type`, `status`, `failed_rows`, `evaluated_at`) VALUES ('cf_gcp_smoke_query_c4a718f8d8ca4e70b450', 'cf_http_file_json_todo', 'id_not_null', 'not_null', 'PASSED', 0, TIMESTAMP_MILLIS(1781695535512)), ('cf_gcp_smoke_query_c4a718f8d8ca4e70b450', 'cf_http_file_json_todo', 'title_not_null', 'not_null', 'PASSED', 0, TIMESTAMP_MILLIS(1781695535512));",
+                    "query": "INSERT INTO `gcp-project-redacted.contractforge_gcp_smoke_ops.contractforge_quality_evidence` (`run_id`, `contract_name`, `rule_name`, `rule_type`, `status`, `failed_rows`, `evaluated_at`) VALUES ('cf_gcp_smoke_query_c4a718f8d8ca4e70b450', 'cf_http_file_json_todo', 'id_not_null', 'not_null', 'PASSED', 0, TIMESTAMP_MILLIS(1781695535512)), ('cf_gcp_smoke_query_c4a718f8d8ca4e70b450', 'cf_http_file_json_todo', 'title_not_null', 'not_null', 'PASSED', 0, TIMESTAMP_MILLIS(1781695535512));",
                     "useLegacySql": false
                   }
                 },
                 "etag": "NV6CJsIHSk0QlkK3//v+qQ==",
-                "id": "midyear-system-499521-p3:us-east1.cf_gcp_smoke_query_7fbd4e4f7e47415c8f9f",
+                "id": "gcp-project-redacted:us-east1.cf_gcp_smoke_query_7fbd4e4f7e47415c8f9f",
                 "jobCreationReason": {
                   "code": "REQUESTED"
                 },
                 "jobReference": {
                   "jobId": "cf_gcp_smoke_query_7fbd4e4f7e47415c8f9f",
                   "location": "us-east1",
-                  "projectId": "midyear-system-499521-p3"
+                  "projectId": "gcp-project-redacted"
                 },
                 "kind": "bigquery#job",
                 "principal_subject": "REDACTED",
-                "selfLink": "https://bigquery.googleapis.com/bigquery/v2/projects/midyear-system-499521-p3/jobs/cf_gcp_smoke_query_7fbd4e4f7e47415c8f9f?location=us-east1",
+                "selfLink": "https://bigquery.googleapis.com/bigquery/v2/projects/gcp-project-redacted/jobs/cf_gcp_smoke_query_7fbd4e4f7e47415c8f9f?location=us-east1",
                 "statistics": {
                   "creationTime": "1781695543433",
                   "endTime": "1781695544786",
@@ -3676,7 +3676,7 @@
                     "referencedTables": [
                       {
                         "datasetId": "contractforge_gcp_smoke_ops",
-                        "projectId": "midyear-system-499521-p3",
+                        "projectId": "gcp-project-redacted",
                         "tableId": "contractforge_quality_evidence"
                       }
                     ],
@@ -3746,25 +3746,25 @@
       "ok": true,
       "result": {
         "artifacts": [
-          "midyear-system-499521-p3_contractforge_gcp_smoke_cf_http_file_csv_countries.gcp.capabilities.json",
-          "midyear-system-499521-p3_contractforge_gcp_smoke_cf_http_file_csv_countries.gcp.contract.json",
-          "midyear-system-499521-p3_contractforge_gcp_smoke_cf_http_file_csv_countries.gcp.deployment_manifest.json",
-          "midyear-system-499521-p3_contractforge_gcp_smoke_cf_http_file_csv_countries.gcp.evidence_ddl.sql",
-          "midyear-system-499521-p3_contractforge_gcp_smoke_cf_http_file_csv_countries.gcp.manifest.json",
-          "midyear-system-499521-p3_contractforge_gcp_smoke_cf_http_file_csv_countries.gcp.review.md",
-          "midyear-system-499521-p3_contractforge_gcp_smoke_cf_http_file_csv_countries.gcp.schema_policy.json",
-          "midyear-system-499521-p3_contractforge_gcp_smoke_cf_http_file_csv_countries.gcp.source_materialization.json",
-          "midyear-system-499521-p3_contractforge_gcp_smoke_cf_http_file_csv_countries.gcp.source_review.json",
-          "midyear-system-499521-p3_contractforge_gcp_smoke_cf_http_file_csv_countries.gcp.source_review.md",
-          "midyear-system-499521-p3_contractforge_gcp_smoke_cf_http_file_csv_countries.gcp.source_support.json",
-          "midyear-system-499521-p3_contractforge_gcp_smoke_cf_http_file_csv_countries.gcp.write.sql"
+          "gcp-project-redacted_contractforge_gcp_smoke_cf_http_file_csv_countries.gcp.capabilities.json",
+          "gcp-project-redacted_contractforge_gcp_smoke_cf_http_file_csv_countries.gcp.contract.json",
+          "gcp-project-redacted_contractforge_gcp_smoke_cf_http_file_csv_countries.gcp.deployment_manifest.json",
+          "gcp-project-redacted_contractforge_gcp_smoke_cf_http_file_csv_countries.gcp.evidence_ddl.sql",
+          "gcp-project-redacted_contractforge_gcp_smoke_cf_http_file_csv_countries.gcp.manifest.json",
+          "gcp-project-redacted_contractforge_gcp_smoke_cf_http_file_csv_countries.gcp.review.md",
+          "gcp-project-redacted_contractforge_gcp_smoke_cf_http_file_csv_countries.gcp.schema_policy.json",
+          "gcp-project-redacted_contractforge_gcp_smoke_cf_http_file_csv_countries.gcp.source_materialization.json",
+          "gcp-project-redacted_contractforge_gcp_smoke_cf_http_file_csv_countries.gcp.source_review.json",
+          "gcp-project-redacted_contractforge_gcp_smoke_cf_http_file_csv_countries.gcp.source_review.md",
+          "gcp-project-redacted_contractforge_gcp_smoke_cf_http_file_csv_countries.gcp.source_support.json",
+          "gcp-project-redacted_contractforge_gcp_smoke_cf_http_file_csv_countries.gcp.write.sql"
         ],
         "blockers": [],
         "executed": true,
         "ok": true,
         "operations": [
           {
-            "artifact": "midyear-system-499521-p3_contractforge_gcp_smoke_cf_http_file_csv_countries.gcp.evidence_ddl.sql",
+            "artifact": "gcp-project-redacted_contractforge_gcp_smoke_cf_http_file_csv_countries.gcp.evidence_ddl.sql",
             "executed": true,
             "job": {
               "deleted_rows": null,
@@ -3780,27 +3780,27 @@
                   "query": {
                     "destinationTable": {
                       "datasetId": "contractforge_gcp_smoke_ops",
-                      "projectId": "midyear-system-499521-p3",
+                      "projectId": "gcp-project-redacted",
                       "tableId": "contractforge_lineage_evidence"
                     },
                     "priority": "INTERACTIVE",
-                    "query": "CREATE TABLE IF NOT EXISTS `midyear-system-499521-p3.contractforge_gcp_smoke_ops.contractforge_lineage_evidence` ( run_id STRING NOT NULL, target_table STRING NOT NULL, source_name STRING NOT NULL, event_json STRING NOT NULL, event_time TIMESTAMP, adapter STRING NOT NULL )",
+                    "query": "CREATE TABLE IF NOT EXISTS `gcp-project-redacted.contractforge_gcp_smoke_ops.contractforge_lineage_evidence` ( run_id STRING NOT NULL, target_table STRING NOT NULL, source_name STRING NOT NULL, event_json STRING NOT NULL, event_time TIMESTAMP, adapter STRING NOT NULL )",
                     "useLegacySql": false
                   }
                 },
                 "etag": "WTW/l47i5EYY90c9hJnlew==",
-                "id": "midyear-system-499521-p3:us-east1.cf_gcp_smoke_query_8cf3c05332f44dcbbf2a",
+                "id": "gcp-project-redacted:us-east1.cf_gcp_smoke_query_8cf3c05332f44dcbbf2a",
                 "jobCreationReason": {
                   "code": "REQUESTED"
                 },
                 "jobReference": {
                   "jobId": "cf_gcp_smoke_query_8cf3c05332f44dcbbf2a",
                   "location": "us-east1",
-                  "projectId": "midyear-system-499521-p3"
+                  "projectId": "gcp-project-redacted"
                 },
                 "kind": "bigquery#job",
                 "principal_subject": "REDACTED",
-                "selfLink": "https://bigquery.googleapis.com/bigquery/v2/projects/midyear-system-499521-p3/jobs/cf_gcp_smoke_query_8cf3c05332f44dcbbf2a?location=us-east1",
+                "selfLink": "https://bigquery.googleapis.com/bigquery/v2/projects/gcp-project-redacted/jobs/cf_gcp_smoke_query_8cf3c05332f44dcbbf2a?location=us-east1",
                 "statistics": {
                   "creationTime": "1781695598043",
                   "endTime": "1781695598222",
@@ -3810,7 +3810,7 @@
                     "ddlOperationPerformed": "SKIP",
                     "ddlTargetTable": {
                       "datasetId": "contractforge_gcp_smoke_ops",
-                      "projectId": "midyear-system-499521-p3",
+                      "projectId": "gcp-project-redacted",
                       "tableId": "contractforge_lineage_evidence"
                     },
                     "performanceInsights": {},
@@ -3876,7 +3876,7 @@
             "name": "prepare_evidence"
           },
           {
-            "artifact": "midyear-system-499521-p3_contractforge_gcp_smoke_cf_http_file_csv_countries.gcp.source_materialization.json",
+            "artifact": "gcp-project-redacted_contractforge_gcp_smoke_cf_http_file_csv_countries.gcp.source_materialization.json",
             "executed": true,
             "job": {
               "deleted_rows": null,
@@ -3893,7 +3893,7 @@
                     "autodetect": true,
                     "destinationTable": {
                       "datasetId": "contractforge_gcp_smoke",
-                      "projectId": "midyear-system-499521-p3",
+                      "projectId": "gcp-project-redacted",
                       "tableId": "cf_http_file_csv_countries"
                     },
                     "skipLeadingRows": 1,
@@ -3902,18 +3902,18 @@
                   }
                 },
                 "etag": "EfjZ8TAqGHwEa1iwjGEJ7w==",
-                "id": "midyear-system-499521-p3:us-east1.cf_gcp_smoke_load_file_b6bb03eccc434e7db220",
+                "id": "gcp-project-redacted:us-east1.cf_gcp_smoke_load_file_b6bb03eccc434e7db220",
                 "jobCreationReason": {
                   "code": "REQUESTED"
                 },
                 "jobReference": {
                   "jobId": "cf_gcp_smoke_load_file_b6bb03eccc434e7db220",
                   "location": "us-east1",
-                  "projectId": "midyear-system-499521-p3"
+                  "projectId": "gcp-project-redacted"
                 },
                 "kind": "bigquery#job",
                 "principal_subject": "REDACTED",
-                "selfLink": "https://bigquery.googleapis.com/bigquery/v2/projects/midyear-system-499521-p3/jobs/cf_gcp_smoke_load_file_b6bb03eccc434e7db220?location=us-east1",
+                "selfLink": "https://bigquery.googleapis.com/bigquery/v2/projects/gcp-project-redacted/jobs/cf_gcp_smoke_load_file_b6bb03eccc434e7db220?location=us-east1",
                 "statistics": {
                   "completionRatio": 0,
                   "creationTime": "1781695608143",
@@ -3982,27 +3982,27 @@
                   "query": {
                     "destinationTable": {
                       "datasetId": "contractforge_gcp_smoke_ops",
-                      "projectId": "midyear-system-499521-p3",
+                      "projectId": "gcp-project-redacted",
                       "tableId": "contractforge_run_evidence"
                     },
                     "priority": "INTERACTIVE",
-                    "query": "INSERT INTO `midyear-system-499521-p3.contractforge_gcp_smoke_ops.contractforge_run_evidence` (`run_id`, `contract_name`, `target_table`, `adapter`, `status`, `started_at`, `finished_at`, `total_bytes_processed`, `total_bytes_billed`, `total_slot_ms`, `job_id`, `statement_type`, `inserted_rows`, `updated_rows`, `deleted_rows`, `error_message`) VALUES ('cf_gcp_smoke_load_file_b6bb03eccc434e7db220', 'cf_http_file_csv_countries', 'midyear-system-499521-p3.contractforge_gcp_smoke.cf_http_file_csv_countries', 'gcp_bigquery', 'SUCCEEDED', TIMESTAMP_MILLIS(1781695608252), TIMESTAMP_MILLIS(1781695609947), NULL, NULL, 157, 'cf_gcp_smoke_load_file_b6bb03eccc434e7db220', 'LOAD', NULL, NULL, NULL, NULL);",
+                    "query": "INSERT INTO `gcp-project-redacted.contractforge_gcp_smoke_ops.contractforge_run_evidence` (`run_id`, `contract_name`, `target_table`, `adapter`, `status`, `started_at`, `finished_at`, `total_bytes_processed`, `total_bytes_billed`, `total_slot_ms`, `job_id`, `statement_type`, `inserted_rows`, `updated_rows`, `deleted_rows`, `error_message`) VALUES ('cf_gcp_smoke_load_file_b6bb03eccc434e7db220', 'cf_http_file_csv_countries', 'gcp-project-redacted.contractforge_gcp_smoke.cf_http_file_csv_countries', 'gcp_bigquery', 'SUCCEEDED', TIMESTAMP_MILLIS(1781695608252), TIMESTAMP_MILLIS(1781695609947), NULL, NULL, 157, 'cf_gcp_smoke_load_file_b6bb03eccc434e7db220', 'LOAD', NULL, NULL, NULL, NULL);",
                     "useLegacySql": false
                   }
                 },
                 "etag": "1FBCYwqrOLJZoBppNP6jww==",
-                "id": "midyear-system-499521-p3:us-east1.cf_gcp_smoke_query_9885929fb928459e8599",
+                "id": "gcp-project-redacted:us-east1.cf_gcp_smoke_query_9885929fb928459e8599",
                 "jobCreationReason": {
                   "code": "REQUESTED"
                 },
                 "jobReference": {
                   "jobId": "cf_gcp_smoke_query_9885929fb928459e8599",
                   "location": "us-east1",
-                  "projectId": "midyear-system-499521-p3"
+                  "projectId": "gcp-project-redacted"
                 },
                 "kind": "bigquery#job",
                 "principal_subject": "REDACTED",
-                "selfLink": "https://bigquery.googleapis.com/bigquery/v2/projects/midyear-system-499521-p3/jobs/cf_gcp_smoke_query_9885929fb928459e8599?location=us-east1",
+                "selfLink": "https://bigquery.googleapis.com/bigquery/v2/projects/gcp-project-redacted/jobs/cf_gcp_smoke_query_9885929fb928459e8599?location=us-east1",
                 "statistics": {
                   "creationTime": "1781695618106",
                   "endTime": "1781695619505",
@@ -4056,7 +4056,7 @@
                             "kind": "COMPUTE",
                             "substeps": [
                               "$1 := 'cf_http_file_csv_countries'",
-                              "$2 := 'midyear-system-499521-p3.contractforge_gcp_smoke.cf_http_file_csv_countries'",
+                              "$2 := 'gcp-project-redacted.contractforge_gcp_smoke.cf_http_file_csv_countries'",
                               "$3 := 'gcp_bigquery'",
                               "$4 := 'SUCCEEDED'",
                               "$5 := 1781695608.252000000",
@@ -4188,7 +4188,7 @@
                     "referencedTables": [
                       {
                         "datasetId": "contractforge_gcp_smoke_ops",
-                        "projectId": "midyear-system-499521-p3",
+                        "projectId": "gcp-project-redacted",
                         "tableId": "contractforge_run_evidence"
                       }
                     ],
@@ -4253,27 +4253,27 @@
                   "query": {
                     "destinationTable": {
                       "datasetId": "contractforge_gcp_smoke_ops",
-                      "projectId": "midyear-system-499521-p3",
+                      "projectId": "gcp-project-redacted",
                       "tableId": "contractforge_lineage_evidence"
                     },
                     "priority": "INTERACTIVE",
-                    "query": "INSERT INTO `midyear-system-499521-p3.contractforge_gcp_smoke_ops.contractforge_lineage_evidence` (`run_id`, `target_table`, `source_name`, `event_json`, `event_time`, `adapter`) VALUES ('cf_gcp_smoke_load_file_b6bb03eccc434e7db220', 'midyear-system-499521-p3.contractforge_gcp_smoke.cf_http_file_csv_countries', 'midyear-system-499521-p3.contractforge_gcp_smoke._staging_cf_http_file_csv_countries', '{\"eventTime\":\"2026-06-17T11:26:49.947000+00:00\",\"eventType\":\"COMPLETE\",\"facets\":{\"contractforge\":{\"_producer\":\"contractforge-gcp\",\"_schemaURL\":\"https://openlineage.io/spec/facets/1-0-0/RunFacet.json\",\"finishedAt\":\"2026-06-17T11:26:49.947000+00:00\",\"layer\":\"bronze\",\"mode\":\"scd0_overwrite\",\"operationMetrics\":{\"jobId\":\"cf_gcp_smoke_load_file_b6bb03eccc434e7db220\",\"jobType\":\"LOAD\",\"outputRows\":194,\"totalSlotMs\":157},\"rowsRead\":194,\"rowsWritten\":194,\"startedAt\":\"2026-06-17T11:26:48.252000+00:00\"}},\"inputs\":[{\"facets\":{\"schema\":{\"_producer\":\"contractforge-gcp\",\"_schemaURL\":\"https://openlineage.io/spec/facets/1-0-0/SchemaDatasetFacet.json\",\"fields\":[]}},\"name\":\"midyear-system-499521-p3.contractforge_gcp_smoke._staging_cf_http_file_csv_countries\",\"namespace\":\"bigquery://midyear-system-499521-p3\"}],\"job\":{\"facets\":{},\"name\":\"bronze.cf_http_file_csv_countries.scd0_overwrite\",\"namespace\":\"bigquery://midyear-system-499521-p3\"},\"outputs\":[{\"facets\":{\"dataQualityMetrics\":{\"_producer\":\"contractforge-gcp\",\"_schemaURL\":\"https://openlineage.io/spec/facets/1-0-0/DataQualityMetricsOutputDatasetFacet.json\",\"rowCount\":194},\"schema\":{\"_producer\":\"contractforge-gcp\",\"_schemaURL\":\"https://openlineage.io/spec/facets/1-0-0/SchemaDatasetFacet.json\",\"fields\":[]}},\"name\":\"midyear-system-499521-p3.contractforge_gcp_smoke.cf_http_file_csv_countries\",\"namespace\":\"bigquery://midyear-system-499521-p3\"}],\"producer\":\"contractforge-gcp\",\"run\":{\"facets\":{\"processing_engine\":{\"_producer\":\"contractforge-gcp\",\"_schemaURL\":\"https://openlineage.io/spec/facets/1-0-0/ProcessingEngineRunFacet.json\",\"name\":\"bigquery\"}},\"runId\":\"cf_gcp_smoke_load_file_b6bb03eccc434e7db220\"},\"schemaURL\":\"https://openlineage.io/spec/1-0-5/OpenLineage.json\"}', TIMESTAMP '2026-06-17T11:26:49.947000+00:00', 'gcp_bigquery');",
+                    "query": "INSERT INTO `gcp-project-redacted.contractforge_gcp_smoke_ops.contractforge_lineage_evidence` (`run_id`, `target_table`, `source_name`, `event_json`, `event_time`, `adapter`) VALUES ('cf_gcp_smoke_load_file_b6bb03eccc434e7db220', 'gcp-project-redacted.contractforge_gcp_smoke.cf_http_file_csv_countries', 'gcp-project-redacted.contractforge_gcp_smoke._staging_cf_http_file_csv_countries', '{\"eventTime\":\"2026-06-17T11:26:49.947000+00:00\",\"eventType\":\"COMPLETE\",\"facets\":{\"contractforge\":{\"_producer\":\"contractforge-gcp\",\"_schemaURL\":\"https://openlineage.io/spec/facets/1-0-0/RunFacet.json\",\"finishedAt\":\"2026-06-17T11:26:49.947000+00:00\",\"layer\":\"bronze\",\"mode\":\"scd0_overwrite\",\"operationMetrics\":{\"jobId\":\"cf_gcp_smoke_load_file_b6bb03eccc434e7db220\",\"jobType\":\"LOAD\",\"outputRows\":194,\"totalSlotMs\":157},\"rowsRead\":194,\"rowsWritten\":194,\"startedAt\":\"2026-06-17T11:26:48.252000+00:00\"}},\"inputs\":[{\"facets\":{\"schema\":{\"_producer\":\"contractforge-gcp\",\"_schemaURL\":\"https://openlineage.io/spec/facets/1-0-0/SchemaDatasetFacet.json\",\"fields\":[]}},\"name\":\"gcp-project-redacted.contractforge_gcp_smoke._staging_cf_http_file_csv_countries\",\"namespace\":\"bigquery://gcp-project-redacted\"}],\"job\":{\"facets\":{},\"name\":\"bronze.cf_http_file_csv_countries.scd0_overwrite\",\"namespace\":\"bigquery://gcp-project-redacted\"},\"outputs\":[{\"facets\":{\"dataQualityMetrics\":{\"_producer\":\"contractforge-gcp\",\"_schemaURL\":\"https://openlineage.io/spec/facets/1-0-0/DataQualityMetricsOutputDatasetFacet.json\",\"rowCount\":194},\"schema\":{\"_producer\":\"contractforge-gcp\",\"_schemaURL\":\"https://openlineage.io/spec/facets/1-0-0/SchemaDatasetFacet.json\",\"fields\":[]}},\"name\":\"gcp-project-redacted.contractforge_gcp_smoke.cf_http_file_csv_countries\",\"namespace\":\"bigquery://gcp-project-redacted\"}],\"producer\":\"contractforge-gcp\",\"run\":{\"facets\":{\"processing_engine\":{\"_producer\":\"contractforge-gcp\",\"_schemaURL\":\"https://openlineage.io/spec/facets/1-0-0/ProcessingEngineRunFacet.json\",\"name\":\"bigquery\"}},\"runId\":\"cf_gcp_smoke_load_file_b6bb03eccc434e7db220\"},\"schemaURL\":\"https://openlineage.io/spec/1-0-5/OpenLineage.json\"}', TIMESTAMP '2026-06-17T11:26:49.947000+00:00', 'gcp_bigquery');",
                     "useLegacySql": false
                   }
                 },
                 "etag": "n21+vOZLS7NcYPDSZw9Now==",
-                "id": "midyear-system-499521-p3:us-east1.cf_gcp_smoke_query_8fcf1666e9664e9186ce",
+                "id": "gcp-project-redacted:us-east1.cf_gcp_smoke_query_8fcf1666e9664e9186ce",
                 "jobCreationReason": {
                   "code": "REQUESTED"
                 },
                 "jobReference": {
                   "jobId": "cf_gcp_smoke_query_8fcf1666e9664e9186ce",
                   "location": "us-east1",
-                  "projectId": "midyear-system-499521-p3"
+                  "projectId": "gcp-project-redacted"
                 },
                 "kind": "bigquery#job",
                 "principal_subject": "REDACTED",
-                "selfLink": "https://bigquery.googleapis.com/bigquery/v2/projects/midyear-system-499521-p3/jobs/cf_gcp_smoke_query_8fcf1666e9664e9186ce?location=us-east1",
+                "selfLink": "https://bigquery.googleapis.com/bigquery/v2/projects/gcp-project-redacted/jobs/cf_gcp_smoke_query_8fcf1666e9664e9186ce?location=us-east1",
                 "statistics": {
                   "creationTime": "1781695627350",
                   "endTime": "1781695628711",
@@ -4327,9 +4327,9 @@
                             "kind": "COMPUTE",
                             "substeps": [
                               "$1 := 'cf_gcp_smoke_load_file_b6bb03eccc434e7db220'",
-                              "$2 := 'midyear-system-499521-p3.contractforge_gcp_smoke.cf_http_file_csv_countries'",
-                              "$3 := 'midyear-system-499521-p3.contractforge_gcp_smoke._staging_cf_http_file_csv_countries'",
-                              "$4 := '{\"eventTime\":\"2026-06-17T11:26:49.947000+00:00\",\"eventType\":\"COMPLETE\",\"facets\":{\"contractforge\":{\"_producer\":\"contractforge-gcp\",\"_schemaURL\":\"https://openlineage.io/spec/facets/1-0-0/RunFacet.json\",\"finishedAt\":\"2026-06-17T11:26:49.947000+00:00\",\"layer\":\"bronze\",\"mode\":\"scd0_overwrite\",\"operationMetrics\":{\"jobId\":\"cf_gcp_smoke_load_file_b6bb03eccc434e7db220\",\"jobType\":\"LOAD\",\"outputRows\":194,\"totalSlotMs\":157},\"rowsRead\":194,\"rowsWritten\":194,\"startedAt\":\"2026-06-17T11:26:48.252000+00:00\"}},\"inputs\":[{\"facets\":{\"schema\":{\"_producer\":\"contractforge-gcp\",\"_schemaURL\":\"https://openlineage.io/spec/facets/1-0-0/SchemaDatasetFacet.json\",\"fields\":[]}},\"name\":\"midyear-system-499521-p3.contractforge_gcp_smoke._staging_cf_http_file_csv_countries\",\"namespace\":\"bigquery://midyear-system-499521-p3\"}],\"job\":{\"facets\":{},\"name\":\"bronze.cf_http_file_csv_countries.scd0_overwrite\",\"namespace\":\"bigquery://midyear-system-499521-p3\"},\"outputs\":[{\"facets\":{\"dataQualityMetrics\":{\"_producer\":\"contractforge-gcp\",\"_schemaURL\":\"https://openlineage.io/spec/facets/1-0-0/DataQualityMetricsOutputDatasetFacet.json\",\"rowCount\":194},\"schema\":{\"_producer\":\"contractforge-gcp\",\"_schemaURL\":\"https://openlineage.io/spec/facets/1-0-0/SchemaDatasetFacet.json\",\"fields\":[]}},\"name\":\"midyear-system-499521-p3.contractforge_gcp_smoke.cf_http_file_csv_countries\",\"namespace\":\"bigquery://midyear-system-499521-p3\"}],\"producer\":\"contractforge-gcp\",\"run\":{\"facets\":{\"processing_engine\":{\"_producer\":\"contractforge-gcp\",\"_schemaURL\":\"https://openlineage.io/spec/facets/1-0-0/ProcessingEngineRunFacet.json\",\"name\":\"bigquery\"}},\"runId\":\"cf_gcp_smoke_load_file_b6bb03eccc434e7db220\"},\"schemaURL\":\"https://openlineage.io/spec/1-0-5/OpenLineage.json\"}'",
+                              "$2 := 'gcp-project-redacted.contractforge_gcp_smoke.cf_http_file_csv_countries'",
+                              "$3 := 'gcp-project-redacted.contractforge_gcp_smoke._staging_cf_http_file_csv_countries'",
+                              "$4 := '{\"eventTime\":\"2026-06-17T11:26:49.947000+00:00\",\"eventType\":\"COMPLETE\",\"facets\":{\"contractforge\":{\"_producer\":\"contractforge-gcp\",\"_schemaURL\":\"https://openlineage.io/spec/facets/1-0-0/RunFacet.json\",\"finishedAt\":\"2026-06-17T11:26:49.947000+00:00\",\"layer\":\"bronze\",\"mode\":\"scd0_overwrite\",\"operationMetrics\":{\"jobId\":\"cf_gcp_smoke_load_file_b6bb03eccc434e7db220\",\"jobType\":\"LOAD\",\"outputRows\":194,\"totalSlotMs\":157},\"rowsRead\":194,\"rowsWritten\":194,\"startedAt\":\"2026-06-17T11:26:48.252000+00:00\"}},\"inputs\":[{\"facets\":{\"schema\":{\"_producer\":\"contractforge-gcp\",\"_schemaURL\":\"https://openlineage.io/spec/facets/1-0-0/SchemaDatasetFacet.json\",\"fields\":[]}},\"name\":\"gcp-project-redacted.contractforge_gcp_smoke._staging_cf_http_file_csv_countries\",\"namespace\":\"bigquery://gcp-project-redacted\"}],\"job\":{\"facets\":{},\"name\":\"bronze.cf_http_file_csv_countries.scd0_overwrite\",\"namespace\":\"bigquery://gcp-project-redacted\"},\"outputs\":[{\"facets\":{\"dataQualityMetrics\":{\"_producer\":\"contractforge-gcp\",\"_schemaURL\":\"https://openlineage.io/spec/facets/1-0-0/DataQualityMetricsOutputDatasetFacet.json\",\"rowCount\":194},\"schema\":{\"_producer\":\"contractforge-gcp\",\"_schemaURL\":\"https://openlineage.io/spec/facets/1-0-0/SchemaDatasetFacet.json\",\"fields\":[]}},\"name\":\"gcp-project-redacted.contractforge_gcp_smoke.cf_http_file_csv_countries\",\"namespace\":\"bigquery://gcp-project-redacted\"}],\"producer\":\"contractforge-gcp\",\"run\":{\"facets\":{\"processing_engine\":{\"_producer\":\"contractforge-gcp\",\"_schemaURL\":\"https://openlineage.io/spec/facets/1-0-0/ProcessingEngineRunFacet.json\",\"name\":\"bigquery\"}},\"runId\":\"cf_gcp_smoke_load_file_b6bb03eccc434e7db220\"},\"schemaURL\":\"https://openlineage.io/spec/1-0-5/OpenLineage.json\"}'",
                               "$5 := 1781695609.947000000",
                               "$6 := 'gcp_bigquery'"
                             ]
@@ -4454,7 +4454,7 @@
                     "referencedTables": [
                       {
                         "datasetId": "contractforge_gcp_smoke_ops",
-                        "projectId": "midyear-system-499521-p3",
+                        "projectId": "gcp-project-redacted",
                         "tableId": "contractforge_lineage_evidence"
                       }
                     ],
@@ -4517,3 +4517,4 @@
     }
   ]
 }
+

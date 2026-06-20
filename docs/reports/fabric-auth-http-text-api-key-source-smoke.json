@@ -8,14 +8,14 @@
   "project": "examples/source-expansion/fabric-auth-http-text-api-key/project.yaml",
   "environment": "examples/source-expansion/fabric-auth-http-text-api-key/environments/fabric.environment.yaml",
   "workspace": {
-    "id": "061fd0c8-c248-4628-a332-6adf16623533",
+    "id": "00000000-0000-0000-0000-000000000000",
     "name": "Manager",
-    "capacity_id": "2139f1ea-2676-46bf-ab4f-ab248c768056",
+    "capacity_id": "00000000-0000-0000-0000-000000000000",
     "capacity_sku": "FTL4",
     "capacity_region": "Brazil South"
   },
   "lakehouse": {
-    "id": "07067d3f-d5e2-48c1-b526-634620e57d4b",
+    "id": "00000000-0000-0000-0000-000000000000",
     "name": "contractforge_lh"
   },
   "source_infrastructure": {
@@ -77,8 +77,8 @@
       "name": "authenticated_http_text_api_key",
       "contract": "contracts/01_authenticated_http_text_api_key.ingestion.yaml",
       "notebook": "cf_workspace_cf_fabric_source_expansion_auth_http_text_api_key",
-      "item_id": "843560f4-f89d-4101-b074-2677dd72f50e",
-      "job_instance_id": "b589e6d2-2422-400d-93a0-ef0aaa9cf5d4",
+      "item_id": "00000000-0000-0000-0000-000000000000",
+      "job_instance_id": "00000000-0000-0000-0000-000000000000",
       "job_status": "Completed",
       "started_at_utc": "2026-06-12T11:41:58.7838794",
       "ended_at_utc": "2026-06-12T11:45:36.2697026"
@@ -87,8 +87,8 @@
       "name": "authenticated_http_text_api_key_evidence_probe",
       "contract": "contracts/02_authenticated_http_text_api_key_evidence_probe.ingestion.yaml",
       "notebook": "cf_workspace_cf_fabric_source_expansion_auth_http_text_api_key_evidence_probe",
-      "item_id": "d798bee9-ef1c-438e-8930-0dd8496d900d",
-      "job_instance_id": "ea49a1d1-cc86-4cc0-bae7-88759f0a3195",
+      "item_id": "00000000-0000-0000-0000-000000000000",
+      "job_instance_id": "00000000-0000-0000-0000-000000000000",
       "job_status": "Completed",
       "started_at_utc": "2026-06-12T11:46:12.9426695",
       "ended_at_utc": "2026-06-12T11:49:52.318282"
@@ -99,3 +99,4 @@
     "The Azure Function fixture is intentionally tiny and exists only to validate the contract/runtime auth path."
   ]
 }
+

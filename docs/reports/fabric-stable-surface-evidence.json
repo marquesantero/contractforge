@@ -8,18 +8,18 @@
   "project": "examples/stable-surface/fabric/project.yaml",
   "environment": "examples/stable-surface/fabric/environments/fabric.environment.yaml",
   "workspace": {
-    "id": "061fd0c8-c248-4628-a332-6adf16623533",
+    "id": "00000000-0000-0000-0000-000000000000",
     "name": "Manager",
-    "capacity_id": "2139f1ea-2676-46bf-ab4f-ab248c768056",
+    "capacity_id": "00000000-0000-0000-0000-000000000000",
     "capacity_sku": "FTL4",
     "capacity_region": "Brazil South",
     "default_spark_pool": {
-      "id": "55f6847a-8a82-46d0-9b61-a3ebbdb1bda9",
+      "id": "00000000-0000-0000-0000-000000000000",
       "name": "cf_small_single_node"
     }
   },
   "lakehouse": {
-    "id": "07067d3f-d5e2-48c1-b526-634620e57d4b",
+    "id": "00000000-0000-0000-0000-000000000000",
     "name": "contractforge_lh"
   },
   "commands": [
@@ -77,8 +77,8 @@
       "name": "append_orders",
       "contract": "contracts/01_append_orders.ingestion.yaml",
       "notebook": "cf_workspace_cf_fabric_stable_orders_append",
-      "item_id": "1dd740bb-19fe-4a17-8690-8775c0f9cc65",
-      "job_instance_id": "d8b0e8c3-3655-438d-acc5-635530a6c6ca",
+      "item_id": "00000000-0000-0000-0000-000000000000",
+      "job_instance_id": "00000000-0000-0000-0000-000000000000",
       "job_status": "Completed",
       "started_at_utc": "2026-06-11T17:32:09.8150806",
       "ended_at_utc": "2026-06-11T17:37:00.7834463"
@@ -87,8 +87,8 @@
       "name": "overwrite_orders",
       "contract": "contracts/02_overwrite_orders.ingestion.yaml",
       "notebook": "cf_workspace_cf_fabric_stable_orders_overwrite",
-      "item_id": "7f816214-5aa0-4fc7-85fd-fed8ff33e861",
-      "job_instance_id": "a5ce9e1e-4c0d-45d6-9f33-43ff5e457ee2",
+      "item_id": "00000000-0000-0000-0000-000000000000",
+      "job_instance_id": "00000000-0000-0000-0000-000000000000",
       "job_status": "Completed",
       "started_at_utc": "2026-06-11T17:38:02.5551537",
       "ended_at_utc": "2026-06-11T17:41:05.6274756"
@@ -97,8 +97,8 @@
       "name": "upsert_customers_seed",
       "contract": "contracts/03_upsert_customers_seed.ingestion.yaml",
       "notebook": "cf_workspace_cf_fabric_stable_customers_current",
-      "item_id": "48a0cb80-ad9b-4087-a449-49b5860e8b26",
-      "job_instance_id": "94372bbd-4802-4927-8fa8-f366a6292ba9",
+      "item_id": "00000000-0000-0000-0000-000000000000",
+      "job_instance_id": "00000000-0000-0000-0000-000000000000",
       "job_status": "Completed",
       "started_at_utc": "2026-06-11T17:41:46.1300994",
       "ended_at_utc": "2026-06-11T17:45:30.2389499"
@@ -107,8 +107,8 @@
       "name": "upsert_customers_change",
       "contract": "contracts/04_upsert_customers_change.ingestion.yaml",
       "notebook": "cf_workspace_cf_fabric_stable_customers_current",
-      "item_id": "48a0cb80-ad9b-4087-a449-49b5860e8b26",
-      "job_instance_id": "736f4885-01f5-47d0-86ab-b845974ec23a",
+      "item_id": "00000000-0000-0000-0000-000000000000",
+      "job_instance_id": "00000000-0000-0000-0000-000000000000",
       "job_status": "Completed",
       "started_at_utc": "2026-06-11T17:46:56.2902338",
       "ended_at_utc": "2026-06-11T17:50:27.2170856"
@@ -117,8 +117,8 @@
       "name": "hash_diff_customers_seed",
       "contract": "contracts/05_hash_diff_customers_seed.ingestion.yaml",
       "notebook": "cf_workspace_cf_fabric_stable_customers_hash",
-      "item_id": "5d7ee90a-87dd-44b6-96aa-6522adbc1345",
-      "job_instance_id": "45e0d4c2-d958-4811-bdc7-9f2e360df491",
+      "item_id": "00000000-0000-0000-0000-000000000000",
+      "job_instance_id": "00000000-0000-0000-0000-000000000000",
       "job_status": "Completed",
       "started_at_utc": "2026-06-11T17:51:12.8762814",
       "ended_at_utc": "2026-06-11T17:54:42.480946"
@@ -127,8 +127,8 @@
       "name": "hash_diff_customers_noop",
       "contract": "contracts/06_hash_diff_customers_noop.ingestion.yaml",
       "notebook": "cf_workspace_cf_fabric_stable_customers_hash",
-      "item_id": "5d7ee90a-87dd-44b6-96aa-6522adbc1345",
-      "job_instance_id": "76d68546-6653-45c8-b023-d7d0b116627d",
+      "item_id": "00000000-0000-0000-0000-000000000000",
+      "job_instance_id": "00000000-0000-0000-0000-000000000000",
       "job_status": "Completed",
       "started_at_utc": "2026-06-11T17:55:54.2922876",
       "ended_at_utc": "2026-06-11T17:59:37.6360087"
@@ -137,8 +137,8 @@
       "name": "hash_diff_customers_change",
       "contract": "contracts/07_hash_diff_customers_change.ingestion.yaml",
       "notebook": "cf_workspace_cf_fabric_stable_customers_hash",
-      "item_id": "5d7ee90a-87dd-44b6-96aa-6522adbc1345",
-      "job_instance_id": "293138ce-0e19-413f-81de-31f4e7493499",
+      "item_id": "00000000-0000-0000-0000-000000000000",
+      "job_instance_id": "00000000-0000-0000-0000-000000000000",
       "job_status": "Completed",
       "started_at_utc": "2026-06-11T18:01:05.9121467",
       "ended_at_utc": "2026-06-11T18:04:52.0940749"
@@ -147,8 +147,8 @@
       "name": "historical_customers_seed",
       "contract": "contracts/08_historical_customers_seed.ingestion.yaml",
       "notebook": "cf_workspace_cf_fabric_stable_customers_history",
-      "item_id": "f978e96b-01f2-41a6-b4b9-714ae5bd5651",
-      "job_instance_id": "7753dacf-dbd7-4e5d-aac3-d542d1c47dd2",
+      "item_id": "00000000-0000-0000-0000-000000000000",
+      "job_instance_id": "00000000-0000-0000-0000-000000000000",
       "job_status": "Completed",
       "started_at_utc": "2026-06-11T18:05:56.6848553",
       "ended_at_utc": "2026-06-11T18:09:37.0469309"
@@ -157,8 +157,8 @@
       "name": "historical_customers_change",
       "contract": "contracts/09_historical_customers_change.ingestion.yaml",
       "notebook": "cf_workspace_cf_fabric_stable_customers_history",
-      "item_id": "f978e96b-01f2-41a6-b4b9-714ae5bd5651",
-      "job_instance_id": "24af9570-0d24-4c18-8559-19853b42616d",
+      "item_id": "00000000-0000-0000-0000-000000000000",
+      "job_instance_id": "00000000-0000-0000-0000-000000000000",
       "job_status": "Completed",
       "started_at_utc": "2026-06-11T18:10:36.2881969",
       "ended_at_utc": "2026-06-11T18:14:13.9011135"
@@ -167,8 +167,8 @@
       "name": "snapshot_customers_seed",
       "contract": "contracts/10_snapshot_customers_seed.ingestion.yaml",
       "notebook": "cf_workspace_cf_fabric_stable_customers_snapshot",
-      "item_id": "4b0169d5-e275-499c-bef6-e5cd06ee3ac6",
-      "job_instance_id": "6756956c-31d2-4505-963c-f6f66f2be312",
+      "item_id": "00000000-0000-0000-0000-000000000000",
+      "job_instance_id": "00000000-0000-0000-0000-000000000000",
       "job_status": "Completed",
       "started_at_utc": "2026-06-11T18:14:57.5652418",
       "ended_at_utc": "2026-06-11T18:18:34.8103929"
@@ -177,8 +177,8 @@
       "name": "snapshot_customers_delete",
       "contract": "contracts/11_snapshot_customers_delete.ingestion.yaml",
       "notebook": "cf_workspace_cf_fabric_stable_customers_snapshot",
-      "item_id": "4b0169d5-e275-499c-bef6-e5cd06ee3ac6",
-      "job_instance_id": "f9f4a056-e99c-4b2f-9776-5779a7c1aa65",
+      "item_id": "00000000-0000-0000-0000-000000000000",
+      "job_instance_id": "00000000-0000-0000-0000-000000000000",
       "job_status": "Completed",
       "started_at_utc": "2026-06-11T18:19:35.7714884",
       "ended_at_utc": "2026-06-11T18:23:21.1302278"
@@ -187,8 +187,8 @@
       "name": "schema_guard_seed",
       "contract": "contracts/12_schema_guard_seed.ingestion.yaml",
       "notebook": "cf_workspace_cf_fabric_stable_schema_guard",
-      "item_id": "575bc80f-507e-4eef-850a-10555675ac38",
-      "job_instance_id": "54ccfc58-0391-40db-9f79-92d6934c4a1b",
+      "item_id": "00000000-0000-0000-0000-000000000000",
+      "job_instance_id": "00000000-0000-0000-0000-000000000000",
       "job_status": "Completed",
       "started_at_utc": "2026-06-11T18:24:25.1852936",
       "ended_at_utc": "2026-06-11T18:27:24.8984881"
@@ -197,8 +197,8 @@
       "name": "quality_abort_failure",
       "contract": "contracts/13_quality_abort_failure.ingestion.yaml",
       "notebook": "cf_workspace_cf_fabric_stable_quality_abort",
-      "item_id": "d8a2b628-e2f6-4d48-bb3e-540e66d6e45a",
-      "job_instance_id": "43bcb4f6-ccc3-4615-8ab6-5f7576b234ee",
+      "item_id": "00000000-0000-0000-0000-000000000000",
+      "job_instance_id": "00000000-0000-0000-0000-000000000000",
       "job_status": "Completed",
       "started_at_utc": "2026-06-11T18:41:56.023686",
       "ended_at_utc": "2026-06-11T18:45:42.9508769"
@@ -207,8 +207,8 @@
       "name": "strict_schema_failure",
       "contract": "contracts/14_strict_schema_failure.ingestion.yaml",
       "notebook": "cf_workspace_cf_fabric_stable_schema_guard",
-      "item_id": "575bc80f-507e-4eef-850a-10555675ac38",
-      "job_instance_id": "1e4350f5-a314-4155-8a56-077984bf8ea5",
+      "item_id": "00000000-0000-0000-0000-000000000000",
+      "job_instance_id": "00000000-0000-0000-0000-000000000000",
       "job_status": "Completed",
       "started_at_utc": "2026-06-11T18:47:11.0316628",
       "ended_at_utc": "2026-06-11T18:50:38.1042492"
@@ -217,8 +217,8 @@
       "name": "governance_review_evidence",
       "contract": "contracts/15_governance_review_evidence.ingestion.yaml",
       "notebook": "cf_workspace_cf_fabric_stable_governance_review",
-      "item_id": "acba2c01-4993-474a-986f-50e1362b5701",
-      "job_instance_id": "b8667814-939a-48c9-8308-d4dc53c2fb72",
+      "item_id": "00000000-0000-0000-0000-000000000000",
+      "job_instance_id": "00000000-0000-0000-0000-000000000000",
       "job_status": "Completed",
       "started_at_utc": "2026-06-11T19:49:12.7818186",
       "ended_at_utc": "2026-06-11T19:52:16.688982"
@@ -227,8 +227,8 @@
       "name": "evidence_probe",
       "contract": "contracts/16_evidence_probe.ingestion.yaml",
       "notebook": "cf_workspace_cf_fabric_stable_evidence_probe",
-      "item_id": "69668bce-d7e7-4300-a0ee-0339fe47f7c8",
-      "job_instance_id": "56f6c54b-88c2-41ee-a3aa-27e2a7f2e5bf",
+      "item_id": "00000000-0000-0000-0000-000000000000",
+      "job_instance_id": "00000000-0000-0000-0000-000000000000",
       "job_status": "Completed",
       "started_at_utc": "2026-06-11T19:53:23.3527833",
       "ended_at_utc": "2026-06-11T19:56:51.6136919"
@@ -240,3 +240,4 @@
     "Access declarations are validated as review evidence; explicit Fabric workspace role assignment, sensitivity labels and OneLake data access role apply are covered by separate governance evidence. Broader Fabric/Purview metadata behavior remains outside the stable-final claim unless separately certified."
   ]
 }
+

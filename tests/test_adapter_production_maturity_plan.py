@@ -205,14 +205,14 @@ def test_aws_kafka_provider_matrix_records_msk_maturity_pass() -> None:
     assert manifest["result"]["maturity_scope"]["required_provider"] == "msk"
     assert manifest["result"]["providers"]["event_hubs_kafka"]["status"] == "PASS"
     assert manifest["result"]["providers"]["msk"]["status"] == "PASS"
-    assert manifest["result"]["providers"]["msk"]["cluster_arn"].startswith("arn:aws:kafka:us-east-1:449112696824:cluster/cf-msk-serverless-validation")
+    assert manifest["result"]["providers"]["msk"]["cluster_arn"].startswith("arn:aws:kafka:us-east-1:000000000000:cluster/cf-msk-serverless-validation")
     assert manifest["result"]["providers"]["msk"]["state"] == "ACTIVE"
     assert manifest["result"]["providers"]["msk"]["bootstrap_brokers"]["BootstrapBrokerStringSaslIam"]
     assert manifest["result"]["providers"]["msk"]["athena_evidence"]["audit_status"] == "AUDITED"
     assert manifest["result"]["providers"]["confluent_compatible"]["status"] == "OPTIONAL_READY_TO_RUN"
     assert manifest["result"]["providers"]["confluent_compatible"]["scope"] == "OPTIONAL_COMPATIBILITY"
     assert manifest["result"]["providers"]["confluent_compatible"]["secret_arn"].startswith(
-        "arn:aws:secretsmanager:us-east-1:449112696824:secret:contractforge/confluent/kafka"
+        "arn:aws:secretsmanager:us-east-1:000000000000:secret:contractforge/confluent/kafka"
     )
     assert manifest["result"]["blockers"] == []
     assert "checkpoint_progress_recorded" in manifest["required_cases"]

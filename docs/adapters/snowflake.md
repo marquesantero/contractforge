@@ -307,7 +307,7 @@ Recent live Snowflake validation covered:
 
 | Scenario | Status | Notes |
 | --- | --- | --- |
-| `smoke-procedure` | `PASS` | Hosted Snowpark procedure imported ZIP-packaged core/adapter libraries and wrote 2 rows; procedure query id `01c4ea61-0001-6b57-0001-084600149952`. |
+| `smoke-procedure` | `PASS` | Hosted Snowpark procedure imported ZIP-packaged core/adapter libraries and wrote 2 rows; procedure query id `00000000-0000-0000-0000-000000000000`. |
 | `smoke-task-graph` | `PASS` | Live task graph deployed two tasks, executed the root task, waited for bronze/silver `SUCCEEDED` states, verified 2-row bronze/silver counts and cleaned up smoke artifacts. |
 | USGS GeoJSON REST medallion | `LOCAL PASS` | The example project now declares Snowflake bronze-to-gold contracts beside the Databricks and AWS contracts, with Snowflake bronze using the same `source.type: rest_api` URL/method/raw response contract. Local runtime tests execute the declared Snowflake contracts in project order. Live hosted-procedure execution requires `CF_USGS_REST_ACCESS` in the Snowflake account. |
 

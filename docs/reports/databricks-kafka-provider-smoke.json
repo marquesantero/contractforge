@@ -6,7 +6,7 @@
   "maturity_gate": "DATABRICKS-KAFKA-CONTRACT-RUNTIME",
   "status": "PASS",
   "executed_at": "2026-06-10",
-  "databricks_profile": "dbc-424b2872-08c9",
+  "databricks_profile": "dbc-redacted",
   "workspace_user": "marco@marques.inf.br",
   "validation_scope": {
     "contract_only": true,
@@ -21,7 +21,7 @@
     "environment_id": "env-36dw32",
     "cluster_id": "lkc-dokqkxo",
     "cluster_name": "cluster_0",
-    "bootstrap_servers": "pkc-619z3.us-east1.gcp.confluent.cloud:9092",
+    "bootstrap_servers": "pkc-redacted.region.confluent.cloud:9092",
     "topic": "cf-databricks-orders",
     "seed_batch_id": "dbx-kafka-1781053436",
     "seeded_messages": 3
@@ -37,7 +37,7 @@
     "checkpoint_storage": {
       "type": "unity_catalog_managed_volume",
       "full_name": "workspace.cf_databricks_kafka_smoke.kafka_smoke",
-      "volume_id": "1655eb2d-666e-465f-ad89-b68db7adc8b2"
+      "volume_id": "00000000-0000-0000-0000-000000000000"
     }
   },
   "contract_runtime": {
@@ -111,3 +111,4 @@
   ],
   "open_items": []
 }
+

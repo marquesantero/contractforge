@@ -8,7 +8,7 @@
   "executed_at": "2026-06-09",
   "connection": {
     "connection_name": "cfingestsvc-pat",
-    "account": "IW11590",
+    "account": "SNOWFLAKE_ACCOUNT_REDACTED",
     "user": "CFINGESTSVC",
     "role": "CONTRACTFORGE_INGEST_ROLE",
     "database": "CONTRACTFORGE_TEST_DB",
@@ -39,12 +39,12 @@
         {
           "name": "bronze_customers",
           "state": "SUCCEEDED",
-          "query_id": "01c4f04d-0001-6b57-0001-084600154b76"
+          "query_id": "00000000-0000-0000-0000-000000000000"
         },
         {
           "name": "silver_customers",
           "state": "SUCCEEDED",
-          "query_id": "01c4f04e-0001-6b9e-0001-084600155a2a"
+          "query_id": "00000000-0000-0000-0000-000000000000"
         }
       ]
     }
@@ -77,3 +77,4 @@
     ]
   }
 }
+

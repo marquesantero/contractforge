@@ -10,13 +10,13 @@ source:
       AVG(amount) AS avg_amount,
       MAX(amount_band) AS max_amount_band,
       CURRENT_TIMESTAMP() AS computed_at_utc
-    FROM `midyear-system-499521-p3.contractforge_gcp_azure_sql_silver.s_azure_sql_orders_current`
+    FROM `gcp-project-redacted.contractforge_gcp_azure_sql_silver.s_azure_sql_orders_current`
     GROUP BY customer_name
   read:
     source_complete: true
 
 target:
-  catalog: midyear-system-499521-p3
+  catalog: gcp-project-redacted
   schema: contractforge_gcp_azure_sql_gold
   table: g_azure_sql_customer_summary
 

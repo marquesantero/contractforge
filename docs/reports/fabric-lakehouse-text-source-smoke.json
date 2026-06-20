@@ -8,13 +8,13 @@
   "project": "examples/source-expansion/fabric-lakehouse-text/project.yaml",
   "environment": "examples/source-expansion/fabric-lakehouse-text/environments/fabric.environment.yaml",
   "workspace": {
-    "id": "061fd0c8-c248-4628-a332-6adf16623533",
+    "id": "00000000-0000-0000-0000-000000000000",
     "name": "Manager",
-    "capacity_id": "2139f1ea-2676-46bf-ab4f-ab248c768056",
+    "capacity_id": "00000000-0000-0000-0000-000000000000",
     "capacity_region": "Brazil South"
   },
   "lakehouse": {
-    "id": "07067d3f-d5e2-48c1-b526-634620e57d4b",
+    "id": "00000000-0000-0000-0000-000000000000",
     "name": "contractforge_lh"
   },
   "source_infrastructure": {
@@ -22,8 +22,8 @@
     "fixture_path": "Files/source-expansion/lakehouse-text/orders.txt",
     "fixture_rows": 2,
     "seed_notebook": "cf_seed_lakehouse_text_source_1781281976",
-    "seed_notebook_id": "51ca9315-8a65-4187-bf31-da3686a4d3e0",
-    "seed_job_instance_id": "e3c3cd40-503e-4d64-bfba-e13cb1db8031",
+    "seed_notebook_id": "00000000-0000-0000-0000-000000000000",
+    "seed_job_instance_id": "00000000-0000-0000-0000-000000000000",
     "seed_status": "Completed"
   },
   "commands": [
@@ -62,8 +62,8 @@
       "name": "lakehouse_text_orders",
       "contract": "contracts/01_lakehouse_text_orders.ingestion.yaml",
       "notebook": "cf_workspace_cf_fabric_source_expansion_lakehouse_text_orders",
-      "item_id": "4c9c42c1-e5d1-44b7-ab03-589d2b9e1639",
-      "job_instance_id": "cbc62189-ff35-4ce9-9b60-44f7436ba8c9",
+      "item_id": "00000000-0000-0000-0000-000000000000",
+      "job_instance_id": "00000000-0000-0000-0000-000000000000",
       "job_status": "Completed",
       "started_at_utc": "2026-06-12T16:38:21.3912782",
       "ended_at_utc": "2026-06-12T16:42:07.6342029"
@@ -72,8 +72,8 @@
       "name": "lakehouse_text_evidence_probe",
       "contract": "contracts/02_lakehouse_text_evidence_probe.ingestion.yaml",
       "notebook": "cf_workspace_cf_fabric_source_expansion_lakehouse_text_evidence_probe",
-      "item_id": "1778245e-ed81-40c4-9742-9f9f924e8018",
-      "job_instance_id": "2c13c1b4-273c-4b5b-8fd5-77244d4c138e",
+      "item_id": "00000000-0000-0000-0000-000000000000",
+      "job_instance_id": "00000000-0000-0000-0000-000000000000",
       "job_status": "Completed",
       "started_at_utc": "2026-06-12T16:43:06.7189106",
       "ended_at_utc": "2026-06-12T16:46:46.1176873"
@@ -85,3 +85,4 @@
     "Fabric stable_final is true for the documented notebook-first surface. Source families outside this stable scope are excluded by docs/reports/fabric-source-expansion-stable-scope-decision.json. Explicit Fabric-native OneLake row and column policy apply is covered separately by docs/reports/fabric-onelake-row-column-policy-smoke.json, and deployment-pipeline stage promotion is covered by docs/reports/fabric-deployment-pipeline-stage-promotion-smoke.json."
   ]
 }
+

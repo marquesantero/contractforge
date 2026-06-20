@@ -6,14 +6,14 @@
   "maturity_gate": "AWS-LF-CONSUMER-MATRIX",
   "status": "PASS",
   "executed_at": "2026-06-09",
-  "account_id": "449112696824",
+  "account_id": "000000000000",
   "region": "us-east-1",
-  "command": "uv run --with boto3 --with \"botocore[crt]\" contractforge-aws smoke-lakeformation-consumer-matrix --account-id 449112696824 --region us-east-1 --database contractforge_tmp_ddl --table plain_tblprops --consumer-principal arn:aws:iam::449112696824:role/ContractForgeLfGlueAllowedRole --athena-workgroup primary --athena-output-location s3://contractforge-aws-smoke-449112696824-us-east-1/athena-results/ --validate-glue-reads --glue-script-s3-uri s3://contractforge-aws-smoke-449112696824-us-east-1/scripts/aws-lf-glue-read-check.py --glue-allowed-role-arn arn:aws:iam::449112696824:role/ContractForgeLfGlueAllowedRole --glue-denied-role-arn arn:aws:iam::449112696824:role/ContractForgeLfGlueDeniedRole --glue-temp-dir s3://contractforge-aws-smoke-449112696824-us-east-1/temp/ --glue-warehouse-s3-uri s3://contractforge-aws-smoke-449112696824-us-east-1/warehouse/tmp-ddl/ --execute",
+  "command": "uv run --with boto3 --with \"botocore[crt]\" contractforge-aws smoke-lakeformation-consumer-matrix --account-id 000000000000 --region us-east-1 --database contractforge_tmp_ddl --table plain_tblprops --consumer-principal arn:aws:iam::000000000000:role/ContractForgeLfGlueAllowedRole --athena-workgroup primary --athena-output-location s3://contractforge-aws-smoke-000000000000-us-east-1/athena-results/ --validate-glue-reads --glue-script-s3-uri s3://contractforge-aws-smoke-000000000000-us-east-1/scripts/aws-lf-glue-read-check.py --glue-allowed-role-arn arn:aws:iam::000000000000:role/ContractForgeLfGlueAllowedRole --glue-denied-role-arn arn:aws:iam::000000000000:role/ContractForgeLfGlueDeniedRole --glue-temp-dir s3://contractforge-aws-smoke-000000000000-us-east-1/temp/ --glue-warehouse-s3-uri s3://contractforge-aws-smoke-000000000000-us-east-1/warehouse/tmp-ddl/ --execute",
   "result": {
     "status": "PASS",
     "database": "contractforge_tmp_ddl",
     "table": "plain_tblprops",
-    "caller_arn": "arn:aws:iam::449112696824:root",
+    "caller_arn": "arn:aws:iam::000000000000:root",
     "athena_workgroup": {
       "name": "primary",
       "state": "ENABLED"
@@ -21,7 +21,7 @@
     "glue_table": {
       "exists": true,
       "is_registered_with_lakeformation": true,
-      "location": "s3://contractforge-aws-smoke-449112696824-us-east-1/warehouse/tmp-ddl/plain_tblprops"
+      "location": "s3://contractforge-aws-smoke-000000000000-us-east-1/warehouse/tmp-ddl/plain_tblprops"
     },
     "lakeformation_table_permission_count": 5,
     "lakeformation_data_cells_filter_count": 1,
@@ -32,34 +32,34 @@
         "id"
       ]
     },
-    "consumer_principal": "arn:aws:iam::449112696824:role/ContractForgeLfGlueAllowedRole",
-    "athena_allowed_role_arn": "arn:aws:iam::449112696824:role/ContractForgeLfAthenaAllowedRole",
-    "athena_denied_role_arn": "arn:aws:iam::449112696824:role/ContractForgeLfAthenaDeniedRole",
-    "athena_output_location": "s3://contractforge-aws-smoke-449112696824-us-east-1/athena-results/",
+    "consumer_principal": "arn:aws:iam::000000000000:role/ContractForgeLfGlueAllowedRole",
+    "athena_allowed_role_arn": "arn:aws:iam::000000000000:role/ContractForgeLfAthenaAllowedRole",
+    "athena_denied_role_arn": "arn:aws:iam::000000000000:role/ContractForgeLfAthenaDeniedRole",
+    "athena_output_location": "s3://contractforge-aws-smoke-000000000000-us-east-1/athena-results/",
     "broad_iam_allowed_principals_revoked": true,
     "athena_read_validation": {
       "status": "PASS",
       "allowed_role_count": {
         "status": "PASS",
-        "query_id": "960a7cae-6f3d-4c09-987c-b9cd686bf8f9",
+        "query_id": "00000000-0000-0000-0000-000000000000",
         "state": "SUCCEEDED",
         "row_count": 0
       },
       "denied_role_count": {
         "status": "PASS",
-        "query_id": "f84325ee-85e5-405b-9ce1-b2bd35bb3b3d",
+        "query_id": "00000000-0000-0000-0000-000000000000",
         "state": "FAILED",
         "expected_failure": true,
         "reason": "TABLE_NOT_FOUND: denied role cannot see awsdatacatalog.contractforge_tmp_ddl.plain_tblprops"
       }
     },
     "temporary_runner_cleanup": {
-      "user": "arn:aws:iam::449112696824:user/ContractForgeLfAthenaRunner",
+      "user": "arn:aws:iam::000000000000:user/ContractForgeLfAthenaRunner",
       "status": "DELETED",
       "access_keys_remaining": 0
     },
-    "glue_allowed_role_arn": "arn:aws:iam::449112696824:role/ContractForgeLfGlueAllowedRole",
-    "glue_denied_role_arn": "arn:aws:iam::449112696824:role/ContractForgeLfGlueDeniedRole",
+    "glue_allowed_role_arn": "arn:aws:iam::000000000000:role/ContractForgeLfGlueAllowedRole",
+    "glue_denied_role_arn": "arn:aws:iam::000000000000:role/ContractForgeLfGlueDeniedRole",
     "glue_read_validation": {
       "status": "PASS",
       "allowed_role_count": {
@@ -83,14 +83,14 @@
       "rows": [
         {
           "access_type": "row_filter",
-          "principal": "arn:aws:iam::449112696824:role/ContractForgeLfAthenaAllowedRole",
+          "principal": "arn:aws:iam::000000000000:role/ContractForgeLfAthenaAllowedRole",
           "privilege": "SELECT",
           "object_name": "contractforge_lf_matrix_id_filter",
           "status": "APPLIED"
         },
         {
           "access_type": "row_filter",
-          "principal": "arn:aws:iam::449112696824:role/ContractForgeLfGlueAllowedRole",
+          "principal": "arn:aws:iam::000000000000:role/ContractForgeLfGlueAllowedRole",
           "privilege": "SELECT",
           "object_name": "contractforge_lf_matrix_id_filter",
           "status": "APPLIED"
@@ -117,3 +117,4 @@
   ],
   "open_items": []
 }
+

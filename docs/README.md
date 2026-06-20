@@ -20,6 +20,8 @@ ContractForge is a multi-runtime contract-first ingestion platform. The core pac
 - [GCP adapter](adapters/gcp.md): GCP BigQuery adapter guide, stable supported surface and review boundaries.
 - [Test contracts across adapters](adapters/test-contracts-across-adapters.md): side-by-side Databricks, AWS, Snowflake, Fabric and GCP guidance for proving the same ingestion with minimal contract diffs.
 - [Platform parity tests](platform-parity-tests.md): shared Databricks/AWS/Snowflake/Fabric/GCP scenarios that validate contract portability boundaries.
+- [ContractForge AI](ai.md): AI-assisted generation, validation and review with deterministic core and adapter gates.
+- [Deployment versioning](deployment-versioning.md): core-owned deployment ledger schema, adapter-native persistence and stable hash semantics.
 - [USGS GeoJSON medallion example](../examples/real-world/usgs-earthquake-rest-medallion/README.md): real Databricks, AWS, Snowflake, Fabric and GCP adapter parity project using the shared GeoJSON medallion intent.
 - [S3 file medallion example](../examples/real-world/s3-file-medallion/README.md): AWS Glue/Iceberg file ingestion project using S3 CSV files, Glue bookmarks and control-table evidence.
 - [AWS failure-path example](../examples/real-world/aws-failure-paths/README.md): contract-only negative tests for failed run evidence, error evidence and redaction.

@@ -39,7 +39,6 @@ on:
         type: choice
         options:
           - trusted-publishing
-          - api-token
       github_release:
         description: "Attach built distributions to a GitHub Release"
         required: true
@@ -212,19 +211,6 @@ jobs:
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           repository-url: https://test.pypi.org/legacy/
-
-      - name: Publish to PyPI with API token
-        if: needs.build.outputs.target == 'pypi' && needs.build.outputs.auth == 'api-token'
-        uses: pypa/gh-action-pypi-publish@release/v1
-        with:
-          password: ${{ secrets.PYPI_API_TOKEN }}
-
-      - name: Publish to TestPyPI with API token
-        if: needs.build.outputs.target == 'testpypi' && needs.build.outputs.auth == 'api-token'
-        uses: pypa/gh-action-pypi-publish@release/v1
-        with:
-          repository-url: https://test.pypi.org/legacy/
-          password: ${{ secrets.TEST_PYPI_API_TOKEN }}
 
   github-release-assets:
     name: Attach GitHub Release assets

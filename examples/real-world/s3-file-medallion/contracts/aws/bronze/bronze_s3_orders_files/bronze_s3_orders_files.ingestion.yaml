@@ -1,7 +1,7 @@
 source:
   type: incremental_files
   system: s3_order_files
-  path: s3://contractforge-aws-smoke-449112696824-us-east-1/data/s3-file-medallion/orders/
+  path: s3://contractforge-aws-smoke-000000000000-us-east-1/data/s3-file-medallion/orders/
   format: csv
   options:
     header: true
@@ -44,5 +44,5 @@ quality_rules:
 extensions:
   aws:
     iceberg:
-      warehouse: s3://contractforge-aws-smoke-449112696824-us-east-1/warehouse/s3-file-e2e/
+      warehouse: s3://contractforge-aws-smoke-000000000000-us-east-1/warehouse/s3-file-e2e/
 

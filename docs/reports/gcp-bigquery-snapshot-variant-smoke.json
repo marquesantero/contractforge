@@ -6,7 +6,7 @@
   "maturity_gate": "GCP-BQ-12C3",
   "status": "PASS_WITH_REVIEW_BOUNDARY",
   "executed_at": "2026-06-17",
-  "project_id": "midyear-system-499521-p3",
+  "project_id": "gcp-project-redacted",
   "location": "us-east1",
   "datasets": {
     "target": "contractforge_gcp_advanced_write_smoke",
@@ -98,3 +98,4 @@
   },
   "decision": "GCP-BQ-12C3 closes compact snapshot complete-source blocker, same-hash reactivation, missing-row tombstone and replay idempotency evidence for opt-in BigQuery review-required execution. Hash_diff_upsert production parity is accepted by GCP-BQ-12C; historical and snapshot production parity remains future work."
 }
+

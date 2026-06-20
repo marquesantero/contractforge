@@ -7,35 +7,35 @@
   "status": "PASS_WITH_REVIEW_BOUNDARY",
   "executed_at": "2026-06-17",
   "environment": {
-    "project_id": "midyear-system-499521-p3",
+    "project_id": "gcp-project-redacted",
     "location": "us-east1",
     "dataset": "contractforge_gcp_smoke",
     "evidence_dataset": "contractforge_gcp_smoke_ops"
   },
   "validated_surfaces": {
     "row_access_policy": {
-      "target": "midyear-system-499521-p3.contractforge_gcp_smoke.governance_ledger_smoke",
+      "target": "gcp-project-redacted.contractforge_gcp_smoke.governance_ledger_smoke",
       "policy": "paid_only_review",
       "filter": "status = 'paid'",
       "readback": "bq ls --row_access_policies",
       "status": "IN_SYNC"
     },
     "direct_data_policy": {
-      "target": "midyear-system-499521-p3.contractforge_gcp_smoke.masking_orders",
+      "target": "gcp-project-redacted.contractforge_gcp_smoke.masking_orders",
       "column": "amount",
-      "data_policy": "projects/897279804928/locations/us-east1/dataPolicies/cf_mask_amount_null",
+      "data_policy": "projects/000000000000/locations/us-east1/dataPolicies/cf_mask_amount_null",
       "readback": "bq show",
       "status": "IN_SYNC"
     },
     "policy_tag": {
-      "target": "midyear-system-499521-p3.contractforge_gcp_smoke.policy_tag_orders",
+      "target": "gcp-project-redacted.contractforge_gcp_smoke.policy_tag_orders",
       "column": "customer_email",
-      "policy_tag": "projects/897279804928/locations/us-east1/taxonomies/9041114829680434011/policyTags/3862408740743282741",
+      "policy_tag": "projects/000000000000/locations/us-east1/taxonomies/9041114829680434011/policyTags/3862408740743282741",
       "readback": "bq show and INFORMATION_SCHEMA.COLUMN_FIELD_PATHS",
       "status": "IN_SYNC"
     },
     "descriptions": {
-      "target": "midyear-system-499521-p3.contractforge_gcp_smoke.annotation_orders",
+      "target": "gcp-project-redacted.contractforge_gcp_smoke.annotation_orders",
       "table_description": "ContractForge GCP annotation smoke table",
       "column": "customer_email",
       "column_description": "Customer email from annotation contract",
@@ -43,8 +43,8 @@
       "status": "IN_SYNC"
     },
     "governance_evidence": {
-      "target": "midyear-system-499521-p3.contractforge_gcp_smoke.governance_ledger_smoke",
-      "table": "midyear-system-499521-p3.contractforge_gcp_smoke_ops.contractforge_governance_evidence",
+      "target": "gcp-project-redacted.contractforge_gcp_smoke.governance_ledger_smoke",
+      "table": "gcp-project-redacted.contractforge_gcp_smoke_ops.contractforge_governance_evidence",
       "row_count": 3,
       "surfaces": [
         "bigquery_description",
@@ -81,3 +81,4 @@
     "raw_personal_email_hits": 0
   }
 }
+

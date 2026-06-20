@@ -33,7 +33,7 @@ def test_snowflake_cli_failure_smoke_dry_run_does_not_connect(monkeypatch: pytes
 
 def test_snowflake_cli_failure_smoke_execute_requires_cleanup(tmp_path) -> None:
     options = tmp_path / "connect.yaml"
-    options.write_text("account: IW11590\nuser: CFINGESTSVC\n", encoding="utf-8")
+    options.write_text("account: TEST_ACCOUNT\nuser: CFINGESTSVC\n", encoding="utf-8")
 
     with pytest.raises(ValueError, match="--execute-cleanup"):
         snowflake_cli_main(["smoke-failure-paths", "--connect-options", str(options), "--execute"])
@@ -87,3 +87,4 @@ class _SmokeResult:
 
     def collect(self):
         return self._rows
+

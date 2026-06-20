@@ -200,8 +200,10 @@ adapters carry native runtime dependencies and behavior.
 | `contractforge-ai` | `0.3.0` | [PyPI](https://pypi.org/project/contractforge-ai/) | [AI companion](ai) |
 
 Releases are built by [`.github/workflows/release.yml`](.github/workflows/release.yml).
-The workflow can be started manually with `workflow_dispatch` for one package,
-or by pushing package-specific tags:
+The workflow publishes with PyPI Trusted Publishing through the GitHub
+environment named `pypi`; API-token publishing is intentionally not part of the
+repository workflow. The workflow can be started manually with
+`workflow_dispatch` for one package, or by pushing package-specific tags:
 
 ```text
 v<version>-core
@@ -213,8 +215,9 @@ v<version>-gcp
 v<version>-ai
 ```
 
-The workflow publishes the selected package to PyPI/TestPyPI and keeps GitHub
-Release assets for environments that cannot resolve PyPI at runtime:
+The workflow publishes the selected package to PyPI/TestPyPI through trusted
+publishing and keeps GitHub Release assets for environments that cannot resolve
+PyPI at runtime:
 
 - `.whl`: standard Python wheel for Databricks, Fabric, private runners and
   S3-hosted AWS Glue dependencies;
@@ -390,7 +393,8 @@ See [publication packaging](docs/specs/publication-packaging.md).
 | Test contracts across adapters | [docs/adapters/test-contracts-across-adapters.md](docs/adapters/test-contracts-across-adapters.md) |
 | Connectors | [docs/connectors.md](docs/connectors.md) |
 | Operations and evidence | [docs/operations.md](docs/operations.md) |
-| ContractForge AI | [ai/README.md](ai/README.md) |
+| ContractForge AI | [docs/ai.md](docs/ai.md) |
+| Deployment versioning | [docs/deployment-versioning.md](docs/deployment-versioning.md) |
 | Security | [docs/security.md](docs/security.md) |
 | Adapter authoring | [docs/specs/adapter-authoring.md](docs/specs/adapter-authoring.md) |
 | Contributing | [CONTRIBUTING.md](CONTRIBUTING.md) |

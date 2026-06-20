@@ -7,7 +7,7 @@ source_system:
   name: s3_order_files
   type: object_storage
   provider: s3
-  seed_prefix: s3://contractforge-aws-smoke-449112696824-us-east-1/data/s3-file-medallion/orders/
+  seed_prefix: s3://contractforge-aws-smoke-000000000000-us-east-1/data/s3-file-medallion/orders/
 
 environments:
   aws: environments/aws.environment.yaml
@@ -33,6 +33,6 @@ execution_order:
 
 validation:
   aws:
-    artifact_bucket: contractforge-aws-smoke-449112696824-us-east-1
+    artifact_bucket: contractforge-aws-smoke-000000000000-us-east-1
     evidence_database: contractforge_cf_s3_file_e2e_ops
 

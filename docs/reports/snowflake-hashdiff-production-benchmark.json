@@ -35,8 +35,8 @@
     {
       "case": "initial_load",
       "run_namespace": "live-20260609-162421",
-      "task_query_id": "01c4f0ba-0001-6b9d-0001-084600156126",
-      "run_id": "0429cd14-d326-4a1e-a0e0-2bdf402ca43c",
+      "task_query_id": "00000000-0000-0000-0000-000000000000",
+      "run_id": "00000000-0000-0000-0000-000000000000",
       "status": "SUCCESS",
       "quality_status": "PASSED",
       "rows_read": 4,
@@ -47,17 +47,17 @@
     {
       "case": "no_change_replay",
       "run_namespace": "live-20260609-162421",
-      "task_query_id": "01c4f0fb-0001-6b57-0001-0846001570c6",
-      "run_id": "3b15d453-123c-4fea-8ac9-006d1024cc74",
+      "task_query_id": "00000000-0000-0000-0000-000000000000",
+      "run_id": "00000000-0000-0000-0000-000000000000",
       "status": "SUCCESS",
       "quality_status": "PASSED",
       "rows_read": 4,
       "rows_written": 4,
       "hash_diff_candidate_rows": 0,
-      "write_query_id": "01c4f0fb-0001-6b57-0001-08460015717e",
+      "write_query_id": "00000000-0000-0000-0000-000000000000",
       "query_ids": [
-        "01c4f0fb-0001-6b57-0001-08460015711e",
-        "01c4f0fb-0001-6b57-0001-08460015717e"
+        "00000000-0000-0000-0000-000000000000",
+        "00000000-0000-0000-0000-000000000000"
       ],
       "target_count": 4,
       "metric_note": "Runtime evidence records logical source rows; target verification confirmed no duplicate rows.",
@@ -66,8 +66,8 @@
     {
       "case": "changed_row_wave",
       "run_namespace": "live-20260609-162421",
-      "task_query_id": "01c4f0d4-0001-6b9d-0001-08460015645e",
-      "run_id": "57f0db4e-6a91-46d9-a42b-62f7d93f782e",
+      "task_query_id": "00000000-0000-0000-0000-000000000000",
+      "run_id": "00000000-0000-0000-0000-000000000000",
       "status": "SUCCESS",
       "quality_status": "PASSED",
       "rows_read": 4,
@@ -94,8 +94,8 @@
     {
       "case": "duplicate_key_failure",
       "run_namespace": "live-20260609-162421",
-      "task_query_id": "01c4f0c2-0001-6b9d-0001-0846001563b2",
-      "run_id": "75eb107b-2455-43be-b70c-a0ba198c19dd",
+      "task_query_id": "00000000-0000-0000-0000-000000000000",
+      "run_id": "00000000-0000-0000-0000-000000000000",
       "status": "EXPECTED_FAILURE",
       "evidence_status": "FAILED",
       "quality_status": "FAILED",
@@ -108,8 +108,8 @@
     {
       "case": "null_key_failure",
       "run_namespace": "live-20260609-162421",
-      "task_query_id": "01c4f0c3-0001-6b57-0001-084600154ee2",
-      "run_id": "10d46265-a4ba-4610-b2c7-ab9cae01d7fe",
+      "task_query_id": "00000000-0000-0000-0000-000000000000",
+      "run_id": "00000000-0000-0000-0000-000000000000",
       "status": "EXPECTED_FAILURE",
       "evidence_status": "FAILED",
       "quality_status": "FAILED",
@@ -122,7 +122,7 @@
   ],
   "cost_reconciliation": {
     "status": "RECORDED",
-    "run_id": "3b15d453-123c-4fea-8ac9-006d1024cc74",
+    "run_id": "00000000-0000-0000-0000-000000000000",
     "query_count": 2,
     "last_checked": "2026-06-09",
     "max_wait_seconds": 90,
@@ -153,3 +153,4 @@
     "Remove or expire retained live benchmark artifacts after release audit evidence is archived."
   ]
 }
+

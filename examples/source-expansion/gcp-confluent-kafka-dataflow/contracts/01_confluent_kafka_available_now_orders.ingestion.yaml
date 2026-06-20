@@ -1,30 +1,30 @@
 source:
   type: kafka_available_now
   system: confluent_cloud
-  bootstrap_servers: pkc-619z3.us-east1.gcp.confluent.cloud:9092
+  bootstrap_servers: pkc-redacted.region.confluent.cloud:9092
   topic: cf-fabric-orders
   consumer_group_id: contractforge-gcp-dataflow-confluent-orders-20260617h
-  checkpoint_location: gs://contractforge-gcp-smoke-midyear-system-499521-p3/dataflow/checkpoints/confluent-orders-20260617h/
+  checkpoint_location: gs://contractforge-gcp-smoke-gcp-project-redacted/dataflow/checkpoints/confluent-orders-20260617h/
   starting_offsets: earliest
   message_format: JSON
   auth:
     mode: SASL_PLAIN
-    username_secret_id: projects/midyear-system-499521-p3/secrets/contractforge-confluent-kafka-api-key/versions/latest
-    password_secret_id: projects/midyear-system-499521-p3/secrets/contractforge-confluent-kafka-api-secret/versions/latest
+    username_secret_id: projects/gcp-project-redacted/secrets/contractforge-confluent-kafka-api-key/versions/latest
+    password_secret_id: projects/gcp-project-redacted/secrets/contractforge-confluent-kafka-api-secret/versions/latest
   output:
-    table: midyear-system-499521-p3:contractforge_gcp_streaming_smoke_usc.confluent_orders
-    deadletter_table: midyear-system-499521-p3:contractforge_gcp_streaming_smoke_usc.confluent_orders_dlq
+    table: gcp-project-redacted:contractforge_gcp_streaming_smoke_usc.confluent_orders
+    deadletter_table: gcp-project-redacted:contractforge_gcp_streaming_smoke_usc.confluent_orders_dlq
   dataflow:
-    project_id: midyear-system-499521-p3
+    project_id: gcp-project-redacted
     location: us-central1
-    temp_location: gs://contractforge-gcp-smoke-midyear-system-499521-p3/dataflow/temp/
+    temp_location: gs://contractforge-gcp-smoke-gcp-project-redacted/dataflow/temp/
     job_name: cf-gcp-confluent-orders-20260617h-rerun
     worker_machine_type: e2-standard-2
     num_workers: 1
     max_workers: 1
 
 target:
-  catalog: midyear-system-499521-p3
+  catalog: gcp-project-redacted
   schema: contractforge_gcp_streaming_smoke_usc
   table: confluent_orders
 

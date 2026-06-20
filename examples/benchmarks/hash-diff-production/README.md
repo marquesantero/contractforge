@@ -26,7 +26,7 @@ contractforge-aws deploy-project examples/benchmarks/hash-diff-production/projec
   --wait \
   --record-cost-evidence \
   --audit-evidence \
-  --athena-output-location s3://contractforge-aws-smoke-449112696824-us-east-1/athena-results/hash-diff-production/
+  --athena-output-location s3://contractforge-aws-smoke-000000000000-us-east-1/athena-results/hash-diff-production/
 ```
 
 GCP:

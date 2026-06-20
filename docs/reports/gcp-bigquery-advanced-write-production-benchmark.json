@@ -10,7 +10,7 @@
   "validated": "2026-06-17",
   "stable_final_blocker": true,
   "review_boundary": "GCP BigQuery production-sized historical and snapshot execution passed through explicit review-required contract execution. Advanced write modes remain excluded from stable-final until cross-adapter parity is accepted.",
-  "project_id": "midyear-system-499521-p3",
+  "project_id": "gcp-project-redacted",
   "location": "us-east1",
   "datasets": {
     "target": "contractforge_gcp_advanced_prod",
@@ -218,11 +218,11 @@
     }
   },
   "retained_artifacts": {
-    "historical_source_table": "midyear-system-499521-p3.contractforge_gcp_advanced_prod.customers_historical_source",
-    "historical_target_table": "midyear-system-499521-p3.contractforge_gcp_advanced_prod.customers_historical_target",
-    "snapshot_source_table": "midyear-system-499521-p3.contractforge_gcp_advanced_prod.customers_snapshot_source",
-    "snapshot_target_table": "midyear-system-499521-p3.contractforge_gcp_advanced_prod.customers_snapshot_target",
-    "evidence_dataset": "midyear-system-499521-p3.contractforge_gcp_advanced_prod_ops"
+    "historical_source_table": "gcp-project-redacted.contractforge_gcp_advanced_prod.customers_historical_source",
+    "historical_target_table": "gcp-project-redacted.contractforge_gcp_advanced_prod.customers_historical_target",
+    "snapshot_source_table": "gcp-project-redacted.contractforge_gcp_advanced_prod.customers_snapshot_source",
+    "snapshot_target_table": "gcp-project-redacted.contractforge_gcp_advanced_prod.customers_snapshot_target",
+    "evidence_dataset": "gcp-project-redacted.contractforge_gcp_advanced_prod_ops"
   },
   "cleanup_status": "RETAINED_FOR_AUDIT",
   "benchmark_project": "examples/benchmarks/advanced-write-production/project.yaml",
@@ -241,3 +241,4 @@
     "https://docs.cloud.google.com/bigquery/docs/access-historical-data"
   ]
 }
+

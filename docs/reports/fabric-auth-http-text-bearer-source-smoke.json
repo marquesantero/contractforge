@@ -8,14 +8,14 @@
   "project": "examples/source-expansion/fabric-auth-http-text-bearer/project.yaml",
   "environment": "examples/source-expansion/fabric-auth-http-text-bearer/environments/fabric.environment.yaml",
   "workspace": {
-    "id": "061fd0c8-c248-4628-a332-6adf16623533",
+    "id": "00000000-0000-0000-0000-000000000000",
     "name": "Manager",
-    "capacity_id": "2139f1ea-2676-46bf-ab4f-ab248c768056",
+    "capacity_id": "00000000-0000-0000-0000-000000000000",
     "capacity_sku": "FTL4",
     "capacity_region": "Brazil South"
   },
   "lakehouse": {
-    "id": "07067d3f-d5e2-48c1-b526-634620e57d4b",
+    "id": "00000000-0000-0000-0000-000000000000",
     "name": "contractforge_lh"
   },
   "source_infrastructure": {
@@ -66,8 +66,8 @@
       "name": "authenticated_http_text_bearer",
       "contract": "contracts/01_authenticated_http_text_bearer.ingestion.yaml",
       "notebook": "cf_workspace_cf_fabric_source_expansion_auth_http_text_bearer",
-      "item_id": "5a6e586d-2008-483d-a12a-241253bd425a",
-      "job_instance_id": "6a733f35-734b-45e9-bd7e-f262473438ab",
+      "item_id": "00000000-0000-0000-0000-000000000000",
+      "job_instance_id": "00000000-0000-0000-0000-000000000000",
       "job_status": "Completed",
       "started_at_utc": "2026-06-12T10:48:04.3782513",
       "ended_at_utc": "2026-06-12T10:51:31.8751914"
@@ -76,8 +76,8 @@
       "name": "authenticated_http_text_bearer_evidence_probe",
       "contract": "contracts/02_authenticated_http_text_bearer_evidence_probe.ingestion.yaml",
       "notebook": "cf_workspace_cf_fabric_source_expansion_auth_http_text_bearer_evidence_probe",
-      "item_id": "5cbfccd1-82d4-421d-80cc-32ceb68b8cea",
-      "job_instance_id": "5919b27b-7f2e-4f14-9e42-d9d1b691948e",
+      "item_id": "00000000-0000-0000-0000-000000000000",
+      "job_instance_id": "00000000-0000-0000-0000-000000000000",
       "job_status": "Completed",
       "started_at_utc": "2026-06-12T10:52:15.9786196",
       "ended_at_utc": "2026-06-12T10:55:59.3513543"
@@ -88,3 +88,4 @@
     "The public endpoint accepts any bearer token value; token introspection is outside the stable claim and endpoint-enforced API-key HTTP-file authorization is covered by a separate Fabric F11 smoke report."
   ]
 }
+

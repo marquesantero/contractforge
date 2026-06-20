@@ -117,14 +117,14 @@
       "rows_written": null,
       "error_type": "ValueError",
       "error_message_prefix": "hash_diff_upsert source contains null merge_keys: [customer_id]",
-      "validated_with_private_runtime_wheel": "s3://contractforge-aws-smoke-449112696824-us-east-1/contractforge-hashdiff-production/live-20260609-161420-nullguard/libs/contractforge_aws-0.1.0-py3-none-any.whl",
+      "validated_with_private_runtime_wheel": "s3://contractforge-aws-smoke-000000000000-us-east-1/contractforge-hashdiff-production/live-20260609-161420-nullguard/libs/contractforge_aws-0.1.0-py3-none-any.whl",
       "control_audit_status": "PASS"
     }
   ],
-  "benchmark_report_query_execution_id": "a11e2dc5-de22-46e0-8528-f40681e7bff8",
+  "benchmark_report_query_execution_id": "00000000-0000-0000-0000-000000000000",
   "evidence_queries": [
-    "7dd42339-2636-4034-99d1-0a9f1e423391",
-    "98eff16f-df8a-4cda-aa7f-bf73f516a9f7"
+    "00000000-0000-0000-0000-000000000000",
+    "00000000-0000-0000-0000-000000000000"
   ],
   "cleanup_status": "RETAINED_FOR_AUDIT",
   "benchmark_project": "examples/benchmarks/hash-diff-production/project.yaml",
@@ -134,3 +134,4 @@
     "Remove or expire retained live benchmark artifacts after release audit evidence is archived."
   ]
 }
+

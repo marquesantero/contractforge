@@ -189,7 +189,7 @@ def test_usgs_rest_medallion_gcp_contracts_plan_and_render_without_workarounds()
     silver = load_contract_bundle(PROJECT / project["execution_order"][1]["contracts"]["gcp"]).contract
     assert "JSON_QUERY_ARRAY(payload, '$.features')" in silver["source"]["query"]
     gold_daily = load_contract_bundle(PROJECT / project["execution_order"][2]["contracts"]["gcp"]).contract
-    assert "FROM `midyear-system-499521-p3.contractforge_gcp_usgs_rest_silver.s_usgs_earthquake_events`" in gold_daily["source"]["query"]
+    assert "FROM `gcp-project-redacted.contractforge_gcp_usgs_rest_silver.s_usgs_earthquake_events`" in gold_daily["source"]["query"]
 
 
 def test_usgs_rest_medallion_fabric_contracts_plan_and_render_without_workarounds() -> None:

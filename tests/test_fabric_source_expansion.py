@@ -681,7 +681,7 @@ def test_fabric_authenticated_rest_oauth_source_expansion_project_is_contract_on
     assert project["source_expansion"]["expected_probe_checks"] == 6
     assert len(project["execution_order"]) == 2
     assert contract["source"]["auth"]["type"] == "oauth_client_credentials"
-    assert contract["source"]["auth"]["client_id"] == "e2ff9b6c-36d7-411b-acb0-7e950fc1260f"
+    assert contract["source"]["auth"]["client_id"] == "00000000-0000-0000-0000-000000000000"
     assert contract["source"]["auth"]["client_secret"] == "{{ secret:fabric/oauth-client-secret }}"
     assert contract["source"]["auth"]["scope"] == "https://management.azure.com/.default"
     assert environment["secrets"]["scopes"]["fabric"] == "https://cffabricf11kv.vault.azure.net/"
@@ -1627,7 +1627,7 @@ def test_fabric_external_azure_blob_shortcut_source_expansion_project_is_contrac
     )
     assert (
         environment["parameters"]["fabric"]["connections"]["azure_blob_shortcut_connection_id"]
-        == "62531089-8a7c-4a9e-acb2-1b6f2618c420"
+        == "00000000-0000-0000-0000-000000000000"
     )
     assert contract["source"] == {
         "type": "csv",
@@ -1733,7 +1733,7 @@ def test_fabric_adls_shortcut_source_expansion_project_is_contract_only() -> Non
     )
     assert (
         environment["parameters"]["fabric"]["connections"]["adls_shortcut_connection_id"]
-        == "360bb77e-d609-4a81-baad-42ec5321db49"
+        == "00000000-0000-0000-0000-000000000000"
     )
     assert contract["source"] == {
         "type": "csv",
@@ -1836,7 +1836,7 @@ def test_fabric_gcs_shortcut_source_expansion_project_is_contract_only() -> None
     )
     assert (
         environment["parameters"]["fabric"]["connections"]["gcs_shortcut_connection_id"]
-        == "144fdc8c-7fbe-4f87-ad24-ba12459f0ca9"
+        == "00000000-0000-0000-0000-000000000000"
     )
     assert contract["source"] == {
         "type": "csv",
@@ -1939,7 +1939,7 @@ def test_fabric_external_s3_shortcut_source_expansion_project_is_contract_only()
     )
     assert (
         environment["parameters"]["fabric"]["connections"]["amazon_s3_shortcut_connection_id"]
-        == "8ddb57e8-473f-42b7-ae79-b82338b0ed31"
+        == "00000000-0000-0000-0000-000000000000"
     )
     assert contract["source"] == {
         "type": "csv",
@@ -2043,10 +2043,10 @@ def test_fabric_s3_compatible_shortcut_source_expansion_project_is_contract_only
     assert shortcut["target"]["s3Compatible"]["connectionId"] == (
         "{{ parameter:fabric.connections.s3_compatible_shortcut_connection_id }}"
     )
-    assert shortcut["target"]["s3Compatible"]["bucket"] == "contractforge-aws-smoke-449112696824-us-east-1"
+    assert shortcut["target"]["s3Compatible"]["bucket"] == "contractforge-aws-smoke-000000000000-us-east-1"
     assert (
         environment["parameters"]["fabric"]["connections"]["s3_compatible_shortcut_connection_id"]
-        == "cca5647e-1e4c-4cc3-b698-5bcf3cd5aa30"
+        == "00000000-0000-0000-0000-000000000000"
     )
     assert contract["source"] == {
         "type": "csv",
@@ -2154,7 +2154,7 @@ def test_fabric_iceberg_table_shortcut_source_expansion_project_is_contract_only
     )
     assert (
         environment["parameters"]["fabric"]["connections"]["amazon_s3_shortcut_connection_id"]
-        == "8ddb57e8-473f-42b7-ae79-b82338b0ed31"
+        == "00000000-0000-0000-0000-000000000000"
     )
     assert contract["source"] == {"type": "iceberg_table", "table": "cf_fabric_iceberg_orders"}
 
@@ -2259,7 +2259,7 @@ def test_fabric_adls_iceberg_table_shortcut_source_expansion_project_is_contract
     )
     assert (
         environment["parameters"]["fabric"]["connections"]["adls_shortcut_connection_id"]
-        == "360bb77e-d609-4a81-baad-42ec5321db49"
+        == "00000000-0000-0000-0000-000000000000"
     )
     assert contract["source"] == {"type": "iceberg_table", "table": "cf_fabric_adls_iceberg_orders"}
 
@@ -2364,7 +2364,7 @@ def test_fabric_gcs_iceberg_table_shortcut_source_expansion_project_is_contract_
     )
     assert (
         environment["parameters"]["fabric"]["connections"]["gcs_shortcut_connection_id"]
-        == "144fdc8c-7fbe-4f87-ad24-ba12459f0ca9"
+        == "00000000-0000-0000-0000-000000000000"
     )
     assert contract["source"] == {"type": "iceberg_table", "table": "cf_fabric_gcs_iceberg_orders"}
 
@@ -2464,7 +2464,7 @@ def test_fabric_confluent_kafka_bounded_source_expansion_project_is_contract_onl
     assert len(project["execution_order"]) == 2
     assert contract["source"]["type"] == "kafka_bounded"
     assert contract["source"]["system"] == "confluent_cloud"
-    assert contract["source"]["bootstrap_servers"] == "pkc-619z3.us-east1.gcp.confluent.cloud:9092"
+    assert contract["source"]["bootstrap_servers"] == "pkc-redacted.region.confluent.cloud:9092"
     assert contract["source"]["topic"] == "cf-fabric-orders"
     assert contract["source"]["options"]["kafka.sasl.jaas.config"] == "{{ secret:fabric/fabric-confluent-kafka-jaas-config }}"
     assert environment["secrets"]["scopes"]["fabric"] == "https://cffabricf11kv.vault.azure.net/"
@@ -2489,7 +2489,7 @@ def test_fabric_confluent_kafka_bounded_source_expansion_plans_and_renders_noteb
     assert planning.status == "SUPPORTED_WITH_WARNINGS"
     assert not planning.blockers
     assert ".format('kafka')" in notebook
-    assert ".option('kafka.bootstrap.servers', 'pkc-619z3.us-east1.gcp.confluent.cloud:9092')" in notebook
+    assert ".option('kafka.bootstrap.servers', 'pkc-redacted.region.confluent.cloud:9092')" in notebook
     assert ".option('subscribe', 'cf-fabric-orders')" in notebook
     assert "_cf_resolve_secret('fabric', 'fabric-confluent-kafka-jaas-config')" in notebook
     assert "{{ secret:fabric/" not in notebook

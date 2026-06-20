@@ -40,9 +40,9 @@
   "execution_evidence": {
     "report": "docs/reports/gcp-dataplex-data-quality-execution-smoke.json",
     "data_scan_id": "cf-contractforge-gcp-advanced-prod-customers-snapshot-target-dq",
-    "job_id": "057cfa5a-b30b-4ec7-8f52-01654dbf3fd1",
+    "job_id": "00000000-0000-0000-0000-000000000000",
     "job_state": "SUCCEEDED",
-    "target_table": "midyear-system-499521-p3.contractforge_gcp_advanced_prod.customers_snapshot_target",
+    "target_table": "gcp-project-redacted.contractforge_gcp_advanced_prod.customers_snapshot_target",
     "rows_scanned": 10000,
     "export_rows_read": 7
   },
@@ -50,9 +50,9 @@
     "report": "docs/reports/gcp-dataplex-lineage-aspects-smoke.json",
     "lineage_run_id": "cf_gcp_dataplex_lineage_aspects_smoke_20260617_b",
     "aspect_run_id": "cf_gcp_dataplex_aspects_smoke_20260617_e",
-    "target_table": "midyear-system-499521-p3.contractforge_gcp_smoke.workflow_gold_orders_by_status",
+    "target_table": "gcp-project-redacted.contractforge_gcp_smoke.workflow_gold_orders_by_status",
     "lineage_events_read": 1,
-    "aspect_type": "projects/midyear-system-499521-p3/locations/us-east1/aspectTypes/contractforge-governance",
+    "aspect_type": "projects/gcp-project-redacted/locations/us-east1/aspectTypes/contractforge-governance",
     "entry_search_total_size": 1,
     "modify_entry_readback": true
   },
@@ -72,3 +72,4 @@
     "https://docs.cloud.google.com/dataplex/docs/reference/rest/v1/projects.locations.aspectTypes"
   ]
 }
+

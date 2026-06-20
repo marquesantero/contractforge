@@ -6,7 +6,7 @@
   "maturity_gate": "GCP-BQ-15C8",
   "status": "PASS",
   "executed_at": "2026-06-16T20:06:38Z",
-  "project_id": "midyear-system-499521-p3",
+  "project_id": "gcp-project-redacted",
   "workflow": {
     "name": "cf-gcp-workflows-smoke-runner",
     "location": "us-central1",
@@ -28,7 +28,7 @@
       "workflows",
       "delete",
       "cf-gcp-workflows-smoke-runner",
-      "--project=midyear-system-499521-p3",
+      "--project=gcp-project-redacted",
       "--location=us-central1",
       "--quiet"
     ]
@@ -60,3 +60,4 @@
     "https://docs.cloud.google.com/sdk/gcloud/reference"
   ]
 }
+

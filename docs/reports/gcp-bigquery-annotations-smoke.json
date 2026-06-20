@@ -4,7 +4,7 @@
   "status": "SUCCEEDED",
   "ok": true,
   "executed": true,
-  "project_id": "midyear-system-499521-p3",
+  "project_id": "gcp-project-redacted",
   "location": "us-east1",
   "dataset": "contractforge_gcp_smoke",
   "table": "annotation_orders",
@@ -25,19 +25,19 @@
       "name": "create_annotation_table",
       "status": "SUCCEEDED",
       "statement_type": "CREATE_TABLE",
-      "target": "midyear-system-499521-p3.contractforge_gcp_smoke.annotation_orders"
+      "target": "gcp-project-redacted.contractforge_gcp_smoke.annotation_orders"
     },
     {
       "name": "apply_table_description",
       "status": "SUCCEEDED",
       "statement_type": "ALTER_TABLE_SET_OPTIONS",
-      "target": "midyear-system-499521-p3.contractforge_gcp_smoke.annotation_orders"
+      "target": "gcp-project-redacted.contractforge_gcp_smoke.annotation_orders"
     },
     {
       "name": "apply_column_description",
       "status": "SUCCEEDED",
       "statement_type": "ALTER_TABLE_ALTER_COLUMN_SET_OPTIONS",
-      "target": "midyear-system-499521-p3.contractforge_gcp_smoke.annotation_orders.customer_email"
+      "target": "gcp-project-redacted.contractforge_gcp_smoke.annotation_orders.customer_email"
     },
     {
       "name": "readback_table_description",
@@ -66,7 +66,7 @@
     {
       "name": "persist_annotation_evidence",
       "status": "SUCCEEDED",
-      "target": "midyear-system-499521-p3.contractforge_gcp_smoke_ops.contractforge_annotation_evidence",
+      "target": "gcp-project-redacted.contractforge_gcp_smoke_ops.contractforge_annotation_evidence",
       "affected_rows": 2
     },
     {
@@ -102,3 +102,4 @@
     "https://docs.cloud.google.com/bigquery/docs/information-schema-column-field-paths"
   ]
 }
+

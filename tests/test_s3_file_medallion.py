@@ -73,10 +73,10 @@ def test_s3_file_contracts_render_runtime_artifacts() -> None:
     assert "job-bookmark-enable" in bronze_definition
     assert "contractforge_cf_s3_file_e2e_bronze.b_orders_files" in silver_job
     assert "contractforge_cf_s3_file_e2e_silver.s_orders_daily" in gold_job
-    assert "s3://contractforge-aws-smoke-449112696824-us-east-1/warehouse/s3-file-e2e/" in bronze_job
-    assert "arn:aws:s3:::contractforge-aws-smoke-449112696824-us-east-1/contractforge-s3-file-e2e/*" in bronze_iam
-    assert "arn:aws:s3:::contractforge-aws-smoke-449112696824-us-east-1/artifacts/contractforge/libs/contractforge_core-0.1.0-py3-none-any.whl" in bronze_iam
-    assert "arn:aws:s3:::contractforge-aws-smoke-449112696824-us-east-1/artifacts/contractforge/libs/contractforge_aws-0.1.0-py3-none-any.whl" in bronze_iam
+    assert "s3://contractforge-aws-smoke-000000000000-us-east-1/warehouse/s3-file-e2e/" in bronze_job
+    assert "arn:aws:s3:::contractforge-aws-smoke-000000000000-us-east-1/contractforge-s3-file-e2e/*" in bronze_iam
+    assert "arn:aws:s3:::contractforge-aws-smoke-000000000000-us-east-1/artifacts/contractforge/libs/contractforge_core-0.1.0-py3-none-any.whl" in bronze_iam
+    assert "arn:aws:s3:::contractforge-aws-smoke-000000000000-us-east-1/artifacts/contractforge/libs/contractforge_aws-0.1.0-py3-none-any.whl" in bronze_iam
     assert any(name.endswith(".deployment_manifest.json") for name in bronze_artifacts)
 
 
