@@ -12,7 +12,7 @@ fabric_setup:
       conflict_policy: CreateOrOverwrite
       target:
         googleCloudStorage:
-          location: https://contractforge-fabric-gcs-testebig-496714.storage.googleapis.com
+          location: https://contractforge-fabric-gcs-example-project-000000.storage.googleapis.com
           subpath: /source-expansion
           connectionId: "{{ parameter:fabric.connections.gcs_shortcut_connection_id }}"
 
@@ -43,5 +43,5 @@ source_expansion:
     name: gcs_orders
     read_path: Files/source-expansion/gcs-shortcuts/gcs_orders/orders.csv
     target_type: GoogleCloudStorage
-    target_location: https://contractforge-fabric-gcs-testebig-496714.storage.googleapis.com
+    target_location: https://contractforge-fabric-gcs-example-project-000000.storage.googleapis.com
     target_subpath: /source-expansion

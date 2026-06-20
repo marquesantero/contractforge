@@ -7,7 +7,7 @@
   "status": "PASS",
   "executed_at": "2026-06-10",
   "databricks_profile": "dbc-redacted",
-  "workspace_user": "marco@marques.inf.br",
+  "workspace_user": "workspace-user@example.com",
   "validation_scope": {
     "contract_only": true,
     "runner": "contractforge_databricks.runtime.bundles.ingest_databricks_bundle",

@@ -12,7 +12,7 @@ fabric_setup:
       conflict_policy: CreateOrOverwrite
       target:
         googleCloudStorage:
-          location: https://contractforge-fabric-gcs-testebig-496714.storage.googleapis.com
+          location: https://contractforge-fabric-gcs-example-project-000000.storage.googleapis.com
           subpath: /iceberg-shortcut/iceberg_orders
           connectionId: "{{ parameter:fabric.connections.gcs_shortcut_connection_id }}"
 
@@ -41,11 +41,11 @@ source_expansion:
   fixture:
     generator: reused_pyiceberg_fixture_from_s3_iceberg_smoke
     rows: 3
-    gcs_prefix: gs://contractforge-fabric-gcs-testebig-496714/iceberg-shortcut/iceberg_orders/
+    gcs_prefix: gs://contractforge-fabric-gcs-example-project-000000/iceberg-shortcut/iceberg_orders/
   shortcut:
     path: Tables
     name: cf_fabric_gcs_iceberg_orders
     read_table: cf_fabric_gcs_iceberg_orders
     target_type: GoogleCloudStorage
-    target_location: https://contractforge-fabric-gcs-testebig-496714.storage.googleapis.com
+    target_location: https://contractforge-fabric-gcs-example-project-000000.storage.googleapis.com
     target_subpath: /iceberg-shortcut/iceberg_orders

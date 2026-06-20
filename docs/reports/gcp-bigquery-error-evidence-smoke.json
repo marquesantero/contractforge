@@ -6,7 +6,7 @@
   "ok": true,
   "executed": true,
   "validated_at_utc": "2026-06-15T17:25:00Z",
-  "project_id": "testebig-496714",
+  "project_id": "example-project-000000",
   "location": "us-east1",
   "dataset": "contractforge_gcp_smoke",
   "evidence_dataset": "contractforge_gcp_smoke_ops",
@@ -31,7 +31,7 @@
       "status": "FAILED",
       "job_id": "cf_gcp_smoke_query_5a12630e20a446f595a1",
       "error_class": "BigQuery table not found",
-      "missing_object": "testebig-496714.contractforge_gcp_smoke.cf_missing_for_error_smoke"
+      "missing_object": "example-project-000000.contractforge_gcp_smoke.cf_missing_for_error_smoke"
     },
     {
       "name": "persist_run_evidence",
@@ -45,7 +45,7 @@
     }
   ],
   "readback": {
-    "table": "testebig-496714.contractforge_gcp_smoke_ops.contractforge_run_evidence",
+    "table": "example-project-000000.contractforge_gcp_smoke_ops.contractforge_run_evidence",
     "run_id": "cf_gcp_smoke_query_5a12630e20a446f595a1",
     "contract_name": "error_smoke_target",
     "status": "FAILED",

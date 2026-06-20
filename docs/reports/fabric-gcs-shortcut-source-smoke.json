@@ -21,11 +21,11 @@
   },
   "source_infrastructure": {
     "provider": "google_cloud_storage",
-    "gcp_project": "testebig-496714",
-    "bucket": "contractforge-fabric-gcs-testebig-496714",
+    "gcp_project": "example-project-000000",
+    "bucket": "contractforge-fabric-gcs-example-project-000000",
     "fixture_path": "source-expansion/orders.csv",
     "fixture_rows": 2,
-    "service_account": "cf-fabric-gcs-shortcut@testebig-496714.iam.gserviceaccount.com",
+    "service_account": "cf-fabric-gcs-shortcut@example-project-000000.iam.gserviceaccount.com",
     "fabric_connection": {
       "id": "00000000-0000-0000-0000-000000000000",
       "display_name": "contractforge-fabric-gcs-shortcut",
@@ -38,7 +38,7 @@
       "path": "Files/source-expansion/gcs-shortcuts",
       "name": "gcs_orders",
       "target_type": "GoogleCloudStorage",
-      "target_location": "https://contractforge-fabric-gcs-testebig-496714.storage.googleapis.com",
+      "target_location": "https://contractforge-fabric-gcs-example-project-000000.storage.googleapis.com",
       "target_subpath": "/source-expansion"
     }
   },

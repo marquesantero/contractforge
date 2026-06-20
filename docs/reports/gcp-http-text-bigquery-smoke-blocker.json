@@ -19,7 +19,7 @@
   "blocker": {
     "code": "GCLOUD_REAUTH_REQUIRED",
     "message": "bq cannot refresh the active gcloud account token in non-interactive execution.",
-    "active_account": "marco@intentus.dev",
+    "active_account": "runner@example.com",
     "project": "gcp-project-redacted",
     "error_prefix": "There was a problem refreshing your current auth tokens: Reauthentication failed. cannot prompt during non-interactive execution."
   },
@@ -29,7 +29,7 @@
     "The smoke runtime converts text lines to newline-delimited JSON before BigQuery load."
   ],
   "required_to_unblock": [
-    "Run gcloud auth login interactively for marco@intentus.dev or switch to a non-expired authenticated account.",
+    "Run gcloud auth login interactively for runner@example.com or switch to a non-expired authenticated account.",
     "Run the real BigQuery http_text smoke and read back target/evidence rows.",
     "Replace this blocker with a PASS report if the contract-only execution succeeds."
   ],
