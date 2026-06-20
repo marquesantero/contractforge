@@ -1,0 +1,97 @@
+{
+  "kind": "contractforge_fabric_source_expansion_evidence",
+  "adapter": "fabric",
+  "source_family": "onelake_shortcut",
+  "shortcut_kind": "internal_onelake_files",
+  "source_format": "orc",
+  "validated_at_utc": "2026-06-12T23:03:03Z",
+  "status": "SUCCEEDED",
+  "project": "examples/source-expansion/fabric-onelake-shortcut/project.yaml",
+  "environment": "examples/source-expansion/fabric-onelake-shortcut/environments/fabric.environment.yaml",
+  "workspace": {
+    "id": "00000000-0000-0000-0000-000000000000",
+    "name": "Manager",
+    "capacity_id": "00000000-0000-0000-0000-000000000000",
+    "capacity_region": "Brazil South"
+  },
+  "lakehouse": {
+    "id": "00000000-0000-0000-0000-000000000000",
+    "name": "contractforge_lh"
+  },
+  "source_infrastructure": {
+    "provider": "fabric_onelake_shortcut",
+    "shortcut": {
+      "path": "Files/source-expansion/onelake-shortcuts",
+      "name": "source_expansion_shortcut",
+      "read_path": "Files/source-expansion/onelake-shortcuts/source_expansion_shortcut/lakehouse-file-formats/orc_orders",
+      "target_path": "Files/source-expansion"
+    },
+    "shortcut_create_api": "POST /workspaces/{workspaceId}/items/{lakehouseId}/shortcuts?shortcutConflictPolicy=CreateOrOverwrite",
+    "shortcut_target": {
+      "type": "OneLake",
+      "workspaceId": "00000000-0000-0000-0000-000000000000",
+      "itemId": "00000000-0000-0000-0000-000000000000",
+      "path": "Files/source-expansion"
+    }
+  },
+  "commands": [
+    "az rest --method post --resource https://api.fabric.microsoft.com --headers Content-Type=application/json --url https://api.fabric.microsoft.com/v1/workspaces/00000000-0000-0000-0000-000000000000/items/00000000-0000-0000-0000-000000000000/shortcuts?shortcutConflictPolicy=CreateOrOverwrite --body @.tmp/fabric_onelake_shortcut_request.json",
+    "contractforge-fabric smoke-project examples/source-expansion/fabric-onelake-shortcut/project.yaml --environment-key fabric --max-attempts 35 --retry-after-seconds 30"
+  ],
+  "contract_source": {
+    "basis": "Contract-only Fabric Lakehouse ORC read through an internal OneLake shortcut plus SQL evidence probe",
+    "workaround_code_used": false,
+    "source_type": "orc",
+    "runtime_path": "Generated Fabric Notebook using Spark DataFrameReader over the OneLake shortcut path"
+  },
+  "coverage": {
+    "source_read": [
+      "internal_onelake_shortcut_orc"
+    ],
+    "target_tables": [
+      "cf_fabric_source_expansion.onelake_shortcut_orc_orders"
+    ],
+    "probe_table": "cf_fabric_source_expansion.onelake_shortcut_evidence_probe",
+    "probe_checks": [
+      "shortcut_target_rows",
+      "shortcut_amount_sum",
+      "run_rows",
+      "quality_rows",
+      "source_metadata_rows"
+    ]
+  },
+  "result_summary": {
+    "submitted_steps": 2,
+    "fabric_job_status_completed": 2,
+    "evidence_probe_result": "SUCCEEDED",
+    "evidence_probe_checks": 5
+  },
+  "steps": [
+    {
+      "name": "onelake_shortcut_orc_orders",
+      "contract": "contracts/01_onelake_shortcut_orc_orders.ingestion.yaml",
+      "notebook": "cf_workspace_cf_fabric_source_expansion_onelake_shortcut_orc_orders",
+      "item_id": "00000000-0000-0000-0000-000000000000",
+      "job_instance_id": "00000000-0000-0000-0000-000000000000",
+      "job_status": "Completed",
+      "started_at_utc": "2026-06-12T22:55:19.157938",
+      "ended_at_utc": "2026-06-12T22:58:50.1503065"
+    },
+    {
+      "name": "onelake_shortcut_evidence_probe",
+      "contract": "contracts/02_onelake_shortcut_evidence_probe.ingestion.yaml",
+      "notebook": "cf_workspace_cf_fabric_source_expansion_onelake_shortcut_evidence_probe",
+      "item_id": "00000000-0000-0000-0000-000000000000",
+      "job_instance_id": "00000000-0000-0000-0000-000000000000",
+      "job_status": "Completed",
+      "started_at_utc": "2026-06-12T22:59:32.0333178",
+      "ended_at_utc": "2026-06-12T23:03:03.0673445"
+    }
+  ],
+  "known_limitations": [
+    "This validates an internal OneLake shortcut to the same Lakehouse Files hierarchy.",
+    "External Azure Blob shortcuts are covered by docs/reports/fabric-external-azure-blob-shortcut-source-smoke.json, external ADLS Gen2 shortcuts are covered by docs/reports/fabric-adls-shortcut-source-smoke.json, external Google Cloud Storage shortcuts are covered by docs/reports/fabric-gcs-shortcut-source-smoke.json, external Amazon S3 shortcuts are covered by docs/reports/fabric-external-s3-shortcut-source-smoke.json and external S3-compatible shortcuts are covered by docs/reports/fabric-s3-compatible-shortcut-source-smoke.json. Private-network shortcuts and managed identity/OAuth object-storage access remain separate review gates.",
+    "Fabric stable_final is true for the documented notebook-first surface. Source families outside this stable scope are excluded by docs/reports/fabric-source-expansion-stable-scope-decision.json. Explicit Fabric-native OneLake row and column policy apply is covered separately by docs/reports/fabric-onelake-row-column-policy-smoke.json, and deployment-pipeline stage promotion is covered by docs/reports/fabric-deployment-pipeline-stage-promotion-smoke.json."
+  ]
+}
+

@@ -1,0 +1,113 @@
+{
+  "kind": "contractforge_gcp_dataplex_lineage_aspects_smoke",
+  "schema_version": "1.0.0",
+  "adapter": "contractforge-gcp",
+  "subtarget": "gcp_bigquery",
+  "maturity_gate": "GCP-BQ-16B",
+  "status": "PASS_WITH_REVIEW_BOUNDARY",
+  "executed_at": "2026-06-17",
+  "project_id": "gcp-project-redacted",
+  "location": "us-east1",
+  "contract_basis": {
+    "source": "gcp-project-redacted.contractforge_gcp_smoke.workflow_bronze_orders",
+    "target": "gcp-project-redacted.contractforge_gcp_smoke.workflow_gold_orders_by_status",
+    "source_resource": "//bigquery.googleapis.com/projects/gcp-project-redacted/datasets/contractforge_gcp_smoke/tables/workflow_bronze_orders",
+    "target_resource": "//bigquery.googleapis.com/projects/gcp-project-redacted/datasets/contractforge_gcp_smoke/tables/workflow_gold_orders_by_status",
+    "target_fully_qualified_name": "bigquery:gcp-project-redacted.contractforge_gcp_smoke.workflow_gold_orders_by_status",
+    "write_mode": "overwrite",
+    "metadata": [
+      "table aliases",
+      "table tags",
+      "column tags",
+      "column PII metadata",
+      "operations metadata"
+    ]
+  },
+  "lineage_execution": {
+    "run_id": "cf_gcp_dataplex_lineage_aspects_smoke_20260617_b",
+    "status": "PASS",
+    "api_enabled": "datalineage.googleapis.com",
+    "publication_method": "processOpenLineageRunEvent",
+    "process": "projects/000000000000/locations/us-east1/processes/575d861f053332bb7bdb5453eb1ca08d",
+    "run": "projects/000000000000/locations/us-east1/processes/575d861f053332bb7bdb5453eb1ca08d/runs/d737fa1de54af48a5af33af312626eb2",
+    "readback": {
+      "lineage_events_returned": 1,
+      "source_fully_qualified_name": "bigquery://gcp-project-redacted/bigquery.googleapis.com/projects/gcp-project-redacted/datasets/contractforge_gcp_smoke/tables/workflow_bronze_orders",
+      "target_fully_qualified_name": "bigquery://gcp-project-redacted/bigquery.googleapis.com/projects/gcp-project-redacted/datasets/contractforge_gcp_smoke/tables/workflow_gold_orders_by_status",
+      "search_links": {
+        "status": "PASS_WITH_EMPTY_RESULT",
+        "note": "The publication response returned the native run; lineageEvents readback from that run returned the expected source and target. searchLinks returned no link names immediately after publication, so batchSearchLinkProcesses was skipped."
+      }
+    }
+  },
+  "aspect_execution": {
+    "run_id": "cf_gcp_dataplex_aspects_smoke_20260617_e",
+    "status": "PASS",
+    "aspect_type": "projects/gcp-project-redacted/locations/us-east1/aspectTypes/contractforge-governance",
+    "aspect_type_uid": "00000000-0000-0000-0000-000000000000",
+    "entry_search": {
+      "method": "searchEntries",
+      "query": "bigquery:gcp-project-redacted.contractforge_gcp_smoke.workflow_gold_orders_by_status",
+      "total_size": 1
+    },
+    "entry_lookup": {
+      "method": "lookupEntry",
+      "entry": "projects/000000000000/locations/us-east1/entryGroups/@bigquery/entries/bigquery.googleapis.com/projects/gcp-project-redacted/datasets/contractforge_gcp_smoke/tables/workflow_gold_orders_by_status",
+      "fully_qualified_name": "bigquery:gcp-project-redacted.contractforge_gcp_smoke.workflow_gold_orders_by_status"
+    },
+    "modify_entry": {
+      "method": "modifyEntry",
+      "status": "PASS",
+      "aspect_key_observed": "000000000000.us-east1.contractforge-governance",
+      "schema_fields": [
+        "contractforge_payload_json",
+        "table_aliases",
+        "table_tags_json",
+        "table_deprecated",
+        "table_pii_json",
+        "columns_json",
+        "operations_json"
+      ],
+      "payload_readback": {
+        "table_aliases": [
+          "gcp_workflow_gold_orders_by_status"
+        ],
+        "table_tags": {
+          "domain": "contractforge",
+          "surface": "gcp_bigquery"
+        },
+        "columns_json_contains": [
+          "status",
+          "order_count"
+        ],
+        "operations_json_contains": [
+          "criticality",
+          "expected_frequency",
+          "freshness_sla_minutes"
+        ]
+      }
+    }
+  },
+  "validated": {
+    "aspect_type_template_uses_required_field_indexes": true,
+    "entry_discovery_uses_search_entries": true,
+    "entry_lookup_uses_entry_resource_name": true,
+    "modify_entry_uses_entry_name_and_aspects": true,
+    "aspect_readback_contains_contractforge_payload": true,
+    "native_lineage_publication_returned_run": true,
+    "native_lineage_events_readback_contains_expected_source_target": true
+  },
+  "review_boundaries": [
+    "This validates the explicit adapter-owned `dataplex-lineage-aspects --execute --readback` command path, not automatic native lineage/aspect emission on every contract smoke.",
+    "searchLinks did not immediately return link names for the published lineage run; run-scoped lineageEvents readback is the recorded native evidence.",
+    "The Dataplex aspect stores the full ContractForge metadata as a lossless JSON string plus indexed summary fields because Dataplex AspectType schemas require stable field indexes and typed fields."
+  ],
+  "sources": [
+    "https://docs.cloud.google.com/dataplex/docs/reference/rest/v1/projects.locations/searchEntries",
+    "https://docs.cloud.google.com/dataplex/docs/reference/rest/v1/projects.locations/lookupEntry",
+    "https://docs.cloud.google.com/dataplex/docs/reference/rest/v1/projects.locations/modifyEntry",
+    "https://docs.cloud.google.com/dataplex/docs/reference/rest/v1/projects.locations.aspectTypes",
+    "https://cloud.google.com/data-catalog/docs/reference/data-lineage/rest"
+  ]
+}
+

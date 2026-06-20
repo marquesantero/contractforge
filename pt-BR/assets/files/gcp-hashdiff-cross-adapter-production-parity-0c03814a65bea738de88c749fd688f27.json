@@ -1,0 +1,70 @@
+{
+  "kind": "contractforge_gcp_hashdiff_cross_adapter_production_parity",
+  "schema_version": "1.0.0",
+  "maturity_gate": "GCP-BQ-12C",
+  "status": "PASS",
+  "decision": "HASH_DIFF_UPSERT_PRODUCTION_PARITY_ACCEPTED",
+  "adapter": "contractforge-gcp",
+  "subtarget": "gcp_bigquery",
+  "validated_surface": "hash_diff_upsert",
+  "accepted_evidence": [
+    {
+      "adapter": "contractforge-gcp",
+      "status": "PASS_WITH_REVIEW_BOUNDARY",
+      "evidence": "docs/reports/gcp-bigquery-hashdiff-production-benchmark.json",
+      "coverage": [
+        "10,000-row initial load",
+        "no-change replay",
+        "changed-row wave",
+        "null key failure",
+        "duplicate key failure",
+        "overlap serialization"
+      ]
+    },
+    {
+      "adapter": "contractforge-aws",
+      "status": "PASS",
+      "evidence": "docs/reports/aws-hashdiff-production-benchmark.json",
+      "coverage": [
+        "initial load",
+        "no-change replay",
+        "changed-row wave",
+        "concurrent or overlap guard",
+        "duplicate key failure",
+        "null key failure"
+      ]
+    },
+    {
+      "adapter": "contractforge-snowflake",
+      "status": "PASS",
+      "evidence": "docs/reports/snowflake-hashdiff-production-benchmark.json",
+      "coverage": [
+        "initial load",
+        "no-change replay",
+        "changed-row wave",
+        "no-overlap task policy",
+        "duplicate key failure",
+        "null key failure",
+        "cost reconciliation"
+      ]
+    },
+    {
+      "adapter": "contractforge-fabric",
+      "status": "PASS",
+      "evidence": "docs/reports/fabric-stable-surface-evidence.json",
+      "coverage": [
+        "hash_diff_upsert seed",
+        "hash_diff_upsert no-op replay",
+        "hash_diff_upsert changed wave",
+        "control-table evidence"
+      ]
+    }
+  ],
+  "remaining_advanced_write_future_scope": [
+    "historical cross-adapter production-sized parity",
+    "snapshot_reconcile_soft_delete cross-adapter production-sized parity"
+  ],
+  "stable_surface_note": "This closes the GCP-BQ-12C hash_diff_upsert production-parity decision. GCP historical and snapshot production parity remains tracked separately, and default GCP stable execution keeps advanced modes review-gated until that broader product decision is changed.",
+  "no_workaround_code_used": true
+}
+

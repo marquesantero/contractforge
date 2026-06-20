@@ -1,0 +1,66 @@
+{
+  "adapter": "contractforge-fabric",
+  "api_surface": "Fabric deploymentPipelines stage-to-stage deploy API",
+  "assigned_source_stage": true,
+  "assigned_target_stage": true,
+  "created_pipeline": true,
+  "created_target_workspace": true,
+  "kind": "contractforge_fabric_deployment_pipeline_stage_promotion_smoke",
+  "operation": {
+    "location": "https://api.fabric.microsoft.com/v1/operations/00000000-0000-0000-0000-000000000000",
+    "operation_id": "00000000-0000-0000-0000-000000000000",
+    "retry_after_seconds": 20
+  },
+  "pipeline": {
+    "display_name": "ContractForge F13 Promotion 20260615121005",
+    "id": "00000000-0000-0000-0000-000000000000",
+    "source_stage_id": "00000000-0000-0000-0000-000000000000",
+    "target_stage_id": "00000000-0000-0000-0000-000000000000"
+  },
+  "pipeline_deleted": true,
+  "promoted_item": {
+    "itemDisplayName": "cf_fabric_stable_surface_smoke_append_orders",
+    "itemId": "00000000-0000-0000-0000-000000000000",
+    "itemType": "Notebook",
+    "lastDeploymentTime": "2026-06-15T12:10:37.04",
+    "sourceItemId": "00000000-0000-0000-0000-000000000000"
+  },
+  "promoted_item_deleted": true,
+  "promoted_item_verified": true,
+  "promotion_completed": true,
+  "promotion_operation_result": {
+    "createdTimeUtc": "2026-06-15T12:10:28.4352642",
+    "error": null,
+    "lastUpdatedTimeUtc": "2026-06-15T12:10:37.1765522",
+    "percentComplete": 100,
+    "status": "Succeeded"
+  },
+  "promotion_submitted": true,
+  "source_item": {
+    "display_name": "cf_fabric_stable_surface_smoke_append_orders",
+    "id": "00000000-0000-0000-0000-000000000000",
+    "type": "Notebook"
+  },
+  "source_stage_item_count": 107,
+  "source_stage_item_found": true,
+  "source_stage_unassigned": true,
+  "source_workspace": {
+    "capacity_id": "00000000-0000-0000-0000-000000000000",
+    "id": "00000000-0000-0000-0000-000000000000",
+    "name": "Manager"
+  },
+  "spark_jobs_started": 0,
+  "status": "SUCCEEDED",
+  "target_stage_item_count": 1,
+  "target_stage_unassigned": true,
+  "target_workspace": {
+    "display_name": "ContractForge F13 Target 20260615121005",
+    "id": "00000000-0000-0000-0000-000000000000",
+    "name": "ContractForge F13 Target 20260615121005"
+  },
+  "target_workspace_delete_attempted": true,
+  "target_workspace_deleted": true,
+  "target_workspace_notebook_count": 1,
+  "validated_at_utc": "2026-06-15T12:10:05Z"
+}
+

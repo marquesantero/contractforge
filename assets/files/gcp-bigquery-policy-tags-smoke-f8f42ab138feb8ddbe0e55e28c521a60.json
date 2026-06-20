@@ -1,0 +1,134 @@
+{
+  "adapter": "gcp",
+  "gate": "GCP-BQ-08",
+  "status": "SUCCEEDED",
+  "ok": true,
+  "executed": true,
+  "project_id": "gcp-project-redacted",
+  "location": "us-east1",
+  "dataset": "contractforge_gcp_smoke",
+  "table": "policy_tag_orders",
+  "taxonomy": {
+    "name": "projects/gcp-project-redacted/locations/us-east1/taxonomies/9041114829680434011",
+    "display_name": "cf_policy_tag_smoke_us_east1",
+    "activated_policy_types": [
+      "FINE_GRAINED_ACCESS_CONTROL"
+    ]
+  },
+  "policy_tag": {
+    "name": "projects/gcp-project-redacted/locations/us-east1/taxonomies/9041114829680434011/policyTags/3862408740743282741",
+    "numeric_project_name": "projects/000000000000/locations/us-east1/taxonomies/9041114829680434011/policyTags/3862408740743282741",
+    "display_name": "confidential_email"
+  },
+  "contract_basis": {
+    "access": {
+      "column_masks": {
+        "customer_email": {
+          "function": "policy_tag:projects/gcp-project-redacted/locations/us-east1/taxonomies/9041114829680434011/policyTags/3862408740743282741",
+          "applies_to": {
+            "principals": [
+              "contractforge-bigquery-reader"
+            ]
+          }
+        }
+      }
+    }
+  },
+  "operations": [
+    {
+      "name": "enable_datacatalog_api",
+      "status": "SUCCEEDED",
+      "service": "datacatalog.googleapis.com"
+    },
+    {
+      "name": "create_wrong_region_taxonomy",
+      "status": "SUCCEEDED",
+      "location": "us",
+      "note": "Kept as evidence of the regional prerequisite; BigQuery rejected this policy tag for a us-east1 dataset."
+    },
+    {
+      "name": "attach_wrong_region_policy_tag",
+      "status": "FAILED_EXPECTED",
+      "error_classification": "REGION_MISMATCH",
+      "error_message": "Policy tag reference does not belong to the allowed regions."
+    },
+    {
+      "name": "create_regional_taxonomy",
+      "status": "SUCCEEDED",
+      "location": "us-east1"
+    },
+    {
+      "name": "create_policy_tag",
+      "status": "SUCCEEDED",
+      "display_name": "confidential_email"
+    },
+    {
+      "name": "attach_policy_tag_to_column",
+      "status": "SUCCEEDED",
+      "surface": "bq update --schema",
+      "column_name": "customer_email"
+    },
+    {
+      "name": "readback_policy_tag",
+      "status": "SUCCEEDED",
+      "source": "INFORMATION_SCHEMA.COLUMN_FIELD_PATHS",
+      "result_rows": [
+        {
+          "column_name": "customer_email",
+          "policy_tags": [
+            "projects/000000000000/locations/us-east1/taxonomies/9041114829680434011/policyTags/3862408740743282741"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "restricted_reader_unprotected_columns",
+      "status": "SUCCEEDED",
+      "result_rows": [
+        {
+          "order_id": "1",
+          "status": "paid"
+        },
+        {
+          "order_id": "2",
+          "status": "new"
+        }
+      ]
+    },
+    {
+      "name": "restricted_reader_protected_column_before_grant",
+      "status": "FAILED_EXPECTED",
+      "error_classification": "FINE_GRAINED_ACCESS_DENIED",
+      "error_message": "User has neither fine-grained reader nor masked get permission to get data protected by policy tag."
+    },
+    {
+      "name": "grant_policy_tag_fine_grained_reader",
+      "status": "SUCCEEDED",
+      "role": "roles/datacatalog.categoryFineGrainedReader"
+    },
+    {
+      "name": "restricted_reader_protected_column_after_grant",
+      "status": "SUCCEEDED",
+      "result_rows": [
+        {
+          "customer_email": "alpha@example.com",
+          "order_id": "1"
+        },
+        {
+          "customer_email": "beta@example.com",
+          "order_id": "2"
+        }
+      ]
+    }
+  ],
+  "decision": {
+    "column_level_access_policy_tags": "VALIDATED",
+    "tag_based_masking": "REVIEW_REQUIRED",
+    "stable_surface_note": "Policy tags can be included as a validated GCP column-level access surface. They are not a substitute for direct BigQuery data masking policies when the contract requires masked values instead of denied access."
+  },
+  "sources": [
+    "https://docs.cloud.google.com/bigquery/docs/column-level-security-intro",
+    "https://docs.cloud.google.com/bigquery/docs/information-schema-column-field-paths"
+  ]
+}
+

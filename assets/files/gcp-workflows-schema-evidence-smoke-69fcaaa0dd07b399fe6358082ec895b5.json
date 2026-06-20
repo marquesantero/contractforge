@@ -1,0 +1,66 @@
+{
+  "kind": "contractforge_gcp_workflows_schema_evidence_smoke",
+  "schema_version": "1.0.0",
+  "adapter": "contractforge-gcp",
+  "subtarget": "gcp_bigquery",
+  "maturity_gate": "GCP-BQ-15C7",
+  "status": "PASS",
+  "executed_at": "2026-06-16T19:53:28Z",
+  "project_id": "gcp-project-redacted",
+  "workflow": {
+    "name": "cf-gcp-workflows-smoke-runner",
+    "location": "us-central1",
+    "revision_id": "000012-fcd",
+    "execution_id": "00000000-0000-0000-0000-000000000000",
+    "execution_state": "SUCCEEDED",
+    "readback_status": "SUCCEEDED"
+  },
+  "validated": {
+    "workflow_schema_evidence_operation": true,
+    "schema_evidence_run_id_is_execution_scoped": true,
+    "schema_evidence_rows_for_schema_policy_contracts": true,
+    "schema_policy_preserved": true,
+    "schema_change_payload_preserved": true,
+    "full_in_workflow_schema_drift_enforcement": false,
+    "idempotent_rerun_cleanup": false,
+    "partial_failure_evidence": false
+  },
+  "readback": {
+    "schema_evidence_by_target": [
+      {
+        "run_id": "workflows:00000000-0000-0000-0000-000000000000:bronze_orders:schema_evidence",
+        "contract_name": "workflow_bronze_orders",
+        "target_table": "gcp-project-redacted.contractforge_gcp_smoke.workflow_bronze_orders",
+        "schema_policy": "permissive",
+        "status": "SUCCEEDED",
+        "added_count": 0,
+        "removed_count": 0,
+        "type_changes_json": "[]",
+        "schema_changes_json": "{\"artifact\": \"deployment/bronze_orders/contractforge_gcp_smoke_workflow_bronze_orders.gcp.schema_policy.json\", \"policy\": \"permissive\", \"source\": \"gcp_workflows_schema_policy_plan\", \"status\": \"planned_no_runtime_drift\"}",
+        "last_evaluated_at": "2026-06-16 19:53:12"
+      },
+      {
+        "run_id": "workflows:00000000-0000-0000-0000-000000000000:gold_orders_by_status:schema_evidence",
+        "contract_name": "workflow_gold_orders_by_status",
+        "target_table": "gcp-project-redacted.contractforge_gcp_smoke.workflow_gold_orders_by_status",
+        "schema_policy": "permissive",
+        "status": "SUCCEEDED",
+        "added_count": 0,
+        "removed_count": 0,
+        "type_changes_json": "[]",
+        "schema_changes_json": "{\"artifact\": \"deployment/gold_orders_by_status/contractforge_gcp_smoke_workflow_gold_orders_by_status.gcp.schema_policy.json\", \"policy\": \"permissive\", \"source\": \"gcp_workflows_schema_policy_plan\", \"status\": \"planned_no_runtime_drift\"}",
+        "last_evaluated_at": "2026-06-16 19:53:28"
+      }
+    ]
+  },
+  "review_boundary": {
+    "certified_now": [
+      "generated Workflows runner persists schema evidence rows for schema-policy contracts",
+      "schema evidence run_id values include the native Workflows execution id",
+      "schema evidence preserves the rendered schema-policy artifact, schema policy and planned no-drift status"
+    ],
+    "superseded_by_certified_runner_smoke": "docs/reports/gcp-workflows-certified-runner-smoke.json",
+    "remaining_before_runner_promotion": []
+  }
+}
+

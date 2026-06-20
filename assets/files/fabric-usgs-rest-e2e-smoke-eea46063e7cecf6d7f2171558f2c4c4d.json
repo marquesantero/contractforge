@@ -1,0 +1,140 @@
+{
+  "kind": "contractforge_fabric_usgs_rest_e2e_smoke",
+  "adapter": "fabric",
+  "validated_at_utc": "2026-06-11T15:42:06Z",
+  "status": "SUCCEEDED",
+  "workspace": {
+    "id": "00000000-0000-0000-0000-000000000000",
+    "name": "Manager",
+    "capacity_id": "00000000-0000-0000-0000-000000000000",
+    "capacity_sku": "FTL4",
+    "capacity_region": "Brazil South",
+    "default_spark_pool": {
+      "id": "00000000-0000-0000-0000-000000000000",
+      "name": "cf_small_single_node"
+    }
+  },
+  "lakehouse": {
+    "id": "00000000-0000-0000-0000-000000000000",
+    "name": "contractforge_lh"
+  },
+  "contract_source": {
+    "project": "examples/real-world/usgs-earthquake-rest-medallion",
+    "basis": "Databricks USGS contracts with Fabric-native table binding only",
+    "workaround_code_used": false
+  },
+  "project_runner": {
+    "validated_at_utc": "2026-06-11T16:47:18Z",
+    "command": "contractforge-fabric smoke-project examples/real-world/usgs-earthquake-rest-medallion/project.yaml --environment-key fabric --max-attempts 35 --retry-after-seconds 30",
+    "status": "SUCCEEDED",
+    "steps": [
+      {
+        "step": "bronze_usgs_geojson",
+        "contract": "bronze_usgs_geojson.ingestion.yaml",
+        "notebook": "cf_workspace_cf_usgs_rest_bronze_b_usgs_earthquake_geojson",
+        "item_id": "00000000-0000-0000-0000-000000000000",
+        "job_instance_id": "00000000-0000-0000-0000-000000000000",
+        "status": "Completed",
+        "started_at_utc": "2026-06-11T16:29:02.8395794",
+        "ended_at_utc": "2026-06-11T16:32:55.896668"
+      },
+      {
+        "step": "silver_usgs_events",
+        "contract": "silver_usgs_events.ingestion.yaml",
+        "notebook": "cf_workspace_cf_usgs_rest_silver_s_usgs_earthquake_events",
+        "item_id": "00000000-0000-0000-0000-000000000000",
+        "job_instance_id": "00000000-0000-0000-0000-000000000000",
+        "status": "Completed",
+        "started_at_utc": "2026-06-11T16:34:18.2599067",
+        "ended_at_utc": "2026-06-11T16:37:15.9818488"
+      },
+      {
+        "step": "gold_usgs_daily_summary",
+        "contract": "gold_usgs_daily_summary.ingestion.yaml",
+        "notebook": "cf_workspace_cf_usgs_rest_gold_g_usgs_earthquake_daily_summary",
+        "item_id": "00000000-0000-0000-0000-000000000000",
+        "job_instance_id": "00000000-0000-0000-0000-000000000000",
+        "status": "Completed",
+        "started_at_utc": "2026-06-11T16:38:27.0728531",
+        "ended_at_utc": "2026-06-11T16:42:17.8045122"
+      },
+      {
+        "step": "gold_usgs_magnitude_bands",
+        "contract": "gold_usgs_magnitude_bands.ingestion.yaml",
+        "notebook": "cf_workspace_cf_usgs_rest_gold_g_usgs_earthquake_magnitude_bands",
+        "item_id": "00000000-0000-0000-0000-000000000000",
+        "job_instance_id": "00000000-0000-0000-0000-000000000000",
+        "status": "Completed",
+        "started_at_utc": "2026-06-11T16:43:41.18686",
+        "ended_at_utc": "2026-06-11T16:47:17.9988122"
+      }
+    ]
+  },
+  "runs": [
+    {
+      "step": "bronze_usgs_geojson",
+      "contract": "bronze_usgs_geojson.ingestion.yaml",
+      "notebook": "cf_workspace_cf_usgs_rest_bronze_b_usgs_earthquake_geojson",
+      "item_id": "00000000-0000-0000-0000-000000000000",
+      "job_instance_id": "00000000-0000-0000-0000-000000000000",
+      "status": "Completed",
+      "started_at_utc": "2026-06-11T14:54:17.406057",
+      "ended_at_utc": "2026-06-11T14:57:47.7505415"
+    },
+    {
+      "step": "silver_usgs_events",
+      "contract": "silver_usgs_events.ingestion.yaml",
+      "notebook": "cf_workspace_cf_usgs_rest_silver_s_usgs_earthquake_events",
+      "item_id": "00000000-0000-0000-0000-000000000000",
+      "job_instance_id": "00000000-0000-0000-0000-000000000000",
+      "status": "Completed",
+      "started_at_utc": "2026-06-11T14:58:48.1674379",
+      "ended_at_utc": "2026-06-11T15:02:34.3469748"
+    },
+    {
+      "step": "gold_usgs_daily_summary",
+      "contract": "gold_usgs_daily_summary.ingestion.yaml",
+      "notebook": "cf_workspace_cf_usgs_rest_gold_g_usgs_earthquake_daily_summary",
+      "item_id": "00000000-0000-0000-0000-000000000000",
+      "job_instance_id": "00000000-0000-0000-0000-000000000000",
+      "status": "Completed",
+      "started_at_utc": "2026-06-11T15:03:57.090732",
+      "ended_at_utc": "2026-06-11T15:07:42.5177377"
+    },
+    {
+      "step": "gold_usgs_magnitude_bands",
+      "contract": "gold_usgs_magnitude_bands.ingestion.yaml",
+      "notebook": "cf_workspace_cf_usgs_rest_gold_g_usgs_earthquake_magnitude_bands",
+      "item_id": "00000000-0000-0000-0000-000000000000",
+      "job_instance_id": "00000000-0000-0000-0000-000000000000",
+      "status": "Completed",
+      "started_at_utc": "2026-06-11T15:08:46.0531531",
+      "ended_at_utc": "2026-06-11T15:12:27.2577029"
+    },
+    {
+      "step": "validation_usgs_e2e_counts",
+      "contract": "generated SQL validation contract",
+      "notebook": "cf_workspace_contractforge_validation_usgs_e2e_counts",
+      "item_id": "00000000-0000-0000-0000-000000000000",
+      "job_instance_id": "00000000-0000-0000-0000-000000000000",
+      "status": "Completed",
+      "started_at_utc": "2026-06-11T15:38:25.7828728",
+      "ended_at_utc": "2026-06-11T15:42:06.5859278"
+    }
+  ],
+  "validation": {
+    "method": "Generated ContractForge SQL contract executed in Fabric",
+    "checks": [
+      "bronze row count equals 1",
+      "silver row count is greater than 0",
+      "gold daily row count is greater than 0",
+      "gold magnitude-band row count is greater than 0"
+    ],
+    "result": "SUCCEEDED"
+  },
+  "known_limitations": [
+    "Fabric SQL endpoint metadata did not expose the Spark-created Lakehouse schemas immediately after the run.",
+    "Notebook job-instance API did not expose stdout or notebook exit values, so the persisted report records validation constraints and job ids rather than raw count values."
+  ]
+}
+

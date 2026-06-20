@@ -1,0 +1,49 @@
+{
+  "kind": "contractforge_gcp_schema_policy_type_mutation_decision",
+  "schema_version": "1.0.0",
+  "adapter": "contractforge-gcp",
+  "subtarget": "gcp_bigquery",
+  "maturity_gate": "GCP-BQ-07I",
+  "status": "DECIDED",
+  "executed_at": "2026-06-16",
+  "decision": {
+    "automatic_type_widening_or_mutation": "REVIEW_REQUIRED",
+    "stable_final_scope": "EXCLUDED_FROM_AUTOMATIC_SCHEMA_POLICY_MUTATION",
+    "supported_schema_policy_runtime": [
+      "strict preflight failure before write",
+      "additive nullable column application",
+      "permissive nullable column application",
+      "destructive type-change block with failed schema evidence",
+      "table/view target schema inspection",
+      "SQL source schema probe inspection",
+      "declared-schema GCS load source probe inspection"
+    ],
+    "planner_behavior": "Render and record type changes as schema evidence, but do not emit or execute BigQuery type-mutation DDL automatically.",
+    "runtime_behavior": "Block type changes under the current GCP smoke runtime unless a future explicitly certified mutation path is added."
+  },
+  "evidence": [
+    "docs/reports/gcp-bigquery-schema-policy-smoke.json",
+    "docs/reports/gcp-bigquery-schema-policy-strict-smoke.json",
+    "docs/reports/gcp-bigquery-schema-policy-permissive-smoke.json",
+    "docs/reports/gcp-bigquery-schema-policy-type-change-smoke.json",
+    "docs/reports/gcp-bigquery-schema-policy-sql-source-smoke.json",
+    "docs/reports/gcp-bigquery-schema-policy-gcs-source-smoke.json"
+  ],
+  "rationale": [
+    "ContractForge schema policy must remain portable across adapters. BigQuery supports some schema changes, but automatic BigQuery type widening or type mutation has platform-specific safety and rewrite implications.",
+    "The validated GCP behavior is to apply nullable additions and block type changes with persisted schema evidence.",
+    "Future type-widening support can be added only as an explicit, evidence-backed adapter extension with reviewed DDL, replay proof and readback."
+  ],
+  "required_before_future_promotion": [
+    "Define the exact BigQuery type-widening matrix accepted by ContractForge for GCP.",
+    "Render reviewed BigQuery DDL or table-rewrite plans for each accepted widening.",
+    "Validate successful widening and rollback/failure evidence in a real BigQuery project.",
+    "Prove replay idempotency and downstream read compatibility for widened columns."
+  ],
+  "sources": [
+    "docs/specs/gcp-capability-parity.md",
+    "src/contractforge_core/schema/diff.py",
+    "adapters/gcp/src/contractforge_gcp/schema/runtime.py"
+  ]
+}
+

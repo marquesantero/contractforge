@@ -1,0 +1,47 @@
+{
+  "adapter": "gcp",
+  "gate": "GCP-BQ-13",
+  "status": "DECIDED",
+  "ok": true,
+  "executed": true,
+  "decision": {
+    "stable_final_scope": "EXCLUDED_FROM_FIRST_STABLE_SURFACE",
+    "kafka_bounded": "REVIEW_REQUIRED",
+    "kafka_available_now": "PROVIDER_PARITY_VALIDATED_FOR_CONFLUENT_DATAFLOW",
+    "eventhubs_bounded": "REVIEW_REQUIRED",
+    "eventhubs_available_now": "REVIEW_REQUIRED",
+    "pubsub_bigquery_subscription": "NATIVE_BUT_NOT_EQUIVALENT_TO_KAFKA_AVAILABLE_NOW",
+    "dataflow_kafka_runtime": "CONFLUENT_PROVIDER_PARITY_VALIDATED_BROADER_STREAMING_REVIEW_SCOPED"
+  },
+  "rationale": [
+    "ContractForge kafka_available_now means checkpoint-driven catch-up over a Kafka-compatible stream with offset progress evidence.",
+    "A Pub/Sub BigQuery subscription writes received messages directly to an existing BigQuery table and removes the need for a subscriber only when no additional processing is needed.",
+    "Google documents BigQuery subscriptions as at-least-once, while the Pub/Sub-to-BigQuery Dataflow template enforces exactly-once by default through pipeline deduplication.",
+    "Dataflow KafkaIO is the right Google Cloud runtime family for Kafka, but it introduces a separate Beam/Dataflow deployment surface, network connectivity, offset/deduplication choices, worker sizing and job-cost evidence.",
+    "Therefore, GCP can be stable for the documented BigQuery/BigLake surface while treating broader streaming as review-scoped. The Confluent/Dataflow provider parity gate is now closed by real-account evidence, but Pub/Sub, Event Hubs and production streaming operations remain separate maturity tracks."
+  ],
+  "required_before_promotion": [
+    "Expand the provider matrix beyond the validated Confluent/Dataflow path when Pub/Sub or Event Hubs becomes product scope.",
+    "Persist richer offset metrics when the chosen provider exposes them without disturbing committed offsets.",
+    "Add production streaming operations coverage for long-running jobs, retry behavior, schema drift and cost alerts before default stable-final inclusion.",
+    "Decide whether Pub/Sub should become a first-class core source type or remain native_passthrough."
+  ],
+  "latest_live_validation": {
+    "evidence": "docs/reports/gcp-confluent-kafka-dataflow-source-promotion-smoke.json",
+    "status": "PASS_WITH_REVIEW_BOUNDARY",
+    "summary": "ContractForge launched the Google-provided Kafka-to-BigQuery Flex Template from a kafka_available_now contract against the existing Confluent topic used by other adapters. Dataflow selected us-central1-f, reached JOB_TYPE_STREAMING, wrote 12 BigQuery rows including a live 3-row batch, kept DLQ rows at 0 and a no-input replay with the same consumer group/checkpoint kept the target count unchanged at 12 while running."
+  },
+  "adapter_behavior": {
+    "source.kafka_bounded": "REVIEW_REQUIRED",
+    "source.kafka_available_now": "PROVIDER_PARITY_VALIDATED_FOR_CONFLUENT_DATAFLOW",
+    "source.eventhubs_bounded": "REVIEW_REQUIRED",
+    "source.eventhubs_available_now": "REVIEW_REQUIRED",
+    "supports_available_now_streaming": true,
+    "streaming_e2e": true
+  },
+  "sources": [
+    "https://docs.cloud.google.com/dataflow/docs/guides/read-from-kafka",
+    "https://docs.cloud.google.com/pubsub/docs/bigquery"
+  ]
+}
+

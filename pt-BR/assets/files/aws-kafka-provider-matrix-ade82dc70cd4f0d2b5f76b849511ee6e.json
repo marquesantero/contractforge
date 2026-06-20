@@ -1,0 +1,116 @@
+{
+  "kind": "contractforge_aws_kafka_provider_matrix",
+  "schema_version": "1.0.0",
+  "adapter": "contractforge-aws",
+  "subtarget": "aws_glue_iceberg",
+  "maturity_gate": "AWS-KAFKA-PROVIDER-MATRIX",
+  "status": "PASS",
+  "executed_at": "2026-06-10",
+  "account_id": "000000000000",
+  "region": "us-east-1",
+  "command": "uv run --with boto3 --with \"botocore[crt]\" contractforge-aws smoke-kafka-provider-matrix --account-id 000000000000 --region us-east-1 --msk-cluster-arn arn:aws:kafka:us-east-1:000000000000:cluster/cf-msk-serverless-validation-20260609/00000000-0000-0000-0000-000000000000-s1 --confluent-bootstrap-servers pkc-redacted.region.confluent.cloud:9092 --confluent-secret-arn arn:aws:secretsmanager:us-east-1:000000000000:secret:contractforge/confluent/kafka-MhIMbL --execute",
+  "result": {
+    "status": "PASS",
+    "maturity_scope": {
+      "required_provider": "msk",
+      "optional_compatibility_provider": "confluent_compatible",
+      "decision": "AWS Kafka maturity is validated with Amazon MSK, the AWS-native managed Kafka provider. Confluent Cloud compatibility is tracked separately and is not a blocker for AWS maturity."
+    },
+    "providers": {
+      "event_hubs_kafka": {
+        "status": "PASS",
+        "evidence": "examples/real-world/aws-eventhubs-kafka-available-now",
+        "notes": [
+          "Azure Event Hubs through Kafka protocol is already validated for Glue available-now streaming.",
+          "Evidence includes checkpoint progression, no-input rerun, quarantine/target writes, cost and Athena audit."
+        ]
+      },
+      "msk": {
+        "status": "PASS",
+        "cluster_arn": "arn:aws:kafka:us-east-1:000000000000:cluster/cf-msk-serverless-validation-20260609/00000000-0000-0000-0000-000000000000-s1",
+        "cluster_name": "cf-msk-serverless-validation-20260609",
+        "cluster_type": "SERVERLESS",
+        "state": "ACTIVE",
+        "bootstrap_brokers": {
+          "BootstrapBrokerStringSaslIam": "boot-qkgfvhrw.c1.kafka-serverless.us-east-1.amazonaws.com:9098"
+        },
+        "contract": ".tmp/aws-msk-kafka-available-now/contracts/aws/bronze/bronze_msk_orders_stream/bronze_msk_orders_stream.ingestion.yaml",
+        "glue_job": "contractforge_contractforge_cf_msk_stream_bronze_b_msk_orders_stream",
+        "vpc_connection": "cf-msk-serverless-validation",
+        "dependency_mode": "s3_wheelhouse",
+        "infrastructure": {
+          "s3_vpc_endpoint": "vpce-0537d59ba806b6ae5",
+          "glue_vpc_endpoint": "vpce-06ffbc084005774e2",
+          "security_group": "sg-02aac66df7c40aae0",
+          "subnets": [
+            "subnet-03c9a0743bc4c463c",
+            "subnet-00b8bdd08fe6f985a"
+          ]
+        },
+        "live_runs": [
+          {
+            "purpose": "first_available_now_run",
+            "status": "SUCCEEDED",
+            "glue_run_id": "jr_1163640408075ae44f2e97e29904d1f2a78f06a9620ea29b0c332553ef5bd915",
+            "rows_read": 3,
+            "rows_written": 3,
+            "batches": 1,
+            "target_row_count": 3,
+            "glue_dpu_seconds": 326.0,
+            "cost_query_execution_id": "00000000-0000-0000-0000-000000000000"
+          },
+          {
+            "purpose": "no_input_checkpoint_rerun",
+            "status": "SUCCEEDED",
+            "glue_run_id": "jr_248f65d48f32bd192123c596ddac499920d4483b14ca7ac0c7ccc47f2e3e3270",
+            "target_row_count_after_rerun": 3,
+            "glue_dpu_seconds": 294.0,
+            "cost_query_execution_id": "00000000-0000-0000-0000-000000000000"
+          }
+        ],
+        "athena_evidence": {
+          "target_count_query_execution_id": "00000000-0000-0000-0000-000000000000",
+          "stream_summary_query_execution_id": "00000000-0000-0000-0000-000000000000",
+          "audit_status": "AUDITED",
+          "success_runs": 2,
+          "redacted_failure_rows": 1,
+          "cost_rows": 2,
+          "total_glue_dpu_seconds": 620.0
+        },
+        "resolved_blockers": [
+          "Glue job definitions now preserve AWS Glue Connections so VPC-backed jobs can reach MSK.",
+          "Private VPC jobs use S3-hosted Python dependency wheels instead of outbound PyPI.",
+          "The validation VPC includes S3 gateway and Glue interface endpoints for private Glue/Iceberg execution."
+        ],
+        "blockers": []
+      },
+      "confluent_compatible": {
+        "status": "OPTIONAL_READY_TO_RUN",
+        "scope": "OPTIONAL_COMPATIBILITY",
+        "bootstrap_servers": "pkc-redacted.region.confluent.cloud:9092",
+        "secret_arn": "arn:aws:secretsmanager:us-east-1:000000000000:secret:contractforge/confluent/kafka-MhIMbL",
+        "blockers": [],
+        "notes": [
+          "Not required for AWS Kafka maturity because the required provider is Amazon MSK.",
+          "Promote to live validation only when claiming cross-provider Confluent Cloud compatibility on AWS."
+        ]
+      }
+    },
+    "blockers": []
+  },
+  "implemented_smoke_command": "contractforge-aws smoke-kafka-provider-matrix",
+  "required_cases": [
+    "provider_available_now_glue_run",
+    "checkpoint_progress_recorded",
+    "no_input_rerun_records_zero_new_rows",
+    "offset_or_position_semantics_recorded",
+    "redacted_failure_evidence_recorded",
+    "stream_evidence_and_cost_rows_recorded"
+  ],
+  "open_items": [],
+  "optional_compatibility_items": [
+    "Promote Confluent-compatible validation from OPTIONAL_READY_TO_RUN to a live available-now Glue run only if AWS claims Confluent Cloud compatibility.",
+    "Record Confluent-compatible Glue run ids, stream evidence rows, checkpoint state, cost rows and redacted failure evidence when that optional compatibility claim is made."
+  ]
+}
+

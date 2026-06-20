@@ -1,0 +1,27 @@
+{
+  "kind": "contractforge_historical_semantics_decision",
+  "schema_version": "1.0.0",
+  "adapter": "contractforge-aws",
+  "subtarget": "aws_glue_iceberg",
+  "maturity_gate": "AWS-HISTORICAL-SEMANTICS",
+  "status": "EXCLUDED_FROM_STABLE_FINAL",
+  "decided_at": "2026-06-09",
+  "decision": {
+    "stable_final_scope": "EXCLUDED",
+    "excluded_modes": [
+      "historical",
+      "snapshot_reconcile_soft_delete"
+    ],
+    "reason": "AWS Iceberg can represent the required table mechanics, but ContractForge has not certified Databricks/AWS parity for late-arriving changes, delete predicates, replay idempotency, validity-window closure and concurrent history updates.",
+    "planner_behavior": "Keep AWS planning at REVIEW_REQUIRED for historical and snapshot_reconcile_soft_delete. Do not silently fall back to append, overwrite or current-state merge."
+  },
+  "required_before_promotion": [
+    "Databricks/AWS parity contracts for historical initial load, changed-row wave, no-change replay and late-arriving updates.",
+    "Delete-expression parity for historical and snapshot soft-delete tombstones.",
+    "Iceberg audit evidence for expired/current row counts, validity windows and idempotent reruns.",
+    "Failure evidence for duplicate keys, null keys, overlapping validity windows and stale sequence policy.",
+    "Cost and Glue run evidence for representative production-sized history workloads."
+  ],
+  "acceptance": "Stable-final AWS claims exclude historical and snapshot soft-delete until linked E2E parity evidence exists."
+}
+

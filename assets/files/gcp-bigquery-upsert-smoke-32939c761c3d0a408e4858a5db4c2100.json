@@ -1,0 +1,138 @@
+{
+  "adapter": "gcp",
+  "blockers": [],
+  "gate": "GCP-BQ-04",
+  "ok": true,
+  "operations": [
+    {
+      "artifact": "testebig-496714_contractforge_gcp_smoke_orders_upsert_target.gcp.evidence_ddl.sql",
+      "executed": true,
+      "job": {
+        "deleted_rows": null,
+        "error_message": null,
+        "inserted_rows": null,
+        "job_id": "cf_gcp_smoke_query_ba981a8f6ac44d9cbd73",
+        "job_type": "QUERY",
+        "output_rows": null,
+        "result_rows": null,
+        "state": "DONE",
+        "statement_type": "CREATE_TABLE",
+        "total_bytes_billed": 0,
+        "total_bytes_processed": 0,
+        "total_slot_ms": 0,
+        "updated_rows": null
+      },
+      "kind": "QUERY",
+      "name": "prepare_evidence"
+    },
+    {
+      "artifact": "testebig-496714_contractforge_gcp_smoke_orders_upsert_target.gcp.write.sql",
+      "executed": true,
+      "job": {
+        "deleted_rows": 0,
+        "error_message": null,
+        "inserted_rows": 1,
+        "job_id": "cf_gcp_smoke_query_da905f0276664746be06",
+        "job_type": "QUERY",
+        "output_rows": null,
+        "result_rows": null,
+        "state": "DONE",
+        "statement_type": "MERGE",
+        "total_bytes_billed": 20971520,
+        "total_bytes_processed": 86,
+        "total_slot_ms": 5556,
+        "updated_rows": 1
+      },
+      "kind": "QUERY",
+      "name": "write_target"
+    },
+    {
+      "artifact": "inline:gcp.run_evidence",
+      "executed": true,
+      "job": {
+        "deleted_rows": null,
+        "error_message": null,
+        "inserted_rows": 1,
+        "job_id": "cf_gcp_smoke_query_57db02db52814677a144",
+        "job_type": "QUERY",
+        "output_rows": null,
+        "result_rows": null,
+        "state": "DONE",
+        "statement_type": "INSERT",
+        "total_bytes_billed": 0,
+        "total_bytes_processed": 0,
+        "total_slot_ms": 1214,
+        "updated_rows": null
+      },
+      "kind": "QUERY",
+      "name": "persist_run_evidence"
+    },
+    {
+      "artifact": "testebig-496714_contractforge_gcp_smoke_orders_upsert_target.gcp.quality.sql",
+      "executed": true,
+      "job": {
+        "deleted_rows": null,
+        "error_message": null,
+        "inserted_rows": null,
+        "job_id": "cf_gcp_smoke_query_1763e3a5a5d443d4b9aa",
+        "job_type": "QUERY",
+        "output_rows": null,
+        "result_rows": [
+          {
+            "failed_rows": "0"
+          }
+        ],
+        "state": "DONE",
+        "statement_type": "SELECT",
+        "total_bytes_billed": 10485760,
+        "total_bytes_processed": 24,
+        "total_slot_ms": 16,
+        "updated_rows": null
+      },
+      "kind": "QUERY",
+      "name": "quality"
+    },
+    {
+      "artifact": "inline:gcp.quality_evidence",
+      "executed": true,
+      "job": {
+        "deleted_rows": null,
+        "error_message": null,
+        "inserted_rows": 1,
+        "job_id": "cf_gcp_smoke_query_5473f510ddb04d269181",
+        "job_type": "QUERY",
+        "output_rows": null,
+        "result_rows": null,
+        "state": "DONE",
+        "statement_type": "INSERT",
+        "total_bytes_billed": 0,
+        "total_bytes_processed": 0,
+        "total_slot_ms": 976,
+        "updated_rows": null
+      },
+      "kind": "QUERY",
+      "name": "persist_quality_evidence"
+    }
+  ],
+  "planning_status": "SUPPORTED_WITH_WARNINGS",
+  "source_table": "testebig-496714.contractforge_gcp_smoke.orders_upsert_source",
+  "status": "SUCCEEDED",
+  "subtarget": "gcp_bigquery",
+  "target_table": "testebig-496714.contractforge_gcp_smoke.orders_upsert_target",
+  "verification": [
+    {
+      "failed_rows": "0",
+      "inserted_rows": "1",
+      "row_count": "3",
+      "updated_rows": "1"
+    }
+  ],
+  "warnings": [
+    {
+      "code": "GCP_STABLE_SURFACE_SCOPE",
+      "message": "GCP BigQuery is stable-final for the documented batch BigQuery surface. Streaming, advanced write modes, deployment runners, native Dataplex integrations, governance auto-repair/delete and overwrite-retention certification are explicitly outside this scoped claim."
+    }
+  ]
+}
+
+

@@ -1,0 +1,60 @@
+{
+  "kind": "contractforge_fabric_project_deploy_smoke",
+  "adapter": "contractforge-fabric",
+  "validated_at_utc": "2026-06-14T13:02:22Z",
+  "status": "SUCCEEDED",
+  "project": "examples/stable-surface/fabric/project.yaml",
+  "environment": "examples/stable-surface/fabric/environments/fabric.environment.yaml",
+  "environment_key": "fabric",
+  "strategy": "notebook_definition",
+  "command": "uv run python -m contractforge_fabric.cli deploy-project examples/stable-surface/fabric/project.yaml --environment-key fabric --update-existing --summary-only",
+  "verification_command": "read-only Fabric Notebook item lookup through FabricRestClient.list_items(item_type='Notebook')",
+  "contract_source": {
+    "contract_only": true,
+    "workaround_code_used": false,
+    "execution_order_steps": 16
+  },
+  "runtime_behavior": {
+    "deploy_only": true,
+    "submitted_notebook_jobs": false,
+    "spark_execution_used": false,
+    "created_or_updated_notebook_definitions": true
+  },
+  "result_summary": {
+    "expected_notebooks": 16,
+    "found_notebooks": 16,
+    "missing_notebooks": []
+  },
+  "notebooks": {
+    "cf_fabric_stable_surface_smoke_append_orders": "00000000-0000-0000-0000-000000000000",
+    "cf_fabric_stable_surface_smoke_overwrite_orders": "00000000-0000-0000-0000-000000000000",
+    "cf_fabric_stable_surface_smoke_upsert_customers_seed": "00000000-0000-0000-0000-000000000000",
+    "cf_fabric_stable_surface_smoke_upsert_customers_change": "00000000-0000-0000-0000-000000000000",
+    "cf_fabric_stable_surface_smoke_hash_diff_customers_seed": "00000000-0000-0000-0000-000000000000",
+    "cf_fabric_stable_surface_smoke_hash_diff_customers_noop": "00000000-0000-0000-0000-000000000000",
+    "cf_fabric_stable_surface_smoke_hash_diff_customers_change": "00000000-0000-0000-0000-000000000000",
+    "cf_fabric_stable_surface_smoke_historical_customers_seed": "00000000-0000-0000-0000-000000000000",
+    "cf_fabric_stable_surface_smoke_historical_customers_change": "00000000-0000-0000-0000-000000000000",
+    "cf_fabric_stable_surface_smoke_snapshot_customers_seed": "00000000-0000-0000-0000-000000000000",
+    "cf_fabric_stable_surface_smoke_snapshot_customers_delete": "00000000-0000-0000-0000-000000000000",
+    "cf_fabric_stable_surface_smoke_schema_guard_seed": "00000000-0000-0000-0000-000000000000",
+    "cf_fabric_stable_surface_smoke_quality_abort_failure": "00000000-0000-0000-0000-000000000000",
+    "cf_fabric_stable_surface_smoke_strict_schema_failure": "00000000-0000-0000-0000-000000000000",
+    "cf_fabric_stable_surface_smoke_governance_review_evidence": "00000000-0000-0000-0000-000000000000",
+    "cf_fabric_stable_surface_smoke_evidence_probe": "00000000-0000-0000-0000-000000000000"
+  },
+  "coverage": {
+    "deploy_project_cli": true,
+    "deterministic_project_manifest": true,
+    "step_specific_notebook_names": true,
+    "fabric_rest_notebook_definition_deploy": true,
+    "fabric_deployment_pipeline_promotion": false,
+    "fabric_git_integration_promotion": false,
+    "fabric_data_factory_promotion": false
+  },
+  "known_limitations": [
+    "This validates deploy-only Notebook definition promotion for the stable-surface project. It does not validate Fabric deployment pipeline stage promotion, workspace Git integration promotion or Data Factory pipeline lifecycle promotion.",
+    "No notebook job was submitted and no Spark execution was used by this validation."
+  ]
+}
+

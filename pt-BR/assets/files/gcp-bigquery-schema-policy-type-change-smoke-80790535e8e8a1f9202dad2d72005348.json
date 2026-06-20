@@ -1,0 +1,76 @@
+{
+  "kind": "contractforge_gcp_bigquery_schema_policy_type_change_smoke",
+  "schema_version": "1.0.0",
+  "adapter": "contractforge-gcp",
+  "subtarget": "gcp_bigquery",
+  "maturity_gate": "GCP-BQ-07F",
+  "status": "PASS_NEGATIVE",
+  "executed_at": "2026-06-16",
+  "project": "gcp-project-redacted",
+  "location": "us-east1",
+  "contract": {
+    "source": "gcp-project-redacted.contractforge_gcp_schema_policy_smoke.schema_policy_type_change_source",
+    "target": "gcp-project-redacted.contractforge_gcp_schema_policy_smoke.schema_policy_type_change_target",
+    "mode": "append",
+    "schema_policy": "permissive"
+  },
+  "command": "python -m contractforge_gcp.cli smoke .tmp/gcp_schema_policy_type_change_contract.yaml --environment .tmp/gcp_schema_policy_smoke_environment.yaml --execute --runtime bq --enforce-schema-policy --report .tmp/gcp-schema-policy-type-change-smoke.json",
+  "operations": [
+    {
+      "name": "prepare_evidence",
+      "status": "SUCCEEDED"
+    },
+    {
+      "name": "schema_policy",
+      "status": "FAILED_EXPECTED",
+      "error_message": "Schema policy permissive does not apply potentially destructive type changes. type_changes=[{'column': 'amount', 'source': 'STRING', 'target': 'FLOAT64', 'allowed': False, 'change': 'type_change'}]",
+      "schema_changes": {
+        "type_changes": [
+          {
+            "column": "amount",
+            "source": "STRING",
+            "target": "FLOAT64",
+            "allowed": false,
+            "change": "type_change",
+            "change_type": "TYPE_CHANGE",
+            "applied": false
+          }
+        ]
+      }
+    },
+    {
+      "name": "persist_schema_evidence",
+      "status": "SUCCEEDED",
+      "inserted_rows": 1
+    }
+  ],
+  "readback": {
+    "target_row_count": 0,
+    "schema_evidence": {
+      "schema_policy": "permissive",
+      "status": "FAILED",
+      "added_columns": [],
+      "removed_columns": [],
+      "type_change_column": "amount",
+      "source_type": "STRING",
+      "target_type": "FLOAT64",
+      "allowed": false,
+      "applied": false,
+      "error_message": "Schema policy permissive does not apply potentially destructive type changes. type_changes=[{'column': 'amount', 'source': 'STRING', 'target': 'FLOAT64', 'allowed': False, 'change': 'type_change'}]"
+    }
+  },
+  "decision": {
+    "destructive_type_change_block_e2e": "VALIDATED",
+    "failure_schema_evidence": "VALIDATED",
+    "target_write_after_drift": "BLOCKED_AS_EXPECTED",
+    "automatic_type_widening_or_mutation": "REVIEW_REQUIRED",
+    "full_schema_policy_promotion": "VALIDATED_WITH_REVIEW_BOUNDARY"
+  },
+  "notes": [
+    "This smoke validates that the opt-in schema-policy runtime hook records and blocks an incompatible BigQuery type drift under schema_policy: permissive.",
+    "The runtime inspected source and target INFORMATION_SCHEMA.COLUMNS, detected amount STRING versus FLOAT64, blocked the append and persisted failed schema evidence with type_changes_json.",
+    "Automatic BigQuery type widening or mutation is review-required outside the stable runtime path."
+  ],
+  "superseded_gap_decision": "docs/reports/gcp-schema-policy-type-mutation-decision.json"
+}
+

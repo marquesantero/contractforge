@@ -1,0 +1,164 @@
+{
+  "kind": "contractforge_hashdiff_production_benchmark",
+  "schema_version": "1.0.0",
+  "adapter": "contractforge-gcp",
+  "subtarget": "gcp_bigquery",
+  "maturity_gate": "GCP-BQ-12C4",
+  "status": "PASS_WITH_REVIEW_BOUNDARY",
+  "runbook": "docs/specs/hash-diff-production-benchmark-runbook.md",
+  "created": "2026-06-17",
+  "validated": "2026-06-17",
+  "stable_final_blocker": true,
+  "review_boundary": "hash_diff_upsert production-sized BigQuery execution passed, but GCP advanced write modes remain excluded from stable-final until historical and snapshot production parity are validated.",
+  "required_cases": [
+    "initial_load",
+    "no_change_replay",
+    "changed_row_wave",
+    "concurrent_or_overlap_guard",
+    "duplicate_key_failure",
+    "null_key_failure"
+  ],
+  "required_metrics": [
+    "bigquery_job_id",
+    "statement_type",
+    "inserted_rows",
+    "updated_rows",
+    "deleted_rows",
+    "total_bytes_processed",
+    "total_slot_ms",
+    "failed_run_evidence",
+    "control_audit_status",
+    "cleanup_status"
+  ],
+  "command_pattern": [
+    "PYTHONPATH=src;adapters/gcp/src uv run python -m contractforge_gcp.cli smoke <hash-diff-contract.yaml> --environment <gcp.environment.yaml> --execute --allow-review-required --runtime bq --skip-quality --report <report.json>"
+  ],
+  "live_results": [
+    {
+      "case": "initial_load",
+      "run_namespace": "live-20260617-gcp-hashdiff-prod",
+      "bigquery_job_id": "cf_gcp_smoke_query_ad2f7a063a2949198c7b",
+      "status": "SUCCESS",
+      "statement_type": "MERGE",
+      "rows_inserted": 10000,
+      "rows_updated": 0,
+      "rows_deleted": 0,
+      "total_bytes_processed": 672856,
+      "total_slot_ms": 3723,
+      "planning_status": "REVIEW_REQUIRED",
+      "control_audit_status": "PASS"
+    },
+    {
+      "case": "no_change_replay",
+      "run_namespace": "live-20260617-gcp-hashdiff-prod",
+      "bigquery_job_id": "cf_gcp_smoke_query_2689a724a23b40318ed8",
+      "status": "SUCCESS",
+      "statement_type": "MERGE",
+      "rows_inserted": 0,
+      "rows_updated": 0,
+      "rows_deleted": 0,
+      "total_bytes_processed": 2005712,
+      "total_slot_ms": 3222,
+      "planning_status": "REVIEW_REQUIRED",
+      "control_audit_status": "PASS"
+    },
+    {
+      "case": "changed_row_wave",
+      "run_namespace": "live-20260617-gcp-hashdiff-prod",
+      "bigquery_job_id": "cf_gcp_smoke_query_93507e1aaaa84b949d09",
+      "status": "SUCCESS",
+      "statement_type": "MERGE",
+      "rows_inserted": 0,
+      "rows_updated": 250,
+      "rows_deleted": 0,
+      "total_bytes_processed": 2007642,
+      "total_slot_ms": 4466,
+      "changed_row_rule": "MOD(customer_id, 40) = 0",
+      "planning_status": "REVIEW_REQUIRED",
+      "control_audit_status": "PASS"
+    },
+    {
+      "case": "concurrent_or_overlap_guard",
+      "run_namespace": "live-20260617-gcp-hashdiff-prod",
+      "status": "PASS",
+      "overlap_policy": "BIGQUERY_MUTATING_DML_SERIALIZED",
+      "first_run": {
+        "report": ".tmp/gcp-hashdiff-prod-concurrent-a.json",
+        "bigquery_job_id": "cf_gcp_smoke_query_bea35ba94d1d4397b2b5",
+        "status": "SUCCESS",
+        "rows_inserted": 0,
+        "rows_updated": 200,
+        "rows_deleted": 0,
+        "total_bytes_processed": 2011130,
+        "total_slot_ms": 4262
+      },
+      "second_run": {
+        "report": ".tmp/gcp-hashdiff-prod-concurrent-b.json",
+        "bigquery_job_id": "cf_gcp_smoke_query_41b4d7258c784d9f95b2",
+        "status": "SUCCESS",
+        "rows_inserted": 0,
+        "rows_updated": 0,
+        "rows_deleted": 0,
+        "total_bytes_processed": 2012688,
+        "total_slot_ms": 3960
+      },
+      "target_verification": {
+        "row_count": 10000,
+        "distinct_keys": 10000,
+        "null_keys": 0,
+        "vip_rows": 200
+      },
+      "control_audit_status": "PASS"
+    },
+    {
+      "case": "duplicate_key_failure",
+      "run_namespace": "live-20260617-gcp-hashdiff-prod-duplicate",
+      "bigquery_job_id": "cf_gcp_smoke_query_014eb2ee57e446e4b3a6",
+      "status": "EXPECTED_FAILURE",
+      "evidence_status": "FAILED",
+      "error_marker": "CONTRACTFORGE_DUPLICATE_MERGE_KEYS",
+      "failed_run_evidence_job_id": "cf_gcp_smoke_query_2dc5360327ff4c6b906d",
+      "control_audit_status": "PASS"
+    },
+    {
+      "case": "null_key_failure",
+      "run_namespace": "live-20260617-gcp-hashdiff-prod-null",
+      "bigquery_job_id": "cf_gcp_smoke_query_fc567912643c46bdb265",
+      "status": "EXPECTED_FAILURE",
+      "evidence_status": "FAILED",
+      "error_marker": "CONTRACTFORGE_NULL_MERGE_KEY",
+      "failed_run_evidence_job_id": "cf_gcp_smoke_query_9c0d2a62447f4aa59a04",
+      "control_audit_status": "PASS"
+    }
+  ],
+  "evidence_readback": {
+    "run_evidence_by_status": {
+      "FAILED": 2,
+      "SUCCEEDED": 5
+    },
+    "target_verification": {
+      "row_count": 10000,
+      "distinct_keys": 10000,
+      "null_keys": 0,
+      "vip_rows": 200
+    }
+  },
+  "retained_artifacts": {
+    "source_table": "gcp-project-redacted.contractforge_gcp_hashdiff_prod.customers_hashdiff_source",
+    "target_table": "gcp-project-redacted.contractforge_gcp_hashdiff_prod.customers_hashdiff_target",
+    "evidence_dataset": "gcp-project-redacted.contractforge_gcp_hashdiff_prod_ops"
+  },
+  "cleanup_status": "RETAINED_FOR_AUDIT",
+  "benchmark_project": "examples/benchmarks/hash-diff-production/project.yaml",
+  "benchmark_contract": "examples/benchmarks/hash-diff-production/contracts/gcp/customers_hashdiff.ingestion.yaml",
+  "open_items": [
+    "Run equivalent production-sized historical and snapshot_reconcile_soft_delete cases before promoting GCP advanced write modes to stable-final.",
+    "Remove or expire retained live benchmark artifacts after release audit evidence is archived."
+  ],
+  "sources": [
+    "https://docs.cloud.google.com/bigquery/docs/reference/standard-sql/dml-syntax",
+    "https://docs.cloud.google.com/bigquery/docs/reference/standard-sql/hash_functions",
+    "https://docs.cloud.google.com/bigquery/docs/reference/standard-sql/data-manipulation-language"
+  ]
+}
+

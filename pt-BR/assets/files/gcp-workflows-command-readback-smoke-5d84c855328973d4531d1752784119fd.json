@@ -1,0 +1,69 @@
+{
+  "kind": "contractforge_gcp_workflows_command_readback_smoke",
+  "schema_version": "1.0.0",
+  "adapter": "contractforge-gcp",
+  "subtarget": "gcp_bigquery",
+  "maturity_gate": "GCP-BQ-15C3",
+  "status": "PASS",
+  "executed_at": "2026-06-16T18:57:18Z",
+  "project_id": "gcp-project-redacted",
+  "workflow": {
+    "name": "cf-gcp-workflows-smoke-runner",
+    "location": "us-central1",
+    "execution_state": "SUCCEEDED",
+    "operation_count": 6,
+    "wait_polling_included": true
+  },
+  "command_path": {
+    "contractforge_command": "contractforge-gcp deploy-project .tmp/gcp-workflows-smoke/project.yaml --environment-key gcp --deploy-orchestration --run-orchestration --wait-orchestration --readback-orchestration --readback-location us-east1 --summary-only",
+    "deploy": "gcloud workflows deploy",
+    "execute": "gcloud workflows execute",
+    "wait": "gcloud workflows executions wait",
+    "describe": "gcloud workflows executions describe",
+    "readback": "bq query --format=json",
+    "readback_location": "us-east1"
+  },
+  "fixes_validated": {
+    "platform_executable_resolution": true,
+    "bq_multiline_sql_flattening": true,
+    "readback_location_override": true,
+    "readback_error_preserves_stdout": true
+  },
+  "readback": {
+    "status": "SUCCEEDED",
+    "query_count": 5,
+    "target_row_counts": [
+      {
+        "step_name": "bronze_orders",
+        "target_table": "gcp-project-redacted.contractforge_gcp_smoke.workflow_bronze_orders",
+        "row_count": 3
+      },
+      {
+        "step_name": "gold_orders_by_status",
+        "target_table": "gcp-project-redacted.contractforge_gcp_smoke.workflow_gold_orders_by_status",
+        "row_count": 2
+      }
+    ],
+    "evidence_tables_present": [
+      "contractforge_annotation_evidence",
+      "contractforge_governance_evidence",
+      "contractforge_lineage_evidence",
+      "contractforge_quality_evidence",
+      "contractforge_run_evidence",
+      "contractforge_schema_evidence"
+    ],
+    "run_evidence_rows": 0,
+    "quality_evidence_rows": 0,
+    "schema_evidence_rows": 0
+  },
+  "review_boundary": {
+    "certified_now": [
+      "adapter-owned deploy/run/wait/readback command path executes end to end",
+      "readback target-count query returns expected bronze and gold row counts",
+      "evidence table presence query returns all required ContractForge evidence tables"
+    ],
+    "superseded_by_certified_runner_smoke": "docs/reports/gcp-workflows-certified-runner-smoke.json",
+    "remaining_before_runner_promotion": []
+  }
+}
+

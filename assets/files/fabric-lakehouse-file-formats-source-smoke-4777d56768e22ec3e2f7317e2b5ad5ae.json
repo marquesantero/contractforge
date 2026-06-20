@@ -1,0 +1,130 @@
+{
+  "kind": "contractforge_fabric_source_expansion_evidence",
+  "adapter": "fabric",
+  "source_family": "lakehouse_file_formats",
+  "formats": [
+    "orc",
+    "avro",
+    "xml"
+  ],
+  "authentication": "fabric_lakehouse_files",
+  "validated_at_utc": "2026-06-12T17:24:55Z",
+  "status": "SUCCEEDED",
+  "project": "examples/source-expansion/fabric-lakehouse-file-formats/project.yaml",
+  "environment": "examples/source-expansion/fabric-lakehouse-file-formats/environments/fabric.environment.yaml",
+  "workspace": {
+    "id": "00000000-0000-0000-0000-000000000000",
+    "name": "Manager",
+    "capacity_id": "00000000-0000-0000-0000-000000000000",
+    "capacity_region": "Brazil South"
+  },
+  "lakehouse": {
+    "id": "00000000-0000-0000-0000-000000000000",
+    "name": "contractforge_lh"
+  },
+  "source_infrastructure": {
+    "provider": "fabric_lakehouse_files",
+    "fixture_paths": {
+      "orc": "Files/source-expansion/lakehouse-file-formats/orc_orders",
+      "avro": "Files/source-expansion/lakehouse-file-formats/avro_orders",
+      "xml": "Files/source-expansion/lakehouse-file-formats/xml_orders"
+    },
+    "fixture_rows_per_format": 2,
+    "seed_notebook": "cf_seed_lakehouse_file_formats_1781283819",
+    "seed_notebook_id": "00000000-0000-0000-0000-000000000000",
+    "seed_job_instance_id": "00000000-0000-0000-0000-000000000000",
+    "seed_status": "Completed"
+  },
+  "commands": [
+    "contractforge-fabric smoke-project examples/source-expansion/fabric-lakehouse-file-formats/project.yaml --environment-key fabric --max-attempts 35 --retry-after-seconds 30"
+  ],
+  "contract_source": {
+    "basis": "Contract-only Fabric Lakehouse ORC, Avro and XML file sources plus SQL evidence probe",
+    "workaround_code_used": false,
+    "source_types": [
+      "orc",
+      "avro",
+      "xml"
+    ],
+    "runtime_path": "Generated Fabric Notebooks using Spark DataFrameReader file formats"
+  },
+  "coverage": {
+    "source_read": [
+      "lakehouse_files_orc",
+      "lakehouse_files_avro",
+      "lakehouse_files_xml_row_tag"
+    ],
+    "target_tables": [
+      "cf_fabric_source_expansion.lakehouse_orc_orders",
+      "cf_fabric_source_expansion.lakehouse_avro_orders",
+      "cf_fabric_source_expansion.lakehouse_xml_orders"
+    ],
+    "probe_table": "cf_fabric_source_expansion.lakehouse_file_formats_evidence_probe",
+    "probe_checks": [
+      "orc_target_rows",
+      "avro_target_rows",
+      "xml_target_rows",
+      "run_rows",
+      "quality_rows",
+      "schema_rows",
+      "source_metadata_rows",
+      "orc_amount_sum",
+      "avro_amount_sum",
+      "xml_amount_sum"
+    ]
+  },
+  "result_summary": {
+    "submitted_steps": 4,
+    "fabric_job_status_completed": 4,
+    "evidence_probe_result": "SUCCEEDED",
+    "evidence_probe_checks": 10
+  },
+  "steps": [
+    {
+      "name": "lakehouse_orc_orders",
+      "contract": "contracts/01_lakehouse_orc_orders.ingestion.yaml",
+      "notebook": "cf_workspace_cf_fabric_source_expansion_lakehouse_orc_orders",
+      "item_id": "00000000-0000-0000-0000-000000000000",
+      "job_instance_id": "00000000-0000-0000-0000-000000000000",
+      "job_status": "Completed",
+      "started_at_utc": "2026-06-12T17:08:04.7392169",
+      "ended_at_utc": "2026-06-12T17:11:46.3428316"
+    },
+    {
+      "name": "lakehouse_avro_orders",
+      "contract": "contracts/02_lakehouse_avro_orders.ingestion.yaml",
+      "notebook": "cf_workspace_cf_fabric_source_expansion_lakehouse_avro_orders",
+      "item_id": "00000000-0000-0000-0000-000000000000",
+      "job_instance_id": "00000000-0000-0000-0000-000000000000",
+      "job_status": "Completed",
+      "started_at_utc": "2026-06-12T17:12:51.013303",
+      "ended_at_utc": "2026-06-12T17:15:53.2076504"
+    },
+    {
+      "name": "lakehouse_xml_orders",
+      "contract": "contracts/03_lakehouse_xml_orders.ingestion.yaml",
+      "notebook": "cf_workspace_cf_fabric_source_expansion_lakehouse_xml_orders",
+      "item_id": "00000000-0000-0000-0000-000000000000",
+      "job_instance_id": "00000000-0000-0000-0000-000000000000",
+      "job_status": "Completed",
+      "started_at_utc": "2026-06-12T17:16:39.3319979",
+      "ended_at_utc": "2026-06-12T17:20:24.7954141"
+    },
+    {
+      "name": "lakehouse_file_formats_evidence_probe",
+      "contract": "contracts/04_lakehouse_file_formats_evidence_probe.ingestion.yaml",
+      "notebook": "cf_workspace_cf_fabric_source_expansion_lakehouse_file_formats_evidence_probe",
+      "item_id": "00000000-0000-0000-0000-000000000000",
+      "job_instance_id": "00000000-0000-0000-0000-000000000000",
+      "job_status": "Completed",
+      "started_at_utc": "2026-06-12T17:21:28.8019719",
+      "ended_at_utc": "2026-06-12T17:24:55.9666426"
+    }
+  ],
+  "known_limitations": [
+    "This validates bounded ORC, Avro and XML reads from Fabric Lakehouse Files.",
+    "Private-network shortcut variants, Delta Sharing, direct-catalog Iceberg variants and native Fabric Real-Time/Eventstream remain separate review gates; external ADLS Gen2 shortcuts are covered by docs/reports/fabric-adls-shortcut-source-smoke.json, external Google Cloud Storage shortcuts are covered by docs/reports/fabric-gcs-shortcut-source-smoke.json, external Amazon S3 shortcuts are covered by docs/reports/fabric-external-s3-shortcut-source-smoke.json, external S3-compatible shortcuts are covered by docs/reports/fabric-s3-compatible-shortcut-source-smoke.json, Amazon S3 Iceberg table shortcuts are covered by docs/reports/fabric-iceberg-table-shortcut-source-smoke.json, ADLS Gen2 Iceberg table shortcuts are covered by docs/reports/fabric-adls-iceberg-table-shortcut-source-smoke.json, Google Cloud Storage Iceberg table shortcuts are covered by docs/reports/fabric-gcs-iceberg-table-shortcut-source-smoke.json and Event Hubs Kafka-compatible available-now is covered by docs/reports/fabric-eventhubs-kafka-available-now-source-smoke.json.",
+    "Fabric stable_final is true for the documented notebook-first surface. Source families outside this stable scope are excluded by docs/reports/fabric-source-expansion-stable-scope-decision.json. Explicit Fabric-native OneLake row and column policy apply is covered separately by docs/reports/fabric-onelake-row-column-policy-smoke.json, and deployment-pipeline stage promotion is covered by docs/reports/fabric-deployment-pipeline-stage-promotion-smoke.json."
+  ]
+}
+

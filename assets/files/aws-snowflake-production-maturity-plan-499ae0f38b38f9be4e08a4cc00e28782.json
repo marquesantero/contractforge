@@ -1,0 +1,128 @@
+{
+  "kind": "contractforge_adapter_production_maturity_plan",
+  "schema_version": "1.0.0",
+  "created": "2026-06-09",
+  "adapters": [
+    "contractforge-aws",
+    "contractforge-snowflake"
+  ],
+  "target": "stable_final",
+  "summary": {
+    "current_state": "Both adapters are stable-supported for their documented surfaces.",
+    "goal": "Close or explicitly exclude remaining production-certification boundaries so strict-final status can pass.",
+    "source_spec": "docs/specs/aws-snowflake-production-maturity-plan.md"
+  },
+  "gates": [
+    {
+      "id": "AWS-HASHDIFF-PROD",
+      "adapter": "contractforge-aws",
+      "surface": "aws_glue_iceberg",
+      "area": "hash_diff_upsert",
+      "status": "PASS",
+      "current_decision": "SUPPORTED_WITH_WARNINGS",
+      "next_action": "Keep the Glue/Iceberg benchmark in release validation and rerun after hash-diff runtime or packaging changes.",
+      "acceptance": "Athena audit rows, Glue run ids, Iceberg snapshot metrics, cost rows and redacted failure evidence prove bounded behavior.",
+      "evidence_target": "docs/reports/aws-hashdiff-production-benchmark.json"
+    },
+    {
+      "id": "AWS-LF-CONSUMER-MATRIX",
+      "adapter": "contractforge-aws",
+      "surface": "aws_glue_iceberg",
+      "area": "lake_formation_governance",
+      "status": "PASS",
+      "current_decision": "EXCLUDED_FROM_STABLE_FINAL",
+      "next_action": "Keep the LF consumer matrix in release validation and rerun after Lake Formation, IAM or Glue runtime changes. Treat arbitrary row-filter and mask expressions as workload-specific review items.",
+      "acceptance": "Allowed principals read exactly declared rows/columns and denied principals cannot exceed the contract; arbitrary unreviewed expressions are outside strict-final.",
+      "evidence_target": "docs/reports/aws-lake-formation-consumer-matrix.json"
+    },
+    {
+      "id": "AWS-KAFKA-PROVIDER-MATRIX",
+      "adapter": "contractforge-aws",
+      "surface": "aws_glue_iceberg",
+      "area": "available_now_streaming",
+      "status": "PASS",
+      "current_decision": "EXCLUDED_FROM_STABLE_FINAL",
+      "next_action": "Keep MSK Serverless in release validation. Treat Confluent-compatible Kafka as an optional compatibility item, not an AWS maturity blocker.",
+      "acceptance": "MSK Serverless checkpoint, offset, failure, stream and cost evidence semantics are recorded.",
+      "evidence_target": "docs/reports/aws-kafka-provider-matrix.json"
+    },
+    {
+      "id": "AWS-HISTORICAL-SEMANTICS",
+      "adapter": "contractforge-aws",
+      "surface": "aws_glue_iceberg",
+      "area": "historical_and_snapshot_reconcile_soft_delete",
+      "status": "EXCLUDED_FROM_STABLE_FINAL",
+      "current_decision": "REVIEW_REQUIRED",
+      "next_action": "Keep historical and snapshot soft-delete outside the AWS stable-final claim until Databricks/AWS parity contracts are implemented and certified.",
+      "acceptance": "Status report and criteria either exclude the behavior or link E2E parity evidence.",
+      "evidence_target": "docs/reports/aws-historical-semantics-decision.json"
+    },
+    {
+      "id": "SNOWFLAKE-TASK-GRAPH-LIVE",
+      "adapter": "contractforge-snowflake",
+      "surface": "snowflake_sql_warehouse",
+      "area": "task_graph_execution",
+      "status": "PASS",
+      "current_decision": "SUPPORTED_WITH_WARNINGS",
+      "next_action": "Keep smoke-task-graph in the release validation set and rerun after task/runtime deployment changes.",
+      "acceptance": "Task graph deploys, root task executes, dependent task succeeds, task history reaches terminal success and cleanup removes smoke artifacts.",
+      "evidence_target": "docs/reports/snowflake-task-graph-live-smoke.json"
+    },
+    {
+      "id": "SNOWFLAKE-HASHDIFF-PROD",
+      "adapter": "contractforge-snowflake",
+      "surface": "snowflake_sql_warehouse",
+      "area": "hash_diff_upsert",
+      "status": "PASS",
+      "current_decision": "SUPPORTED_WITH_WARNINGS",
+      "next_action": "Keep the Snowflake benchmark in release validation and rerun after hash-diff runtime, procedure or packaging changes.",
+      "acceptance": "Snowflake query ids, query-history cost signals, hash-diff candidate metrics and control-table rows prove bounded behavior.",
+      "evidence_target": "docs/reports/snowflake-hashdiff-production-benchmark.json"
+    },
+    {
+      "id": "SNOWFLAKE-ACCESS-POLICY-SMOKE",
+      "adapter": "contractforge-snowflake",
+      "surface": "snowflake_sql_warehouse",
+      "area": "access_governance",
+      "status": "EXCLUDED_FROM_STABLE_FINAL",
+      "current_decision": "SUPPORTED_WITH_WARNINGS",
+      "next_action": "Keep row access and masking policy certification outside the Snowflake stable-final claim for accounts where ROW ACCESS POLICY is unavailable.",
+      "acceptance": "Access-policy smoke result and status reports explicitly exclude unavailable policy features without weakening supported table grants, comments/tags or validate-only governance.",
+      "evidence_target": "docs/reports/snowflake-access-policy-smoke.json"
+    },
+    {
+      "id": "SNOWFLAKE-CONTINUOUS-INGESTION-DECISION",
+      "adapter": "contractforge-snowflake",
+      "surface": "snowflake_sql_warehouse",
+      "area": "snowpipe_and_streams",
+      "status": "EXCLUDED_FROM_STABLE_FINAL",
+      "current_decision": "REVIEW_REQUIRED",
+      "next_action": "Keep Snowpipe, Streams, Snowpipe Streaming and Kafka connector ingestion outside the Snowflake stable-final claim until a connector/runtime mapping is implemented and certified.",
+      "acceptance": "Decision manifest, planner/status output and docs explicitly exclude continuous ingestion from stable-final without silent fallback.",
+      "evidence_target": "docs/reports/snowflake-continuous-ingestion-decision.json"
+    },
+    {
+      "id": "SNOWFLAKE-HISTORICAL-SEMANTICS",
+      "adapter": "contractforge-snowflake",
+      "surface": "snowflake_sql_warehouse",
+      "area": "historical_and_snapshot_reconcile_soft_delete",
+      "status": "EXCLUDED_FROM_STABLE_FINAL",
+      "current_decision": "REVIEW_REQUIRED",
+      "next_action": "Keep historical and snapshot soft-delete outside the Snowflake stable-final claim until Databricks/Snowflake parity contracts are implemented and certified.",
+      "acceptance": "Status report and criteria either exclude the behavior or link E2E parity evidence.",
+      "evidence_target": "docs/reports/snowflake-historical-semantics-decision.json"
+    }
+  ],
+  "execution_order": [
+    "AWS-HASHDIFF-PROD",
+    "SNOWFLAKE-HASHDIFF-PROD",
+    "SNOWFLAKE-TASK-GRAPH-LIVE",
+    "AWS-LF-CONSUMER-MATRIX",
+    "SNOWFLAKE-ACCESS-POLICY-SMOKE",
+    "AWS-KAFKA-PROVIDER-MATRIX",
+    "SNOWFLAKE-CONTINUOUS-INGESTION-DECISION",
+    "AWS-HISTORICAL-SEMANTICS",
+    "SNOWFLAKE-HISTORICAL-SEMANTICS"
+  ]
+}
+

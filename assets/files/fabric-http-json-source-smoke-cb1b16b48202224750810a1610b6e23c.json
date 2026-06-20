@@ -1,0 +1,73 @@
+{
+  "kind": "contractforge_fabric_source_expansion_evidence",
+  "adapter": "contractforge-fabric",
+  "source_family": "http_json",
+  "authentication": "none",
+  "validated_at_utc": "2026-06-11T22:14:53Z",
+  "status": "SUCCEEDED",
+  "project": "examples/source-expansion/fabric-http-json/project.yaml",
+  "environment": "examples/source-expansion/fabric-http-json/environments/fabric.environment.yaml",
+  "workspace": {
+    "id": "00000000-0000-0000-0000-000000000000",
+    "name": "Manager",
+    "capacity_id": "00000000-0000-0000-0000-000000000000",
+    "capacity_region": "Brazil South"
+  },
+  "lakehouse": {
+    "id": "00000000-0000-0000-0000-000000000000",
+    "name": "contractforge_lh"
+  },
+  "command": "uv run python -m contractforge_fabric.cli smoke-project examples/source-expansion/fabric-http-json/project.yaml --environment-key fabric --max-attempts 35 --retry-after-seconds 30",
+  "contract_source": {
+    "basis": "Contract-only public bounded HTTP JSON source plus SQL evidence probe",
+    "workaround_code_used": false,
+    "source_connector": "http_json",
+    "runtime_path": "Generated Fabric Notebook using contractforge_core.connectors.read_http_file_payload"
+  },
+  "coverage": {
+    "source_family": "http_json",
+    "source_url": "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_day.geojson",
+    "target_table": "cf_fabric_source_expansion.http_json_usgs_geojson",
+    "probe_table": "cf_fabric_source_expansion.http_json_evidence_probe",
+    "probe_checks": [
+      "target_rows",
+      "run_rows",
+      "quality_rows",
+      "schema_rows",
+      "source_metadata_rows"
+    ]
+  },
+  "result_summary": {
+    "submitted_steps": 2,
+    "fabric_job_status_completed": 2,
+    "evidence_probe_checks": 5
+  },
+  "steps": [
+    {
+      "name": "http_json_usgs_geojson",
+      "contract": "contracts/01_http_json_usgs_geojson.ingestion.yaml",
+      "notebook": "cf_workspace_cf_fabric_source_expansion_http_json_usgs_geojson",
+      "item_id": "00000000-0000-0000-0000-000000000000",
+      "job_instance_id": "00000000-0000-0000-0000-000000000000",
+      "job_status": "Completed",
+      "started_at_utc": "2026-06-11T22:06:37.3431479",
+      "ended_at_utc": "2026-06-11T22:10:17.5825787"
+    },
+    {
+      "name": "http_json_evidence_probe",
+      "contract": "contracts/02_http_json_evidence_probe.ingestion.yaml",
+      "notebook": "cf_workspace_cf_fabric_source_expansion_http_json_evidence_probe",
+      "item_id": "00000000-0000-0000-0000-000000000000",
+      "job_instance_id": "00000000-0000-0000-0000-000000000000",
+      "job_status": "Completed",
+      "started_at_utc": "2026-06-11T22:11:26.5651779",
+      "ended_at_utc": "2026-06-11T22:14:53.8978801"
+    }
+  ],
+  "known_limitations": [
+    "This validates public/no-auth bounded HTTP JSON only.",
+    "Authenticated HTTP/REST, JDBC, object storage and bounded stream evidence is covered by separate Fabric F11 smoke reports.",
+    "Fabric stable_final is true for the documented notebook-first surface. Source families outside this stable scope are excluded by docs/reports/fabric-source-expansion-stable-scope-decision.json. Explicit Fabric-native OneLake row and column policy apply is covered separately by docs/reports/fabric-onelake-row-column-policy-smoke.json, and deployment-pipeline stage promotion is covered by docs/reports/fabric-deployment-pipeline-stage-promotion-smoke.json."
+  ]
+}
+

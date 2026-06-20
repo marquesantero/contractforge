@@ -1,0 +1,437 @@
+{
+  "adapter": "gcp",
+  "contracts": [
+    {
+      "blockers": [],
+      "name": "bronze_orders_csv",
+      "ok": true,
+      "operations": [
+        {
+          "artifact": "testebig-496714_contractforge_gcp_smoke_b2g_bronze_orders.gcp.evidence_ddl.sql",
+          "executed": true,
+          "job": {
+            "deleted_rows": null,
+            "error_message": null,
+            "inserted_rows": null,
+            "job_id": "cf_gcp_smoke_query_74ca06b84f2342f38c2c",
+            "job_type": "QUERY",
+            "output_rows": null,
+            "result_rows": null,
+            "state": "DONE",
+            "statement_type": "CREATE_TABLE",
+            "total_bytes_billed": 0,
+            "total_bytes_processed": 0,
+            "total_slot_ms": 0,
+            "updated_rows": null
+          },
+          "kind": "QUERY",
+          "name": "prepare_evidence"
+        },
+        {
+          "artifact": "testebig-496714_contractforge_gcp_smoke_b2g_bronze_orders.gcp.load_job.json",
+          "executed": true,
+          "job": {
+            "deleted_rows": null,
+            "error_message": null,
+            "inserted_rows": null,
+            "job_id": "cf_gcp_smoke_load_c95017fd029246bb9e4a",
+            "job_type": "LOAD",
+            "output_rows": 3,
+            "result_rows": null,
+            "state": "DONE",
+            "statement_type": null,
+            "total_bytes_billed": null,
+            "total_bytes_processed": null,
+            "total_slot_ms": 116,
+            "updated_rows": null
+          },
+          "kind": "LOAD",
+          "name": "load_source"
+        },
+        {
+          "artifact": "inline:gcp.run_evidence",
+          "executed": true,
+          "job": {
+            "deleted_rows": null,
+            "error_message": null,
+            "inserted_rows": 1,
+            "job_id": "cf_gcp_smoke_query_b0b03a68b39b409cbf7c",
+            "job_type": "QUERY",
+            "output_rows": null,
+            "result_rows": null,
+            "state": "DONE",
+            "statement_type": "INSERT",
+            "total_bytes_billed": 0,
+            "total_bytes_processed": 0,
+            "total_slot_ms": 690,
+            "updated_rows": null
+          },
+          "kind": "QUERY",
+          "name": "persist_run_evidence"
+        },
+        {
+          "artifact": "testebig-496714_contractforge_gcp_smoke_b2g_bronze_orders.gcp.quality.sql",
+          "executed": true,
+          "job": {
+            "deleted_rows": null,
+            "error_message": null,
+            "inserted_rows": null,
+            "job_id": "cf_gcp_smoke_query_30a0db6793c046ddae19",
+            "job_type": "QUERY",
+            "output_rows": null,
+            "result_rows": [
+              {
+                "failed_rows": "0"
+              }
+            ],
+            "state": "DONE",
+            "statement_type": "SELECT",
+            "total_bytes_billed": 10485760,
+            "total_bytes_processed": 24,
+            "total_slot_ms": 14,
+            "updated_rows": null
+          },
+          "kind": "QUERY",
+          "name": "quality"
+        },
+        {
+          "artifact": "inline:gcp.quality_evidence",
+          "executed": true,
+          "job": {
+            "deleted_rows": null,
+            "error_message": null,
+            "inserted_rows": 1,
+            "job_id": "cf_gcp_smoke_query_da92fc4b8f5b4d059d76",
+            "job_type": "QUERY",
+            "output_rows": null,
+            "result_rows": null,
+            "state": "DONE",
+            "statement_type": "INSERT",
+            "total_bytes_billed": 0,
+            "total_bytes_processed": 0,
+            "total_slot_ms": 677,
+            "updated_rows": null
+          },
+          "kind": "QUERY",
+          "name": "persist_quality_evidence"
+        }
+      ],
+      "planning_status": "SUPPORTED_WITH_WARNINGS",
+      "status": "SUCCEEDED",
+      "target_table": "testebig-496714.contractforge_gcp_smoke.b2g_bronze_orders",
+      "warnings": [
+        {
+          "code": "GCP_STABLE_SURFACE_SCOPE",
+          "message": "GCP BigQuery is stable-final for the documented batch BigQuery surface. Streaming, advanced write modes, deployment runners, native Dataplex integrations, governance auto-repair/delete and overwrite-retention certification are explicitly outside this scoped claim."
+        }
+      ]
+    },
+    {
+      "blockers": [],
+      "name": "silver_orders_curated",
+      "ok": true,
+      "operations": [
+        {
+          "artifact": "testebig-496714_contractforge_gcp_smoke_b2g_silver_orders.gcp.evidence_ddl.sql",
+          "executed": true,
+          "job": {
+            "deleted_rows": null,
+            "error_message": null,
+            "inserted_rows": null,
+            "job_id": "cf_gcp_smoke_query_d51a0c3b7b4148ab9bb1",
+            "job_type": "QUERY",
+            "output_rows": null,
+            "result_rows": null,
+            "state": "DONE",
+            "statement_type": "CREATE_TABLE",
+            "total_bytes_billed": 0,
+            "total_bytes_processed": 0,
+            "total_slot_ms": 0,
+            "updated_rows": null
+          },
+          "kind": "QUERY",
+          "name": "prepare_evidence"
+        },
+        {
+          "artifact": "testebig-496714_contractforge_gcp_smoke_b2g_silver_orders.gcp.write.sql",
+          "executed": true,
+          "job": {
+            "deleted_rows": null,
+            "error_message": null,
+            "inserted_rows": null,
+            "job_id": "cf_gcp_smoke_query_2fdc22be23884d1caf90",
+            "job_type": "QUERY",
+            "output_rows": null,
+            "result_rows": null,
+            "state": "DONE",
+            "statement_type": "CREATE_TABLE_AS_SELECT",
+            "total_bytes_billed": 10485760,
+            "total_bytes_processed": 65,
+            "total_slot_ms": 788,
+            "updated_rows": null
+          },
+          "kind": "QUERY",
+          "name": "write_target"
+        },
+        {
+          "artifact": "inline:gcp.run_evidence",
+          "executed": true,
+          "job": {
+            "deleted_rows": null,
+            "error_message": null,
+            "inserted_rows": 1,
+            "job_id": "cf_gcp_smoke_query_64a43439c5704f4c8007",
+            "job_type": "QUERY",
+            "output_rows": null,
+            "result_rows": null,
+            "state": "DONE",
+            "statement_type": "INSERT",
+            "total_bytes_billed": 0,
+            "total_bytes_processed": 0,
+            "total_slot_ms": 687,
+            "updated_rows": null
+          },
+          "kind": "QUERY",
+          "name": "persist_run_evidence"
+        },
+        {
+          "artifact": "testebig-496714_contractforge_gcp_smoke_b2g_silver_orders.gcp.quality.sql",
+          "executed": true,
+          "job": {
+            "deleted_rows": null,
+            "error_message": null,
+            "inserted_rows": null,
+            "job_id": "cf_gcp_smoke_query_8648f31d28f54ed8b11c",
+            "job_type": "QUERY",
+            "output_rows": null,
+            "result_rows": [
+              {
+                "failed_rows": "0"
+              },
+              {
+                "failed_rows": "0"
+              }
+            ],
+            "state": "DONE",
+            "statement_type": "SELECT",
+            "total_bytes_billed": 10485760,
+            "total_bytes_processed": 24,
+            "total_slot_ms": 40,
+            "updated_rows": null
+          },
+          "kind": "QUERY",
+          "name": "quality"
+        },
+        {
+          "artifact": "inline:gcp.quality_evidence",
+          "executed": true,
+          "job": {
+            "deleted_rows": null,
+            "error_message": null,
+            "inserted_rows": 2,
+            "job_id": "cf_gcp_smoke_query_2f201095111a4c5a8cf1",
+            "job_type": "QUERY",
+            "output_rows": null,
+            "result_rows": null,
+            "state": "DONE",
+            "statement_type": "INSERT",
+            "total_bytes_billed": 0,
+            "total_bytes_processed": 0,
+            "total_slot_ms": 677,
+            "updated_rows": null
+          },
+          "kind": "QUERY",
+          "name": "persist_quality_evidence"
+        }
+      ],
+      "planning_status": "SUPPORTED_WITH_WARNINGS",
+      "status": "SUCCEEDED",
+      "target_table": "testebig-496714.contractforge_gcp_smoke.b2g_silver_orders",
+      "warnings": [
+        {
+          "code": "GCP_STABLE_SURFACE_SCOPE",
+          "message": "GCP BigQuery is stable-final for the documented batch BigQuery surface. Streaming, advanced write modes, deployment runners, native Dataplex integrations, governance auto-repair/delete and overwrite-retention certification are explicitly outside this scoped claim."
+        }
+      ]
+    },
+    {
+      "blockers": [],
+      "name": "gold_orders_by_status",
+      "ok": true,
+      "operations": [
+        {
+          "artifact": "testebig-496714_contractforge_gcp_smoke_b2g_gold_orders_by_status.gcp.evidence_ddl.sql",
+          "executed": true,
+          "job": {
+            "deleted_rows": null,
+            "error_message": null,
+            "inserted_rows": null,
+            "job_id": "cf_gcp_smoke_query_86a92133e299435598d4",
+            "job_type": "QUERY",
+            "output_rows": null,
+            "result_rows": null,
+            "state": "DONE",
+            "statement_type": "CREATE_TABLE",
+            "total_bytes_billed": 0,
+            "total_bytes_processed": 0,
+            "total_slot_ms": 0,
+            "updated_rows": null
+          },
+          "kind": "QUERY",
+          "name": "prepare_evidence"
+        },
+        {
+          "artifact": "testebig-496714_contractforge_gcp_smoke_b2g_gold_orders_by_status.gcp.write.sql",
+          "executed": true,
+          "job": {
+            "deleted_rows": null,
+            "error_message": null,
+            "inserted_rows": null,
+            "job_id": "cf_gcp_smoke_query_80b9013f1d3c4f5c8475",
+            "job_type": "QUERY",
+            "output_rows": null,
+            "result_rows": null,
+            "state": "DONE",
+            "statement_type": "CREATE_TABLE_AS_SELECT",
+            "total_bytes_billed": 10485760,
+            "total_bytes_processed": 41,
+            "total_slot_ms": 630,
+            "updated_rows": null
+          },
+          "kind": "QUERY",
+          "name": "write_target"
+        },
+        {
+          "artifact": "inline:gcp.run_evidence",
+          "executed": true,
+          "job": {
+            "deleted_rows": null,
+            "error_message": null,
+            "inserted_rows": 1,
+            "job_id": "cf_gcp_smoke_query_99fcebcd191b47fd9635",
+            "job_type": "QUERY",
+            "output_rows": null,
+            "result_rows": null,
+            "state": "DONE",
+            "statement_type": "INSERT",
+            "total_bytes_billed": 0,
+            "total_bytes_processed": 0,
+            "total_slot_ms": 588,
+            "updated_rows": null
+          },
+          "kind": "QUERY",
+          "name": "persist_run_evidence"
+        },
+        {
+          "artifact": "testebig-496714_contractforge_gcp_smoke_b2g_gold_orders_by_status.gcp.quality.sql",
+          "executed": true,
+          "job": {
+            "deleted_rows": null,
+            "error_message": null,
+            "inserted_rows": null,
+            "job_id": "cf_gcp_smoke_query_6546e912325c4721aa26",
+            "job_type": "QUERY",
+            "output_rows": null,
+            "result_rows": [
+              {
+                "failed_rows": "0"
+              },
+              {
+                "failed_rows": "0"
+              }
+            ],
+            "state": "DONE",
+            "statement_type": "SELECT",
+            "total_bytes_billed": 10485760,
+            "total_bytes_processed": 16,
+            "total_slot_ms": 16,
+            "updated_rows": null
+          },
+          "kind": "QUERY",
+          "name": "quality"
+        },
+        {
+          "artifact": "inline:gcp.quality_evidence",
+          "executed": true,
+          "job": {
+            "deleted_rows": null,
+            "error_message": null,
+            "inserted_rows": 2,
+            "job_id": "cf_gcp_smoke_query_12a73ae5355d4df4b6f8",
+            "job_type": "QUERY",
+            "output_rows": null,
+            "result_rows": null,
+            "state": "DONE",
+            "statement_type": "INSERT",
+            "total_bytes_billed": 0,
+            "total_bytes_processed": 0,
+            "total_slot_ms": 617,
+            "updated_rows": null
+          },
+          "kind": "QUERY",
+          "name": "persist_quality_evidence"
+        }
+      ],
+      "planning_status": "SUPPORTED_WITH_WARNINGS",
+      "status": "SUCCEEDED",
+      "target_table": "testebig-496714.contractforge_gcp_smoke.b2g_gold_orders_by_status",
+      "warnings": [
+        {
+          "code": "GCP_STABLE_SURFACE_SCOPE",
+          "message": "GCP BigQuery is stable-final for the documented batch BigQuery surface. Streaming, advanced write modes, deployment runners, native Dataplex integrations, governance auto-repair/delete and overwrite-retention certification are explicitly outside this scoped claim."
+        }
+      ]
+    }
+  ],
+  "dataset": "testebig-496714.contractforge_gcp_smoke",
+  "gate": "GCP-BQ-03",
+  "gold_rows": [
+    {
+      "amount_total": "10.5",
+      "order_count": "1",
+      "status": "new"
+    },
+    {
+      "amount_total": "27.25",
+      "order_count": "2",
+      "status": "paid"
+    }
+  ],
+  "ok": true,
+  "run_evidence_rows": [
+    {
+      "contract_name": "b2g_bronze_orders",
+      "run_evidence_rows": "1"
+    },
+    {
+      "contract_name": "b2g_gold_orders_by_status",
+      "run_evidence_rows": "1"
+    },
+    {
+      "contract_name": "b2g_silver_orders",
+      "run_evidence_rows": "1"
+    }
+  ],
+  "source_uri": "gs://contractforge-fabric-gcs-testebig-496714/contractforge/gcp-smoke/formats/orders.csv",
+  "status": "SUCCEEDED",
+  "subtarget": "gcp_bigquery",
+  "verification": [
+    {
+      "failed_rows": "0",
+      "layer": "bronze",
+      "row_count": "3"
+    },
+    {
+      "failed_rows": "0",
+      "layer": "gold",
+      "row_count": "2"
+    },
+    {
+      "failed_rows": "0",
+      "layer": "silver",
+      "row_count": "3"
+    }
+  ]
+}
+
+

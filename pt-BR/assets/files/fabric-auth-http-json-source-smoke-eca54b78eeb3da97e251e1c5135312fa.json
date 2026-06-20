@@ -1,0 +1,83 @@
+{
+  "kind": "contractforge_fabric_source_expansion_evidence",
+  "adapter": "contractforge-fabric",
+  "source_family": "http_json",
+  "authentication": "basic_key_vault_placeholder",
+  "status": "SUCCEEDED",
+  "validated_at": "2026-06-11T23:35:15Z",
+  "project": "examples/source-expansion/fabric-auth-http-json/project.yaml",
+  "environment": "examples/source-expansion/fabric-auth-http-json/environments/fabric.environment.yaml",
+  "workspace": {
+    "workspace_id": "00000000-0000-0000-0000-000000000000",
+    "workspace_name": "Manager",
+    "capacity_id": "00000000-0000-0000-0000-000000000000",
+    "capacity_region": "Brazil South",
+    "lakehouse_id": "00000000-0000-0000-0000-000000000000",
+    "lakehouse_name": "contractforge_lh"
+  },
+  "command": "uv run python -m contractforge_fabric.cli smoke-project examples/source-expansion/fabric-auth-http-json/project.yaml --environment-key fabric --max-attempts 35 --retry-after-seconds 30",
+  "contract_source": {
+    "contract_only": true,
+    "workaround_code_used": false,
+    "source_connector": "http_json",
+    "auth_mode": "basic",
+    "secret_reference": "{{ secret:fabric/postman-basic-password }}",
+    "key_vault": "https://cffabricf11kv.vault.azure.net/",
+    "secret_value_recorded": false
+  },
+  "coverage": {
+    "source_family": "http_json",
+    "authentication": "basic_key_vault_placeholder",
+    "target_table": "cf_fabric_source_expansion.auth_http_json_basic",
+    "probe_table": "cf_fabric_source_expansion.auth_http_json_evidence_probe",
+    "probe_checks": [
+      "target_rows",
+      "target_authenticated_true",
+      "run_rows",
+      "quality_rows",
+      "schema_rows",
+      "source_metadata_rows"
+    ],
+    "evidence_tables": [
+      "contractforge.ctrl_ingestion_runs",
+      "contractforge.ctrl_ingestion_quality",
+      "contractforge.ctrl_ingestion_schema_changes",
+      "contractforge.ctrl_ingestion_metadata"
+    ]
+  },
+  "result_summary": {
+    "submitted_steps": 2,
+    "succeeded_steps": 2,
+    "failed_steps": 0,
+    "fabric_job_status_completed": 2,
+    "evidence_probe_checks": 6
+  },
+  "steps": [
+    {
+      "name": "authenticated_http_json_basic",
+      "contract": "contracts/01_authenticated_http_json_basic.ingestion.yaml",
+      "notebook": "cf_workspace_cf_fabric_source_expansion_auth_http_json_basic",
+      "item_id": "00000000-0000-0000-0000-000000000000",
+      "job_instance_id": "00000000-0000-0000-0000-000000000000",
+      "start_time_utc": "2026-06-11T23:26:49.7080201",
+      "end_time_utc": "2026-06-11T23:30:34.5619335",
+      "status": "SUCCEEDED"
+    },
+    {
+      "name": "authenticated_http_json_evidence_probe",
+      "contract": "contracts/02_authenticated_http_json_evidence_probe.ingestion.yaml",
+      "notebook": "cf_workspace_cf_fabric_source_expansion_auth_http_json_evidence_probe",
+      "item_id": "00000000-0000-0000-0000-000000000000",
+      "job_instance_id": "00000000-0000-0000-0000-000000000000",
+      "start_time_utc": "2026-06-11T23:31:39.9758786",
+      "end_time_utc": "2026-06-11T23:35:15.6997703",
+      "status": "SUCCEEDED"
+    }
+  ],
+  "notes": [
+    "The generated notebook resolved the HTTP Basic password through Fabric notebookutils and Azure Key Vault.",
+    "The rendered notebook and evidence report do not contain the secret value.",
+    "This evidence is part of the stable F11 source surface; out-of-scope source families are excluded by docs/reports/fabric-source-expansion-stable-scope-decision.json."
+  ]
+}
+
