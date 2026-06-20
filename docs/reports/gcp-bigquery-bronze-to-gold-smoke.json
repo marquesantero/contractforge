@@ -7,7 +7,7 @@
       "ok": true,
       "operations": [
         {
-          "artifact": "testebig-496714_contractforge_gcp_smoke_b2g_bronze_orders.gcp.evidence_ddl.sql",
+          "artifact": "example-project-000000_contractforge_gcp_smoke_b2g_bronze_orders.gcp.evidence_ddl.sql",
           "executed": true,
           "job": {
             "deleted_rows": null,
@@ -28,7 +28,7 @@
           "name": "prepare_evidence"
         },
         {
-          "artifact": "testebig-496714_contractforge_gcp_smoke_b2g_bronze_orders.gcp.load_job.json",
+          "artifact": "example-project-000000_contractforge_gcp_smoke_b2g_bronze_orders.gcp.load_job.json",
           "executed": true,
           "job": {
             "deleted_rows": null,
@@ -70,7 +70,7 @@
           "name": "persist_run_evidence"
         },
         {
-          "artifact": "testebig-496714_contractforge_gcp_smoke_b2g_bronze_orders.gcp.quality.sql",
+          "artifact": "example-project-000000_contractforge_gcp_smoke_b2g_bronze_orders.gcp.quality.sql",
           "executed": true,
           "job": {
             "deleted_rows": null,
@@ -118,7 +118,7 @@
       ],
       "planning_status": "SUPPORTED_WITH_WARNINGS",
       "status": "SUCCEEDED",
-      "target_table": "testebig-496714.contractforge_gcp_smoke.b2g_bronze_orders",
+      "target_table": "example-project-000000.contractforge_gcp_smoke.b2g_bronze_orders",
       "warnings": [
         {
           "code": "GCP_STABLE_SURFACE_SCOPE",
@@ -132,7 +132,7 @@
       "ok": true,
       "operations": [
         {
-          "artifact": "testebig-496714_contractforge_gcp_smoke_b2g_silver_orders.gcp.evidence_ddl.sql",
+          "artifact": "example-project-000000_contractforge_gcp_smoke_b2g_silver_orders.gcp.evidence_ddl.sql",
           "executed": true,
           "job": {
             "deleted_rows": null,
@@ -153,7 +153,7 @@
           "name": "prepare_evidence"
         },
         {
-          "artifact": "testebig-496714_contractforge_gcp_smoke_b2g_silver_orders.gcp.write.sql",
+          "artifact": "example-project-000000_contractforge_gcp_smoke_b2g_silver_orders.gcp.write.sql",
           "executed": true,
           "job": {
             "deleted_rows": null,
@@ -195,7 +195,7 @@
           "name": "persist_run_evidence"
         },
         {
-          "artifact": "testebig-496714_contractforge_gcp_smoke_b2g_silver_orders.gcp.quality.sql",
+          "artifact": "example-project-000000_contractforge_gcp_smoke_b2g_silver_orders.gcp.quality.sql",
           "executed": true,
           "job": {
             "deleted_rows": null,
@@ -246,7 +246,7 @@
       ],
       "planning_status": "SUPPORTED_WITH_WARNINGS",
       "status": "SUCCEEDED",
-      "target_table": "testebig-496714.contractforge_gcp_smoke.b2g_silver_orders",
+      "target_table": "example-project-000000.contractforge_gcp_smoke.b2g_silver_orders",
       "warnings": [
         {
           "code": "GCP_STABLE_SURFACE_SCOPE",
@@ -260,7 +260,7 @@
       "ok": true,
       "operations": [
         {
-          "artifact": "testebig-496714_contractforge_gcp_smoke_b2g_gold_orders_by_status.gcp.evidence_ddl.sql",
+          "artifact": "example-project-000000_contractforge_gcp_smoke_b2g_gold_orders_by_status.gcp.evidence_ddl.sql",
           "executed": true,
           "job": {
             "deleted_rows": null,
@@ -281,7 +281,7 @@
           "name": "prepare_evidence"
         },
         {
-          "artifact": "testebig-496714_contractforge_gcp_smoke_b2g_gold_orders_by_status.gcp.write.sql",
+          "artifact": "example-project-000000_contractforge_gcp_smoke_b2g_gold_orders_by_status.gcp.write.sql",
           "executed": true,
           "job": {
             "deleted_rows": null,
@@ -323,7 +323,7 @@
           "name": "persist_run_evidence"
         },
         {
-          "artifact": "testebig-496714_contractforge_gcp_smoke_b2g_gold_orders_by_status.gcp.quality.sql",
+          "artifact": "example-project-000000_contractforge_gcp_smoke_b2g_gold_orders_by_status.gcp.quality.sql",
           "executed": true,
           "job": {
             "deleted_rows": null,
@@ -374,7 +374,7 @@
       ],
       "planning_status": "SUPPORTED_WITH_WARNINGS",
       "status": "SUCCEEDED",
-      "target_table": "testebig-496714.contractforge_gcp_smoke.b2g_gold_orders_by_status",
+      "target_table": "example-project-000000.contractforge_gcp_smoke.b2g_gold_orders_by_status",
       "warnings": [
         {
           "code": "GCP_STABLE_SURFACE_SCOPE",
@@ -383,7 +383,7 @@
       ]
     }
   ],
-  "dataset": "testebig-496714.contractforge_gcp_smoke",
+  "dataset": "example-project-000000.contractforge_gcp_smoke",
   "gate": "GCP-BQ-03",
   "gold_rows": [
     {
@@ -412,7 +412,7 @@
       "run_evidence_rows": "1"
     }
   ],
-  "source_uri": "gs://contractforge-fabric-gcs-testebig-496714/contractforge/gcp-smoke/formats/orders.csv",
+  "source_uri": "gs://contractforge-fabric-gcs-example-project-000000/contractforge/gcp-smoke/formats/orders.csv",
   "status": "SUCCEEDED",
   "subtarget": "gcp_bigquery",
   "verification": [

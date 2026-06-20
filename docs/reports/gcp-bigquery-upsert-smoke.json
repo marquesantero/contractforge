@@ -5,7 +5,7 @@
   "ok": true,
   "operations": [
     {
-      "artifact": "testebig-496714_contractforge_gcp_smoke_orders_upsert_target.gcp.evidence_ddl.sql",
+      "artifact": "example-project-000000_contractforge_gcp_smoke_orders_upsert_target.gcp.evidence_ddl.sql",
       "executed": true,
       "job": {
         "deleted_rows": null,
@@ -26,7 +26,7 @@
       "name": "prepare_evidence"
     },
     {
-      "artifact": "testebig-496714_contractforge_gcp_smoke_orders_upsert_target.gcp.write.sql",
+      "artifact": "example-project-000000_contractforge_gcp_smoke_orders_upsert_target.gcp.write.sql",
       "executed": true,
       "job": {
         "deleted_rows": 0,
@@ -68,7 +68,7 @@
       "name": "persist_run_evidence"
     },
     {
-      "artifact": "testebig-496714_contractforge_gcp_smoke_orders_upsert_target.gcp.quality.sql",
+      "artifact": "example-project-000000_contractforge_gcp_smoke_orders_upsert_target.gcp.quality.sql",
       "executed": true,
       "job": {
         "deleted_rows": null,
@@ -115,10 +115,10 @@
     }
   ],
   "planning_status": "SUPPORTED_WITH_WARNINGS",
-  "source_table": "testebig-496714.contractforge_gcp_smoke.orders_upsert_source",
+  "source_table": "example-project-000000.contractforge_gcp_smoke.orders_upsert_source",
   "status": "SUCCEEDED",
   "subtarget": "gcp_bigquery",
-  "target_table": "testebig-496714.contractforge_gcp_smoke.orders_upsert_target",
+  "target_table": "example-project-000000.contractforge_gcp_smoke.orders_upsert_target",
   "verification": [
     {
       "failed_rows": "0",

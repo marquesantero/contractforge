@@ -1,6 +1,6 @@
 {
   "adapter": "gcp",
-  "dataset": "testebig-496714.contractforge_gcp_smoke",
+  "dataset": "example-project-000000.contractforge_gcp_smoke",
   "formats": {
     "avro": {
       "blockers": [],
@@ -8,7 +8,7 @@
       "ok": true,
       "operations": [
         {
-          "artifact": "testebig-496714_contractforge_gcp_smoke_orders_avro.gcp.evidence_ddl.sql",
+          "artifact": "example-project-000000_contractforge_gcp_smoke_orders_avro.gcp.evidence_ddl.sql",
           "executed": true,
           "job": {
             "error_message": null,
@@ -27,7 +27,7 @@
           "name": "prepare_evidence"
         },
         {
-          "artifact": "testebig-496714_contractforge_gcp_smoke_orders_avro.gcp.load_job.json",
+          "artifact": "example-project-000000_contractforge_gcp_smoke_orders_avro.gcp.load_job.json",
           "executed": true,
           "job": {
             "error_message": null,
@@ -65,7 +65,7 @@
           "name": "persist_run_evidence"
         },
         {
-          "artifact": "testebig-496714_contractforge_gcp_smoke_orders_avro.gcp.quality.sql",
+          "artifact": "example-project-000000_contractforge_gcp_smoke_orders_avro.gcp.quality.sql",
           "executed": true,
           "job": {
             "error_message": null,
@@ -122,7 +122,7 @@
       "ok": true,
       "operations": [
         {
-          "artifact": "testebig-496714_contractforge_gcp_smoke_orders_csv.gcp.evidence_ddl.sql",
+          "artifact": "example-project-000000_contractforge_gcp_smoke_orders_csv.gcp.evidence_ddl.sql",
           "executed": true,
           "job": {
             "error_message": null,
@@ -141,7 +141,7 @@
           "name": "prepare_evidence"
         },
         {
-          "artifact": "testebig-496714_contractforge_gcp_smoke_orders_csv.gcp.load_job.json",
+          "artifact": "example-project-000000_contractforge_gcp_smoke_orders_csv.gcp.load_job.json",
           "executed": true,
           "job": {
             "error_message": null,
@@ -179,7 +179,7 @@
           "name": "persist_run_evidence"
         },
         {
-          "artifact": "testebig-496714_contractforge_gcp_smoke_orders_csv.gcp.quality.sql",
+          "artifact": "example-project-000000_contractforge_gcp_smoke_orders_csv.gcp.quality.sql",
           "executed": true,
           "job": {
             "error_message": null,
@@ -236,7 +236,7 @@
       "ok": true,
       "operations": [
         {
-          "artifact": "testebig-496714_contractforge_gcp_smoke_orders_ndjson.gcp.evidence_ddl.sql",
+          "artifact": "example-project-000000_contractforge_gcp_smoke_orders_ndjson.gcp.evidence_ddl.sql",
           "executed": true,
           "job": {
             "error_message": null,
@@ -255,7 +255,7 @@
           "name": "prepare_evidence"
         },
         {
-          "artifact": "testebig-496714_contractforge_gcp_smoke_orders_ndjson.gcp.load_job.json",
+          "artifact": "example-project-000000_contractforge_gcp_smoke_orders_ndjson.gcp.load_job.json",
           "executed": true,
           "job": {
             "error_message": null,
@@ -293,7 +293,7 @@
           "name": "persist_run_evidence"
         },
         {
-          "artifact": "testebig-496714_contractforge_gcp_smoke_orders_ndjson.gcp.quality.sql",
+          "artifact": "example-project-000000_contractforge_gcp_smoke_orders_ndjson.gcp.quality.sql",
           "executed": true,
           "job": {
             "error_message": null,
@@ -350,7 +350,7 @@
       "ok": true,
       "operations": [
         {
-          "artifact": "testebig-496714_contractforge_gcp_smoke_orders_orc.gcp.evidence_ddl.sql",
+          "artifact": "example-project-000000_contractforge_gcp_smoke_orders_orc.gcp.evidence_ddl.sql",
           "executed": true,
           "job": {
             "error_message": null,
@@ -369,7 +369,7 @@
           "name": "prepare_evidence"
         },
         {
-          "artifact": "testebig-496714_contractforge_gcp_smoke_orders_orc.gcp.load_job.json",
+          "artifact": "example-project-000000_contractforge_gcp_smoke_orders_orc.gcp.load_job.json",
           "executed": true,
           "job": {
             "error_message": null,
@@ -407,7 +407,7 @@
           "name": "persist_run_evidence"
         },
         {
-          "artifact": "testebig-496714_contractforge_gcp_smoke_orders_orc.gcp.quality.sql",
+          "artifact": "example-project-000000_contractforge_gcp_smoke_orders_orc.gcp.quality.sql",
           "executed": true,
           "job": {
             "error_message": null,
@@ -464,7 +464,7 @@
       "ok": true,
       "operations": [
         {
-          "artifact": "testebig-496714_contractforge_gcp_smoke_orders_parquet.gcp.evidence_ddl.sql",
+          "artifact": "example-project-000000_contractforge_gcp_smoke_orders_parquet.gcp.evidence_ddl.sql",
           "executed": true,
           "job": {
             "error_message": null,
@@ -483,7 +483,7 @@
           "name": "prepare_evidence"
         },
         {
-          "artifact": "testebig-496714_contractforge_gcp_smoke_orders_parquet.gcp.load_job.json",
+          "artifact": "example-project-000000_contractforge_gcp_smoke_orders_parquet.gcp.load_job.json",
           "executed": true,
           "job": {
             "error_message": null,
@@ -521,7 +521,7 @@
           "name": "persist_run_evidence"
         },
         {
-          "artifact": "testebig-496714_contractforge_gcp_smoke_orders_parquet.gcp.quality.sql",
+          "artifact": "example-project-000000_contractforge_gcp_smoke_orders_parquet.gcp.quality.sql",
           "executed": true,
           "job": {
             "error_message": null,
@@ -574,7 +574,7 @@
     }
   },
   "gate": "GCP-BQ-02",
-  "source_prefix": "gs://contractforge-fabric-gcs-testebig-496714/contractforge/gcp-smoke/formats/",
+  "source_prefix": "gs://contractforge-fabric-gcs-example-project-000000/contractforge/gcp-smoke/formats/",
   "subtarget": "gcp_bigquery"
 }
 

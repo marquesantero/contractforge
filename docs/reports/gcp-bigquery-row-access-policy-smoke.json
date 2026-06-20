@@ -6,14 +6,14 @@
   "ok": true,
   "executed": true,
   "validated_at_utc": "2026-06-15T17:16:00Z",
-  "project_id": "testebig-496714",
+  "project_id": "example-project-000000",
   "location": "us-east1",
   "dataset": "contractforge_gcp_smoke",
   "source_table": "b2g_silver_orders",
   "policy": {
     "name": "cf_paid_orders_policy",
     "filter_predicate": "status = 'paid'",
-    "grantee": "serviceAccount:contractforge-bigquery-reader@testebig-496714.iam.gserviceaccount.com"
+    "grantee": "serviceAccount:contractforge-bigquery-reader@example-project-000000.iam.gserviceaccount.com"
   },
   "contract_basis": {
     "upstream_report": "docs/reports/gcp-bigquery-bronze-to-gold-smoke.json",
@@ -36,7 +36,7 @@
       "readback": {
         "policy_name": "cf_paid_orders_policy",
         "filter_predicate": "status = 'paid'",
-        "grantee": "serviceAccount:contractforge-bigquery-reader@testebig-496714.iam.gserviceaccount.com"
+        "grantee": "serviceAccount:contractforge-bigquery-reader@example-project-000000.iam.gserviceaccount.com"
       }
     },
     {

@@ -1,22 +1,22 @@
 {
   "artifacts": [
-    "testebig-496714_contractforge_gcp_smoke_orders_csv.gcp.capabilities.json",
-    "testebig-496714_contractforge_gcp_smoke_orders_csv.gcp.contract.json",
-    "testebig-496714_contractforge_gcp_smoke_orders_csv.gcp.evidence_ddl.sql",
-    "testebig-496714_contractforge_gcp_smoke_orders_csv.gcp.load_job.json",
-    "testebig-496714_contractforge_gcp_smoke_orders_csv.gcp.manifest.json",
-    "testebig-496714_contractforge_gcp_smoke_orders_csv.gcp.quality.sql",
-    "testebig-496714_contractforge_gcp_smoke_orders_csv.gcp.review.md",
-    "testebig-496714_contractforge_gcp_smoke_orders_csv.gcp.source_review.json",
-    "testebig-496714_contractforge_gcp_smoke_orders_csv.gcp.source_support.json",
-    "testebig-496714_contractforge_gcp_smoke_orders_csv.gcp.write.sql"
+    "example-project-000000_contractforge_gcp_smoke_orders_csv.gcp.capabilities.json",
+    "example-project-000000_contractforge_gcp_smoke_orders_csv.gcp.contract.json",
+    "example-project-000000_contractforge_gcp_smoke_orders_csv.gcp.evidence_ddl.sql",
+    "example-project-000000_contractforge_gcp_smoke_orders_csv.gcp.load_job.json",
+    "example-project-000000_contractforge_gcp_smoke_orders_csv.gcp.manifest.json",
+    "example-project-000000_contractforge_gcp_smoke_orders_csv.gcp.quality.sql",
+    "example-project-000000_contractforge_gcp_smoke_orders_csv.gcp.review.md",
+    "example-project-000000_contractforge_gcp_smoke_orders_csv.gcp.source_review.json",
+    "example-project-000000_contractforge_gcp_smoke_orders_csv.gcp.source_support.json",
+    "example-project-000000_contractforge_gcp_smoke_orders_csv.gcp.write.sql"
   ],
   "blockers": [],
   "executed": true,
   "ok": true,
   "operations": [
     {
-      "artifact": "testebig-496714_contractforge_gcp_smoke_orders_csv.gcp.evidence_ddl.sql",
+      "artifact": "example-project-000000_contractforge_gcp_smoke_orders_csv.gcp.evidence_ddl.sql",
       "executed": true,
       "job": {
         "deleted_rows": null,
@@ -32,27 +32,27 @@
             "query": {
               "destinationTable": {
                 "datasetId": "contractforge_gcp_smoke_ops",
-                "projectId": "testebig-496714",
+                "projectId": "example-project-000000",
                 "tableId": "contractforge_quality_evidence"
               },
               "priority": "INTERACTIVE",
-              "query": "CREATE TABLE IF NOT EXISTS `testebig-496714.contractforge_gcp_smoke_ops.contractforge_quality_evidence` ( run_id STRING NOT NULL, contract_name STRING NOT NULL, rule_name STRING NOT NULL, rule_type STRING NOT NULL, status STRING NOT NULL, failed_rows INT64, evaluated_at TIMESTAMP )",
+              "query": "CREATE TABLE IF NOT EXISTS `example-project-000000.contractforge_gcp_smoke_ops.contractforge_quality_evidence` ( run_id STRING NOT NULL, contract_name STRING NOT NULL, rule_name STRING NOT NULL, rule_type STRING NOT NULL, status STRING NOT NULL, failed_rows INT64, evaluated_at TIMESTAMP )",
               "useLegacySql": false
             }
           },
           "etag": "vicUdKPMl/ixrWxjmEMv9A==",
-          "id": "testebig-496714:us-east1.cf_gcp_smoke_query_5c3f12969dab436e90b0",
+          "id": "example-project-000000:us-east1.cf_gcp_smoke_query_5c3f12969dab436e90b0",
           "jobCreationReason": {
             "code": "REQUESTED"
           },
           "jobReference": {
             "jobId": "cf_gcp_smoke_query_5c3f12969dab436e90b0",
             "location": "us-east1",
-            "projectId": "testebig-496714"
+            "projectId": "example-project-000000"
           },
           "kind": "bigquery#job",
           "principal_subject": "REDACTED",
-          "selfLink": "https://bigquery.googleapis.com/bigquery/v2/projects/testebig-496714/jobs/cf_gcp_smoke_query_5c3f12969dab436e90b0?location=us-east1",
+          "selfLink": "https://bigquery.googleapis.com/bigquery/v2/projects/example-project-000000/jobs/cf_gcp_smoke_query_5c3f12969dab436e90b0?location=us-east1",
           "statistics": {
             "creationTime": "1781536998536",
             "endTime": "1781536998705",
@@ -62,7 +62,7 @@
               "ddlOperationPerformed": "SKIP",
               "ddlTargetTable": {
                 "datasetId": "contractforge_gcp_smoke_ops",
-                "projectId": "testebig-496714",
+                "projectId": "example-project-000000",
                 "tableId": "contractforge_quality_evidence"
               },
               "performanceInsights": {},
@@ -132,7 +132,7 @@
       "name": "prepare_evidence"
     },
     {
-      "artifact": "testebig-496714_contractforge_gcp_smoke_orders_csv.gcp.load_job.json",
+      "artifact": "example-project-000000_contractforge_gcp_smoke_orders_csv.gcp.load_job.json",
       "executed": true,
       "job": {
         "deleted_rows": null,
@@ -149,30 +149,30 @@
               "autodetect": true,
               "destinationTable": {
                 "datasetId": "contractforge_gcp_smoke",
-                "projectId": "testebig-496714",
+                "projectId": "example-project-000000",
                 "tableId": "orders_csv"
               },
               "skipLeadingRows": 1,
               "sourceFormat": "CSV",
               "sourceUris": [
-                "gs://contractforge-fabric-gcs-testebig-496714/contractforge/gcp-smoke/orders.csv"
+                "gs://contractforge-fabric-gcs-example-project-000000/contractforge/gcp-smoke/orders.csv"
               ],
               "writeDisposition": "WRITE_TRUNCATE"
             }
           },
           "etag": "7/xv04yX4xoasox4su7K4A==",
-          "id": "testebig-496714:us-east1.cf_gcp_smoke_load_7da39eb17725429d8234",
+          "id": "example-project-000000:us-east1.cf_gcp_smoke_load_7da39eb17725429d8234",
           "jobCreationReason": {
             "code": "REQUESTED"
           },
           "jobReference": {
             "jobId": "cf_gcp_smoke_load_7da39eb17725429d8234",
             "location": "us-east1",
-            "projectId": "testebig-496714"
+            "projectId": "example-project-000000"
           },
           "kind": "bigquery#job",
           "principal_subject": "REDACTED",
-          "selfLink": "https://bigquery.googleapis.com/bigquery/v2/projects/testebig-496714/jobs/cf_gcp_smoke_load_7da39eb17725429d8234?location=us-east1",
+          "selfLink": "https://bigquery.googleapis.com/bigquery/v2/projects/example-project-000000/jobs/cf_gcp_smoke_load_7da39eb17725429d8234?location=us-east1",
           "statistics": {
             "completionRatio": 0,
             "creationTime": "1781537006262",
@@ -242,27 +242,27 @@
             "query": {
               "destinationTable": {
                 "datasetId": "contractforge_gcp_smoke_ops",
-                "projectId": "testebig-496714",
+                "projectId": "example-project-000000",
                 "tableId": "contractforge_run_evidence"
               },
               "priority": "INTERACTIVE",
-              "query": "INSERT INTO `testebig-496714.contractforge_gcp_smoke_ops.contractforge_run_evidence` (`run_id`, `contract_name`, `target_table`, `adapter`, `status`, `started_at`, `finished_at`, `total_bytes_processed`, `total_bytes_billed`, `total_slot_ms`, `job_id`, `statement_type`, `inserted_rows`, `updated_rows`, `deleted_rows`, `error_message`) VALUES ('cf_gcp_smoke_load_7da39eb17725429d8234', 'orders_csv', 'testebig-496714.contractforge_gcp_smoke.orders_csv', 'gcp_bigquery', 'SUCCEEDED', TIMESTAMP_MILLIS(1781537006379), TIMESTAMP_MILLIS(1781537009330), NULL, NULL, 833, 'cf_gcp_smoke_load_7da39eb17725429d8234', 'LOAD', NULL, NULL, NULL, NULL);",
+              "query": "INSERT INTO `example-project-000000.contractforge_gcp_smoke_ops.contractforge_run_evidence` (`run_id`, `contract_name`, `target_table`, `adapter`, `status`, `started_at`, `finished_at`, `total_bytes_processed`, `total_bytes_billed`, `total_slot_ms`, `job_id`, `statement_type`, `inserted_rows`, `updated_rows`, `deleted_rows`, `error_message`) VALUES ('cf_gcp_smoke_load_7da39eb17725429d8234', 'orders_csv', 'example-project-000000.contractforge_gcp_smoke.orders_csv', 'gcp_bigquery', 'SUCCEEDED', TIMESTAMP_MILLIS(1781537006379), TIMESTAMP_MILLIS(1781537009330), NULL, NULL, 833, 'cf_gcp_smoke_load_7da39eb17725429d8234', 'LOAD', NULL, NULL, NULL, NULL);",
               "useLegacySql": false
             }
           },
           "etag": "6AdBWqJsFJeKVX8fuoBT7g==",
-          "id": "testebig-496714:us-east1.cf_gcp_smoke_query_949ec4b5c06540d2900d",
+          "id": "example-project-000000:us-east1.cf_gcp_smoke_query_949ec4b5c06540d2900d",
           "jobCreationReason": {
             "code": "REQUESTED"
           },
           "jobReference": {
             "jobId": "cf_gcp_smoke_query_949ec4b5c06540d2900d",
             "location": "us-east1",
-            "projectId": "testebig-496714"
+            "projectId": "example-project-000000"
           },
           "kind": "bigquery#job",
           "principal_subject": "REDACTED",
-          "selfLink": "https://bigquery.googleapis.com/bigquery/v2/projects/testebig-496714/jobs/cf_gcp_smoke_query_949ec4b5c06540d2900d?location=us-east1",
+          "selfLink": "https://bigquery.googleapis.com/bigquery/v2/projects/example-project-000000/jobs/cf_gcp_smoke_query_949ec4b5c06540d2900d?location=us-east1",
           "statistics": {
             "creationTime": "1781537017810",
             "endTime": "1781537019307",
@@ -313,7 +313,7 @@
                       "kind": "COMPUTE",
                       "substeps": [
                         "$1 := 'orders_csv'",
-                        "$2 := 'testebig-496714.contractforge_gcp_smoke.orders_csv'",
+                        "$2 := 'example-project-000000.contractforge_gcp_smoke.orders_csv'",
                         "$3 := 'gcp_bigquery'",
                         "$4 := 'SUCCEEDED'",
                         "$5 := 1781537006.379000000",
@@ -445,7 +445,7 @@
               "referencedTables": [
                 {
                   "datasetId": "contractforge_gcp_smoke_ops",
-                  "projectId": "testebig-496714",
+                  "projectId": "example-project-000000",
                   "tableId": "contractforge_run_evidence"
                 }
               ],
@@ -487,7 +487,7 @@
       "name": "persist_run_evidence"
     },
     {
-      "artifact": "testebig-496714_contractforge_gcp_smoke_orders_csv.gcp.quality.sql",
+      "artifact": "example-project-000000_contractforge_gcp_smoke_orders_csv.gcp.quality.sql",
       "executed": true,
       "job": {
         "deleted_rows": null,
@@ -503,28 +503,28 @@
             "query": {
               "destinationTable": {
                 "datasetId": "_9c74134de4f7c55cacdbd6a2eb6cca48e1d010d1",
-                "projectId": "testebig-496714",
+                "projectId": "example-project-000000",
                 "tableId": "anon84e0eda6da2b24a1bd264b0c81dfa9aa5ffb3e917e5f0fc982283b76d52166d1"
               },
               "priority": "INTERACTIVE",
-              "query": "SELECT COUNT(*) AS failed_rows FROM `testebig-496714.contractforge_gcp_smoke.orders_csv` WHERE `order_id` IS NULL",
+              "query": "SELECT COUNT(*) AS failed_rows FROM `example-project-000000.contractforge_gcp_smoke.orders_csv` WHERE `order_id` IS NULL",
               "useLegacySql": false,
               "writeDisposition": "WRITE_TRUNCATE"
             }
           },
           "etag": "pdUkvUz/sVyMjbiAbzswrg==",
-          "id": "testebig-496714:us-east1.cf_gcp_smoke_query_360228cfb0304bfc860a",
+          "id": "example-project-000000:us-east1.cf_gcp_smoke_query_360228cfb0304bfc860a",
           "jobCreationReason": {
             "code": "REQUESTED"
           },
           "jobReference": {
             "jobId": "cf_gcp_smoke_query_360228cfb0304bfc860a",
             "location": "us-east1",
-            "projectId": "testebig-496714"
+            "projectId": "example-project-000000"
           },
           "kind": "bigquery#job",
           "principal_subject": "REDACTED",
-          "selfLink": "https://bigquery.googleapis.com/bigquery/v2/projects/testebig-496714/jobs/cf_gcp_smoke_query_360228cfb0304bfc860a?location=us-east1",
+          "selfLink": "https://bigquery.googleapis.com/bigquery/v2/projects/example-project-000000/jobs/cf_gcp_smoke_query_360228cfb0304bfc860a?location=us-east1",
           "statistics": {
             "creationTime": "1781537027179",
             "endTime": "1781537027498",
@@ -539,7 +539,7 @@
                     "explanation": "Table does not have CMETA.",
                     "tableReference": {
                       "datasetId": "contractforge_gcp_smoke",
-                      "projectId": "testebig-496714",
+                      "projectId": "example-project-000000",
                       "tableId": "orders_csv"
                     },
                     "unusedReason": "OTHER_REASON"
@@ -589,7 +589,7 @@
                       "kind": "READ",
                       "substeps": [
                         "$1:order_id",
-                        "FROM testebig-496714.contractforge_gcp_smoke.orders_csv",
+                        "FROM example-project-000000.contractforge_gcp_smoke.orders_csv",
                         "WHERE is_null($1)"
                       ]
                     },
@@ -626,7 +626,7 @@
               "referencedTables": [
                 {
                   "datasetId": "contractforge_gcp_smoke",
-                  "projectId": "testebig-496714",
+                  "projectId": "example-project-000000",
                   "tableId": "orders_csv"
                 }
               ],
@@ -688,27 +688,27 @@
             "query": {
               "destinationTable": {
                 "datasetId": "contractforge_gcp_smoke_ops",
-                "projectId": "testebig-496714",
+                "projectId": "example-project-000000",
                 "tableId": "contractforge_quality_evidence"
               },
               "priority": "INTERACTIVE",
-              "query": "INSERT INTO `testebig-496714.contractforge_gcp_smoke_ops.contractforge_quality_evidence` (`run_id`, `contract_name`, `rule_name`, `rule_type`, `status`, `failed_rows`, `evaluated_at`) VALUES ('cf_gcp_smoke_query_360228cfb0304bfc860a', 'orders_csv', 'order_id_not_null', 'not_null', 'PASSED', 0, TIMESTAMP_MILLIS(1781537027498));",
+              "query": "INSERT INTO `example-project-000000.contractforge_gcp_smoke_ops.contractforge_quality_evidence` (`run_id`, `contract_name`, `rule_name`, `rule_type`, `status`, `failed_rows`, `evaluated_at`) VALUES ('cf_gcp_smoke_query_360228cfb0304bfc860a', 'orders_csv', 'order_id_not_null', 'not_null', 'PASSED', 0, TIMESTAMP_MILLIS(1781537027498));",
               "useLegacySql": false
             }
           },
           "etag": "e6fQa/Megy3PiIWapRsWXA==",
-          "id": "testebig-496714:us-east1.cf_gcp_smoke_query_2d73c428288048feab26",
+          "id": "example-project-000000:us-east1.cf_gcp_smoke_query_2d73c428288048feab26",
           "jobCreationReason": {
             "code": "REQUESTED"
           },
           "jobReference": {
             "jobId": "cf_gcp_smoke_query_2d73c428288048feab26",
             "location": "us-east1",
-            "projectId": "testebig-496714"
+            "projectId": "example-project-000000"
           },
           "kind": "bigquery#job",
           "principal_subject": "REDACTED",
-          "selfLink": "https://bigquery.googleapis.com/bigquery/v2/projects/testebig-496714/jobs/cf_gcp_smoke_query_2d73c428288048feab26?location=us-east1",
+          "selfLink": "https://bigquery.googleapis.com/bigquery/v2/projects/example-project-000000/jobs/cf_gcp_smoke_query_2d73c428288048feab26?location=us-east1",
           "statistics": {
             "creationTime": "1781537035168",
             "endTime": "1781537036482",
@@ -887,7 +887,7 @@
               "referencedTables": [
                 {
                   "datasetId": "contractforge_gcp_smoke_ops",
-                  "projectId": "testebig-496714",
+                  "projectId": "example-project-000000",
                   "tableId": "contractforge_quality_evidence"
                 }
               ],

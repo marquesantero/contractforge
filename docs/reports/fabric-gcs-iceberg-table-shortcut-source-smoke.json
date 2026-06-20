@@ -21,8 +21,8 @@
   },
   "source_infrastructure": {
     "provider": "google_cloud_storage_iceberg_table",
-    "gcp_project": "testebig-496714",
-    "bucket": "contractforge-fabric-gcs-testebig-496714",
+    "gcp_project": "example-project-000000",
+    "bucket": "contractforge-fabric-gcs-example-project-000000",
     "object_prefix": "iceberg-shortcut/iceberg_orders",
     "fixture_rows": 3,
     "fixture_batch_id": "contractforge_fabric_iceberg_20260613",
@@ -42,14 +42,14 @@
       "path": "Tables",
       "name": "cf_fabric_gcs_iceberg_orders",
       "target_type": "GoogleCloudStorage",
-      "target_location": "https://contractforge-fabric-gcs-testebig-496714.storage.googleapis.com",
+      "target_location": "https://contractforge-fabric-gcs-example-project-000000.storage.googleapis.com",
       "target_subpath": "/iceberg-shortcut/iceberg_orders",
       "read_table": "cf_fabric_gcs_iceberg_orders"
     }
   },
   "commands": [
     "aws s3 sync s3://contractforge-aws-smoke-000000000000-us-east-1/source-expansion/fabric-iceberg-shortcut/iceberg_orders .tmp/fabric-gcs-iceberg-from-s3/iceberg_orders --region us-east-1 --endpoint-url https://s3.us-east-1.amazonaws.com --only-show-errors",
-    "gcloud storage cp --recursive .tmp/fabric-gcs-iceberg-from-s3/iceberg_orders gs://contractforge-fabric-gcs-testebig-496714/iceberg-shortcut/ --quiet",
+    "gcloud storage cp --recursive .tmp/fabric-gcs-iceberg-from-s3/iceberg_orders gs://contractforge-fabric-gcs-example-project-000000/iceberg-shortcut/ --quiet",
     "contractforge-fabric smoke-project examples/source-expansion/fabric-gcs-iceberg-table-shortcut/project.yaml --environment-key fabric --max-attempts 35 --retry-after-seconds 30"
   ],
   "contract_source": {

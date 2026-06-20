@@ -1217,7 +1217,7 @@ def test_gcp_authenticated_rest_http_secret_manager_variants_blocker_report() ->
     assert payload["status"] == "SUPERSEDED"
     assert payload["superseded_by"] == "docs/reports/gcp-auth-rest-http-secret-manager-variants-smoke.json"
     assert payload["blocker"]["code"] == "GCLOUD_REAUTH_REQUIRED"
-    assert payload["blocker"]["active_account"] == "marco@intentus.dev"
+    assert payload["blocker"]["active_account"] == "runner@example.com"
     assert payload["blocker"]["project"] == "gcp-project-redacted"
     assert set(payload["attempted_variants"]) == {
         "rest_api bearer_token",
