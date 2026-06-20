@@ -20,7 +20,7 @@
     "code": "GCLOUD_REAUTH_REQUIRED",
     "message": "bq cannot refresh the active gcloud account token in non-interactive execution.",
     "active_account": "marco@intentus.dev",
-    "project": "midyear-system-499521-p3",
+    "project": "gcp-project-redacted",
     "error_prefix": "There was a problem refreshing your current auth tokens: Reauthentication failed. cannot prompt during non-interactive execution."
   },
   "validated_before_block": [
@@ -35,3 +35,4 @@
   ],
   "no_workaround_code_used": true
 }
+

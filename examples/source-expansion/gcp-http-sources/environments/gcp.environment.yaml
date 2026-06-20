@@ -1,6 +1,6 @@
 parameters:
   gcp:
-    project_id: midyear-system-499521-p3
+    project_id: gcp-project-redacted
     location: us-east1
     dataset: contractforge_gcp_smoke
 evidence:

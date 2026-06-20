@@ -6,15 +6,15 @@
   "maturity_gate": "GCP-BQ-20E",
   "status": "PASS_WITH_REVIEW_BOUNDARY",
   "executed_at": "2026-06-17",
-  "project_id": "midyear-system-499521-p3",
+  "project_id": "gcp-project-redacted",
   "location": "us-east1",
   "dataset": "contractforge_gcp_smoke",
   "source": {
     "type": "iceberg_table",
-    "path": "gs://contractforge-gcp-smoke-midyear-system-499521-p3/biglake-iceberg/raw-registration/1781706358/",
+    "path": "gs://contractforge-gcp-smoke-gcp-project-redacted/biglake-iceberg/raw-registration/1781706358/",
     "registration": {
       "table": "raw_iceberg_registered_1781706358",
-      "connection_id": "897279804928.us-east1.cf_biglake_smoke",
+      "connection_id": "000000000000.us-east1.cf_biglake_smoke",
       "schema": "order_id:INT64,status:STRING,amount:FLOAT64"
     }
   },
@@ -33,9 +33,9 @@
         "surface": "contractforge-gcp source-promotion --readback",
         "num_rows": "0",
         "biglake_configuration": {
-          "connectionId": "897279804928.us-east1.cf_biglake_smoke",
+          "connectionId": "000000000000.us-east1.cf_biglake_smoke",
           "fileFormat": "PARQUET",
-          "storageUri": "gs://contractforge-gcp-smoke-midyear-system-499521-p3/biglake-iceberg/raw-registration/1781706358/",
+          "storageUri": "gs://contractforge-gcp-smoke-gcp-project-redacted/biglake-iceberg/raw-registration/1781706358/",
           "tableFormat": "ICEBERG"
         },
         "schema_fields": [
@@ -94,3 +94,4 @@
   ],
   "no_workaround_code_used": true
 }
+

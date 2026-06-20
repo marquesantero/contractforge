@@ -8,14 +8,14 @@
   "project": "examples/source-expansion/fabric-azure-blob/project.yaml",
   "environment": "examples/source-expansion/fabric-azure-blob/environments/fabric.environment.yaml",
   "workspace": {
-    "id": "061fd0c8-c248-4628-a332-6adf16623533",
+    "id": "00000000-0000-0000-0000-000000000000",
     "name": "Manager",
-    "capacity_id": "2139f1ea-2676-46bf-ab4f-ab248c768056",
+    "capacity_id": "00000000-0000-0000-0000-000000000000",
     "capacity_sku": "FTL4",
     "capacity_region": "Brazil South"
   },
   "lakehouse": {
-    "id": "07067d3f-d5e2-48c1-b526-634620e57d4b",
+    "id": "00000000-0000-0000-0000-000000000000",
     "name": "contractforge_lh"
   },
   "source_infrastructure": {
@@ -69,8 +69,8 @@
       "name": "azure_blob_orders",
       "contract": "contracts/01_azure_blob_orders.ingestion.yaml",
       "notebook": "cf_workspace_cf_fabric_source_expansion_azure_blob_orders",
-      "item_id": "63751b35-78a7-465f-920c-ec0ac716d484",
-      "job_instance_id": "8bef29a8-73cf-4ca1-ac6b-e53572c24b13",
+      "item_id": "00000000-0000-0000-0000-000000000000",
+      "job_instance_id": "00000000-0000-0000-0000-000000000000",
       "job_status": "Completed",
       "started_at_utc": "2026-06-12T00:48:29.9528952",
       "ended_at_utc": "2026-06-12T00:52:08.9116104"
@@ -79,8 +79,8 @@
       "name": "azure_blob_evidence_probe",
       "contract": "contracts/02_azure_blob_evidence_probe.ingestion.yaml",
       "notebook": "cf_workspace_cf_fabric_source_expansion_azure_blob_evidence_probe",
-      "item_id": "420a26ff-34c0-4a87-ac1d-94fbd5e187a2",
-      "job_instance_id": "76097c0b-a0cb-48a5-b286-274239805831",
+      "item_id": "00000000-0000-0000-0000-000000000000",
+      "job_instance_id": "00000000-0000-0000-0000-000000000000",
       "job_status": "Completed",
       "started_at_utc": "2026-06-12T00:53:07.3176107",
       "ended_at_utc": "2026-06-12T00:56:52.6130934"
@@ -91,3 +91,4 @@
     "The storage account is a tiny test fixture, not a production security model."
   ]
 }
+

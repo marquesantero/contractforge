@@ -36,7 +36,7 @@ uv run contractforge-aws deploy-project examples/real-world/aws-eventhubs-kafka-
   --run `
   --wait `
   --audit-evidence `
-  --athena-output-location s3://contractforge-aws-smoke-449112696824-us-east-1/athena-results/ `
+  --athena-output-location s3://contractforge-aws-smoke-000000000000-us-east-1/athena-results/ `
   --poll-interval-seconds 20 `
   --max-wait-seconds 1800
 ```
@@ -48,7 +48,7 @@ uv run contractforge-aws record-glue-cost examples/real-world/aws-eventhubs-kafk
   --environment examples/real-world/aws-eventhubs-kafka-available-now/environments/aws.environment.yaml `
   --job-name contractforge_contractforge_cf_eventhubs_stream_bronze_b_eventhub_orders_stream `
   --run-id <glue-run-id> `
-  --athena-output-location s3://contractforge-aws-smoke-449112696824-us-east-1/athena-results/
+  --athena-output-location s3://contractforge-aws-smoke-000000000000-us-east-1/athena-results/
 ```
 
 ## Cleanup

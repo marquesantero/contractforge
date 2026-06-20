@@ -179,7 +179,7 @@ target:
 ```yaml
 # GCP BigQuery
 target:
-  catalog: midyear-system-499521-p3
+  catalog: gcp-project-redacted
   schema: contractforge_gcp_usgs_rest_bronze
   table: b_usgs_earthquake_geojson
 ```
@@ -323,7 +323,7 @@ As regras não são comentário: elas entram no plano, no runtime e na evidênci
 source:
   type: kafka_available_now
   system: confluent_cloud
-  bootstrap_servers: pkc-619z3.us-east1.gcp.confluent.cloud:9092
+  bootstrap_servers: pkc-redacted.region.confluent.cloud:9092
   topic: cf-databricks-orders
   checkpoint_location: /Volumes/.../checkpoints/...
   starting_offsets: earliest

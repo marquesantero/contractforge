@@ -32,7 +32,7 @@ deployment:
     lakehouse_name: contractforge_lh
   gcp:
     runtime: bigquery_smoke
-    project_id: midyear-system-499521-p3
+    project_id: gcp-project-redacted
     location: US
 
 schedule:

@@ -6,11 +6,11 @@
   "maturity_gate": "GCP-BQ-07F",
   "status": "PASS_NEGATIVE",
   "executed_at": "2026-06-16",
-  "project": "midyear-system-499521-p3",
+  "project": "gcp-project-redacted",
   "location": "us-east1",
   "contract": {
-    "source": "midyear-system-499521-p3.contractforge_gcp_schema_policy_smoke.schema_policy_type_change_source",
-    "target": "midyear-system-499521-p3.contractforge_gcp_schema_policy_smoke.schema_policy_type_change_target",
+    "source": "gcp-project-redacted.contractforge_gcp_schema_policy_smoke.schema_policy_type_change_source",
+    "target": "gcp-project-redacted.contractforge_gcp_schema_policy_smoke.schema_policy_type_change_target",
     "mode": "append",
     "schema_policy": "permissive"
   },
@@ -73,3 +73,4 @@
   ],
   "superseded_gap_decision": "docs/reports/gcp-schema-policy-type-mutation-decision.json"
 }
+

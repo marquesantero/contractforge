@@ -6,14 +6,14 @@
   "maturity_gate": "GCP-BQ-17B1",
   "status": "PASS_WITH_REVIEW_BOUNDARY",
   "executed_at": "2026-06-17",
-  "project": "midyear-system-499521-p3",
+  "project": "gcp-project-redacted",
   "location": "us-east1",
   "dataset": "contractforge_gcp_smoke",
   "evidence_dataset": "contractforge_gcp_smoke_ops",
   "contract": {
     "name": "governance_ledger_smoke",
-    "source": "midyear-system-499521-p3.contractforge_gcp_smoke.workflow_bronze_orders",
-    "target": "midyear-system-499521-p3.contractforge_gcp_smoke.governance_ledger_smoke",
+    "source": "gcp-project-redacted.contractforge_gcp_smoke.workflow_bronze_orders",
+    "target": "gcp-project-redacted.contractforge_gcp_smoke.governance_ledger_smoke",
     "mode": "overwrite",
     "declared_governance": [
       "row_filter",
@@ -54,7 +54,7 @@
     ]
   },
   "readback": {
-    "table": "midyear-system-499521-p3.contractforge_gcp_smoke_ops.contractforge_governance_evidence",
+    "table": "gcp-project-redacted.contractforge_gcp_smoke_ops.contractforge_governance_evidence",
     "row_count": 3,
     "surfaces": [
       "bigquery_description",
@@ -97,7 +97,8 @@
   ],
   "commands": [
     "PYTHONPATH=.;src;adapters/gcp/src uv run python <inline governed smoke contract>",
-    "bq --project_id=midyear-system-499521-p3 --location=us-east1 --format=json query --use_legacy_sql=false <governance evidence readback SQL>"
+    "bq --project_id=gcp-project-redacted --location=us-east1 --format=json query --use_legacy_sql=false <governance evidence readback SQL>"
   ],
   "no_workaround_code_used": true
 }
+

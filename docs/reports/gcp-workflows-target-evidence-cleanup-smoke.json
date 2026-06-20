@@ -6,14 +6,14 @@
   "maturity_gate": "GCP-BQ-15C10",
   "status": "PASS",
   "executed_at": "2026-06-16T20:55:00Z",
-  "project_id": "midyear-system-499521-p3",
+  "project_id": "gcp-project-redacted",
   "workflow": {
     "name": "cf-gcp-workflows-write-failure-runner",
     "location": "us-central1"
   },
   "contract": {
     "name": "workflow_bronze_orders_write_failure",
-    "target_table": "midyear-system-499521-p3.contractforge_gcp_smoke.workflow_bronze_orders_write_failure"
+    "target_table": "gcp-project-redacted.contractforge_gcp_smoke.workflow_bronze_orders_write_failure"
   },
   "validated": {
     "generated_cleanup_plan_artifact": true,
@@ -47,7 +47,7 @@
     "run": "PYTHONPATH=.;src;adapters/gcp/src uv run python .tmp/run_gcp_workflows_cleanup_data_smoke.py",
     "cleanup_data": [
       "bq",
-      "--project_id=midyear-system-499521-p3",
+      "--project_id=gcp-project-redacted",
       "--location=us-east1",
       "--format=json",
       "query",
@@ -73,3 +73,4 @@
     "https://docs.cloud.google.com/sdk/gcloud/reference/workflows"
   ]
 }
+

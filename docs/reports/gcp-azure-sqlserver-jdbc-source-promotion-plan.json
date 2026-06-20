@@ -23,7 +23,7 @@
         "--region",
         "us-central1",
         "--project",
-        "midyear-system-499521-p3",
+        "gcp-project-redacted",
         "--template-file-gcs-location",
         "gs://dataflow-templates-us-central1/latest/flex/Jdbc_to_BigQuery_Flex",
         "--disable-public-ips",
@@ -32,9 +32,9 @@
         "--subnetwork",
         "regions/us-central1/subnetworks/default",
         "--staging-location",
-        "gs://contractforge-gcp-smoke-midyear-system-499521-p3/dataflow/staging/azure-sqlserver-jdbc/",
+        "gs://contractforge-gcp-smoke-gcp-project-redacted/dataflow/staging/azure-sqlserver-jdbc/",
         "--temp-location",
-        "gs://contractforge-gcp-smoke-midyear-system-499521-p3/dataflow/temp/azure-sqlserver-jdbc/",
+        "gs://contractforge-gcp-smoke-gcp-project-redacted/dataflow/temp/azure-sqlserver-jdbc/",
         "--worker-zone",
         "us-central1-f",
         "--worker-machine-type",
@@ -48,9 +48,9 @@
         "disable_public_ips": true,
         "max_workers": "1",
         "network": "default",
-        "staging_location": "gs://contractforge-gcp-smoke-midyear-system-499521-p3/dataflow/staging/azure-sqlserver-jdbc/",
+        "staging_location": "gs://contractforge-gcp-smoke-gcp-project-redacted/dataflow/staging/azure-sqlserver-jdbc/",
         "subnetwork": "regions/us-central1/subnetworks/default",
-        "temp_location": "gs://contractforge-gcp-smoke-midyear-system-499521-p3/dataflow/temp/azure-sqlserver-jdbc/",
+        "temp_location": "gs://contractforge-gcp-smoke-gcp-project-redacted/dataflow/temp/azure-sqlserver-jdbc/",
         "worker_machine_type": "e2-standard-2",
         "worker_zone": "us-central1-f"
       },
@@ -60,26 +60,26 @@
         "Manual local JDBC extraction or file export is not acceptable promotion evidence."
       ],
       "parameters": {
-        "bigQueryLoadingTemporaryDirectory": "gs://contractforge-gcp-smoke-midyear-system-499521-p3/dataflow/temp/azure-sqlserver-jdbc/bq-load/",
-        "bigQuerySchemaPath": "gs://contractforge-gcp-smoke-midyear-system-499521-p3/schemas/gcp-azure-sqlserver-jdbc/orders.schema.json",
+        "bigQueryLoadingTemporaryDirectory": "gs://contractforge-gcp-smoke-gcp-project-redacted/dataflow/temp/azure-sqlserver-jdbc/bq-load/",
+        "bigQuerySchemaPath": "gs://contractforge-gcp-smoke-gcp-project-redacted/schemas/gcp-azure-sqlserver-jdbc/orders.schema.json",
         "connectionURL": "jdbc:sqlserver://cffabricf11sql65687.database.windows.net:1433;database=contractforge_f11;encrypt=true;trustServerCertificate=false;hostNameInCertificate=*.database.windows.net;loginTimeout=30",
         "createDisposition": "CREATE_IF_NEEDED",
         "driverClassName": "com.microsoft.sqlserver.jdbc.SQLServerDriver",
-        "driverJars": "gs://contractforge-gcp-smoke-midyear-system-499521-p3/drivers/mssql-jdbc-12.10.1.jre11.jar",
+        "driverJars": "gs://contractforge-gcp-smoke-gcp-project-redacted/drivers/mssql-jdbc-12.10.1.jre11.jar",
         "fetchSize": "100",
-        "outputTable": "midyear-system-499521-p3:contractforge_gcp_azure_sql_bronze.b_azure_sql_orders",
-        "password": "projects/midyear-system-499521-p3/secrets/contractforge-azure-sqlserver-password/versions/latest",
+        "outputTable": "gcp-project-redacted:contractforge_gcp_azure_sql_bronze.b_azure_sql_orders",
+        "password": "projects/gcp-project-redacted/secrets/contractforge-azure-sqlserver-password/versions/latest",
         "query": "SELECT\n  CAST(order_id AS VARCHAR(64)) AS order_id,\n  CAST(customer_name AS VARCHAR(256)) AS customer_name,\n  CAST(amount AS FLOAT) AS amount\nFROM dbo.cf_fabric_jdbc_orders",
-        "username": "projects/midyear-system-499521-p3/secrets/contractforge-azure-sqlserver-user/versions/latest"
+        "username": "projects/gcp-project-redacted/secrets/contractforge-azure-sqlserver-user/versions/latest"
       },
-      "project_id": "midyear-system-499521-p3",
+      "project_id": "gcp-project-redacted",
       "readback_commands": {
         "count_output_table": [
           "bq",
           "--format=json",
           "query",
           "--use_legacy_sql=false",
-          "SELECT COUNT(*) AS row_count FROM `midyear-system-499521-p3.contractforge_gcp_azure_sql_bronze.b_azure_sql_orders`"
+          "SELECT COUNT(*) AS row_count FROM `gcp-project-redacted.contractforge_gcp_azure_sql_bronze.b_azure_sql_orders`"
         ],
         "describe_job": [
           "gcloud",
@@ -90,14 +90,14 @@
           "--region",
           "us-central1",
           "--project",
-          "midyear-system-499521-p3",
+          "gcp-project-redacted",
           "--format=json"
         ]
       },
       "runtime": "Google-provided Dataflow JDBC to BigQuery batch template.",
       "source_type": "sqlserver",
       "status": "REVIEW_REQUIRED",
-      "temp_location": "gs://contractforge-gcp-smoke-midyear-system-499521-p3/dataflow/temp/azure-sqlserver-jdbc/",
+      "temp_location": "gs://contractforge-gcp-smoke-gcp-project-redacted/dataflow/temp/azure-sqlserver-jdbc/",
       "template": {
         "documentation": "https://docs.cloud.google.com/dataflow/docs/guides/templates/provided/jdbc-to-bigquery",
         "name": "Jdbc_to_BigQuery_Flex"
@@ -158,3 +158,4 @@
   "status": "PLANNED_NOT_EXECUTED",
   "subtarget": "gcp_bigquery"
 }
+

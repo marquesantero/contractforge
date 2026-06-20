@@ -20,7 +20,7 @@ source:
       - name: value
         type: STRING
 target:
-  catalog: midyear-system-499521-p3
+  catalog: gcp-project-redacted
   schema: contractforge_gcp_smoke
   table: cf_auth_http_json_bearer
 mode: overwrite

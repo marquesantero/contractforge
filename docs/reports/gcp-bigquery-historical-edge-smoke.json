@@ -6,7 +6,7 @@
   "maturity_gate": "GCP-BQ-12C2",
   "status": "PASS_WITH_REVIEW_BOUNDARY",
   "executed_at": "2026-06-17",
-  "project_id": "midyear-system-499521-p3",
+  "project_id": "gcp-project-redacted",
   "location": "us-east1",
   "datasets": {
     "target": "contractforge_gcp_advanced_write_smoke",
@@ -112,3 +112,4 @@
   },
   "decision": "GCP-BQ-12C2 closes compact historical delete-expression and late-arriving reject evidence for opt-in BigQuery review-required execution. GCP-BQ-12C3 later closes compact snapshot complete-source reactivation and tombstone variants. Hash_diff_upsert production parity is accepted by GCP-BQ-12C; historical and snapshot production parity remains future work."
 }
+

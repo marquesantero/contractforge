@@ -24,3 +24,4 @@
   ],
   "acceptance": "Stable-final Snowflake claims exclude historical and snapshot soft-delete until linked E2E parity evidence exists."
 }
+

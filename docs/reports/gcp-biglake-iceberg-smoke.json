@@ -4,19 +4,19 @@
   "status": "SUCCEEDED",
   "ok": true,
   "executed": true,
-  "project_id": "midyear-system-499521-p3",
+  "project_id": "gcp-project-redacted",
   "location": "us-east1",
   "dataset": "contractforge_gcp_smoke",
-  "bucket": "contractforge-gcp-smoke-midyear-system-499521-p3",
+  "bucket": "contractforge-gcp-smoke-gcp-project-redacted",
   "connection": {
-    "name": "projects/897279804928/locations/us-east1/connections/cf_biglake_smoke",
-    "connection_id": "897279804928.us-east1.cf_biglake_smoke",
+    "name": "projects/000000000000/locations/us-east1/connections/cf_biglake_smoke",
+    "connection_id": "000000000000.us-east1.cf_biglake_smoke",
     "type": "CLOUD_RESOURCE",
-    "service_account": "bqcx-897279804928-rjgx@gcp-sa-bigquery-condel.iam.gserviceaccount.com"
+    "service_account": "bqcx-000000000000-rjgx@gcp-sa-bigquery-condel.iam.gserviceaccount.com"
   },
   "table": {
-    "name": "midyear-system-499521-p3.contractforge_gcp_smoke.biglake_iceberg_orders",
-    "storage_uri": "gs://contractforge-gcp-smoke-midyear-system-499521-p3/biglake-iceberg/orders/",
+    "name": "gcp-project-redacted.contractforge_gcp_smoke.biglake_iceberg_orders",
+    "storage_uri": "gs://contractforge-gcp-smoke-gcp-project-redacted/biglake-iceberg/orders/",
     "managed_table_type": "BIGLAKE",
     "table_format": "ICEBERG",
     "file_format": "PARQUET"
@@ -24,7 +24,7 @@
   "contract_basis": {
     "source": {
       "type": "iceberg_table",
-      "table": "midyear-system-499521-p3.contractforge_gcp_smoke.biglake_iceberg_orders"
+      "table": "gcp-project-redacted.contractforge_gcp_smoke.biglake_iceberg_orders"
     },
     "supported_surface": "registered_bigquery_biglake_iceberg_table"
   },
@@ -37,7 +37,7 @@
     {
       "name": "create_cloud_resource_connection",
       "status": "SUCCEEDED",
-      "connection_id": "897279804928.us-east1.cf_biglake_smoke"
+      "connection_id": "000000000000.us-east1.cf_biglake_smoke"
     },
     {
       "name": "grant_connection_bucket_access",
@@ -94,8 +94,8 @@
       "name": "readback_biglake_configuration",
       "status": "SUCCEEDED",
       "biglake_configuration": {
-        "connectionId": "897279804928.us-east1.cf_biglake_smoke",
-        "storageUri": "gs://contractforge-gcp-smoke-midyear-system-499521-p3/biglake-iceberg/orders/",
+        "connectionId": "000000000000.us-east1.cf_biglake_smoke",
+        "storageUri": "gs://contractforge-gcp-smoke-gcp-project-redacted/biglake-iceberg/orders/",
         "fileFormat": "PARQUET",
         "tableFormat": "ICEBERG"
       },
@@ -105,7 +105,7 @@
       "name": "readback_storage_layout",
       "status": "SUCCEEDED",
       "objects_observed": [
-        "biglake-iceberg/orders/data/188441d0-bd06-4ad6-a73d-ab52ea7d984b-46bc8417591218ba-f-00000-of-00001.parquet",
+        "biglake-iceberg/orders/data/00000000-0000-0000-0000-000000000000-46bc8417591218ba-f-00000-of-00001.parquet",
         "biglake-iceberg/orders/metadata/v0.metadata.json"
       ]
     }
@@ -120,3 +120,4 @@
     "https://docs.cloud.google.com/bigquery/docs/create-cloud-resource-connection"
   ]
 }
+

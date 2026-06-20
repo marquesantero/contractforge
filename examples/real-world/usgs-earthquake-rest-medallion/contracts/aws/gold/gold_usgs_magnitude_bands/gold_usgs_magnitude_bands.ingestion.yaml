@@ -38,4 +38,4 @@ quality_rules:
 extensions:
   aws:
     iceberg:
-      warehouse: s3://contractforge-aws-smoke-449112696824-us-east-1/warehouse/usgs-rest/
+      warehouse: s3://contractforge-aws-smoke-000000000000-us-east-1/warehouse/usgs-rest/

@@ -9,14 +9,14 @@
   "project": "examples/source-expansion/fabric-adls-shortcut/project.yaml",
   "environment": "examples/source-expansion/fabric-adls-shortcut/environments/fabric.environment.yaml",
   "workspace": {
-    "id": "061fd0c8-c248-4628-a332-6adf16623533",
+    "id": "00000000-0000-0000-0000-000000000000",
     "name": "Manager",
-    "capacity_id": "2139f1ea-2676-46bf-ab4f-ab248c768056",
+    "capacity_id": "00000000-0000-0000-0000-000000000000",
     "capacity_sku": "FTL4",
     "capacity_region": "Brazil South"
   },
   "lakehouse": {
-    "id": "07067d3f-d5e2-48c1-b526-634620e57d4b",
+    "id": "00000000-0000-0000-0000-000000000000",
     "name": "contractforge_lh"
   },
   "source_infrastructure": {
@@ -28,7 +28,7 @@
     "fixture_path": "source-expansion/orders.csv",
     "fixture_rows": 2,
     "fabric_connection": {
-      "id": "360bb77e-d609-4a81-baad-42ec5321db49",
+      "id": "00000000-0000-0000-0000-000000000000",
       "display_name": "contractforge-fabric-adls-shortcut",
       "type": "AzureDataLakeStorage",
       "credential_type": "Key",
@@ -94,8 +94,8 @@
       "name": "adls_shortcut_orders",
       "contract": "contracts/01_adls_shortcut_orders.ingestion.yaml",
       "notebook": "cf_workspace_cf_fabric_source_expansion_adls_shortcut_orders",
-      "item_id": "4f999666-5d15-471b-b745-e04e795d1c8e",
-      "job_instance_id": "1e77d422-1b33-4dfc-9bd7-7a1d86b89394",
+      "item_id": "00000000-0000-0000-0000-000000000000",
+      "job_instance_id": "00000000-0000-0000-0000-000000000000",
       "job_status": "Completed",
       "started_at_utc": "2026-06-13T18:31:56.694202",
       "ended_at_utc": "2026-06-13T18:35:25.9678762"
@@ -104,8 +104,8 @@
       "name": "adls_shortcut_evidence_probe",
       "contract": "contracts/02_adls_shortcut_evidence_probe.ingestion.yaml",
       "notebook": "cf_workspace_cf_fabric_source_expansion_adls_shortcut_evidence_probe",
-      "item_id": "fb92e3f5-cc6c-4c11-8385-78d229071d99",
-      "job_instance_id": "0c7360fa-9acb-4952-a827-2a4ebe22ea46",
+      "item_id": "00000000-0000-0000-0000-000000000000",
+      "job_instance_id": "00000000-0000-0000-0000-000000000000",
       "job_status": "Completed",
       "started_at_utc": "2026-06-13T18:36:09.6955418",
       "ended_at_utc": "2026-06-13T18:39:55.1699534"
@@ -116,3 +116,4 @@
     "It does not validate ADLS Gen2 managed identity/OAuth shortcut credentials, private-network shortcuts, Delta Sharing or direct-catalog Iceberg variants. External Azure Blob, external Google Cloud Storage, external Amazon S3, external S3-compatible, ADLS Gen2 Iceberg table, Amazon S3 Iceberg table and Google Cloud Storage Iceberg table shortcuts are covered separately."
   ]
 }
+

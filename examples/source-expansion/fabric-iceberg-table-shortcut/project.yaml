@@ -12,7 +12,7 @@ fabric_setup:
       conflict_policy: CreateOrOverwrite
       target:
         amazonS3:
-          location: https://contractforge-aws-smoke-449112696824-us-east-1.s3.us-east-1.amazonaws.com
+          location: https://contractforge-aws-smoke-000000000000-us-east-1.s3.us-east-1.amazonaws.com
           subpath: /source-expansion/fabric-iceberg-shortcut/iceberg_orders
           connectionId: "{{ parameter:fabric.connections.amazon_s3_shortcut_connection_id }}"
 
@@ -41,11 +41,11 @@ source_expansion:
   fixture:
     generator: pyiceberg_local_sql_catalog
     rows: 3
-    s3_prefix: s3://contractforge-aws-smoke-449112696824-us-east-1/source-expansion/fabric-iceberg-shortcut/iceberg_orders/
+    s3_prefix: s3://contractforge-aws-smoke-000000000000-us-east-1/source-expansion/fabric-iceberg-shortcut/iceberg_orders/
   shortcut:
     path: Tables
     name: cf_fabric_iceberg_orders
     read_table: cf_fabric_iceberg_orders
     target_type: AmazonS3
-    target_location: https://contractforge-aws-smoke-449112696824-us-east-1.s3.us-east-1.amazonaws.com
+    target_location: https://contractforge-aws-smoke-000000000000-us-east-1.s3.us-east-1.amazonaws.com
     target_subpath: /source-expansion/fabric-iceberg-shortcut/iceberg_orders

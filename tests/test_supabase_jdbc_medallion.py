@@ -83,10 +83,10 @@ def test_supabase_jdbc_contracts_render_runtime_artifacts() -> None:
     assert "spark.read" in aws_job
     assert "_cf_resolve_secret" in aws_job
     assert "s3://replace-with-artifact-bucket" not in aws_job
-    assert "s3://contractforge-aws-smoke-449112696824-us-east-1/warehouse/supabase-jdbc-v2/" in aws_job
-    assert "arn:aws:s3:::contractforge-aws-smoke-449112696824-us-east-1/contractforge-supabase-jdbc-v2/*" in aws_iam
-    assert "arn:aws:s3:::contractforge-aws-smoke-449112696824-us-east-1/artifacts/contractforge/libs/contractforge_core-0.1.0-py3-none-any.whl" in aws_iam
-    assert "arn:aws:s3:::contractforge-aws-smoke-449112696824-us-east-1/artifacts/contractforge/libs/contractforge_aws-0.1.0-py3-none-any.whl" in aws_iam
+    assert "s3://contractforge-aws-smoke-000000000000-us-east-1/warehouse/supabase-jdbc-v2/" in aws_job
+    assert "arn:aws:s3:::contractforge-aws-smoke-000000000000-us-east-1/contractforge-supabase-jdbc-v2/*" in aws_iam
+    assert "arn:aws:s3:::contractforge-aws-smoke-000000000000-us-east-1/artifacts/contractforge/libs/contractforge_core-0.1.0-py3-none-any.whl" in aws_iam
+    assert "arn:aws:s3:::contractforge-aws-smoke-000000000000-us-east-1/artifacts/contractforge/libs/contractforge_aws-0.1.0-py3-none-any.whl" in aws_iam
 
 
 def test_supabase_jdbc_logical_table_refs_render_to_platform_qualified_names() -> None:

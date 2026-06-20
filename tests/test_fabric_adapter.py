@@ -33,7 +33,7 @@ def _environment() -> dict[str, object]:
     return {
         "parameters": {
             "fabric": {
-                "tenant_id": "3fb3492c-48be-4ac6-ae3a-fec6a63cf4d1",
+                "tenant_id": "00000000-0000-0000-0000-000000000000",
                 "tenant_domain": "ticomcafe.com.br",
                 "workspace_name": "cf-dev",
                 "lakehouse_name": "contractforge_lh",
@@ -177,7 +177,7 @@ def test_fabric_render_contract_emits_review_bundle_with_public_aliases() -> Non
     assert "`contractforge_lh`" in review
 
     capabilities = json.loads(artifacts[f"{prefix}.fabric.capabilities.json"])
-    assert capabilities["runtime"]["tenant_id"] == "3fb3492c-48be-4ac6-ae3a-fec6a63cf4d1"
+    assert capabilities["runtime"]["tenant_id"] == "00000000-0000-0000-0000-000000000000"
     assert capabilities["runtime"]["tenant_domain"] == "ticomcafe.com.br"
     assert capabilities["supports"]["historical"] is True
     assert "historical" not in capabilities["review_required_semantics"]

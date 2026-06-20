@@ -9,7 +9,7 @@ source:
     retry_backoff_seconds: 1
     max_bytes: 1048576
 target:
-  catalog: midyear-system-499521-p3
+  catalog: gcp-project-redacted
   schema: contractforge_gcp_smoke
   table: cf_http_file_orc_orders
 mode: overwrite

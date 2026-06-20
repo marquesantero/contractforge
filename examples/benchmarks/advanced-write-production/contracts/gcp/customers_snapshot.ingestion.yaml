@@ -11,7 +11,7 @@ source:
       - updated_at
 
 target:
-  catalog: midyear-system-499521-p3
+  catalog: gcp-project-redacted
   schema: contractforge_gcp_advanced_prod
   table: customers_snapshot_target
 

@@ -31,9 +31,9 @@
     "bronze_rows": 2,
     "silver_rows": 2,
     "gold_rows": 2,
-    "bronze_table": "midyear-system-499521-p3.contractforge_gcp_azure_sql_bronze.b_azure_sql_orders",
-    "silver_table": "midyear-system-499521-p3.contractforge_gcp_azure_sql_silver.s_azure_sql_orders_current",
-    "gold_table": "midyear-system-499521-p3.contractforge_gcp_azure_sql_gold.g_azure_sql_customer_summary"
+    "bronze_table": "gcp-project-redacted.contractforge_gcp_azure_sql_bronze.b_azure_sql_orders",
+    "silver_table": "gcp-project-redacted.contractforge_gcp_azure_sql_silver.s_azure_sql_orders_current",
+    "gold_table": "gcp-project-redacted.contractforge_gcp_azure_sql_gold.g_azure_sql_customer_summary"
   },
   "downstream_smokes": {
     "silver": "docs/reports/gcp-azure-sqlserver-jdbc-silver-smoke.json",
@@ -52,3 +52,4 @@
     "us-east1 and parts of us-central1 hit temporary Dataflow worker stockout; the successful run used us-central1-f with e2-standard-2."
   ]
 }
+

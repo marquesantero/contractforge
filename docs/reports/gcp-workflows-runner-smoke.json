@@ -6,12 +6,12 @@
   "maturity_gate": "GCP-BQ-15B",
   "status": "PASS",
   "executed_at": "2026-06-16T17:30:49Z",
-  "project_id": "midyear-system-499521-p3",
+  "project_id": "gcp-project-redacted",
   "workflow": {
     "name": "cf-gcp-workflows-smoke-runner",
     "location": "us-central1",
     "revision_id": "000004-26f",
-    "execution_id": "3533e6c3-5804-497c-8cd9-a6ba284ed944",
+    "execution_id": "00000000-0000-0000-0000-000000000000",
     "execution_state": "SUCCEEDED",
     "duration_seconds": 19.219853772,
     "result": {
@@ -43,12 +43,12 @@
     "evidence_table_ddl_readback": true
   },
   "iam_prerequisites": {
-    "runtime_service_account": "897279804928-compute@developer.gserviceaccount.com",
+    "runtime_service_account": "000000000000-compute@developer.gserviceaccount.com",
     "roles_granted_for_smoke": [
       "roles/bigquery.jobUser",
       "roles/bigquery.dataEditor"
     ],
-    "workflows_service_agent": "service-897279804928@gcp-sa-workflows.iam.gserviceaccount.com"
+    "workflows_service_agent": "service-000000000000@gcp-sa-workflows.iam.gserviceaccount.com"
   },
   "readback": {
     "dataset_location": "us-east1",
@@ -107,10 +107,11 @@
   ],
   "remaining_review_boundary": "This historical smoke proved generated-runner deployment, execution, BigQuery polling and target/evidence-table readback. GCP-BQ-15C is now closed by docs/reports/gcp-workflows-certified-runner-smoke.json.",
   "commands": [
-    "gcloud services enable workflows.googleapis.com workflowexecutions.googleapis.com --project=midyear-system-499521-p3",
-    "gcloud beta services identity create --service=workflows.googleapis.com --project=midyear-system-499521-p3",
+    "gcloud services enable workflows.googleapis.com workflowexecutions.googleapis.com --project=gcp-project-redacted",
+    "gcloud beta services identity create --service=workflows.googleapis.com --project=gcp-project-redacted",
     "uv run python -m contractforge_gcp.cli deploy-project .tmp/gcp-workflows-smoke/project.yaml --environment-key gcp --dry-run --output-dir .tmp/gcp-workflows-smoke/bundle --summary-only",
-    "gcloud workflows deploy cf-gcp-workflows-smoke-runner --project=midyear-system-499521-p3 --location=us-central1 --source=.tmp/gcp-workflows-smoke/bundle/deployment/gcp_workflows_runner.yaml",
-    "gcloud workflows run cf-gcp-workflows-smoke-runner --project=midyear-system-499521-p3 --location=us-central1 --format=json"
+    "gcloud workflows deploy cf-gcp-workflows-smoke-runner --project=gcp-project-redacted --location=us-central1 --source=.tmp/gcp-workflows-smoke/bundle/deployment/gcp_workflows_runner.yaml",
+    "gcloud workflows run cf-gcp-workflows-smoke-runner --project=gcp-project-redacted --location=us-central1 --format=json"
   ]
 }
+

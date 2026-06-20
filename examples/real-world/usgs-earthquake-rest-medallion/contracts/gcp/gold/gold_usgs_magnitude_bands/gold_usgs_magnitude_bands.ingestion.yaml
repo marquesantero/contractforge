@@ -13,13 +13,13 @@ source:
       MIN(event_time) AS first_event_time,
       MAX(event_time) AS latest_event_time,
       CURRENT_TIMESTAMP() AS computed_at_utc
-    FROM `midyear-system-499521-p3.contractforge_gcp_usgs_rest_silver.s_usgs_earthquake_events`
+    FROM `gcp-project-redacted.contractforge_gcp_usgs_rest_silver.s_usgs_earthquake_events`
     GROUP BY magnitude_band, event_type
   read:
     source_complete: true
 
 target:
-  catalog: midyear-system-499521-p3
+  catalog: gcp-project-redacted
   schema: contractforge_gcp_usgs_rest_gold
   table: g_usgs_earthquake_magnitude_bands
 

@@ -6,7 +6,7 @@
   "maturity_gate": "GCP-BQ-15C6",
   "status": "PASS",
   "executed_at": "2026-06-16T19:40:45Z",
-  "project_id": "midyear-system-499521-p3",
+  "project_id": "gcp-project-redacted",
   "validated": {
     "workflow_execution_id_from_sys_get_env": true,
     "run_evidence_uses_execution_scoped_run_id": true,
@@ -19,32 +19,32 @@
     "name": "cf-gcp-workflows-smoke-runner",
     "location": "us-central1",
     "revision_id": "000011-16c",
-    "execution_id": "a320ba50-a07c-48cc-bf02-d53fc031938d",
+    "execution_id": "00000000-0000-0000-0000-000000000000",
     "execution_state": "SUCCEEDED",
     "readback_status": "SUCCEEDED",
     "run_evidence": [
       {
-        "run_id": "workflows:a320ba50-a07c-48cc-bf02-d53fc031938d:bronze_orders:write_target",
+        "run_id": "workflows:00000000-0000-0000-0000-000000000000:bronze_orders:write_target",
         "contract_name": "workflow_bronze_orders",
         "status": "SUCCEEDED",
-        "target_table": "midyear-system-499521-p3.contractforge_gcp_smoke.workflow_bronze_orders"
+        "target_table": "gcp-project-redacted.contractforge_gcp_smoke.workflow_bronze_orders"
       },
       {
-        "run_id": "workflows:a320ba50-a07c-48cc-bf02-d53fc031938d:gold_orders_by_status:write_target",
+        "run_id": "workflows:00000000-0000-0000-0000-000000000000:gold_orders_by_status:write_target",
         "contract_name": "workflow_gold_orders_by_status",
         "status": "SUCCEEDED",
-        "target_table": "midyear-system-499521-p3.contractforge_gcp_smoke.workflow_gold_orders_by_status"
+        "target_table": "gcp-project-redacted.contractforge_gcp_smoke.workflow_gold_orders_by_status"
       }
     ],
     "quality_evidence": [
       {
-        "run_id": "workflows:a320ba50-a07c-48cc-bf02-d53fc031938d:bronze_orders:quality",
+        "run_id": "workflows:00000000-0000-0000-0000-000000000000:bronze_orders:quality",
         "contract_name": "workflow_bronze_orders",
         "status": "PASSED",
         "failed_rows": 0
       },
       {
-        "run_id": "workflows:a320ba50-a07c-48cc-bf02-d53fc031938d:gold_orders_by_status:quality",
+        "run_id": "workflows:00000000-0000-0000-0000-000000000000:gold_orders_by_status:quality",
         "contract_name": "workflow_gold_orders_by_status",
         "status": "PASSED",
         "failed_rows": 0
@@ -55,12 +55,12 @@
     "name": "cf-gcp-workflows-quality-failure",
     "location": "us-central1",
     "revision_id": "000003-17b",
-    "execution_id": "c982289e-df34-4614-829e-47ea653dfb0f",
+    "execution_id": "00000000-0000-0000-0000-000000000000",
     "execution_state": "FAILED",
     "error_payload": "Quality check failed with 1 failed rows.",
     "quality_evidence": [
       {
-        "run_id": "workflows:c982289e-df34-4614-829e-47ea653dfb0f:bronze_orders_quality_failure:quality",
+        "run_id": "workflows:00000000-0000-0000-0000-000000000000:bronze_orders_quality_failure:quality",
         "contract_name": "workflow_bronze_orders_quality_failure",
         "status": "FAILED",
         "failed_rows": 1
@@ -78,3 +78,4 @@
     "https://docs.cloud.google.com/workflows/docs/reference/environment-variables"
   ]
 }
+

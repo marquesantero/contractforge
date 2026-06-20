@@ -4,27 +4,27 @@
   "status": "SUCCEEDED",
   "ok": true,
   "executed": true,
-  "project_id": "midyear-system-499521-p3",
+  "project_id": "gcp-project-redacted",
   "location": "us-east1",
   "dataset": "contractforge_gcp_smoke",
   "table": "policy_tag_orders",
   "taxonomy": {
-    "name": "projects/midyear-system-499521-p3/locations/us-east1/taxonomies/9041114829680434011",
+    "name": "projects/gcp-project-redacted/locations/us-east1/taxonomies/9041114829680434011",
     "display_name": "cf_policy_tag_smoke_us_east1",
     "activated_policy_types": [
       "FINE_GRAINED_ACCESS_CONTROL"
     ]
   },
   "policy_tag": {
-    "name": "projects/midyear-system-499521-p3/locations/us-east1/taxonomies/9041114829680434011/policyTags/3862408740743282741",
-    "numeric_project_name": "projects/897279804928/locations/us-east1/taxonomies/9041114829680434011/policyTags/3862408740743282741",
+    "name": "projects/gcp-project-redacted/locations/us-east1/taxonomies/9041114829680434011/policyTags/3862408740743282741",
+    "numeric_project_name": "projects/000000000000/locations/us-east1/taxonomies/9041114829680434011/policyTags/3862408740743282741",
     "display_name": "confidential_email"
   },
   "contract_basis": {
     "access": {
       "column_masks": {
         "customer_email": {
-          "function": "policy_tag:projects/midyear-system-499521-p3/locations/us-east1/taxonomies/9041114829680434011/policyTags/3862408740743282741",
+          "function": "policy_tag:projects/gcp-project-redacted/locations/us-east1/taxonomies/9041114829680434011/policyTags/3862408740743282741",
           "applies_to": {
             "principals": [
               "contractforge-bigquery-reader"
@@ -76,7 +76,7 @@
         {
           "column_name": "customer_email",
           "policy_tags": [
-            "projects/897279804928/locations/us-east1/taxonomies/9041114829680434011/policyTags/3862408740743282741"
+            "projects/000000000000/locations/us-east1/taxonomies/9041114829680434011/policyTags/3862408740743282741"
           ]
         }
       ]
@@ -131,3 +131,4 @@
     "https://docs.cloud.google.com/bigquery/docs/information-schema-column-field-paths"
   ]
 }
+

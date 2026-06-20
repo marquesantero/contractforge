@@ -8,7 +8,7 @@ source:
         raw_response,
         response_page_number,
         PARSE_JSON(raw_response) AS payload
-      FROM `midyear-system-499521-p3.contractforge_gcp_usgs_rest_bronze.b_usgs_earthquake_geojson`
+      FROM `gcp-project-redacted.contractforge_gcp_usgs_rest_bronze.b_usgs_earthquake_geojson`
     ),
     flattened AS (
       SELECT
@@ -108,7 +108,7 @@ source:
     source_complete: true
 
 target:
-  catalog: midyear-system-499521-p3
+  catalog: gcp-project-redacted
   schema: contractforge_gcp_usgs_rest_silver
   table: s_usgs_earthquake_events
 

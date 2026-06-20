@@ -13,7 +13,7 @@
     "This validates native role create/list/delete only. Row and column constraints still need live certification once Fabric exposes the Spark-created stable-surface tables through the Lakehouse table metadata used by OneLake Data Access Security."
   ],
   "lakehouse": {
-    "id": "07067d3f-d5e2-48c1-b526-634620e57d4b",
+    "id": "00000000-0000-0000-0000-000000000000",
     "name": "contractforge_lh"
   },
   "listed": true,
@@ -32,7 +32,8 @@
   "status": "SUCCEEDED",
   "validated_at_utc": "2026-06-14T14:32:09Z",
   "workspace": {
-    "id": "061fd0c8-c248-4628-a332-6adf16623533",
+    "id": "00000000-0000-0000-0000-000000000000",
     "name": "Manager"
   }
 }
+

@@ -6,7 +6,7 @@ source:
   response:
     raw_column: payload_line
 target:
-  catalog: midyear-system-499521-p3
+  catalog: gcp-project-redacted
   schema: contractforge_gcp_smoke
   table: cf_http_file_text_countries
 mode: overwrite

@@ -6,7 +6,7 @@
   "ok": true,
   "executed": true,
   "validated_at_utc": "2026-06-15T18:05:00Z",
-  "project_id": "midyear-system-499521-p3",
+  "project_id": "gcp-project-redacted",
   "project_name": "contractforge",
   "organization_backed": true,
   "organization_id": "698047658121",
@@ -14,13 +14,13 @@
   "dataset": "contractforge_gcp_smoke",
   "table": "masking_orders",
   "policy": {
-    "name": "projects/897279804928/locations/us-east1/dataPolicies/cf_mask_amount_null",
+    "name": "projects/000000000000/locations/us-east1/dataPolicies/cf_mask_amount_null",
     "data_policy_id": "cf_mask_amount_null",
     "data_policy_type": "DATA_MASKING_POLICY",
     "version": "V2",
     "masking_expression": "ALWAYS_NULL",
     "target_column": "amount",
-    "grantee": "principal://iam.googleapis.com/projects/-/serviceAccounts/contractforge-bigquery-reader@midyear-system-499521-p3.iam.gserviceaccount.com"
+    "grantee": "principal://iam.googleapis.com/projects/-/serviceAccounts/contractforge-bigquery-reader@gcp-project-redacted.iam.gserviceaccount.com"
   },
   "operations": [
     {
@@ -74,7 +74,7 @@
       "type": "FLOAT",
       "data_policies": [
         {
-          "name": "projects/897279804928/locations/us-east1/dataPolicies/cf_mask_amount_null"
+          "name": "projects/000000000000/locations/us-east1/dataPolicies/cf_mask_amount_null"
         }
       ]
     },
@@ -84,7 +84,7 @@
       "version": "V2",
       "masking_expression": "ALWAYS_NULL",
       "grantees": [
-        "principal://iam.googleapis.com/projects/-/serviceAccounts/contractforge-bigquery-reader@midyear-system-499521-p3.iam.gserviceaccount.com"
+        "principal://iam.googleapis.com/projects/-/serviceAccounts/contractforge-bigquery-reader@gcp-project-redacted.iam.gserviceaccount.com"
       ]
     }
   },
@@ -99,3 +99,4 @@
     "https://docs.cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language"
   ]
 }
+

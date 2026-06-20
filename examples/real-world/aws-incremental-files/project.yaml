@@ -7,7 +7,7 @@ source_system:
   name: s3_incremental_events
   type: object_storage
   provider: s3
-  seed_prefix: s3://contractforge-aws-smoke-449112696824-us-east-1/data/aws-incremental-files/events/
+  seed_prefix: s3://contractforge-aws-smoke-000000000000-us-east-1/data/aws-incremental-files/events/
 
 environments:
   aws: environments/aws.environment.yaml
@@ -21,7 +21,7 @@ execution_order:
 
 validation:
   aws:
-    artifact_bucket: contractforge-aws-smoke-449112696824-us-east-1
+    artifact_bucket: contractforge-aws-smoke-000000000000-us-east-1
     evidence_database: contractforge_cf_incremental_files_ops
     upload_waves:
       - data/events/wave1/events_2026_06_01.csv

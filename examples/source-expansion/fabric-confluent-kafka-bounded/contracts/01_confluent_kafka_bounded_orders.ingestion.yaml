@@ -1,7 +1,7 @@
 source:
   type: kafka_bounded
   system: confluent_cloud
-  bootstrap_servers: pkc-619z3.us-east1.gcp.confluent.cloud:9092
+  bootstrap_servers: pkc-redacted.region.confluent.cloud:9092
   topic: cf-fabric-orders
   starting_offsets: earliest
   ending_offsets: latest

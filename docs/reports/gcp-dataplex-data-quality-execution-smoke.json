@@ -6,10 +6,10 @@
       "apiVersion": "v1",
       "createTime": "2026-06-17T02:08:03.613149541Z",
       "requestedCancellation": false,
-      "target": "projects/midyear-system-499521-p3/locations/us-east1/dataScans/cf-contractforge-gcp-advanced-prod-customers-snapshot-target-dq",
+      "target": "projects/gcp-project-redacted/locations/us-east1/dataScans/cf-contractforge-gcp-advanced-prod-customers-snapshot-target-dq",
       "verb": "delete"
     },
-    "name": "projects/midyear-system-499521-p3/locations/us-east1/operations/operation-1781662083602-65469879a59d7-a790019a-efc0fb89"
+    "name": "projects/gcp-project-redacted/locations/us-east1/operations/operation-1781662083602-65469879a59d7-a790019a-efc0fb89"
   },
   "cleanup_readback": {
     "data_scan_found": false,
@@ -17,14 +17,14 @@
     "status": "SUCCEEDED"
   },
   "create": {
-    "message": "Dataplex REST POST https://dataplex.googleapis.com/v1/projects/midyear-system-499521-p3/locations/us-east1/dataScans?dataScanId=cf-contractforge-gcp-advanced-prod-customers-snapshot-target-dq failed with HTTP 409: {\n  \"error\": {\n    \"code\": 409,\n    \"message\": \"Resource 'projects/midyear-system-499521-p3/locations/us-east1/dataScans/cf-contractforge-gcp-advanced-prod-customers-snapshot-target-dq' already exists\",\n    \"status\": \"ALREADY_EXISTS\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.ResourceInfo\",\n        \"resourceName\": \"projects/midyear-system-499521-p3/locations/us-east1/dataScans/cf-contractforge-gcp-advanced-prod-customers-snapshot-target-dq\"\n      }\n    ]\n  }\n}\n",
+    "message": "Dataplex REST POST https://dataplex.googleapis.com/v1/projects/gcp-project-redacted/locations/us-east1/dataScans?dataScanId=cf-contractforge-gcp-advanced-prod-customers-snapshot-target-dq failed with HTTP 409: {\n  \"error\": {\n    \"code\": 409,\n    \"message\": \"Resource 'projects/gcp-project-redacted/locations/us-east1/dataScans/cf-contractforge-gcp-advanced-prod-customers-snapshot-target-dq' already exists\",\n    \"status\": \"ALREADY_EXISTS\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.ResourceInfo\",\n        \"resourceName\": \"projects/gcp-project-redacted/locations/us-east1/dataScans/cf-contractforge-gcp-advanced-prod-customers-snapshot-target-dq\"\n      }\n    ]\n  }\n}\n",
     "reason": "data_scan_already_exists",
     "status": "SKIPPED"
   },
   "data_scan": {
     "createTime": "2026-06-17T02:04:31.550889699Z",
     "data": {
-      "resource": "//bigquery.googleapis.com/projects/midyear-system-499521-p3/datasets/contractforge_gcp_advanced_prod/tables/customers_snapshot_target"
+      "resource": "//bigquery.googleapis.com/projects/gcp-project-redacted/datasets/contractforge_gcp_advanced_prod/tables/customers_snapshot_target"
     },
     "displayName": "ContractForge contractforge_gcp_advanced_prod.customers_snapshot_target data quality",
     "executionSpec": {
@@ -33,23 +33,23 @@
       }
     },
     "executionStatus": {},
-    "name": "projects/midyear-system-499521-p3/locations/us-east1/dataScans/cf-contractforge-gcp-advanced-prod-customers-snapshot-target-dq",
+    "name": "projects/gcp-project-redacted/locations/us-east1/dataScans/cf-contractforge-gcp-advanced-prod-customers-snapshot-target-dq",
     "state": "ACTIVE",
     "type": "DATA_QUALITY",
-    "uid": "76e9d8c1-9fd9-4ae1-92e6-cb77829a33c3",
+    "uid": "00000000-0000-0000-0000-000000000000",
     "updateTime": "2026-06-17T02:05:46.305478729Z"
   },
   "execution_included": true,
   "job": {
     "createTime": "2026-06-17T02:06:23.246200229Z",
     "endTime": "2026-06-17T02:06:52.002398116Z",
-    "name": "projects/897279804928/locations/us-east1/dataScans/cf-contractforge-gcp-advanced-prod-customers-snapshot-target-dq/jobs/057cfa5a-b30b-4ec7-8f52-01654dbf3fd1",
+    "name": "projects/000000000000/locations/us-east1/dataScans/cf-contractforge-gcp-advanced-prod-customers-snapshot-target-dq/jobs/00000000-0000-0000-0000-000000000000",
     "startTime": "2026-06-17T02:06:23.852Z",
     "state": "SUCCEEDED",
     "type": "DATA_QUALITY",
-    "uid": "057cfa5a-b30b-4ec7-8f52-01654dbf3fd1"
+    "uid": "00000000-0000-0000-0000-000000000000"
   },
-  "job_name": "projects/897279804928/locations/us-east1/dataScans/cf-contractforge-gcp-advanced-prod-customers-snapshot-target-dq/jobs/057cfa5a-b30b-4ec7-8f52-01654dbf3fd1",
+  "job_name": "projects/000000000000/locations/us-east1/dataScans/cf-contractforge-gcp-advanced-prod-customers-snapshot-target-dq/jobs/00000000-0000-0000-0000-000000000000",
   "plan": {
     "adapter": "contractforge-gcp",
     "curl_templates": {
@@ -64,13 +64,13 @@
         "Content-Type: application/json",
         "-d",
         "<dataScan JSON from rest.create.body>",
-        "https://dataplex.googleapis.com/v1/projects/midyear-system-499521-p3/locations/us-east1/dataScans?dataScanId=cf-contractforge-gcp-advanced-prod-customers-snapshot-target-dq"
+        "https://dataplex.googleapis.com/v1/projects/gcp-project-redacted/locations/us-east1/dataScans?dataScanId=cf-contractforge-gcp-advanced-prod-customers-snapshot-target-dq"
       ],
       "list_jobs": [
         "curl",
         "-H",
         "Authorization: Bearer ${ACCESS_TOKEN}",
-        "https://dataplex.googleapis.com/v1/projects/midyear-system-499521-p3/locations/us-east1/dataScans/cf-contractforge-gcp-advanced-prod-customers-snapshot-target-dq/jobs"
+        "https://dataplex.googleapis.com/v1/projects/gcp-project-redacted/locations/us-east1/dataScans/cf-contractforge-gcp-advanced-prod-customers-snapshot-target-dq/jobs"
       ],
       "run": [
         "curl",
@@ -82,15 +82,15 @@
         "Content-Type: application/json",
         "-d",
         "{}",
-        "https://dataplex.googleapis.com/v1/projects/midyear-system-499521-p3/locations/us-east1/dataScans/cf-contractforge-gcp-advanced-prod-customers-snapshot-target-dq:run"
+        "https://dataplex.googleapis.com/v1/projects/gcp-project-redacted/locations/us-east1/dataScans/cf-contractforge-gcp-advanced-prod-customers-snapshot-target-dq:run"
       ]
     },
     "data_scan": {
       "id": "cf-contractforge-gcp-advanced-prod-customers-snapshot-target-dq",
       "location": "us-east1",
-      "name": "projects/midyear-system-499521-p3/locations/us-east1/dataScans/cf-contractforge-gcp-advanced-prod-customers-snapshot-target-dq",
-      "parent": "projects/midyear-system-499521-p3/locations/us-east1",
-      "result_table": "projects/midyear-system-499521-p3/datasets/contractforge_gcp_advanced_prod_ops/tables/contractforge_dataplex_quality_results"
+      "name": "projects/gcp-project-redacted/locations/us-east1/dataScans/cf-contractforge-gcp-advanced-prod-customers-snapshot-target-dq",
+      "parent": "projects/gcp-project-redacted/locations/us-east1",
+      "result_table": "projects/gcp-project-redacted/datasets/contractforge_gcp_advanced_prod_ops/tables/contractforge_dataplex_quality_results"
     },
     "execution": {
       "included": false,
@@ -98,7 +98,7 @@
     },
     "kind": "contractforge.gcp.dataplex_data_quality_execution_plan.v1",
     "readback": {
-      "bigquery_export_query": "SELECT * FROM `midyear-system-499521-p3.contractforge_gcp_advanced_prod_ops.contractforge_dataplex_quality_results` LIMIT 100",
+      "bigquery_export_query": "SELECT * FROM `gcp-project-redacted.contractforge_gcp_advanced_prod_ops.contractforge_dataplex_quality_results` LIMIT 100",
       "job_state_path": "jobs[].state",
       "latest_job_query_hint": "Use list_jobs, then call get_job_template with the selected job id."
     },
@@ -106,13 +106,13 @@
       "create": {
         "body": {
           "data": {
-            "resource": "//bigquery.googleapis.com/projects/midyear-system-499521-p3/datasets/contractforge_gcp_advanced_prod/tables/customers_snapshot_target"
+            "resource": "//bigquery.googleapis.com/projects/gcp-project-redacted/datasets/contractforge_gcp_advanced_prod/tables/customers_snapshot_target"
           },
           "dataQualitySpec": {
             "catalogPublishingEnabled": false,
             "postScanActions": {
               "bigqueryExport": {
-                "resultsTable": "projects/midyear-system-499521-p3/datasets/contractforge_gcp_advanced_prod_ops/tables/contractforge_dataplex_quality_results"
+                "resultsTable": "projects/gcp-project-redacted/datasets/contractforge_gcp_advanced_prod_ops/tables/contractforge_dataplex_quality_results"
               }
             },
             "rules": [
@@ -178,28 +178,28 @@
           "displayName": "ContractForge contractforge_gcp_advanced_prod.customers_snapshot_target data quality"
         },
         "method": "POST",
-        "url": "https://dataplex.googleapis.com/v1/projects/midyear-system-499521-p3/locations/us-east1/dataScans?dataScanId=cf-contractforge-gcp-advanced-prod-customers-snapshot-target-dq"
+        "url": "https://dataplex.googleapis.com/v1/projects/gcp-project-redacted/locations/us-east1/dataScans?dataScanId=cf-contractforge-gcp-advanced-prod-customers-snapshot-target-dq"
       },
       "delete": {
         "method": "DELETE",
-        "url": "https://dataplex.googleapis.com/v1/projects/midyear-system-499521-p3/locations/us-east1/dataScans/cf-contractforge-gcp-advanced-prod-customers-snapshot-target-dq"
+        "url": "https://dataplex.googleapis.com/v1/projects/gcp-project-redacted/locations/us-east1/dataScans/cf-contractforge-gcp-advanced-prod-customers-snapshot-target-dq"
       },
       "get_data_scan": {
         "method": "GET",
-        "url": "https://dataplex.googleapis.com/v1/projects/midyear-system-499521-p3/locations/us-east1/dataScans/cf-contractforge-gcp-advanced-prod-customers-snapshot-target-dq"
+        "url": "https://dataplex.googleapis.com/v1/projects/gcp-project-redacted/locations/us-east1/dataScans/cf-contractforge-gcp-advanced-prod-customers-snapshot-target-dq"
       },
       "get_job_template": {
         "method": "GET",
-        "url": "https://dataplex.googleapis.com/v1/projects/midyear-system-499521-p3/locations/us-east1/dataScans/cf-contractforge-gcp-advanced-prod-customers-snapshot-target-dq/jobs/{job_id}"
+        "url": "https://dataplex.googleapis.com/v1/projects/gcp-project-redacted/locations/us-east1/dataScans/cf-contractforge-gcp-advanced-prod-customers-snapshot-target-dq/jobs/{job_id}"
       },
       "list_jobs": {
         "method": "GET",
-        "url": "https://dataplex.googleapis.com/v1/projects/midyear-system-499521-p3/locations/us-east1/dataScans/cf-contractforge-gcp-advanced-prod-customers-snapshot-target-dq/jobs"
+        "url": "https://dataplex.googleapis.com/v1/projects/gcp-project-redacted/locations/us-east1/dataScans/cf-contractforge-gcp-advanced-prod-customers-snapshot-target-dq/jobs"
       },
       "run": {
         "body": {},
         "method": "POST",
-        "url": "https://dataplex.googleapis.com/v1/projects/midyear-system-499521-p3/locations/us-east1/dataScans/cf-contractforge-gcp-advanced-prod-customers-snapshot-target-dq:run"
+        "url": "https://dataplex.googleapis.com/v1/projects/gcp-project-redacted/locations/us-east1/dataScans/cf-contractforge-gcp-advanced-prod-customers-snapshot-target-dq:run"
       }
     },
     "review_boundaries": [
@@ -216,19 +216,19 @@
     "subtarget": "gcp_bigquery"
   },
   "readback": {
-    "query": "SELECT * FROM `midyear-system-499521-p3.contractforge_gcp_advanced_prod_ops.contractforge_dataplex_quality_results` LIMIT 100",
+    "query": "SELECT * FROM `gcp-project-redacted.contractforge_gcp_advanced_prod_ops.contractforge_dataplex_quality_results` LIMIT 100",
     "row_count": 7,
     "rows": [
       {
         "created_on": "2026-06-17 02:05:44",
         "data_quality_job_configuration": "{\"enable_catalog_based_rules\":false,\"increment_column\":\"\",\"incremental\":false,\"row_filter\":\"\",\"sampling_percent\":100,\"trigger\":\"on_demand\"}",
-        "data_quality_job_id": "057cfa5a-b30b-4ec7-8f52-01654dbf3fd1",
+        "data_quality_job_id": "00000000-0000-0000-0000-000000000000",
         "data_quality_scan": {
           "data_scan_id": "cf-contractforge-gcp-advanced-prod-customers-snapshot-target-dq",
           "display_name": "ContractForge contractforge_gcp_advanced_prod.customers_snapshot_target data quality",
           "location": "us-east1",
-          "project_id": "midyear-system-499521-p3",
-          "resource_name": "//dataplex.googleapis.com/projects/897279804928/locations/us-east1/dataScans/cf-contractforge-gcp-advanced-prod-customers-snapshot-target-dq"
+          "project_id": "gcp-project-redacted",
+          "resource_name": "//dataplex.googleapis.com/projects/000000000000/locations/us-east1/dataScans/cf-contractforge-gcp-advanced-prod-customers-snapshot-target-dq"
         },
         "data_source": {
           "catalog_id": null,
@@ -239,10 +239,10 @@
           "dataplex_zone_id": null,
           "dataset_id": "contractforge_gcp_advanced_prod",
           "namespace_id": null,
-          "resource_name": "//bigquery.googleapis.com/projects/midyear-system-499521-p3/datasets/contractforge_gcp_advanced_prod/tables/customers_snapshot_target",
+          "resource_name": "//bigquery.googleapis.com/projects/gcp-project-redacted/datasets/contractforge_gcp_advanced_prod/tables/customers_snapshot_target",
           "table_id": "customers_snapshot_target",
-          "table_project_id": "midyear-system-499521-p3",
-          "table_project_number": "897279804928"
+          "table_project_id": "gcp-project-redacted",
+          "table_project_number": "000000000000"
         },
         "debug_queries": [],
         "job_dimension_result": "{\"COMPLETENESS\":{\"passed\":true,\"score\":100},\"UNIQUENESS\":{\"passed\":true,\"score\":100},\"VALIDITY\":{\"passed\":true,\"score\":100}}",
@@ -263,7 +263,7 @@
         "rule_description": "ContractForge not_null rule for customer_id.",
         "rule_dimension": "COMPLETENESS",
         "rule_evaluation_type": "Per row",
-        "rule_failed_records_query": "WITH `057cfa5a-b30b-4ec7-8f52-01654dbf3fd1` AS (SELECT * FROM `midyear-system-499521-p3.contractforge_gcp_advanced_prod.customers_snapshot_target` ) SELECT * FROM `057cfa5a-b30b-4ec7-8f52-01654dbf3fd1` WHERE (`customer_id` IS NULL);",
+        "rule_failed_records_query": "WITH `00000000-0000-0000-0000-000000000000` AS (SELECT * FROM `gcp-project-redacted.contractforge_gcp_advanced_prod.customers_snapshot_target` ) SELECT * FROM `00000000-0000-0000-0000-000000000000` WHERE (`customer_id` IS NULL);",
         "rule_name": "customer-id-not-null",
         "rule_parameters": null,
         "rule_passed": "true",
@@ -279,13 +279,13 @@
       {
         "created_on": "2026-06-17 02:05:44",
         "data_quality_job_configuration": "{\"enable_catalog_based_rules\":false,\"increment_column\":\"\",\"incremental\":false,\"row_filter\":\"\",\"sampling_percent\":100,\"trigger\":\"on_demand\"}",
-        "data_quality_job_id": "057cfa5a-b30b-4ec7-8f52-01654dbf3fd1",
+        "data_quality_job_id": "00000000-0000-0000-0000-000000000000",
         "data_quality_scan": {
           "data_scan_id": "cf-contractforge-gcp-advanced-prod-customers-snapshot-target-dq",
           "display_name": "ContractForge contractforge_gcp_advanced_prod.customers_snapshot_target data quality",
           "location": "us-east1",
-          "project_id": "midyear-system-499521-p3",
-          "resource_name": "//dataplex.googleapis.com/projects/897279804928/locations/us-east1/dataScans/cf-contractforge-gcp-advanced-prod-customers-snapshot-target-dq"
+          "project_id": "gcp-project-redacted",
+          "resource_name": "//dataplex.googleapis.com/projects/000000000000/locations/us-east1/dataScans/cf-contractforge-gcp-advanced-prod-customers-snapshot-target-dq"
         },
         "data_source": {
           "catalog_id": null,
@@ -296,10 +296,10 @@
           "dataplex_zone_id": null,
           "dataset_id": "contractforge_gcp_advanced_prod",
           "namespace_id": null,
-          "resource_name": "//bigquery.googleapis.com/projects/midyear-system-499521-p3/datasets/contractforge_gcp_advanced_prod/tables/customers_snapshot_target",
+          "resource_name": "//bigquery.googleapis.com/projects/gcp-project-redacted/datasets/contractforge_gcp_advanced_prod/tables/customers_snapshot_target",
           "table_id": "customers_snapshot_target",
-          "table_project_id": "midyear-system-499521-p3",
-          "table_project_number": "897279804928"
+          "table_project_id": "gcp-project-redacted",
+          "table_project_number": "000000000000"
         },
         "debug_queries": [],
         "job_dimension_result": "{\"COMPLETENESS\":{\"passed\":true,\"score\":100},\"UNIQUENESS\":{\"passed\":true,\"score\":100},\"VALIDITY\":{\"passed\":true,\"score\":100}}",
@@ -320,7 +320,7 @@
         "rule_description": "ContractForge not_null rule for segment.",
         "rule_dimension": "COMPLETENESS",
         "rule_evaluation_type": "Per row",
-        "rule_failed_records_query": "WITH `057cfa5a-b30b-4ec7-8f52-01654dbf3fd1` AS (SELECT * FROM `midyear-system-499521-p3.contractforge_gcp_advanced_prod.customers_snapshot_target` ) SELECT * FROM `057cfa5a-b30b-4ec7-8f52-01654dbf3fd1` WHERE (`segment` IS NULL);",
+        "rule_failed_records_query": "WITH `00000000-0000-0000-0000-000000000000` AS (SELECT * FROM `gcp-project-redacted.contractforge_gcp_advanced_prod.customers_snapshot_target` ) SELECT * FROM `00000000-0000-0000-0000-000000000000` WHERE (`segment` IS NULL);",
         "rule_name": "segment-not-null",
         "rule_parameters": null,
         "rule_passed": "true",
@@ -336,13 +336,13 @@
       {
         "created_on": "2026-06-17 02:05:44",
         "data_quality_job_configuration": "{\"enable_catalog_based_rules\":false,\"increment_column\":\"\",\"incremental\":false,\"row_filter\":\"\",\"sampling_percent\":100,\"trigger\":\"on_demand\"}",
-        "data_quality_job_id": "057cfa5a-b30b-4ec7-8f52-01654dbf3fd1",
+        "data_quality_job_id": "00000000-0000-0000-0000-000000000000",
         "data_quality_scan": {
           "data_scan_id": "cf-contractforge-gcp-advanced-prod-customers-snapshot-target-dq",
           "display_name": "ContractForge contractforge_gcp_advanced_prod.customers_snapshot_target data quality",
           "location": "us-east1",
-          "project_id": "midyear-system-499521-p3",
-          "resource_name": "//dataplex.googleapis.com/projects/897279804928/locations/us-east1/dataScans/cf-contractforge-gcp-advanced-prod-customers-snapshot-target-dq"
+          "project_id": "gcp-project-redacted",
+          "resource_name": "//dataplex.googleapis.com/projects/000000000000/locations/us-east1/dataScans/cf-contractforge-gcp-advanced-prod-customers-snapshot-target-dq"
         },
         "data_source": {
           "catalog_id": null,
@@ -353,10 +353,10 @@
           "dataplex_zone_id": null,
           "dataset_id": "contractforge_gcp_advanced_prod",
           "namespace_id": null,
-          "resource_name": "//bigquery.googleapis.com/projects/midyear-system-499521-p3/datasets/contractforge_gcp_advanced_prod/tables/customers_snapshot_target",
+          "resource_name": "//bigquery.googleapis.com/projects/gcp-project-redacted/datasets/contractforge_gcp_advanced_prod/tables/customers_snapshot_target",
           "table_id": "customers_snapshot_target",
-          "table_project_id": "midyear-system-499521-p3",
-          "table_project_number": "897279804928"
+          "table_project_id": "gcp-project-redacted",
+          "table_project_number": "000000000000"
         },
         "debug_queries": [],
         "job_dimension_result": "{\"COMPLETENESS\":{\"passed\":true,\"score\":100},\"UNIQUENESS\":{\"passed\":true,\"score\":100},\"VALIDITY\":{\"passed\":true,\"score\":100}}",
@@ -377,7 +377,7 @@
         "rule_description": "ContractForge not_null rule for status.",
         "rule_dimension": "COMPLETENESS",
         "rule_evaluation_type": "Per row",
-        "rule_failed_records_query": "WITH `057cfa5a-b30b-4ec7-8f52-01654dbf3fd1` AS (SELECT * FROM `midyear-system-499521-p3.contractforge_gcp_advanced_prod.customers_snapshot_target` ) SELECT * FROM `057cfa5a-b30b-4ec7-8f52-01654dbf3fd1` WHERE (`status` IS NULL);",
+        "rule_failed_records_query": "WITH `00000000-0000-0000-0000-000000000000` AS (SELECT * FROM `gcp-project-redacted.contractforge_gcp_advanced_prod.customers_snapshot_target` ) SELECT * FROM `00000000-0000-0000-0000-000000000000` WHERE (`status` IS NULL);",
         "rule_name": "status-not-null",
         "rule_parameters": null,
         "rule_passed": "true",
@@ -393,13 +393,13 @@
       {
         "created_on": "2026-06-17 02:05:44",
         "data_quality_job_configuration": "{\"enable_catalog_based_rules\":false,\"increment_column\":\"\",\"incremental\":false,\"row_filter\":\"\",\"sampling_percent\":100,\"trigger\":\"on_demand\"}",
-        "data_quality_job_id": "057cfa5a-b30b-4ec7-8f52-01654dbf3fd1",
+        "data_quality_job_id": "00000000-0000-0000-0000-000000000000",
         "data_quality_scan": {
           "data_scan_id": "cf-contractforge-gcp-advanced-prod-customers-snapshot-target-dq",
           "display_name": "ContractForge contractforge_gcp_advanced_prod.customers_snapshot_target data quality",
           "location": "us-east1",
-          "project_id": "midyear-system-499521-p3",
-          "resource_name": "//dataplex.googleapis.com/projects/897279804928/locations/us-east1/dataScans/cf-contractforge-gcp-advanced-prod-customers-snapshot-target-dq"
+          "project_id": "gcp-project-redacted",
+          "resource_name": "//dataplex.googleapis.com/projects/000000000000/locations/us-east1/dataScans/cf-contractforge-gcp-advanced-prod-customers-snapshot-target-dq"
         },
         "data_source": {
           "catalog_id": null,
@@ -410,10 +410,10 @@
           "dataplex_zone_id": null,
           "dataset_id": "contractforge_gcp_advanced_prod",
           "namespace_id": null,
-          "resource_name": "//bigquery.googleapis.com/projects/midyear-system-499521-p3/datasets/contractforge_gcp_advanced_prod/tables/customers_snapshot_target",
+          "resource_name": "//bigquery.googleapis.com/projects/gcp-project-redacted/datasets/contractforge_gcp_advanced_prod/tables/customers_snapshot_target",
           "table_id": "customers_snapshot_target",
-          "table_project_id": "midyear-system-499521-p3",
-          "table_project_number": "897279804928"
+          "table_project_id": "gcp-project-redacted",
+          "table_project_number": "000000000000"
         },
         "debug_queries": [],
         "job_dimension_result": "{\"COMPLETENESS\":{\"passed\":true,\"score\":100},\"UNIQUENESS\":{\"passed\":true,\"score\":100},\"VALIDITY\":{\"passed\":true,\"score\":100}}",
@@ -434,7 +434,7 @@
         "rule_description": "ContractForge not_null rule for balance.",
         "rule_dimension": "COMPLETENESS",
         "rule_evaluation_type": "Per row",
-        "rule_failed_records_query": "WITH `057cfa5a-b30b-4ec7-8f52-01654dbf3fd1` AS (SELECT * FROM `midyear-system-499521-p3.contractforge_gcp_advanced_prod.customers_snapshot_target` ) SELECT * FROM `057cfa5a-b30b-4ec7-8f52-01654dbf3fd1` WHERE (`balance` IS NULL);",
+        "rule_failed_records_query": "WITH `00000000-0000-0000-0000-000000000000` AS (SELECT * FROM `gcp-project-redacted.contractforge_gcp_advanced_prod.customers_snapshot_target` ) SELECT * FROM `00000000-0000-0000-0000-000000000000` WHERE (`balance` IS NULL);",
         "rule_name": "balance-not-null",
         "rule_parameters": null,
         "rule_passed": "true",
@@ -450,13 +450,13 @@
       {
         "created_on": "2026-06-17 02:05:44",
         "data_quality_job_configuration": "{\"enable_catalog_based_rules\":false,\"increment_column\":\"\",\"incremental\":false,\"row_filter\":\"\",\"sampling_percent\":100,\"trigger\":\"on_demand\"}",
-        "data_quality_job_id": "057cfa5a-b30b-4ec7-8f52-01654dbf3fd1",
+        "data_quality_job_id": "00000000-0000-0000-0000-000000000000",
         "data_quality_scan": {
           "data_scan_id": "cf-contractforge-gcp-advanced-prod-customers-snapshot-target-dq",
           "display_name": "ContractForge contractforge_gcp_advanced_prod.customers_snapshot_target data quality",
           "location": "us-east1",
-          "project_id": "midyear-system-499521-p3",
-          "resource_name": "//dataplex.googleapis.com/projects/897279804928/locations/us-east1/dataScans/cf-contractforge-gcp-advanced-prod-customers-snapshot-target-dq"
+          "project_id": "gcp-project-redacted",
+          "resource_name": "//dataplex.googleapis.com/projects/000000000000/locations/us-east1/dataScans/cf-contractforge-gcp-advanced-prod-customers-snapshot-target-dq"
         },
         "data_source": {
           "catalog_id": null,
@@ -467,10 +467,10 @@
           "dataplex_zone_id": null,
           "dataset_id": "contractforge_gcp_advanced_prod",
           "namespace_id": null,
-          "resource_name": "//bigquery.googleapis.com/projects/midyear-system-499521-p3/datasets/contractforge_gcp_advanced_prod/tables/customers_snapshot_target",
+          "resource_name": "//bigquery.googleapis.com/projects/gcp-project-redacted/datasets/contractforge_gcp_advanced_prod/tables/customers_snapshot_target",
           "table_id": "customers_snapshot_target",
-          "table_project_id": "midyear-system-499521-p3",
-          "table_project_number": "897279804928"
+          "table_project_id": "gcp-project-redacted",
+          "table_project_number": "000000000000"
         },
         "debug_queries": [],
         "job_dimension_result": "{\"COMPLETENESS\":{\"passed\":true,\"score\":100},\"UNIQUENESS\":{\"passed\":true,\"score\":100},\"VALIDITY\":{\"passed\":true,\"score\":100}}",
@@ -491,7 +491,7 @@
         "rule_description": "ContractForge not_null rule for updated_at.",
         "rule_dimension": "COMPLETENESS",
         "rule_evaluation_type": "Per row",
-        "rule_failed_records_query": "WITH `057cfa5a-b30b-4ec7-8f52-01654dbf3fd1` AS (SELECT * FROM `midyear-system-499521-p3.contractforge_gcp_advanced_prod.customers_snapshot_target` ) SELECT * FROM `057cfa5a-b30b-4ec7-8f52-01654dbf3fd1` WHERE (`updated_at` IS NULL);",
+        "rule_failed_records_query": "WITH `00000000-0000-0000-0000-000000000000` AS (SELECT * FROM `gcp-project-redacted.contractforge_gcp_advanced_prod.customers_snapshot_target` ) SELECT * FROM `00000000-0000-0000-0000-000000000000` WHERE (`updated_at` IS NULL);",
         "rule_name": "updated-at-not-null",
         "rule_parameters": null,
         "rule_passed": "true",
@@ -507,13 +507,13 @@
       {
         "created_on": "2026-06-17 02:05:44",
         "data_quality_job_configuration": "{\"enable_catalog_based_rules\":false,\"increment_column\":\"\",\"incremental\":false,\"row_filter\":\"\",\"sampling_percent\":100,\"trigger\":\"on_demand\"}",
-        "data_quality_job_id": "057cfa5a-b30b-4ec7-8f52-01654dbf3fd1",
+        "data_quality_job_id": "00000000-0000-0000-0000-000000000000",
         "data_quality_scan": {
           "data_scan_id": "cf-contractforge-gcp-advanced-prod-customers-snapshot-target-dq",
           "display_name": "ContractForge contractforge_gcp_advanced_prod.customers_snapshot_target data quality",
           "location": "us-east1",
-          "project_id": "midyear-system-499521-p3",
-          "resource_name": "//dataplex.googleapis.com/projects/897279804928/locations/us-east1/dataScans/cf-contractforge-gcp-advanced-prod-customers-snapshot-target-dq"
+          "project_id": "gcp-project-redacted",
+          "resource_name": "//dataplex.googleapis.com/projects/000000000000/locations/us-east1/dataScans/cf-contractforge-gcp-advanced-prod-customers-snapshot-target-dq"
         },
         "data_source": {
           "catalog_id": null,
@@ -524,10 +524,10 @@
           "dataplex_zone_id": null,
           "dataset_id": "contractforge_gcp_advanced_prod",
           "namespace_id": null,
-          "resource_name": "//bigquery.googleapis.com/projects/midyear-system-499521-p3/datasets/contractforge_gcp_advanced_prod/tables/customers_snapshot_target",
+          "resource_name": "//bigquery.googleapis.com/projects/gcp-project-redacted/datasets/contractforge_gcp_advanced_prod/tables/customers_snapshot_target",
           "table_id": "customers_snapshot_target",
-          "table_project_id": "midyear-system-499521-p3",
-          "table_project_number": "897279804928"
+          "table_project_id": "gcp-project-redacted",
+          "table_project_number": "000000000000"
         },
         "debug_queries": [],
         "job_dimension_result": "{\"COMPLETENESS\":{\"passed\":true,\"score\":100},\"UNIQUENESS\":{\"passed\":true,\"score\":100},\"VALIDITY\":{\"passed\":true,\"score\":100}}",
@@ -548,7 +548,7 @@
         "rule_description": "ContractForge unique_key rule for customer_id.",
         "rule_dimension": "UNIQUENESS",
         "rule_evaluation_type": "Per row",
-        "rule_failed_records_query": "WITH `057cfa5a-b30b-4ec7-8f52-01654dbf3fd1` AS (SELECT * FROM `midyear-system-499521-p3.contractforge_gcp_advanced_prod.customers_snapshot_target` ) SELECT * FROM `057cfa5a-b30b-4ec7-8f52-01654dbf3fd1` WHERE `customer_id` IN (SELECT `customer_id` FROM `057cfa5a-b30b-4ec7-8f52-01654dbf3fd1` GROUP BY `customer_id` HAVING COUNT(`customer_id`) > 1);",
+        "rule_failed_records_query": "WITH `00000000-0000-0000-0000-000000000000` AS (SELECT * FROM `gcp-project-redacted.contractforge_gcp_advanced_prod.customers_snapshot_target` ) SELECT * FROM `00000000-0000-0000-0000-000000000000` WHERE `customer_id` IN (SELECT `customer_id` FROM `00000000-0000-0000-0000-000000000000` GROUP BY `customer_id` HAVING COUNT(`customer_id`) > 1);",
         "rule_name": "unique-key",
         "rule_parameters": null,
         "rule_passed": "true",
@@ -564,13 +564,13 @@
       {
         "created_on": "2026-06-17 02:05:44",
         "data_quality_job_configuration": "{\"enable_catalog_based_rules\":false,\"increment_column\":\"\",\"incremental\":false,\"row_filter\":\"\",\"sampling_percent\":100,\"trigger\":\"on_demand\"}",
-        "data_quality_job_id": "057cfa5a-b30b-4ec7-8f52-01654dbf3fd1",
+        "data_quality_job_id": "00000000-0000-0000-0000-000000000000",
         "data_quality_scan": {
           "data_scan_id": "cf-contractforge-gcp-advanced-prod-customers-snapshot-target-dq",
           "display_name": "ContractForge contractforge_gcp_advanced_prod.customers_snapshot_target data quality",
           "location": "us-east1",
-          "project_id": "midyear-system-499521-p3",
-          "resource_name": "//dataplex.googleapis.com/projects/897279804928/locations/us-east1/dataScans/cf-contractforge-gcp-advanced-prod-customers-snapshot-target-dq"
+          "project_id": "gcp-project-redacted",
+          "resource_name": "//dataplex.googleapis.com/projects/000000000000/locations/us-east1/dataScans/cf-contractforge-gcp-advanced-prod-customers-snapshot-target-dq"
         },
         "data_source": {
           "catalog_id": null,
@@ -581,10 +581,10 @@
           "dataplex_zone_id": null,
           "dataset_id": "contractforge_gcp_advanced_prod",
           "namespace_id": null,
-          "resource_name": "//bigquery.googleapis.com/projects/midyear-system-499521-p3/datasets/contractforge_gcp_advanced_prod/tables/customers_snapshot_target",
+          "resource_name": "//bigquery.googleapis.com/projects/gcp-project-redacted/datasets/contractforge_gcp_advanced_prod/tables/customers_snapshot_target",
           "table_id": "customers_snapshot_target",
-          "table_project_id": "midyear-system-499521-p3",
-          "table_project_number": "897279804928"
+          "table_project_id": "gcp-project-redacted",
+          "table_project_number": "000000000000"
         },
         "debug_queries": [],
         "job_dimension_result": "{\"COMPLETENESS\":{\"passed\":true,\"score\":100},\"UNIQUENESS\":{\"passed\":true,\"score\":100},\"VALIDITY\":{\"passed\":true,\"score\":100}}",
@@ -605,7 +605,7 @@
         "rule_description": "ContractForge expression quality rule.",
         "rule_dimension": "VALIDITY",
         "rule_evaluation_type": "Per row",
-        "rule_failed_records_query": "WITH `057cfa5a-b30b-4ec7-8f52-01654dbf3fd1` AS (SELECT * FROM `midyear-system-499521-p3.contractforge_gcp_advanced_prod.customers_snapshot_target` ) SELECT * FROM `057cfa5a-b30b-4ec7-8f52-01654dbf3fd1` WHERE (NOT((balance >= 0) IS TRUE));",
+        "rule_failed_records_query": "WITH `00000000-0000-0000-0000-000000000000` AS (SELECT * FROM `gcp-project-redacted.contractforge_gcp_advanced_prod.customers_snapshot_target` ) SELECT * FROM `00000000-0000-0000-0000-000000000000` WHERE (NOT((balance >= 0) IS TRUE));",
         "rule_name": "non-negative-balance",
         "rule_parameters": "{\"sql_expression\":\"balance >= 0\"}",
         "rule_passed": "true",
@@ -631,7 +631,7 @@
       "dataQualitySpec": {
         "postScanActions": {
           "bigqueryExport": {
-            "resultsTable": "projects/midyear-system-499521-p3/datasets/contractforge_gcp_advanced_prod_ops/tables/contractforge_dataplex_quality_results"
+            "resultsTable": "projects/gcp-project-redacted/datasets/contractforge_gcp_advanced_prod_ops/tables/contractforge_dataplex_quality_results"
           }
         },
         "rules": [
@@ -694,12 +694,13 @@
           }
         ]
       },
-      "name": "projects/897279804928/locations/us-east1/dataScans/cf-contractforge-gcp-advanced-prod-customers-snapshot-target-dq/jobs/057cfa5a-b30b-4ec7-8f52-01654dbf3fd1",
+      "name": "projects/000000000000/locations/us-east1/dataScans/cf-contractforge-gcp-advanced-prod-customers-snapshot-target-dq/jobs/00000000-0000-0000-0000-000000000000",
       "state": "PENDING",
       "type": "DATA_QUALITY",
-      "uid": "057cfa5a-b30b-4ec7-8f52-01654dbf3fd1"
+      "uid": "00000000-0000-0000-0000-000000000000"
     }
   },
   "status": "SUCCEEDED",
   "type": "dataplex_data_quality"
 }
+

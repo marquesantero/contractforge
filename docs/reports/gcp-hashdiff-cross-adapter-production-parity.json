@@ -67,3 +67,4 @@
   "stable_surface_note": "This closes the GCP-BQ-12C hash_diff_upsert production-parity decision. GCP historical and snapshot production parity remains tracked separately, and default GCP stable execution keeps advanced modes review-gated until that broader product decision is changed.",
   "no_workaround_code_used": true
 }
+

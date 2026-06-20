@@ -9,27 +9,27 @@
   "project": "examples/source-expansion/fabric-s3-compatible-shortcut/project.yaml",
   "environment": "examples/source-expansion/fabric-s3-compatible-shortcut/environments/fabric.environment.yaml",
   "workspace": {
-    "id": "061fd0c8-c248-4628-a332-6adf16623533",
+    "id": "00000000-0000-0000-0000-000000000000",
     "name": "Manager",
-    "capacity_id": "2139f1ea-2676-46bf-ab4f-ab248c768056",
+    "capacity_id": "00000000-0000-0000-0000-000000000000",
     "capacity_sku": "FTL4",
     "capacity_region": "Brazil South"
   },
   "lakehouse": {
-    "id": "07067d3f-d5e2-48c1-b526-634620e57d4b",
+    "id": "00000000-0000-0000-0000-000000000000",
     "name": "contractforge_lh"
   },
   "source_infrastructure": {
     "provider": "amazon_s3_compatible_endpoint",
-    "aws_account": "449112696824",
-    "bucket": "contractforge-aws-smoke-449112696824-us-east-1",
+    "aws_account": "000000000000",
+    "bucket": "contractforge-aws-smoke-000000000000-us-east-1",
     "region": "us-east-1",
     "endpoint": "https://s3.us-east-1.amazonaws.com",
     "object_prefix": "source-expansion/fabric-s3-compatible-shortcut",
     "fixture_rows": 3,
     "iam_user": "contractforge-fabric-s3-compatible-shortcut",
     "fabric_connection": {
-      "id": "cca5647e-1e4c-4cc3-b698-5bcf3cd5aa30",
+      "id": "00000000-0000-0000-0000-000000000000",
       "display_name": "contractforge-fabric-s3-compatible-shortcut",
       "type": "AmazonS3Compatible",
       "credential_type": "Basic",
@@ -40,7 +40,7 @@
       "name": "s3_compatible_orders",
       "target_type": "S3Compatible",
       "target_location": "https://s3.us-east-1.amazonaws.com",
-      "target_bucket": "contractforge-aws-smoke-449112696824-us-east-1",
+      "target_bucket": "contractforge-aws-smoke-000000000000-us-east-1",
       "target_subpath": "/source-expansion/fabric-s3-compatible-shortcut",
       "read_path": "Files/source-expansion/s3-compatible-shortcuts/s3_compatible_orders/orders.csv"
     }
@@ -97,8 +97,8 @@
       "name": "s3_compatible_shortcut_orders",
       "contract": "contracts/01_s3_compatible_shortcut_orders.ingestion.yaml",
       "notebook": "cf_workspace_cf_fabric_source_expansion_s3_compatible_shortcut_orders",
-      "item_id": "ff85bbaf-cf18-4bf0-9324-48837f44aaaf",
-      "job_instance_id": "d7e5aec9-2c89-46ea-9eb5-1dc6299e6c7d",
+      "item_id": "00000000-0000-0000-0000-000000000000",
+      "job_instance_id": "00000000-0000-0000-0000-000000000000",
       "job_status": "Completed",
       "started_at_utc": "2026-06-14T01:28:09.3399712",
       "ended_at_utc": "2026-06-14T01:31:38.7587996"
@@ -107,8 +107,8 @@
       "name": "s3_compatible_shortcut_evidence_probe",
       "contract": "contracts/02_s3_compatible_shortcut_evidence_probe.ingestion.yaml",
       "notebook": "cf_workspace_cf_fabric_source_expansion_s3_compatible_shortcut_evidence_probe",
-      "item_id": "30757efe-2b10-4d6e-becb-a513ce4af437",
-      "job_instance_id": "aa4d4118-1764-45a9-b01d-adb38a8f61db",
+      "item_id": "00000000-0000-0000-0000-000000000000",
+      "job_instance_id": "00000000-0000-0000-0000-000000000000",
       "job_status": "Completed",
       "started_at_utc": "2026-06-14T01:32:25.120472",
       "ended_at_utc": "2026-06-14T01:36:12.1921337"
@@ -119,3 +119,4 @@
     "It does not validate private-network S3-compatible endpoints, managed identity/OAuth object-storage access, Delta Sharing, direct Spark Iceberg catalog reads or native Fabric Real-Time/Eventstream routing."
   ]
 }
+

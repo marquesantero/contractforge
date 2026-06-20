@@ -51,3 +51,4 @@
     "reason": "Cross-adapter historical and snapshot production parity is incomplete because the AWS and Snowflake production reports are hash_diff_upsert-only."
   }
 }
+

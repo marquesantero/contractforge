@@ -11,7 +11,7 @@ source:
       - payload_hash_noise
 
 target:
-  catalog: midyear-system-499521-p3
+  catalog: gcp-project-redacted
   schema: contractforge_gcp_hashdiff_prod
   table: customers_hashdiff_target
 

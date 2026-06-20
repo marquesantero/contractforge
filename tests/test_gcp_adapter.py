@@ -1981,7 +1981,7 @@ def test_gcp_render_contract_reads_registered_biglake_iceberg_table_source() -> 
     contract = {
         "source": {
             "type": "iceberg_table",
-            "table": "midyear-system-499521-p3.contractforge_gcp_smoke.biglake_iceberg_orders",
+            "table": "gcp-project-redacted.contractforge_gcp_smoke.biglake_iceberg_orders",
         },
         "target": {"catalog": "test-project", "schema": "bronze", "table": "orders_from_iceberg"},
         "mode": "overwrite",
@@ -1993,7 +1993,7 @@ def test_gcp_render_contract_reads_registered_biglake_iceberg_table_source() -> 
 
     assert source_review["status"] == "SUPPORTED"
     assert "CREATE OR REPLACE TABLE `test-project.bronze.orders_from_iceberg` AS" in sql
-    assert "SELECT * FROM `midyear-system-499521-p3.contractforge_gcp_smoke.biglake_iceberg_orders`" in sql
+    assert "SELECT * FROM `gcp-project-redacted.contractforge_gcp_smoke.biglake_iceberg_orders`" in sql
 
 
 def test_gcp_render_contract_emits_upsert_merge_sql() -> None:

@@ -613,7 +613,7 @@ def test_fabric_rest_client_from_environment_uses_workspace_and_token_provider()
         {
             "parameters": {
                 "fabric": {
-                    "tenant_id": "3fb3492c-48be-4ac6-ae3a-fec6a63cf4d1",
+                    "tenant_id": "00000000-0000-0000-0000-000000000000",
                     "workspace_id": "workspace-1",
                 }
             }

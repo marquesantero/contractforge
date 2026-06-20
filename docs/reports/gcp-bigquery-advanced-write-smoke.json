@@ -6,7 +6,7 @@
   "maturity_gate": "GCP-BQ-12A",
   "status": "PASS_WITH_REVIEW_BOUNDARY",
   "executed_at": "2026-06-16",
-  "project_id": "midyear-system-499521-p3",
+  "project_id": "gcp-project-redacted",
   "location": "us-east1",
   "datasets": {
     "target": "contractforge_gcp_advanced_write_smoke",
@@ -151,3 +151,4 @@
   ],
   "decision": "GCP-BQ-12A is closed for compact opt-in BigQuery replay/idempotency evidence. GCP-BQ-12C1 later closed hash_diff_upsert changed-row and source-key preflight evidence, GCP-BQ-12C2 closed compact historical delete-expression and late-arriving reject evidence, and GCP-BQ-12C3 closed compact snapshot complete-source reactivation/tombstone evidence. GCP-BQ-12C now accepts hash_diff_upsert cross-adapter production parity; historical and snapshot production parity remains future work."
 }
+

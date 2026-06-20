@@ -6,11 +6,11 @@
       "workflows",
       "delete",
       "cf-gcp-workflows-smoke-runner",
-      "--project=midyear-system-499521-p3",
+      "--project=gcp-project-redacted",
       "--location=us-central1",
       "--quiet"
     ],
-    "raw": "Delete request issued for: [cf-gcp-workflows-smoke-runner]\nWaiting for operation [projects/midyear-system-499521-p3/locations/us-central1/operations/operation-1781648174477-654664a8df0cb-8ce72c4b-c537a5d8] to complete...\n...........done.\nDeleted workflow [cf-gcp-workflows-smoke-runner].",
+    "raw": "Delete request issued for: [cf-gcp-workflows-smoke-runner]\nWaiting for operation [projects/gcp-project-redacted/locations/us-central1/operations/operation-1781648174477-654664a8df0cb-8ce72c4b-c537a5d8] to complete...\n...........done.\nDeleted workflow [cf-gcp-workflows-smoke-runner].",
     "status": "SUCCEEDED"
   },
   "contract_basis": {
@@ -27,7 +27,7 @@
   "executed_at": "2026-06-16T22:16:15Z",
   "kind": "contractforge_gcp_workflows_certified_runner_smoke",
   "maturity_gate": "GCP-BQ-15C",
-  "project_id": "midyear-system-499521-p3",
+  "project_id": "gcp-project-redacted",
   "promotion_decision": {
     "decision": "PROMOTE_GCP_BQ_15C",
     "reason": "The adapter-owned CLI path now has repeated live reset/deploy/run/wait/execution-scoped-readback evidence for the ordered project runner. Transient retry behavior is accepted from generated Workflows retry policy and existing command-path coverage; in-Workflow schema drift remains tracked as a separate schema-policy implementation boundary instead of blocking 15C."
@@ -55,8 +55,8 @@
           "table_name": "contractforge_schema_evidence"
         }
       ],
-      "execution_id": "c2bae7f2-9c67-4fd5-9439-90ff3982378a",
-      "execution_name": "projects/897279804928/locations/us-central1/workflows/cf-gcp-workflows-smoke-runner/executions/c2bae7f2-9c67-4fd5-9439-90ff3982378a",
+      "execution_id": "00000000-0000-0000-0000-000000000001",
+      "execution_name": "projects/000000000000/locations/us-central1/workflows/cf-gcp-workflows-smoke-runner/executions/00000000-0000-0000-0000-000000000001",
       "label": "first",
       "quality_evidence": [
         {
@@ -74,7 +74,7 @@
           "quality_rows": "1"
         }
       ],
-      "readback_execution_id": "c2bae7f2-9c67-4fd5-9439-90ff3982378a",
+      "readback_execution_id": "00000000-0000-0000-0000-000000000001",
       "readback_execution_scoped": true,
       "readback_status": "SUCCEEDED",
       "reset_query_count": 8,
@@ -85,14 +85,14 @@
           "last_finished_at": "2026-06-16 22:13:36",
           "run_rows": "1",
           "succeeded_rows": "1",
-          "target_table": "midyear-system-499521-p3.contractforge_gcp_smoke.workflow_bronze_orders"
+          "target_table": "gcp-project-redacted.contractforge_gcp_smoke.workflow_bronze_orders"
         },
         {
           "failed_rows": "0",
           "last_finished_at": "2026-06-16 22:13:58",
           "run_rows": "1",
           "succeeded_rows": "1",
-          "target_table": "midyear-system-499521-p3.contractforge_gcp_smoke.workflow_gold_orders_by_status"
+          "target_table": "gcp-project-redacted.contractforge_gcp_smoke.workflow_gold_orders_by_status"
         }
       ],
       "schema_evidence": [
@@ -101,14 +101,14 @@
           "last_evaluated_at": "2026-06-16 22:13:38",
           "schema_rows": "1",
           "succeeded_rows": "1",
-          "target_table": "midyear-system-499521-p3.contractforge_gcp_smoke.workflow_bronze_orders"
+          "target_table": "gcp-project-redacted.contractforge_gcp_smoke.workflow_bronze_orders"
         },
         {
           "failed_rows": "0",
           "last_evaluated_at": "2026-06-16 22:14:00",
           "schema_rows": "1",
           "succeeded_rows": "1",
-          "target_table": "midyear-system-499521-p3.contractforge_gcp_smoke.workflow_gold_orders_by_status"
+          "target_table": "gcp-project-redacted.contractforge_gcp_smoke.workflow_gold_orders_by_status"
         }
       ],
       "status": "SUCCEEDED",
@@ -116,19 +116,19 @@
         {
           "row_count": "3",
           "step_name": "bronze_orders",
-          "target_table": "midyear-system-499521-p3.contractforge_gcp_smoke.workflow_bronze_orders"
+          "target_table": "gcp-project-redacted.contractforge_gcp_smoke.workflow_bronze_orders"
         },
         {
           "row_count": "2",
           "step_name": "gold_orders_by_status",
-          "target_table": "midyear-system-499521-p3.contractforge_gcp_smoke.workflow_gold_orders_by_status"
+          "target_table": "gcp-project-redacted.contractforge_gcp_smoke.workflow_gold_orders_by_status"
         }
       ],
       "wait_state": "SUCCEEDED",
       "workflow": {
         "location": "us-central1",
         "name": "cf-gcp-workflows-smoke-runner",
-        "project_id": "midyear-system-499521-p3"
+        "project_id": "gcp-project-redacted"
       }
     },
     {
@@ -153,8 +153,8 @@
           "table_name": "contractforge_schema_evidence"
         }
       ],
-      "execution_id": "f5d0a3c1-9443-48cc-a486-2e63c4a84ff5",
-      "execution_name": "projects/897279804928/locations/us-central1/workflows/cf-gcp-workflows-smoke-runner/executions/f5d0a3c1-9443-48cc-a486-2e63c4a84ff5",
+      "execution_id": "00000000-0000-0000-0000-000000000002",
+      "execution_name": "projects/000000000000/locations/us-central1/workflows/cf-gcp-workflows-smoke-runner/executions/00000000-0000-0000-0000-000000000002",
       "label": "second",
       "quality_evidence": [
         {
@@ -172,7 +172,7 @@
           "quality_rows": "1"
         }
       ],
-      "readback_execution_id": "f5d0a3c1-9443-48cc-a486-2e63c4a84ff5",
+      "readback_execution_id": "00000000-0000-0000-0000-000000000002",
       "readback_execution_scoped": true,
       "readback_status": "SUCCEEDED",
       "reset_query_count": 8,
@@ -183,14 +183,14 @@
           "last_finished_at": "2026-06-16 22:15:25",
           "run_rows": "1",
           "succeeded_rows": "1",
-          "target_table": "midyear-system-499521-p3.contractforge_gcp_smoke.workflow_bronze_orders"
+          "target_table": "gcp-project-redacted.contractforge_gcp_smoke.workflow_bronze_orders"
         },
         {
           "failed_rows": "0",
           "last_finished_at": "2026-06-16 22:15:37",
           "run_rows": "1",
           "succeeded_rows": "1",
-          "target_table": "midyear-system-499521-p3.contractforge_gcp_smoke.workflow_gold_orders_by_status"
+          "target_table": "gcp-project-redacted.contractforge_gcp_smoke.workflow_gold_orders_by_status"
         }
       ],
       "schema_evidence": [
@@ -199,14 +199,14 @@
           "last_evaluated_at": "2026-06-16 22:15:27",
           "schema_rows": "1",
           "succeeded_rows": "1",
-          "target_table": "midyear-system-499521-p3.contractforge_gcp_smoke.workflow_bronze_orders"
+          "target_table": "gcp-project-redacted.contractforge_gcp_smoke.workflow_bronze_orders"
         },
         {
           "failed_rows": "0",
           "last_evaluated_at": "2026-06-16 22:15:39",
           "schema_rows": "1",
           "succeeded_rows": "1",
-          "target_table": "midyear-system-499521-p3.contractforge_gcp_smoke.workflow_gold_orders_by_status"
+          "target_table": "gcp-project-redacted.contractforge_gcp_smoke.workflow_gold_orders_by_status"
         }
       ],
       "status": "SUCCEEDED",
@@ -214,19 +214,19 @@
         {
           "row_count": "3",
           "step_name": "bronze_orders",
-          "target_table": "midyear-system-499521-p3.contractforge_gcp_smoke.workflow_bronze_orders"
+          "target_table": "gcp-project-redacted.contractforge_gcp_smoke.workflow_bronze_orders"
         },
         {
           "row_count": "2",
           "step_name": "gold_orders_by_status",
-          "target_table": "midyear-system-499521-p3.contractforge_gcp_smoke.workflow_gold_orders_by_status"
+          "target_table": "gcp-project-redacted.contractforge_gcp_smoke.workflow_gold_orders_by_status"
         }
       ],
       "wait_state": "SUCCEEDED",
       "workflow": {
         "location": "us-central1",
         "name": "cf-gcp-workflows-smoke-runner",
-        "project_id": "midyear-system-499521-p3"
+        "project_id": "gcp-project-redacted"
       }
     }
   ],
@@ -248,3 +248,4 @@
     "workflow_resource_cleanup": true
   }
 }
+

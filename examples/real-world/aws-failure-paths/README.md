@@ -22,7 +22,7 @@ $project = "examples/real-world/aws-failure-paths"
 $environment = "$project/environments/aws.environment.yaml"
 
 aws s3 cp "$project/data/orders/" `
-  "s3://contractforge-aws-smoke-449112696824-us-east-1/data/aws-failure-paths/orders/" `
+  "s3://contractforge-aws-smoke-000000000000-us-east-1/data/aws-failure-paths/orders/" `
   --recursive `
   --region $env:AWS_REGION
 

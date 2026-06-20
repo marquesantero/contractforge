@@ -14,7 +14,7 @@ source:
       - name: completed
         type: BOOL
 target:
-  catalog: midyear-system-499521-p3
+  catalog: gcp-project-redacted
   schema: contractforge_gcp_smoke
   table: cf_http_file_json_todo
 mode: overwrite

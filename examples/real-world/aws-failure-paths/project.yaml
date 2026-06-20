@@ -7,7 +7,7 @@ source_system:
   name: s3_failure_fixtures
   type: object_storage
   provider: s3
-  seed_prefix: s3://contractforge-aws-smoke-449112696824-us-east-1/data/aws-failure-paths/orders/
+  seed_prefix: s3://contractforge-aws-smoke-000000000000-us-east-1/data/aws-failure-paths/orders/
 
 environments:
   aws: environments/aws.environment.yaml
@@ -28,7 +28,7 @@ execution_order:
 
 validation:
   aws:
-    artifact_bucket: contractforge-aws-smoke-449112696824-us-east-1
+    artifact_bucket: contractforge-aws-smoke-000000000000-us-east-1
     evidence_database: contractforge_cf_aws_failure_paths_ops
     expected_terminal_state: FAILED
 
