@@ -1,4 +1,4 @@
-"""Cross-adapter parity scenarios for moving contracts between Databricks, AWS, Snowflake and Fabric."""
+"""Cross-adapter parity scenarios for moving contracts between Databricks, AWS, Snowflake, Fabric and GCP."""
 
 from __future__ import annotations
 
@@ -9,6 +9,7 @@ import pytest
 from contractforge_aws import plan_aws_contract, render_aws_contract
 from contractforge_databricks import plan_databricks_contract, render_databricks_contract
 from contractforge_fabric import plan_fabric_contract, render_fabric_contract
+from contractforge_gcp import plan_gcp_contract, render_gcp_contract
 from contractforge_snowflake import plan_snowflake_contract, render_snowflake_contract
 from tools.platform_parity.contracts import (
     platform_delta,
@@ -25,16 +26,22 @@ def test_platform_parity_contract_intent_is_identical_except_runtime_binding(sce
     aws_contract = scenario.contract_for("aws")
     snowflake_contract = scenario.contract_for("snowflake")
     fabric_contract = scenario.contract_for("fabric")
+    gcp_contract = scenario.contract_for("gcp")
 
     assert portability_signature(databricks_contract) == portability_signature(aws_contract)
     assert portability_signature(databricks_contract) == portability_signature(snowflake_contract)
     assert portability_signature(databricks_contract) == portability_signature(fabric_contract)
+    assert portability_signature(databricks_contract) == portability_signature(gcp_contract)
     assert platform_delta(databricks_contract) != platform_delta(aws_contract)
     assert platform_delta(databricks_contract) != platform_delta(snowflake_contract)
     assert platform_delta(databricks_contract) != platform_delta(fabric_contract)
+    assert platform_delta(databricks_contract) != platform_delta(gcp_contract)
     assert platform_delta(aws_contract) != platform_delta(snowflake_contract)
     assert platform_delta(aws_contract) != platform_delta(fabric_contract)
+    assert platform_delta(aws_contract) != platform_delta(gcp_contract)
     assert platform_delta(snowflake_contract) != platform_delta(fabric_contract)
+    assert platform_delta(snowflake_contract) != platform_delta(gcp_contract)
+    assert platform_delta(fabric_contract) != platform_delta(gcp_contract)
 
 
 @pytest.mark.parametrize("scenario", platform_parity_scenarios(), ids=lambda item: item.name)
@@ -57,11 +64,16 @@ def test_same_contract_semantics_plan_on_all_platforms(scenario) -> None:
         scenario.contract_for("fabric"),
         environment=scenario.environment_for("fabric"),
     )
+    gcp_result = plan_gcp_contract(
+        scenario.contract_for("gcp"),
+        environment=scenario.environment_for("gcp"),
+    )
 
     assert databricks_result.status == scenario.expected_databricks_status
     assert aws_result.status == scenario.expected_aws_status
     assert snowflake_result.status == scenario.expected_snowflake_status
     assert fabric_result.status == scenario.expected_fabric_status
+    assert gcp_result.status == scenario.expected_gcp_status
 
 
 @pytest.mark.parametrize("scenario", platform_parity_scenarios(), ids=lambda item: item.name)
@@ -84,6 +96,10 @@ def test_same_contract_semantics_render_expected_platform_artifacts(scenario) ->
         scenario.contract_for("fabric"),
         environment=scenario.environment_for("fabric"),
     ).artifacts
+    gcp_artifacts = render_gcp_contract(
+        scenario.contract_for("gcp"),
+        environment=scenario.environment_for("gcp"),
+    ).artifacts
 
     for suffix in scenario.required_databricks_artifact_suffixes:
         assert any(name.endswith(suffix) for name in databricks_artifacts), suffix
@@ -93,6 +109,8 @@ def test_same_contract_semantics_render_expected_platform_artifacts(scenario) ->
         assert any(name.endswith(suffix) for name in snowflake_artifacts), suffix
     for suffix in scenario.required_fabric_artifact_suffixes:
         assert any(name.endswith(suffix) for name in fabric_artifacts), suffix
+    for suffix in scenario.required_gcp_artifact_suffixes:
+        assert any(name.endswith(suffix) for name in gcp_artifacts), suffix
 
 
 def test_platform_parity_report_is_machine_readable() -> None:
@@ -102,6 +120,7 @@ def test_platform_parity_report_is_machine_readable() -> None:
     assert report["scenario_count"] == len(platform_parity_scenarios())
     assert all(item["portable_signature_equal"] for item in report["results"])
     assert all("fabric_status" in item for item in report["results"])
+    assert all("gcp_status" in item for item in report["results"])
 
 
 @pytest.mark.parametrize("scenario", platform_parity_scenarios(), ids=lambda item: item.name)

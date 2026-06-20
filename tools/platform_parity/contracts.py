@@ -1,4 +1,4 @@
-"""Shared Databricks/AWS/Snowflake/Fabric parity scenarios.
+"""Shared Databricks/AWS/Snowflake/Fabric/GCP parity scenarios.
 
 The scenarios in this module deliberately keep ingestion intent identical
 across platforms. Only runtime binding is overlaid: source location,
@@ -11,7 +11,7 @@ from copy import deepcopy
 from dataclasses import dataclass
 from typing import Any, Literal
 
-PlatformName = Literal["databricks", "aws", "snowflake", "fabric"]
+PlatformName = Literal["databricks", "aws", "snowflake", "fabric", "gcp"]
 
 
 @dataclass(frozen=True)
@@ -23,18 +23,22 @@ class ParityScenario:
     aws_overlay: dict[str, Any]
     snowflake_overlay: dict[str, Any]
     fabric_overlay: dict[str, Any]
+    gcp_overlay: dict[str, Any]
     databricks_environment: dict[str, Any]
     aws_environment: dict[str, Any]
     snowflake_environment: dict[str, Any]
     fabric_environment: dict[str, Any]
+    gcp_environment: dict[str, Any]
     expected_databricks_status: str
     expected_aws_status: str
     expected_snowflake_status: str
     expected_fabric_status: str
+    expected_gcp_status: str
     required_databricks_artifact_suffixes: tuple[str, ...]
     required_aws_artifact_suffixes: tuple[str, ...]
     required_snowflake_artifact_suffixes: tuple[str, ...]
     required_fabric_artifact_suffixes: tuple[str, ...]
+    required_gcp_artifact_suffixes: tuple[str, ...]
 
     def contract_for(self, platform: PlatformName) -> dict[str, Any]:
         overlay = {
@@ -42,6 +46,7 @@ class ParityScenario:
             "aws": self.aws_overlay,
             "snowflake": self.snowflake_overlay,
             "fabric": self.fabric_overlay,
+            "gcp": self.gcp_overlay,
         }[platform]
         return deep_merge(self.base_contract, overlay)
 
@@ -52,6 +57,7 @@ class ParityScenario:
                 "aws": self.aws_environment,
                 "snowflake": self.snowflake_environment,
                 "fabric": self.fabric_environment,
+                "gcp": self.gcp_environment,
             }[platform]
         )
 
@@ -62,6 +68,8 @@ def platform_parity_scenarios() -> tuple[ParityScenario, ...]:
         _orders_overwrite_shape(),
         _customers_upsert(),
         _customers_hash_diff(),
+        _customers_historical(),
+        _customers_snapshot_soft_delete(),
         _governance_review_boundary(),
     )
 
@@ -136,7 +144,7 @@ def deep_merge(base: dict[str, Any], overlay: dict[str, Any]) -> dict[str, Any]:
     return merged
 
 
-def _common_environments() -> tuple[dict[str, Any], dict[str, Any], dict[str, Any], dict[str, Any]]:
+def _common_environments() -> tuple[dict[str, Any], dict[str, Any], dict[str, Any], dict[str, Any], dict[str, Any]]:
     databricks = {
         "name": "parity_databricks",
         "adapter": "databricks",
@@ -196,13 +204,25 @@ def _common_environments() -> tuple[dict[str, Any], dict[str, Any], dict[str, An
             }
         },
     }
-    return databricks, aws, snowflake, fabric
+    gcp = {
+        "name": "parity_gcp",
+        "adapter": "gcp",
+        "evidence": {"dataset": "contractforge_cf_parity_ops"},
+        "parameters": {
+            "gcp": {
+                "project_id": "contractforge-parity",
+                "location": "US",
+                "dataset": "contractforge",
+            }
+        },
+    }
+    return databricks, aws, snowflake, fabric, gcp
 
 
 def _source_overlays(
     dataset: str,
     columns: dict[str, str],
-) -> tuple[dict[str, Any], dict[str, Any], dict[str, Any], dict[str, Any]]:
+) -> tuple[dict[str, Any], dict[str, Any], dict[str, Any], dict[str, Any], dict[str, Any]]:
     databricks = {"source": {"path": f"dbfs:/tmp/contractforge/parity/{dataset}/"}}
     aws = {
         "source": {"path": f"s3://contractforge-parity-us-east-1/data/{dataset}/"},
@@ -221,7 +241,8 @@ def _source_overlays(
         "extensions": {"snowflake": {"explain_enabled": False}},
     }
     fabric = {"source": {"path": f"Files/contractforge/parity/{dataset}/"}}
-    return databricks, aws, snowflake, fabric
+    gcp = {"source": {"path": f"gs://contractforge-parity-us/data/{dataset}/"}}
+    return databricks, aws, snowflake, fabric, gcp
 
 
 def _snowflake_columns(*names: str) -> dict[str, str]:
@@ -233,8 +254,8 @@ def _base_target(table: str, layer: str = "bronze") -> dict[str, Any]:
 
 
 def _orders_append_quality() -> ParityScenario:
-    databricks_env, aws_env, snowflake_env, fabric_env = _common_environments()
-    dbx_source, aws_source, snowflake_source, fabric_source = _source_overlays(
+    databricks_env, aws_env, snowflake_env, fabric_env, gcp_env = _common_environments()
+    dbx_source, aws_source, snowflake_source, fabric_source, gcp_source = _source_overlays(
         "orders_append",
         _snowflake_columns("order_id", "status", "amount"),
     )
@@ -270,14 +291,17 @@ def _orders_append_quality() -> ParityScenario:
         aws_overlay=aws_source,
         snowflake_overlay=snowflake_source,
         fabric_overlay=fabric_source,
+        gcp_overlay=gcp_source,
         databricks_environment=databricks_env,
         aws_environment=aws_env,
         snowflake_environment=snowflake_env,
         fabric_environment=fabric_env,
+        gcp_environment=gcp_env,
         expected_databricks_status="SUPPORTED",
         expected_aws_status="SUPPORTED",
         expected_snowflake_status="SUPPORTED",
         expected_fabric_status="SUPPORTED_WITH_WARNINGS",
+        expected_gcp_status="SUPPORTED_WITH_WARNINGS",
         required_databricks_artifact_suffixes=(".review.md", ".quality.sql", ".annotations.sql", ".databricks.yml"),
         required_aws_artifact_suffixes=(".review.md", ".glue_job.py", ".evidence_ddl.sql", ".annotations.json"),
         required_snowflake_artifact_suffixes=(".contract.json", ".publish_manifest.json", ".planning.md"),
@@ -287,12 +311,13 @@ def _orders_append_quality() -> ParityScenario:
             ".fabric.notebook.definition.json",
             ".fabric.source_review.json",
         ),
+        required_gcp_artifact_suffixes=(".gcp.contract.json", ".gcp.capabilities.json", ".gcp.write.sql"),
     )
 
 
 def _orders_overwrite_shape() -> ParityScenario:
-    databricks_env, aws_env, snowflake_env, fabric_env = _common_environments()
-    dbx_source, aws_source, snowflake_source, fabric_source = _source_overlays(
+    databricks_env, aws_env, snowflake_env, fabric_env, gcp_env = _common_environments()
+    dbx_source, aws_source, snowflake_source, fabric_source, gcp_source = _source_overlays(
         "orders_overwrite_shape",
         _snowflake_columns("order_id", "payload"),
     )
@@ -330,14 +355,17 @@ def _orders_overwrite_shape() -> ParityScenario:
         aws_overlay=aws_source,
         snowflake_overlay=snowflake_source,
         fabric_overlay=fabric_source,
+        gcp_overlay=gcp_source,
         databricks_environment=databricks_env,
         aws_environment=aws_env,
         snowflake_environment=snowflake_env,
         fabric_environment=fabric_env,
+        gcp_environment=gcp_env,
         expected_databricks_status="SUPPORTED",
         expected_aws_status="SUPPORTED_WITH_WARNINGS",
         expected_snowflake_status="REVIEW_REQUIRED",
         expected_fabric_status="SUPPORTED_WITH_WARNINGS",
+        expected_gcp_status="UNSUPPORTED",
         required_databricks_artifact_suffixes=(".review.md", ".shape.sql", ".quality.sql", ".databricks.yml"),
         required_aws_artifact_suffixes=(".review.md", ".glue_job.py", ".evidence_ddl.sql"),
         required_snowflake_artifact_suffixes=(".contract.json", ".publish_manifest.json", ".planning.md"),
@@ -347,17 +375,18 @@ def _orders_overwrite_shape() -> ParityScenario:
             ".fabric.notebook.definition.json",
             ".fabric.source_review.json",
         ),
+        required_gcp_artifact_suffixes=(".gcp.contract.json", ".gcp.capabilities.json"),
     )
 
 
 def _customers_upsert() -> ParityScenario:
-    databricks_env, aws_env, snowflake_env, fabric_env = _common_environments()
-    dbx_source, aws_source, snowflake_source, fabric_source = _source_overlays(
+    databricks_env, aws_env, snowflake_env, fabric_env, gcp_env = _common_environments()
+    dbx_source, aws_source, snowflake_source, fabric_source, gcp_source = _source_overlays(
         "customers_upsert",
         _snowflake_columns("customer_id", "email", "updated_at"),
     )
     base = {
-        "source": {"type": "json", "format": "json"},
+        "source": {"type": "json", "format": "json", "read": {"columns": ["customer_id", "email", "updated_at"]}},
         "target": _base_target("customers_current", layer="silver"),
         "layer": "silver",
         "mode": "scd1_upsert",
@@ -384,14 +413,17 @@ def _customers_upsert() -> ParityScenario:
         aws_overlay=aws_source,
         snowflake_overlay=snowflake_source,
         fabric_overlay=fabric_source,
+        gcp_overlay=gcp_source,
         databricks_environment=databricks_env,
         aws_environment=aws_env,
         snowflake_environment=snowflake_env,
         fabric_environment=fabric_env,
+        gcp_environment=gcp_env,
         expected_databricks_status="SUPPORTED",
         expected_aws_status="SUPPORTED",
         expected_snowflake_status="SUPPORTED",
         expected_fabric_status="SUPPORTED_WITH_WARNINGS",
+        expected_gcp_status="SUPPORTED_WITH_WARNINGS",
         required_databricks_artifact_suffixes=(".review.md", ".write_mode.sql", ".quality.sql", ".databricks.yml"),
         required_aws_artifact_suffixes=(".review.md", ".glue_job.py", ".evidence_ddl.sql"),
         required_snowflake_artifact_suffixes=(".contract.json", ".publish_manifest.json", ".planning.md"),
@@ -401,17 +433,22 @@ def _customers_upsert() -> ParityScenario:
             ".fabric.notebook.definition.json",
             ".fabric.source_review.json",
         ),
+        required_gcp_artifact_suffixes=(".gcp.contract.json", ".gcp.capabilities.json", ".gcp.write.sql"),
     )
 
 
 def _customers_hash_diff() -> ParityScenario:
-    databricks_env, aws_env, snowflake_env, fabric_env = _common_environments()
-    dbx_source, aws_source, snowflake_source, fabric_source = _source_overlays(
+    databricks_env, aws_env, snowflake_env, fabric_env, gcp_env = _common_environments()
+    dbx_source, aws_source, snowflake_source, fabric_source, gcp_source = _source_overlays(
         "customers_hash_diff",
         _snowflake_columns("customer_id", "lifetime_value", "updated_at"),
     )
     base = {
-        "source": {"type": "json", "format": "json"},
+        "source": {
+            "type": "json",
+            "format": "json",
+            "read": {"columns": ["customer_id", "lifetime_value", "customer_band", "updated_at"]},
+        },
         "target": _base_target("customers_hashdiff", layer="silver"),
         "layer": "silver",
         "mode": "scd1_hash_diff",
@@ -436,14 +473,17 @@ def _customers_hash_diff() -> ParityScenario:
         aws_overlay=aws_source,
         snowflake_overlay=snowflake_source,
         fabric_overlay=fabric_source,
+        gcp_overlay=gcp_source,
         databricks_environment=databricks_env,
         aws_environment=aws_env,
         snowflake_environment=snowflake_env,
         fabric_environment=fabric_env,
+        gcp_environment=gcp_env,
         expected_databricks_status="SUPPORTED",
         expected_aws_status="SUPPORTED_WITH_WARNINGS",
         expected_snowflake_status="SUPPORTED_WITH_WARNINGS",
         expected_fabric_status="SUPPORTED_WITH_WARNINGS",
+        expected_gcp_status="REVIEW_REQUIRED",
         required_databricks_artifact_suffixes=(".review.md", ".write_mode.sql", ".quality.sql", ".databricks.yml"),
         required_aws_artifact_suffixes=(".review.md", ".glue_job.py", ".evidence_ddl.sql"),
         required_snowflake_artifact_suffixes=(".contract.json", ".publish_manifest.json", ".planning.md"),
@@ -453,12 +493,143 @@ def _customers_hash_diff() -> ParityScenario:
             ".fabric.notebook.definition.json",
             ".fabric.source_review.json",
         ),
+        required_gcp_artifact_suffixes=(
+            ".gcp.contract.json",
+            ".gcp.capabilities.json",
+            ".gcp.advanced_write_mode_review.json",
+        ),
+    )
+
+
+def _customers_historical() -> ParityScenario:
+    databricks_env, aws_env, snowflake_env, fabric_env, gcp_env = _common_environments()
+    dbx_source, aws_source, snowflake_source, fabric_source, gcp_source = _source_overlays(
+        "customers_historical",
+        _snowflake_columns("customer_id", "email", "status", "updated_at"),
+    )
+    base = {
+        "source": {
+            "type": "json",
+            "format": "json",
+            "read": {"columns": ["customer_id", "email", "status", "updated_at"]},
+        },
+        "target": _base_target("customers_history", layer="silver"),
+        "layer": "silver",
+        "mode": "historical",
+        "merge_keys": ["customer_id"],
+        "schema_policy": "additive_only",
+        "scd2_change_columns": ["email", "status"],
+        "scd2_effective_from_column": "updated_at",
+        "scd2_sequence_by": "updated_at",
+        "scd2_late_arriving_policy": "reject",
+        "scd2_apply_as_deletes": "status = 'DELETE'",
+        "quality_rules": {
+            "required_columns": ["customer_id", "email", "status", "updated_at"],
+            "not_null": ["customer_id", "updated_at"],
+            "unique_key": ["customer_id"],
+        },
+    }
+    return ParityScenario(
+        name="customers_historical",
+        description="Historical SCD2 customer history with effective dating, delete expression and late-arriving reject semantics.",
+        base_contract=base,
+        databricks_overlay=dbx_source,
+        aws_overlay=aws_source,
+        snowflake_overlay=snowflake_source,
+        fabric_overlay=fabric_source,
+        gcp_overlay=gcp_source,
+        databricks_environment=databricks_env,
+        aws_environment=aws_env,
+        snowflake_environment=snowflake_env,
+        fabric_environment=fabric_env,
+        gcp_environment=gcp_env,
+        expected_databricks_status="SUPPORTED",
+        expected_aws_status="REVIEW_REQUIRED",
+        expected_snowflake_status="REVIEW_REQUIRED",
+        expected_fabric_status="SUPPORTED_WITH_WARNINGS",
+        expected_gcp_status="REVIEW_REQUIRED",
+        required_databricks_artifact_suffixes=(".review.md", ".write_mode.sql", ".quality.sql", ".databricks.yml"),
+        required_aws_artifact_suffixes=(".review.md", ".write_mode_review.md", ".evidence_ddl.sql"),
+        required_snowflake_artifact_suffixes=(".contract.json", ".publish_manifest.json", ".planning.md"),
+        required_fabric_artifact_suffixes=(
+            ".fabric.review.md",
+            ".fabric.notebook.py",
+            ".fabric.notebook.definition.json",
+            ".fabric.source_review.json",
+        ),
+        required_gcp_artifact_suffixes=(
+            ".gcp.contract.json",
+            ".gcp.capabilities.json",
+            ".gcp.advanced_write_mode_review.json",
+        ),
+    )
+
+
+def _customers_snapshot_soft_delete() -> ParityScenario:
+    databricks_env, aws_env, snowflake_env, fabric_env, gcp_env = _common_environments()
+    dbx_source, aws_source, snowflake_source, fabric_source, gcp_source = _source_overlays(
+        "customers_snapshot_soft_delete",
+        _snowflake_columns("customer_id", "email", "status", "updated_at"),
+    )
+    base = {
+        "source": {
+            "type": "json",
+            "format": "json",
+            "read": {
+                "columns": ["customer_id", "email", "status", "updated_at"],
+                "source_complete": True,
+            },
+        },
+        "target": _base_target("customers_snapshot", layer="silver"),
+        "layer": "silver",
+        "mode": "snapshot_reconcile_soft_delete",
+        "merge_keys": ["customer_id"],
+        "schema_policy": "additive_only",
+        "quality_rules": {
+            "required_columns": ["customer_id", "email", "status", "updated_at"],
+            "not_null": ["customer_id"],
+            "unique_key": ["customer_id"],
+        },
+    }
+    return ParityScenario(
+        name="customers_snapshot_soft_delete",
+        description="Complete-source snapshot reconciliation that reactivates present rows and soft-deletes missing keys.",
+        base_contract=base,
+        databricks_overlay=dbx_source,
+        aws_overlay=aws_source,
+        snowflake_overlay=snowflake_source,
+        fabric_overlay=fabric_source,
+        gcp_overlay=gcp_source,
+        databricks_environment=databricks_env,
+        aws_environment=aws_env,
+        snowflake_environment=snowflake_env,
+        fabric_environment=fabric_env,
+        gcp_environment=gcp_env,
+        expected_databricks_status="SUPPORTED",
+        expected_aws_status="REVIEW_REQUIRED",
+        expected_snowflake_status="REVIEW_REQUIRED",
+        expected_fabric_status="SUPPORTED_WITH_WARNINGS",
+        expected_gcp_status="REVIEW_REQUIRED",
+        required_databricks_artifact_suffixes=(".review.md", ".write_mode.sql", ".quality.sql", ".databricks.yml"),
+        required_aws_artifact_suffixes=(".review.md", ".write_mode_review.md", ".evidence_ddl.sql"),
+        required_snowflake_artifact_suffixes=(".contract.json", ".publish_manifest.json", ".planning.md"),
+        required_fabric_artifact_suffixes=(
+            ".fabric.review.md",
+            ".fabric.notebook.py",
+            ".fabric.notebook.definition.json",
+            ".fabric.source_review.json",
+        ),
+        required_gcp_artifact_suffixes=(
+            ".gcp.contract.json",
+            ".gcp.capabilities.json",
+            ".gcp.advanced_write_mode_review.json",
+        ),
     )
 
 
 def _governance_review_boundary() -> ParityScenario:
-    databricks_env, aws_env, snowflake_env, fabric_env = _common_environments()
-    dbx_source, aws_source, snowflake_source, fabric_source = _source_overlays(
+    databricks_env, aws_env, snowflake_env, fabric_env, gcp_env = _common_environments()
+    dbx_source, aws_source, snowflake_source, fabric_source, gcp_source = _source_overlays(
         "governed_customers",
         _snowflake_columns("customer_id", "email", "country"),
     )
@@ -503,14 +674,17 @@ def _governance_review_boundary() -> ParityScenario:
         aws_overlay=aws_source,
         snowflake_overlay=snowflake_source,
         fabric_overlay=fabric_source,
+        gcp_overlay=gcp_source,
         databricks_environment=databricks_env,
         aws_environment=aws_env,
         snowflake_environment=snowflake_env,
         fabric_environment=fabric_env,
+        gcp_environment=gcp_env,
         expected_databricks_status="SUPPORTED",
         expected_aws_status="REVIEW_REQUIRED",
         expected_snowflake_status="SUPPORTED",
         expected_fabric_status="REVIEW_REQUIRED",
+        expected_gcp_status="REVIEW_REQUIRED",
         required_databricks_artifact_suffixes=(".review.md", ".governance.sql", ".access_audit.sql", ".databricks.yml"),
         required_aws_artifact_suffixes=(".review.md", ".lakeformation.json", ".lakeformation_evidence.sql"),
         required_snowflake_artifact_suffixes=(".contract.json", ".publish_manifest.json", ".planning.md"),
@@ -520,4 +694,5 @@ def _governance_review_boundary() -> ParityScenario:
             ".fabric.notebook.py",
             ".fabric.notebook.definition.json",
         ),
+        required_gcp_artifact_suffixes=(".gcp.contract.json", ".gcp.capabilities.json", ".gcp.governance_ledger.json"),
     )

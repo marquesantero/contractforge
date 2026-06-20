@@ -87,6 +87,15 @@ _RECORDS: dict[str, tuple[dict[str, Any], ...]] = {
         {"customer_id": "c-001", "lifetime_value": "1200.50", "updated_at": "2026-05-31T10:00:00Z"},
         {"customer_id": "c-002", "lifetime_value": "25.00", "updated_at": "2026-05-31T10:05:00Z"},
     ),
+    "customers_historical": (
+        {"customer_id": "c-001", "email": "a@example.com", "status": "ACTIVE", "updated_at": "2026-05-31T10:00:00Z"},
+        {"customer_id": "c-001", "email": "a.new@example.com", "status": "ACTIVE", "updated_at": "2026-06-01T10:00:00Z"},
+        {"customer_id": "c-002", "email": "b@example.com", "status": "DELETE", "updated_at": "2026-06-01T11:00:00Z"},
+    ),
+    "customers_snapshot_soft_delete": (
+        {"customer_id": "c-001", "email": "a@example.com", "status": "ACTIVE", "updated_at": "2026-06-01T10:00:00Z"},
+        {"customer_id": "c-003", "email": "c@example.com", "status": "ACTIVE", "updated_at": "2026-06-01T10:05:00Z"},
+    ),
     "governance_review_boundary": (
         {"customer_id": "c-001", "email": "a@example.com", "country": "BR"},
         {"customer_id": "c-002", "email": "b@example.com", "country": "US"},

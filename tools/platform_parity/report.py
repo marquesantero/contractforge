@@ -1,4 +1,4 @@
-"""Render a Databricks/AWS/Snowflake/Fabric portability report for parity scenarios."""
+"""Render a Databricks/AWS/Snowflake/Fabric/GCP portability report for parity scenarios."""
 
 from __future__ import annotations
 
@@ -10,6 +10,7 @@ from typing import Any
 from contractforge_aws import plan_aws_contract, render_aws_contract
 from contractforge_databricks import plan_databricks_contract, render_databricks_contract
 from contractforge_fabric import plan_fabric_contract, render_fabric_contract
+from contractforge_gcp import plan_gcp_contract, render_gcp_contract
 from contractforge_snowflake import plan_snowflake_contract, render_snowflake_contract
 
 from tools.platform_parity.contracts import (
@@ -28,15 +29,18 @@ class PlatformParityResult:
     aws_status: str
     snowflake_status: str
     fabric_status: str
+    gcp_status: str
     portable_signature_equal: bool
     databricks_artifacts: tuple[str, ...]
     aws_artifacts: tuple[str, ...]
     snowflake_artifacts: tuple[str, ...]
     fabric_artifacts: tuple[str, ...]
+    gcp_artifacts: tuple[str, ...]
     databricks_delta: dict[str, Any]
     aws_delta: dict[str, Any]
     snowflake_delta: dict[str, Any]
     fabric_delta: dict[str, Any]
+    gcp_delta: dict[str, Any]
 
 
 def parity_result(scenario: ParityScenario) -> PlatformParityResult:
@@ -44,6 +48,7 @@ def parity_result(scenario: ParityScenario) -> PlatformParityResult:
     aws_contract = scenario.contract_for("aws")
     snowflake_contract = scenario.contract_for("snowflake")
     fabric_contract = scenario.contract_for("fabric")
+    gcp_contract = scenario.contract_for("gcp")
     databricks_plan = plan_databricks_contract(
         databricks_contract,
         runtime_type="serverless",
@@ -58,6 +63,10 @@ def parity_result(scenario: ParityScenario) -> PlatformParityResult:
     fabric_plan = plan_fabric_contract(
         fabric_contract,
         environment=scenario.environment_for("fabric"),
+    )
+    gcp_plan = plan_gcp_contract(
+        gcp_contract,
+        environment=scenario.environment_for("gcp"),
     )
     databricks_artifacts = render_databricks_contract(
         databricks_contract,
@@ -74,6 +83,10 @@ def parity_result(scenario: ParityScenario) -> PlatformParityResult:
         fabric_contract,
         environment=scenario.environment_for("fabric"),
     ).artifacts
+    gcp_artifacts = render_gcp_contract(
+        gcp_contract,
+        environment=scenario.environment_for("gcp"),
+    ).artifacts
     portable_signature = portability_signature(databricks_contract)
     return PlatformParityResult(
         scenario=scenario.name,
@@ -81,19 +94,23 @@ def parity_result(scenario: ParityScenario) -> PlatformParityResult:
         aws_status=str(aws_plan.status),
         snowflake_status=str(snowflake_plan.status),
         fabric_status=str(fabric_plan.status),
+        gcp_status=str(gcp_plan.status),
         portable_signature_equal=(
             portable_signature == portability_signature(aws_contract)
             and portable_signature == portability_signature(snowflake_contract)
             and portable_signature == portability_signature(fabric_contract)
+            and portable_signature == portability_signature(gcp_contract)
         ),
         databricks_artifacts=tuple(sorted(databricks_artifacts)),
         aws_artifacts=tuple(sorted(aws_artifacts)),
         snowflake_artifacts=tuple(sorted(snowflake_artifacts)),
         fabric_artifacts=tuple(sorted(fabric_artifacts)),
+        gcp_artifacts=tuple(sorted(gcp_artifacts)),
         databricks_delta=platform_delta(databricks_contract),
         aws_delta=platform_delta(aws_contract),
         snowflake_delta=platform_delta(snowflake_contract),
         fabric_delta=platform_delta(fabric_contract),
+        gcp_delta=platform_delta(gcp_contract),
     )
 
 
