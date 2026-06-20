@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="en-US" dir="ltr" class="docs-wrapper plugin-docs plugin-id-default docs-version-current docs-doc-page docs-doc-id-specs/semantic-contract" data-has-hydrated="false">
+<head>
+<meta charset="UTF-8">
+<meta name="generator" content="Docusaurus v3.10.1">
+<title data-rh="true">Semantic Contract Specification | ContractForge</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:image" content="https://marquesantero.github.io/contractforge/img/contractforge-logo.png"><meta data-rh="true" name="twitter:image" content="https://marquesantero.github.io/contractforge/img/contractforge-logo.png"><meta data-rh="true" property="og:url" content="https://marquesantero.github.io/contractforge/docs/specs/semantic-contract/"><meta data-rh="true" property="og:locale" content="en_US"><meta data-rh="true" property="og:locale:alternate" content="pt_BR"><meta data-rh="true" name="docusaurus_locale" content="en"><meta data-rh="true" name="docsearch:language" content="en"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="Semantic Contract Specification | ContractForge"><meta data-rh="true" name="description" content="Purpose"><meta data-rh="true" property="og:description" content="Purpose"><link data-rh="true" rel="icon" href="/contractforge/img/contractforge-mark.png"><link data-rh="true" rel="canonical" href="https://marquesantero.github.io/contractforge/docs/specs/semantic-contract/"><link data-rh="true" rel="alternate" href="https://marquesantero.github.io/contractforge/docs/specs/semantic-contract/" hreflang="en-US"><link data-rh="true" rel="alternate" href="https://marquesantero.github.io/contractforge/pt-BR/docs/specs/semantic-contract/" hreflang="pt-BR"><link data-rh="true" rel="alternate" href="https://marquesantero.github.io/contractforge/docs/specs/semantic-contract/" hreflang="x-default"><link rel="stylesheet" href="/contractforge/assets/css/styles.e35730a0.css">
+<script src="/contractforge/assets/js/runtime~main.6fc30d92.js" defer="defer"></script>
+<script src="/contractforge/assets/js/main.d725e8b0.js" defer="defer"></script>
+</head>
+<body>
+<svg style="display: none;"><defs>
+<symbol id="theme-svg-external-link" viewBox="0 0 24 24"><path fill="currentColor" d="M21 13v10h-21v-19h12v2h-10v15h17v-8h2zm3-12h-10.988l4.035 4-6.977 7.07 2.828 2.828 6.977-7.07 4.125 4.172v-11z"/></symbol>
+</defs></svg>
+<script>!function(){var t=function(){try{return new URLSearchParams(window.location.search).get("docusaurus-theme")}catch(t){}}()||function(){try{return window.localStorage.getItem("theme")}catch(t){}}();document.documentElement.setAttribute("data-theme",t||"light"),document.documentElement.setAttribute("data-theme-choice",t||"light")}(),function(){try{const c=new URLSearchParams(window.location.search).entries();for(var[t,e]of c)if(t.startsWith("docusaurus-data-")){var a=t.replace("docusaurus-data-","data-");document.documentElement.setAttribute(a,e)}}catch(t){}}()</script><div id="__docusaurus"><div role="region" aria-label="Skip to main content"><a class="skipToContent_fXgn" href="#__docusaurus_skipToContent_fallback">Skip to main content</a></div><nav aria-label="Main" class="theme-layout-navbar navbar navbar--fixed-top"><div class="navbar__inner"><div class="theme-layout-navbar-left navbar__items"><button aria-label="Toggle navigation bar" aria-expanded="false" class="navbar__toggle clean-btn" type="button"><svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><path stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="2" d="M4 7h22M4 15h22M4 23h22"></path></svg></button><a class="navbar__brand" href="/contractforge/"><div class="navbar__logo"><img src="/contractforge/img/contractforge-mark.png" alt="ContractForge" class="themedComponent_mlkZ themedComponent--light_NVdE"><img src="/contractforge/img/contractforge-mark.png" alt="ContractForge" class="themedComponent_mlkZ themedComponent--dark_xIcU"></div><b class="navbar__title text--truncate">ContractForge</b></a><a class="navbar__item navbar__link" href="/contractforge/docs/intro/">Docs</a><a class="navbar__item navbar__link" href="/contractforge/docs/adapters/overview/">Adapters</a><a class="navbar__item navbar__link" href="/contractforge/docs/connectors/overview/">Connectors</a></div><div class="theme-layout-navbar-right navbar__items navbar__items--right"><div class="navbar__item dropdown dropdown--hoverable dropdown--right"><a href="#" aria-haspopup="true" aria-expanded="false" role="button" class="navbar__link"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" class="iconLanguage_nlXk"><path fill="currentColor" d="M12.87 15.07l-2.54-2.51.03-.03c1.74-1.94 2.98-4.17 3.71-6.53H17V4h-7V2H8v2H1v1.99h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2l-4.5-12zm-2.62 7l1.62-4.33L19.12 17h-3.24z"></path></svg>English</a><ul class="dropdown__menu"><li><a href="/contractforge/docs/specs/semantic-contract/" target="_self" rel="noopener noreferrer" class="dropdown__link dropdown__link--active" lang="en-US">English</a></li><li><a href="/contractforge/pt-BR/docs/specs/semantic-contract/" target="_self" rel="noopener noreferrer" class="dropdown__link" lang="pt-BR">Português</a></li></ul></div><div class="navbarSearchContainer_Bca1"><div class="navbar__search searchBarContainer_NW3z" dir="ltr"><input placeholder="Search" aria-label="Search" class="navbar__search-input searchInput_YFbd" value=""><div class="loadingRing_RJI3 searchBarLoadingRing_YnHq"><div></div><div></div><div></div><div></div></div></div></div><a href="https://github.com/marquesantero/contractforge" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">GitHub<svg width="13.5" height="13.5" aria-label="(opens in new tab)" class="iconExternalLink_nPIU"><use href="#theme-svg-external-link"></use></svg></a><div class="toggle_vylO colorModeToggle_DEke"><button class="clean-btn toggleButton_gllP toggleButtonDisabled_aARS" type="button" disabled="" title="system mode" aria-label="Switch between dark and light mode (currently system mode)"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" class="toggleIcon_g3eP lightToggleIcon_pyhR"><path fill="currentColor" d="M12,9c1.65,0,3,1.35,3,3s-1.35,3-3,3s-3-1.35-3-3S10.35,9,12,9 M12,7c-2.76,0-5,2.24-5,5s2.24,5,5,5s5-2.24,5-5 S14.76,7,12,7L12,7z M2,13l2,0c0.55,0,1-0.45,1-1s-0.45-1-1-1l-2,0c-0.55,0-1,0.45-1,1S1.45,13,2,13z M20,13l2,0c0.55,0,1-0.45,1-1 s-0.45-1-1-1l-2,0c-0.55,0-1,0.45-1,1S19.45,13,20,13z M11,2v2c0,0.55,0.45,1,1,1s1-0.45,1-1V2c0-0.55-0.45-1-1-1S11,1.45,11,2z M11,20v2c0,0.55,0.45,1,1,1s1-0.45,1-1v-2c0-0.55-0.45-1-1-1C11.45,19,11,19.45,11,20z M5.99,4.58c-0.39-0.39-1.03-0.39-1.41,0 c-0.39,0.39-0.39,1.03,0,1.41l1.06,1.06c0.39,0.39,1.03,0.39,1.41,0s0.39-1.03,0-1.41L5.99,4.58z M18.36,16.95 c-0.39-0.39-1.03-0.39-1.41,0c-0.39,0.39-0.39,1.03,0,1.41l1.06,1.06c0.39,0.39,1.03,0.39,1.41,0c0.39-0.39,0.39-1.03,0-1.41 L18.36,16.95z M19.42,5.99c0.39-0.39,0.39-1.03,0-1.41c-0.39-0.39-1.03-0.39-1.41,0l-1.06,1.06c-0.39,0.39-0.39,1.03,0,1.41 s1.03,0.39,1.41,0L19.42,5.99z M7.05,18.36c0.39-0.39,0.39-1.03,0-1.41c-0.39-0.39-1.03-0.39-1.41,0l-1.06,1.06 c-0.39,0.39-0.39,1.03,0,1.41s1.03,0.39,1.41,0L7.05,18.36z"></path></svg><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" class="toggleIcon_g3eP darkToggleIcon_wfgR"><path fill="currentColor" d="M9.37,5.51C9.19,6.15,9.1,6.82,9.1,7.5c0,4.08,3.32,7.4,7.4,7.4c0.68,0,1.35-0.09,1.99-0.27C17.45,17.19,14.93,19,12,19 c-3.86,0-7-3.14-7-7C5,9.07,6.81,6.55,9.37,5.51z M12,3c-4.97,0-9,4.03-9,9s4.03,9,9,9s9-4.03,9-9c0-0.46-0.04-0.92-0.1-1.36 c-0.98,1.37-2.58,2.26-4.4,2.26c-2.98,0-5.4-2.42-5.4-5.4c0-1.81,0.89-3.42,2.26-4.4C12.92,3.04,12.46,3,12,3L12,3z"></path></svg><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" class="toggleIcon_g3eP systemToggleIcon_QzmC"><path fill="currentColor" d="m12 21c4.971 0 9-4.029 9-9s-4.029-9-9-9-9 4.029-9 9 4.029 9 9 9zm4.95-13.95c1.313 1.313 2.05 3.093 2.05 4.95s-0.738 3.637-2.05 4.95c-1.313 1.313-3.093 2.05-4.95 2.05v-14c1.857 0 3.637 0.737 4.95 2.05z"></path></svg></button></div></div></div><div role="presentation" class="navbar-sidebar__backdrop"></div></nav><div id="__docusaurus_skipToContent_fallback" class="theme-layout-main main-wrapper mainWrapper_z2l0"><div class="docsWrapper_hBAB"><button aria-label="Scroll back to top" class="clean-btn theme-back-to-top-button backToTopButton_sjWU" type="button"></button><div class="docRoot_UBD9"><main class="docMainContainer_TBSr docMainContainerEnhanced_lQrH"><div class="container padding-top--md padding-bottom--lg"><div class="row"><div class="col docItemCol_VOVn"><div class="docItemContainer_Djhp"><article><div class="tocCollapsible_ETCw theme-doc-toc-mobile tocMobile_ITEo"><button type="button" class="clean-btn tocCollapsibleButton_TO0P">On this page</button></div><div class="theme-doc-markdown markdown"><header><h1>Semantic Contract Specification</h1></header>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="purpose">Purpose<a href="#purpose" class="hash-link" aria-label="Direct link to Purpose" title="Direct link to Purpose" translate="no">​</a></h2>
+<p>The semantic contract is the normalized ingestion intent used by ContractForge Core after external contract files have been parsed and validated.</p>
+<p>The semantic contract describes what must happen, not how a platform must execute it.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="inputs">Inputs<a href="#inputs" class="hash-link" aria-label="Direct link to Inputs" title="Direct link to Inputs" translate="no">​</a></h2>
+<p>ContractForge Core keeps the split-contract vocabulary from ContractForge. These are ContractForge contracts, not Databricks contracts:</p>
+<ul>
+<li class="">ingestion/source contract</li>
+<li class="">annotations contract</li>
+<li class="">operations contract</li>
+<li class="">access contract</li>
+<li class="">shape and transform contract</li>
+</ul>
+<p>These contracts are validated with platform-neutral Pydantic models in <code>contractforge_core.contracts</code>.</p>
+<p>The complete contract-section rules are defined in <a class="" href="/contractforge/docs/specs/contract-sections/">contract-sections.md</a>.</p>
+<p>Adapters must conform to these sections. A platform-specific adapter may translate a ContractForge concept to native features when semantics are equivalent, but it must not reshape the core contract to match one platform&#x27;s API.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="core-intents">Core Intents<a href="#core-intents" class="hash-link" aria-label="Direct link to Core Intents" title="Direct link to Core Intents" translate="no">​</a></h2>
+<p>Portable semantic objects are immutable and represent:</p>
+<ul>
+<li class="">source intent</li>
+<li class="">target intent</li>
+<li class="">write intent</li>
+<li class="">quality intent</li>
+<li class="">governance intent</li>
+<li class="">operations intent</li>
+<li class="">watermark intent and typed watermark values</li>
+<li class="">shape intent</li>
+<li class="">transform intent</li>
+<li class="">naming policy for derived artifacts</li>
+</ul>
+<p><code>source.type</code> is the concrete source family. <code>source.intent</code> may refine that family into adapter planning intent without replacing the raw source payload. For example, <code>source.type: s3</code> with <code>source.intent: file_stream</code> keeps the object-storage source explicit while telling adapters that newly discovered files and progress tracking are required.</p>
+<p>The core also preserves optional source discovery and state intent:</p>
+<ul>
+<li class=""><code>source.discovery.strategy</code>: <code>file_listing</code>, <code>event_driven</code> or <code>queue_based</code></li>
+<li class=""><code>source.discovery.tracking</code>: <code>modification_time</code>, <code>filename_pattern</code>, <code>external_state</code> or <code>external_queue</code></li>
+<li class=""><code>source.state.storage</code>: <code>adapter_managed</code>, <code>external</code> or <code>job_local</code></li>
+<li class=""><code>source.state.location</code>: neutral state location such as object storage, database table or key-value store</li>
+</ul>
+<p>These are semantic planning hints, not runtime implementations. Adapters decide whether their native platform can preserve them.</p>
+<p><code>target.catalog_type</code> is optional target metadata for adapters that need to distinguish logical catalog mappings, such as <code>metastore</code>, <code>database</code> or <code>schema</code>. It does not name a vendor catalog product. Physical catalog binding belongs in environment configuration or adapter-owned parameters.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="write-semantics">Write Semantics<a href="#write-semantics" class="hash-link" aria-label="Direct link to Write Semantics" title="Direct link to Write Semantics" translate="no">​</a></h2>
+<p>The initial write vocabulary follows ContractForge:</p>
+<ul>
+<li class=""><code>append</code></li>
+<li class=""><code>overwrite</code></li>
+<li class=""><code>upsert</code></li>
+<li class=""><code>hash_diff_upsert</code></li>
+<li class=""><code>historical</code></li>
+<li class=""><code>snapshot_reconcile_soft_delete</code></li>
+<li class=""><code>custom:&lt;name&gt;</code></li>
+</ul>
+<p>Adapters must never silently downgrade these modes. If an adapter cannot preserve the requested write semantics, planning must return <code>REVIEW_REQUIRED</code> or <code>UNSUPPORTED</code>.</p>
+<p><code>custom:&lt;name&gt;</code> is an explicit adapter-owned extension namespace. The core accepts it so contracts can be parsed and reviewed, but it is not portable semantic intent and requires adapter-declared support before planning can return <code>SUPPORTED</code>.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="execution-intent">Execution Intent<a href="#execution-intent" class="hash-link" aria-label="Direct link to Execution Intent" title="Direct link to Execution Intent" translate="no">​</a></h2>
+<p>The ingestion contract may declare execution intent without naming a scheduler, stream runtime or platform primitive:</p>
+<div class="language-yaml codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-yaml codeBlock_bY9V thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:#393A34"><span class="token key atrule" style="color:#00a4db">execution</span><span class="token punctuation" style="color:#393A34">:</span><span class="token plain"></span><br></div><div class="token-line" style="color:#393A34"><span class="token plain">  </span><span class="token key atrule" style="color:#00a4db">freshness</span><span class="token punctuation" style="color:#393A34">:</span><span class="token plain"> near_real_time</span><br></div><div class="token-line" style="color:#393A34"><span class="token plain">  </span><span class="token key atrule" style="color:#00a4db">latency_target</span><span class="token punctuation" style="color:#393A34">:</span><span class="token plain"> 5 minutes</span><br></div><div class="token-line" style="color:#393A34"><span class="token plain">  </span><span class="token key atrule" style="color:#00a4db">preferred</span><span class="token punctuation" style="color:#393A34">:</span><span class="token plain"> continuous</span><br></div><div class="token-line" style="color:#393A34"><span class="token plain">  </span><span class="token key atrule" style="color:#00a4db">fallback</span><span class="token punctuation" style="color:#393A34">:</span><span class="token plain"> batch_incremental</span><br></div></code></pre></div></div>
+<p>Portable fields:</p>
+<ul>
+<li class=""><code>freshness</code>: <code>batch</code>, <code>near_real_time</code> or <code>real_time</code></li>
+<li class=""><code>latency_target</code>: readable SLA target preserved for planning and evidence</li>
+<li class=""><code>preferred</code>: <code>scheduled</code>, <code>event_driven</code>, <code>continuous</code> or <code>available_now</code></li>
+<li class=""><code>fallback</code>: <code>scheduled</code>, <code>batch_incremental</code>, <code>review_required</code> or <code>fail</code></li>
+</ul>
+<p><code>preferred: available_now</code> sets the semantic available-now marker used by capability matching. It does not require the core to know Spark Structured Streaming, Databricks Auto Loader, Glue Streaming, Snowpipe or Fabric Eventstream. If a platform can only approximate the preference, the adapter must return warnings or <code>REVIEW_REQUIRED</code> according to its capability declaration.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="write-mode-portability">Write Mode Portability<a href="#write-mode-portability" class="hash-link" aria-label="Direct link to Write Mode Portability" title="Direct link to Write Mode Portability" translate="no">​</a></h2>
+<p>The core classifies write modes by semantic portability and platform requirements:</p>
+<table><thead><tr><th>Mode</th><th>Core semantic intent</th><th>Portable baseline</th><th>Platform requirements</th></tr></thead><tbody><tr><td><code>append</code></td><td>Insert new rows without reconciling existing target rows.</td><td>Portable.</td><td>Append-capable storage or table API.</td></tr><tr><td><code>overwrite</code></td><td>Replace the target or declared target scope.</td><td>Portable with caution.</td><td>Atomic overwrite or adapter-declared replacement semantics.</td></tr><tr><td><code>upsert</code></td><td>Update current state by keys without history.</td><td>General semantic, not universally supported.</td><td>Merge/upsert capability and stable key semantics.</td></tr><tr><td><code>hash_diff_upsert</code></td><td>Current-state upsert with hash-based change detection.</td><td>General pattern, capability-gated.</td><td>Merge/upsert plus adapter-declared hash-diff support.</td></tr><tr><td><code>historical</code></td><td>Preserve historical versions with current-row markers and validity windows.</td><td>Review-prone across engines.</td><td>Merge/upsert plus explicit historical capability.</td></tr><tr><td><code>snapshot_reconcile_soft_delete</code></td><td>Reconcile full snapshots and mark missing target keys inactive/deleted.</td><td>Review-prone across engines.</td><td>Snapshot reconciliation capability or review marker.</td></tr><tr><td><code>custom:&lt;name&gt;</code></td><td>Adapter-owned write behavior.</td><td>Not portable.</td><td>Adapter-registered handler and explicit capability declaration.</td></tr></tbody></table>
+<p><code>historical</code> and <code>snapshot_reconcile_soft_delete</code> are intentionally not treated as universally portable. Similar platform features can differ in late-arriving event handling, delete semantics, validity interval closure, isolation guarantees, and generated metadata columns.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="portable-validation">Portable Validation<a href="#portable-validation" class="hash-link" aria-label="Direct link to Portable Validation" title="Direct link to Portable Validation" translate="no">​</a></h2>
+<p>Portable validation checks contract shape, required fields, write mode names, schema policy names, quality declarations, governance declarations, and operational metadata.</p>
+<p>Portable validation must not import Spark, Databricks SDKs, boto3, Azure SDKs, Fabric SDKs, or any platform runtime.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="schema-diff-semantics">Schema Diff Semantics<a href="#schema-diff-semantics" class="hash-link" aria-label="Direct link to Schema Diff Semantics" title="Direct link to Schema Diff Semantics" translate="no">​</a></h2>
+<p>The core owns platform-neutral schema comparison:</p>
+<ul>
+<li class="">added columns</li>
+<li class="">removed columns, excluding ContractForge control columns</li>
+<li class="">type changes</li>
+<li class="">type widening classification</li>
+<li class="">validation against <code>strict</code>, <code>additive_only</code> and <code>permissive</code> schema policies</li>
+</ul>
+<p>Adapters decide how to inspect physical schemas, apply allowed changes and persist schema-change evidence. For example, Databricks may render Delta <code>ALTER TABLE</code> statements, while another adapter may use Iceberg, Snowflake or Fabric-native schema APIs.</p>
+<p>The core must not assume that all platforms support the same type-widening DDL. A core schema diff can be valid while an adapter still returns <code>REVIEW_REQUIRED</code> or <code>UNSUPPORTED</code> for applying it.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="preparation-semantics">Preparation Semantics<a href="#preparation-semantics" class="hash-link" aria-label="Direct link to Preparation Semantics" title="Direct link to Preparation Semantics" translate="no">​</a></h2>
+<p>The core owns small staging specifications for ContractForge write algorithms:</p>
+<ul>
+<li class="">hash-diff staging metadata</li>
+<li class="">historical insert columns, merge keys, change columns and sequence column</li>
+<li class="">snapshot soft-delete source columns and soft-delete metadata columns</li>
+</ul>
+<p>Hash-based write modes support two explicit strategies:</p>
+<ul>
+<li class=""><code>hash_strategy: explicit</code> (default): <code>hash_keys</code> lists the content columns that define a change. This is recommended for governed and high-value tables.</li>
+<li class=""><code>hash_strategy: all_columns_except</code>: all prepared source columns are candidates except <code>merge_keys</code>, user-declared <code>hash_exclude_columns</code>, and ContractForge/framework-generated columns such as <code>row_hash</code>, <code>source_loaded_at_utc</code>, SCD control columns, and <code>transform.derive</code> / <code>transform.composite_keys</code> outputs.</li>
+</ul>
+<p><code>hash_exclude_columns</code> remains a portable semantic field, not a Databricks option. Adapters must apply the exclusion when materializing hash-diff or historical change detection, or return a planning warning/blocker if they cannot preserve it.</p>
+<p>Historical contracts may declare <code>scd2_effective_from_column</code> to use a source-provided timestamp as the new version&#x27;s <code>valid_from</code> value. If omitted, adapters may use the execution timestamp. Adapters must validate that the column exists before execution and must not silently replace a declared effective-from column with runtime time.</p>
+<p>Historical contracts may also declare <code>scd2_late_arriving_policy</code>:</p>
+<ul>
+<li class=""><code>apply</code>: process the row even if its <code>scd2_sequence_by</code> value is not newer than the current target version.</li>
+<li class=""><code>ignore</code>: skip late-arriving rows.</li>
+<li class=""><code>reject</code>: fail execution when late-arriving rows are detected.</li>
+</ul>
+<p><code>ignore</code> and <code>reject</code> require <code>scd2_sequence_by</code>. Adapters that cannot enforce the requested behavior must return a blocker or review-required result.</p>
+<p><code>scd2_apply_as_deletes</code> declares a boolean expression that classifies source rows as logical deletes for historical mode. A capable adapter should expire the current target version for matching keys, mark the change as a delete in its history metadata where supported, and prevent those delete rows from being inserted as new current versions.</p>
+<p>Adapters decide how to materialize these staging specs. Databricks may use Spark SQL/DataFrames and Delta MERGE; other platforms may use temporary tables, native SQL, managed pipelines or review artifacts.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="portable-connector-helpers">Portable Connector Helpers<a href="#portable-connector-helpers" class="hash-link" aria-label="Direct link to Portable Connector Helpers" title="Direct link to Portable Connector Helpers" translate="no">​</a></h2>
+<p>The core may define platform-neutral connector contracts and helper semantics for common protocols.</p>
+<p>Examples:</p>
+<ul>
+<li class="">HTTP bounded file options: source type, URL, query parameters, headers, auth shape, retry intent and reader-neutral file options.</li>
+<li class="">JDBC batch options: URL, table/query exclusivity, read partitioning fields and auth shape.</li>
+<li class="">File, object-storage and catalog source options: source kind, provider, format normalization, reader options, table/path/query rules.</li>
+<li class="">Bounded event-stream replay options: Kafka and Event Hubs connection, topic/assignment, starting position and ending position for catch-up reads, not continuous streaming execution.</li>
+<li class="">Delta Sharing consumer options: profile reference, shared table name and reader-neutral options.</li>
+<li class="">Native passthrough and REST API descriptors: required source fields, request shape, pagination intent, watermark intent and secret-field redaction for review artifacts.</li>
+<li class="">RDS IAM token semantics: JDBC host/port parsing, region inference and SigV4 token generation.</li>
+<li class="">Connection references: <code>source.type: connection</code> with <code>connection_path</code> loads a reusable source YAML and merges dataset-specific fields before semantic normalization.</li>
+<li class="">Logical table references: catalog/table sources may use <code>source.ref: layer.table</code> or <code>source.table_ref: {layer, table}</code>; SQL sources may use <code>{{ table_ref:layer.table }}</code> placeholders. The core only validates/parses the portable reference. Adapters resolve it to native table names such as Unity Catalog, Glue Catalog/Iceberg, Snowflake databases or Fabric Lakehouse tables.</li>
+</ul>
+<p>These helpers must not execute platform code. They cannot import Spark, Databricks SDK, boto3, Snowpark, Fabric SDK or cloud-specific runtime clients.</p>
+<p>Adapters consume these helpers and translate them into native runtime artifacts.</p>
+<p>Connection resolution is a contract-loading concern. Adapters must not be required to know where reusable connection files live; they receive the resolved source payload. <code>connection_path</code> may use <code>project://...</code> to resolve from the nearest <code>project.yaml</code> root, or a same-bundle relative path that stays under the ingestion bundle directory. Absolute paths and <code>..</code> traversal are rejected.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="partitioning-semantics">Partitioning Semantics<a href="#partitioning-semantics" class="hash-link" aria-label="Direct link to Partitioning Semantics" title="Direct link to Partitioning Semantics" translate="no">​</a></h2>
+<p>The core owns partition predicate input validation, such as preserving distinct values in order and enforcing configured limits.</p>
+<p>Adapters render platform-specific predicates. For example, Databricks renders SQL <code>IN</code> and <code>replaceWhere</code> expressions with Databricks quoting rules.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="quality-semantics">Quality Semantics<a href="#quality-semantics" class="hash-link" aria-label="Direct link to Quality Semantics" title="Direct link to Quality Semantics" translate="no">​</a></h2>
+<p>The core carries quality intent for:</p>
+<ul>
+<li class="">required columns</li>
+<li class="">not-null checks</li>
+<li class="">unique keys</li>
+<li class="">accepted values</li>
+<li class="">minimum row count</li>
+<li class="">maximum null ratio</li>
+<li class="">named boolean expressions</li>
+</ul>
+<p>Rules may carry severity such as <code>abort</code>, <code>warn</code> or <code>quarantine</code>. The contract-level <code>on_quality_fail</code> policy preserves the Databricks adapter baseline global behavior for failed quality checks: <code>fail</code>, <code>warn</code> or <code>quarantine</code>. The core preserves the intent, severity and global policy; adapters decide how to execute checks, isolate invalid rows, persist evidence and handle platform SQL dialect differences.</p>
+<p><code>quality_rules.custom</code> is accepted as an opaque extension payload. The core validates the basic custom rule shape and preserves evaluator-specific parameters under <code>extensions.quality.custom</code>, but it does not treat custom rules as portable quality semantics. Platform adapters may execute them through adapter-owned registries when they explicitly support that runtime extension.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="shape-and-transform-semantics">Shape And Transform Semantics<a href="#shape-and-transform-semantics" class="hash-link" aria-label="Direct link to Shape And Transform Semantics" title="Direct link to Shape And Transform Semantics" translate="no">​</a></h2>
+<p>The core preserves ContractForge shape and transform intent as semantic data.</p>
+<p>Portable transform concepts include:</p>
+<ul>
+<li class="">cast</li>
+<li class="">derive</li>
+<li class="">standardize</li>
+<li class="">deduplicate</li>
+</ul>
+<p>Deduplication is declared only as <code>transform.deduplicate</code>. The core does not accept legacy top-level aliases for this behavior; adapters must consume the canonical transform intent and fail clearly when the required deterministic order is absent.</p>
+<p>Composite key construction is declared as <code>transform.composite_keys</code>. It declares derived keys by concatenating source columns with ContractForge semantics. Adapters must materialize the key before write-mode key validation and before deduplication that depends on the derived key.</p>
+<p>Shape concepts such as JSON parsing, array handling and flattening are also retained, but adapters decide whether they can execute them natively, through DataFrame preparation, through SQL, or require review.</p>
+<p>Contracts may declare a top-level <code>schemas</code> registry for named structural schemas used by shape operations. When the registry is present, the core resolves <code>shape.parse_json[].schema_ref</code> into a concrete <code>schema</code> while preserving the reference name for review/evidence. If no registry is present, the reference is preserved for review artifacts and adapters must require a concrete schema before runtime execution. A parse-json declaration must use either <code>schema</code> or <code>schema_ref</code>, not both.</p>
+<p>The core must not import Spark or implement DataFrame algorithms. Adapter renderers and runtimes translate these intents to platform-native preparation steps.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="naming-policy">Naming Policy<a href="#naming-policy" class="hash-link" aria-label="Direct link to Naming Policy" title="Direct link to Naming Policy" translate="no">​</a></h2>
+<p>Naming policy is portable ContractForge metadata for derived artifacts.</p>
+<p>It may control generated names such as:</p>
+<ul>
+<li class="">contract basename</li>
+<li class="">bundle name</li>
+<li class="">job name</li>
+<li class="">task key</li>
+<li class="">artifact prefix</li>
+<li class="">display/logical names</li>
+</ul>
+<p>It must not rewrite physical target identifiers by default. Target catalog, schema and table remain the explicit ingestion target. Adapters may use naming policy for deployment artifacts while preserving the target namespace declared in the contract.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="watermarks">Watermarks<a href="#watermarks" class="hash-link" aria-label="Direct link to Watermarks" title="Direct link to Watermarks" translate="no">​</a></h2>
+<p>Watermark intent is a ContractForge ingestion concept, not a Databricks concept.</p>
+<p>The core owns the portable typed watermark value format:</p>
+<ul>
+<li class="">stable JSON</li>
+<li class="">one entry per watermark column</li>
+<li class="">each entry carries a logical type and serialized value</li>
+<li class="">simple and composite watermarks use the same payload shape</li>
+</ul>
+<p>Adapters own how that value is applied. For example, Databricks can render a lexicographic SQL predicate and store the current value in Delta evidence/state tables, while another adapter may use a native bookmark, query predicate or workflow parameter.</p>
+<p>The core must not import DataFrame APIs to compute or apply a watermark.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="contract-metadata">Contract Metadata<a href="#contract-metadata" class="hash-link" aria-label="Direct link to Contract Metadata" title="Direct link to Contract Metadata" translate="no">​</a></h2>
+<p>Contract metadata that explains how the contract was produced is platform-neutral when it does not imply execution behavior. For example, <code>applied_presets</code> records the preset names expanded into the contract so adapters can include them in evidence and public run payloads. It must not change planning or execution by itself.</p>
+<p>Operational source metadata such as <code>source.system</code> may be preserved as evidence metadata. Runtime artifact names such as Databricks notebook paths, Glue job names or Fabric item names are not ingestion semantics; adapters should populate them from runtime metadata or environment context. Evidence storage location is not an ingestion semantic: use the environment contract, for example <code>environment.evidence.catalog</code> and <code>environment.evidence.schema</code>, or adapter-owned runtime options. The core does not accept legacy root aliases such as <code>source_system</code>, <code>ctrl_schema</code> or <code>notebook_name</code> and does not add physical metadata columns by default.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="platform-extensions">Platform Extensions<a href="#platform-extensions" class="hash-link" aria-label="Direct link to Platform Extensions" title="Direct link to Platform Extensions" translate="no">​</a></h2>
+<p>Platform-specific fields may exist in contract extension maps, but the core must classify them before planning:</p>
+<ul>
+<li class="">portable</li>
+<li class="">platform-specific</li>
+<li class="">supported with warnings</li>
+<li class="">review required</li>
+<li class="">unsupported</li>
+</ul>
+<p>Platform extensions are additive. They do not replace the portable ingestion, annotations, operations or access contract sections.</p></div><footer class="theme-doc-footer docusaurus-mt-lg"><div class="row margin-top--sm theme-doc-footer-edit-meta-row"><div class="col noPrint_WFHX"><a href="https://github.com/marquesantero/contractforge/edit/main/site/docs/specs/semantic-contract.md" target="_blank" rel="noopener noreferrer" class="theme-edit-this-page"><svg fill="currentColor" height="20" width="20" viewBox="0 0 40 40" class="iconEdit_Z9Sw" aria-hidden="true"><g><path d="m34.5 11.7l-3 3.1-6.3-6.3 3.1-3q0.5-0.5 1.2-0.5t1.1 0.5l3.9 3.9q0.5 0.4 0.5 1.1t-0.5 1.2z m-29.5 17.1l18.4-18.5 6.3 6.3-18.4 18.4h-6.3v-6.2z"></path></g></svg>Edit this page</a></div><div class="col lastUpdated_JAkA"></div></div></footer></article><nav class="docusaurus-mt-lg pagination-nav" aria-label="Docs pages"></nav></div></div><div class="col col--3"><div class="tableOfContents_bqdL thin-scrollbar theme-doc-toc-desktop"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#purpose" class="table-of-contents__link toc-highlight">Purpose</a></li><li><a href="#inputs" class="table-of-contents__link toc-highlight">Inputs</a></li><li><a href="#core-intents" class="table-of-contents__link toc-highlight">Core Intents</a></li><li><a href="#write-semantics" class="table-of-contents__link toc-highlight">Write Semantics</a></li><li><a href="#execution-intent" class="table-of-contents__link toc-highlight">Execution Intent</a></li><li><a href="#write-mode-portability" class="table-of-contents__link toc-highlight">Write Mode Portability</a></li><li><a href="#portable-validation" class="table-of-contents__link toc-highlight">Portable Validation</a></li><li><a href="#schema-diff-semantics" class="table-of-contents__link toc-highlight">Schema Diff Semantics</a></li><li><a href="#preparation-semantics" class="table-of-contents__link toc-highlight">Preparation Semantics</a></li><li><a href="#portable-connector-helpers" class="table-of-contents__link toc-highlight">Portable Connector Helpers</a></li><li><a href="#partitioning-semantics" class="table-of-contents__link toc-highlight">Partitioning Semantics</a></li><li><a href="#quality-semantics" class="table-of-contents__link toc-highlight">Quality Semantics</a></li><li><a href="#shape-and-transform-semantics" class="table-of-contents__link toc-highlight">Shape And Transform Semantics</a></li><li><a href="#naming-policy" class="table-of-contents__link toc-highlight">Naming Policy</a></li><li><a href="#watermarks" class="table-of-contents__link toc-highlight">Watermarks</a></li><li><a href="#contract-metadata" class="table-of-contents__link toc-highlight">Contract Metadata</a></li><li><a href="#platform-extensions" class="table-of-contents__link toc-highlight">Platform Extensions</a></li></ul></div></div></div></div></main></div></div></div><footer class="theme-layout-footer footer footer--dark"><div class="container container-fluid"><div class="row footer__links"><div class="theme-layout-footer-column col footer__col"><div class="footer__title">Documentation</div><ul class="footer__items clean-list"><li class="footer__item"><a class="footer__link-item" href="/contractforge/docs/start/quickstart/">Quick start</a></li><li class="footer__item"><a class="footer__link-item" href="/contractforge/docs/contracts/overview/">Contracts</a></li><li class="footer__item"><a class="footer__link-item" href="/contractforge/docs/connectors/overview/">Connectors</a></li><li class="footer__item"><a class="footer__link-item" href="/contractforge/docs/operations/overview/">Operations</a></li></ul></div><div class="theme-layout-footer-column col footer__col"><div class="footer__title">Project</div><ul class="footer__items clean-list"><li class="footer__item"><a href="https://github.com/marquesantero/contractforge" target="_blank" rel="noopener noreferrer" class="footer__link-item">GitHub<svg width="13.5" height="13.5" aria-label="(opens in new tab)" class="iconExternalLink_nPIU"><use href="#theme-svg-external-link"></use></svg></a></li><li class="footer__item"><a href="https://github.com/marquesantero/contractforge/issues" target="_blank" rel="noopener noreferrer" class="footer__link-item">Issues<svg width="13.5" height="13.5" aria-label="(opens in new tab)" class="iconExternalLink_nPIU"><use href="#theme-svg-external-link"></use></svg></a></li><li class="footer__item"><a href="https://github.com/marquesantero/contractforge/releases" target="_blank" rel="noopener noreferrer" class="footer__link-item">Releases<svg width="13.5" height="13.5" aria-label="(opens in new tab)" class="iconExternalLink_nPIU"><use href="#theme-svg-external-link"></use></svg></a></li></ul></div></div><div class="footer__bottom text--center"><div class="footer__copyright">Copyright © 2026 ContractForge contributors. Documentation powered by Docusaurus.</div></div></div></footer></div>
+</body>
+</html>

@@ -1,0 +1,580 @@
+{
+  "adapter": "gcp",
+  "dataset": "testebig-496714.contractforge_gcp_smoke",
+  "formats": {
+    "avro": {
+      "blockers": [],
+      "executed": true,
+      "ok": true,
+      "operations": [
+        {
+          "artifact": "testebig-496714_contractforge_gcp_smoke_orders_avro.gcp.evidence_ddl.sql",
+          "executed": true,
+          "job": {
+            "error_message": null,
+            "inserted_rows": null,
+            "job_id": "cf_gcp_smoke_query_e832fdb1448e4a84b3f6",
+            "job_type": "QUERY",
+            "output_rows": null,
+            "result_rows": null,
+            "state": "DONE",
+            "statement_type": "CREATE_TABLE",
+            "total_bytes_billed": 0,
+            "total_bytes_processed": 0,
+            "total_slot_ms": 0
+          },
+          "kind": "QUERY",
+          "name": "prepare_evidence"
+        },
+        {
+          "artifact": "testebig-496714_contractforge_gcp_smoke_orders_avro.gcp.load_job.json",
+          "executed": true,
+          "job": {
+            "error_message": null,
+            "inserted_rows": null,
+            "job_id": "cf_gcp_smoke_load_99176ff29eaa4d57aead",
+            "job_type": "LOAD",
+            "output_rows": 3,
+            "result_rows": null,
+            "state": "DONE",
+            "statement_type": null,
+            "total_bytes_billed": null,
+            "total_bytes_processed": null,
+            "total_slot_ms": 179
+          },
+          "kind": "LOAD",
+          "name": "load_source"
+        },
+        {
+          "artifact": "inline:gcp.run_evidence",
+          "executed": true,
+          "job": {
+            "error_message": null,
+            "inserted_rows": 1,
+            "job_id": "cf_gcp_smoke_query_8b7b9cc217804e45b746",
+            "job_type": "QUERY",
+            "output_rows": null,
+            "result_rows": null,
+            "state": "DONE",
+            "statement_type": "INSERT",
+            "total_bytes_billed": 0,
+            "total_bytes_processed": 0,
+            "total_slot_ms": 1130
+          },
+          "kind": "QUERY",
+          "name": "persist_run_evidence"
+        },
+        {
+          "artifact": "testebig-496714_contractforge_gcp_smoke_orders_avro.gcp.quality.sql",
+          "executed": true,
+          "job": {
+            "error_message": null,
+            "inserted_rows": null,
+            "job_id": "cf_gcp_smoke_query_967f0d18b0e243d7914b",
+            "job_type": "QUERY",
+            "output_rows": null,
+            "result_rows": [
+              {
+                "failed_rows": "0"
+              }
+            ],
+            "state": "DONE",
+            "statement_type": "SELECT",
+            "total_bytes_billed": 10485760,
+            "total_bytes_processed": 24,
+            "total_slot_ms": 13
+          },
+          "kind": "QUERY",
+          "name": "quality"
+        },
+        {
+          "artifact": "inline:gcp.quality_evidence",
+          "executed": true,
+          "job": {
+            "error_message": null,
+            "inserted_rows": 1,
+            "job_id": "cf_gcp_smoke_query_d9669ff04c5e45c98551",
+            "job_type": "QUERY",
+            "output_rows": null,
+            "result_rows": null,
+            "state": "DONE",
+            "statement_type": "INSERT",
+            "total_bytes_billed": 0,
+            "total_bytes_processed": 0,
+            "total_slot_ms": 1188
+          },
+          "kind": "QUERY",
+          "name": "persist_quality_evidence"
+        }
+      ],
+      "planning_status": "SUPPORTED_WITH_WARNINGS",
+      "status": "SUCCEEDED",
+      "warnings": [
+        {
+          "code": "GCP_STABLE_SURFACE_SCOPE",
+          "message": "GCP BigQuery is stable-final for the documented batch BigQuery surface. Streaming, advanced write modes, deployment runners, native Dataplex integrations, governance auto-repair/delete and overwrite-retention certification are explicitly outside this scoped claim."
+        }
+      ]
+    },
+    "csv": {
+      "blockers": [],
+      "executed": true,
+      "ok": true,
+      "operations": [
+        {
+          "artifact": "testebig-496714_contractforge_gcp_smoke_orders_csv.gcp.evidence_ddl.sql",
+          "executed": true,
+          "job": {
+            "error_message": null,
+            "inserted_rows": null,
+            "job_id": "cf_gcp_smoke_query_f88a218a98ea463fbd23",
+            "job_type": "QUERY",
+            "output_rows": null,
+            "result_rows": null,
+            "state": "DONE",
+            "statement_type": "CREATE_TABLE",
+            "total_bytes_billed": 0,
+            "total_bytes_processed": 0,
+            "total_slot_ms": 0
+          },
+          "kind": "QUERY",
+          "name": "prepare_evidence"
+        },
+        {
+          "artifact": "testebig-496714_contractforge_gcp_smoke_orders_csv.gcp.load_job.json",
+          "executed": true,
+          "job": {
+            "error_message": null,
+            "inserted_rows": null,
+            "job_id": "cf_gcp_smoke_load_378d042c79674d36ab78",
+            "job_type": "LOAD",
+            "output_rows": 3,
+            "result_rows": null,
+            "state": "DONE",
+            "statement_type": null,
+            "total_bytes_billed": null,
+            "total_bytes_processed": null,
+            "total_slot_ms": 120
+          },
+          "kind": "LOAD",
+          "name": "load_source"
+        },
+        {
+          "artifact": "inline:gcp.run_evidence",
+          "executed": true,
+          "job": {
+            "error_message": null,
+            "inserted_rows": 1,
+            "job_id": "cf_gcp_smoke_query_7b4db023a6ea44efac47",
+            "job_type": "QUERY",
+            "output_rows": null,
+            "result_rows": null,
+            "state": "DONE",
+            "statement_type": "INSERT",
+            "total_bytes_billed": 0,
+            "total_bytes_processed": 0,
+            "total_slot_ms": 1320
+          },
+          "kind": "QUERY",
+          "name": "persist_run_evidence"
+        },
+        {
+          "artifact": "testebig-496714_contractforge_gcp_smoke_orders_csv.gcp.quality.sql",
+          "executed": true,
+          "job": {
+            "error_message": null,
+            "inserted_rows": null,
+            "job_id": "cf_gcp_smoke_query_a35e659cce0a46a5a17f",
+            "job_type": "QUERY",
+            "output_rows": null,
+            "result_rows": [
+              {
+                "failed_rows": "0"
+              }
+            ],
+            "state": "DONE",
+            "statement_type": "SELECT",
+            "total_bytes_billed": 10485760,
+            "total_bytes_processed": 24,
+            "total_slot_ms": 29
+          },
+          "kind": "QUERY",
+          "name": "quality"
+        },
+        {
+          "artifact": "inline:gcp.quality_evidence",
+          "executed": true,
+          "job": {
+            "error_message": null,
+            "inserted_rows": 1,
+            "job_id": "cf_gcp_smoke_query_157fdffb188445d98ea2",
+            "job_type": "QUERY",
+            "output_rows": null,
+            "result_rows": null,
+            "state": "DONE",
+            "statement_type": "INSERT",
+            "total_bytes_billed": 0,
+            "total_bytes_processed": 0,
+            "total_slot_ms": 1117
+          },
+          "kind": "QUERY",
+          "name": "persist_quality_evidence"
+        }
+      ],
+      "planning_status": "SUPPORTED_WITH_WARNINGS",
+      "status": "SUCCEEDED",
+      "warnings": [
+        {
+          "code": "GCP_STABLE_SURFACE_SCOPE",
+          "message": "GCP BigQuery is stable-final for the documented batch BigQuery surface. Streaming, advanced write modes, deployment runners, native Dataplex integrations, governance auto-repair/delete and overwrite-retention certification are explicitly outside this scoped claim."
+        }
+      ]
+    },
+    "ndjson": {
+      "blockers": [],
+      "executed": true,
+      "ok": true,
+      "operations": [
+        {
+          "artifact": "testebig-496714_contractforge_gcp_smoke_orders_ndjson.gcp.evidence_ddl.sql",
+          "executed": true,
+          "job": {
+            "error_message": null,
+            "inserted_rows": null,
+            "job_id": "cf_gcp_smoke_query_6090548c500340dab2d7",
+            "job_type": "QUERY",
+            "output_rows": null,
+            "result_rows": null,
+            "state": "DONE",
+            "statement_type": "CREATE_TABLE",
+            "total_bytes_billed": 0,
+            "total_bytes_processed": 0,
+            "total_slot_ms": 0
+          },
+          "kind": "QUERY",
+          "name": "prepare_evidence"
+        },
+        {
+          "artifact": "testebig-496714_contractforge_gcp_smoke_orders_ndjson.gcp.load_job.json",
+          "executed": true,
+          "job": {
+            "error_message": null,
+            "inserted_rows": null,
+            "job_id": "cf_gcp_smoke_load_40c8f19c2acb4cc1b6bd",
+            "job_type": "LOAD",
+            "output_rows": 3,
+            "result_rows": null,
+            "state": "DONE",
+            "statement_type": null,
+            "total_bytes_billed": null,
+            "total_bytes_processed": null,
+            "total_slot_ms": 142
+          },
+          "kind": "LOAD",
+          "name": "load_source"
+        },
+        {
+          "artifact": "inline:gcp.run_evidence",
+          "executed": true,
+          "job": {
+            "error_message": null,
+            "inserted_rows": 1,
+            "job_id": "cf_gcp_smoke_query_8e4376b751004a9ea1b7",
+            "job_type": "QUERY",
+            "output_rows": null,
+            "result_rows": null,
+            "state": "DONE",
+            "statement_type": "INSERT",
+            "total_bytes_billed": 0,
+            "total_bytes_processed": 0,
+            "total_slot_ms": 1150
+          },
+          "kind": "QUERY",
+          "name": "persist_run_evidence"
+        },
+        {
+          "artifact": "testebig-496714_contractforge_gcp_smoke_orders_ndjson.gcp.quality.sql",
+          "executed": true,
+          "job": {
+            "error_message": null,
+            "inserted_rows": null,
+            "job_id": "cf_gcp_smoke_query_50b4554174854b98b8b1",
+            "job_type": "QUERY",
+            "output_rows": null,
+            "result_rows": [
+              {
+                "failed_rows": "0"
+              }
+            ],
+            "state": "DONE",
+            "statement_type": "SELECT",
+            "total_bytes_billed": 10485760,
+            "total_bytes_processed": 24,
+            "total_slot_ms": 22
+          },
+          "kind": "QUERY",
+          "name": "quality"
+        },
+        {
+          "artifact": "inline:gcp.quality_evidence",
+          "executed": true,
+          "job": {
+            "error_message": null,
+            "inserted_rows": 1,
+            "job_id": "cf_gcp_smoke_query_f0339dea575f4f0bb793",
+            "job_type": "QUERY",
+            "output_rows": null,
+            "result_rows": null,
+            "state": "DONE",
+            "statement_type": "INSERT",
+            "total_bytes_billed": 0,
+            "total_bytes_processed": 0,
+            "total_slot_ms": 1120
+          },
+          "kind": "QUERY",
+          "name": "persist_quality_evidence"
+        }
+      ],
+      "planning_status": "SUPPORTED_WITH_WARNINGS",
+      "status": "SUCCEEDED",
+      "warnings": [
+        {
+          "code": "GCP_STABLE_SURFACE_SCOPE",
+          "message": "GCP BigQuery is stable-final for the documented batch BigQuery surface. Streaming, advanced write modes, deployment runners, native Dataplex integrations, governance auto-repair/delete and overwrite-retention certification are explicitly outside this scoped claim."
+        }
+      ]
+    },
+    "orc": {
+      "blockers": [],
+      "executed": true,
+      "ok": true,
+      "operations": [
+        {
+          "artifact": "testebig-496714_contractforge_gcp_smoke_orders_orc.gcp.evidence_ddl.sql",
+          "executed": true,
+          "job": {
+            "error_message": null,
+            "inserted_rows": null,
+            "job_id": "cf_gcp_smoke_query_268db9999cd347819c41",
+            "job_type": "QUERY",
+            "output_rows": null,
+            "result_rows": null,
+            "state": "DONE",
+            "statement_type": "CREATE_TABLE",
+            "total_bytes_billed": 0,
+            "total_bytes_processed": 0,
+            "total_slot_ms": 0
+          },
+          "kind": "QUERY",
+          "name": "prepare_evidence"
+        },
+        {
+          "artifact": "testebig-496714_contractforge_gcp_smoke_orders_orc.gcp.load_job.json",
+          "executed": true,
+          "job": {
+            "error_message": null,
+            "inserted_rows": null,
+            "job_id": "cf_gcp_smoke_load_1949f49038334183b2ac",
+            "job_type": "LOAD",
+            "output_rows": 3,
+            "result_rows": null,
+            "state": "DONE",
+            "statement_type": null,
+            "total_bytes_billed": null,
+            "total_bytes_processed": null,
+            "total_slot_ms": 2626
+          },
+          "kind": "LOAD",
+          "name": "load_source"
+        },
+        {
+          "artifact": "inline:gcp.run_evidence",
+          "executed": true,
+          "job": {
+            "error_message": null,
+            "inserted_rows": 1,
+            "job_id": "cf_gcp_smoke_query_fa4ab3b4e4284c4fa106",
+            "job_type": "QUERY",
+            "output_rows": null,
+            "result_rows": null,
+            "state": "DONE",
+            "statement_type": "INSERT",
+            "total_bytes_billed": 0,
+            "total_bytes_processed": 0,
+            "total_slot_ms": 1249
+          },
+          "kind": "QUERY",
+          "name": "persist_run_evidence"
+        },
+        {
+          "artifact": "testebig-496714_contractforge_gcp_smoke_orders_orc.gcp.quality.sql",
+          "executed": true,
+          "job": {
+            "error_message": null,
+            "inserted_rows": null,
+            "job_id": "cf_gcp_smoke_query_46a4b9fc4bb04c9db3c9",
+            "job_type": "QUERY",
+            "output_rows": null,
+            "result_rows": [
+              {
+                "failed_rows": "0"
+              }
+            ],
+            "state": "DONE",
+            "statement_type": "SELECT",
+            "total_bytes_billed": 10485760,
+            "total_bytes_processed": 24,
+            "total_slot_ms": 25
+          },
+          "kind": "QUERY",
+          "name": "quality"
+        },
+        {
+          "artifact": "inline:gcp.quality_evidence",
+          "executed": true,
+          "job": {
+            "error_message": null,
+            "inserted_rows": 1,
+            "job_id": "cf_gcp_smoke_query_29b8ea81f1594edb9e44",
+            "job_type": "QUERY",
+            "output_rows": null,
+            "result_rows": null,
+            "state": "DONE",
+            "statement_type": "INSERT",
+            "total_bytes_billed": 0,
+            "total_bytes_processed": 0,
+            "total_slot_ms": 1047
+          },
+          "kind": "QUERY",
+          "name": "persist_quality_evidence"
+        }
+      ],
+      "planning_status": "SUPPORTED_WITH_WARNINGS",
+      "status": "SUCCEEDED",
+      "warnings": [
+        {
+          "code": "GCP_STABLE_SURFACE_SCOPE",
+          "message": "GCP BigQuery is stable-final for the documented batch BigQuery surface. Streaming, advanced write modes, deployment runners, native Dataplex integrations, governance auto-repair/delete and overwrite-retention certification are explicitly outside this scoped claim."
+        }
+      ]
+    },
+    "parquet": {
+      "blockers": [],
+      "executed": true,
+      "ok": true,
+      "operations": [
+        {
+          "artifact": "testebig-496714_contractforge_gcp_smoke_orders_parquet.gcp.evidence_ddl.sql",
+          "executed": true,
+          "job": {
+            "error_message": null,
+            "inserted_rows": null,
+            "job_id": "cf_gcp_smoke_query_0fc18c81478341edb78d",
+            "job_type": "QUERY",
+            "output_rows": null,
+            "result_rows": null,
+            "state": "DONE",
+            "statement_type": "CREATE_TABLE",
+            "total_bytes_billed": 0,
+            "total_bytes_processed": 0,
+            "total_slot_ms": 0
+          },
+          "kind": "QUERY",
+          "name": "prepare_evidence"
+        },
+        {
+          "artifact": "testebig-496714_contractforge_gcp_smoke_orders_parquet.gcp.load_job.json",
+          "executed": true,
+          "job": {
+            "error_message": null,
+            "inserted_rows": null,
+            "job_id": "cf_gcp_smoke_load_8c259d3f853f45f49c24",
+            "job_type": "LOAD",
+            "output_rows": 3,
+            "result_rows": null,
+            "state": "DONE",
+            "statement_type": null,
+            "total_bytes_billed": null,
+            "total_bytes_processed": null,
+            "total_slot_ms": 183
+          },
+          "kind": "LOAD",
+          "name": "load_source"
+        },
+        {
+          "artifact": "inline:gcp.run_evidence",
+          "executed": true,
+          "job": {
+            "error_message": null,
+            "inserted_rows": 1,
+            "job_id": "cf_gcp_smoke_query_b2696fa76c3d4b2aaf6c",
+            "job_type": "QUERY",
+            "output_rows": null,
+            "result_rows": null,
+            "state": "DONE",
+            "statement_type": "INSERT",
+            "total_bytes_billed": 0,
+            "total_bytes_processed": 0,
+            "total_slot_ms": 1120
+          },
+          "kind": "QUERY",
+          "name": "persist_run_evidence"
+        },
+        {
+          "artifact": "testebig-496714_contractforge_gcp_smoke_orders_parquet.gcp.quality.sql",
+          "executed": true,
+          "job": {
+            "error_message": null,
+            "inserted_rows": null,
+            "job_id": "cf_gcp_smoke_query_9b50b201a65744faa499",
+            "job_type": "QUERY",
+            "output_rows": null,
+            "result_rows": [
+              {
+                "failed_rows": "0"
+              }
+            ],
+            "state": "DONE",
+            "statement_type": "SELECT",
+            "total_bytes_billed": 10485760,
+            "total_bytes_processed": 24,
+            "total_slot_ms": 14
+          },
+          "kind": "QUERY",
+          "name": "quality"
+        },
+        {
+          "artifact": "inline:gcp.quality_evidence",
+          "executed": true,
+          "job": {
+            "error_message": null,
+            "inserted_rows": 1,
+            "job_id": "cf_gcp_smoke_query_8df871a7b0ca48f1bdcc",
+            "job_type": "QUERY",
+            "output_rows": null,
+            "result_rows": null,
+            "state": "DONE",
+            "statement_type": "INSERT",
+            "total_bytes_billed": 0,
+            "total_bytes_processed": 0,
+            "total_slot_ms": 1217
+          },
+          "kind": "QUERY",
+          "name": "persist_quality_evidence"
+        }
+      ],
+      "planning_status": "SUPPORTED_WITH_WARNINGS",
+      "status": "SUCCEEDED",
+      "warnings": [
+        {
+          "code": "GCP_STABLE_SURFACE_SCOPE",
+          "message": "GCP BigQuery is stable-final for the documented batch BigQuery surface. Streaming, advanced write modes, deployment runners, native Dataplex integrations, governance auto-repair/delete and overwrite-retention certification are explicitly outside this scoped claim."
+        }
+      ]
+    }
+  },
+  "gate": "GCP-BQ-02",
+  "source_prefix": "gs://contractforge-fabric-gcs-testebig-496714/contractforge/gcp-smoke/formats/",
+  "subtarget": "gcp_bigquery"
+}
+

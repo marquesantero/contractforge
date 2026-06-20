@@ -1,0 +1,57 @@
+{
+  "kind": "contractforge_snowflake_access_policy_smoke",
+  "schema_version": "1.0.0",
+  "adapter": "contractforge-snowflake",
+  "subtarget": "snowflake_sql_warehouse",
+  "maturity_gate": "SNOWFLAKE-ACCESS-POLICY-SMOKE",
+  "status": "EXCLUDED_FROM_STABLE_FINAL",
+  "executed_at": "2026-06-09",
+  "connection": {
+    "connection_name": "cfingestsvc-pat",
+    "role": "CONTRACTFORGE_INGEST_ROLE",
+    "database": "CONTRACTFORGE_TEST_DB",
+    "warehouse": "COMPUTE_WH"
+  },
+  "command": "uv run --with snowflake-connector-python contractforge-snowflake smoke-access-policy --connect-options .tmp/snowflake-hashdiff-live/connect-options.yaml --connection cfingestsvc-pat --table-prefix CF_SMOKE_ACCESS_MATURITY --execute --execute-cleanup --output-dir .tmp/snowflake-access-policy-smoke",
+  "result": {
+    "status": "BLOCKED",
+    "blocked_at": "CREATE OR REPLACE ROW ACCESS POLICY",
+    "error_type": "snowflake.connector.errors.ProgrammingError",
+    "error_code": "000002",
+    "sql_state": "0A000",
+    "error_message": "Unsupported feature 'ROW ACCESS POLICY'."
+  },
+  "decision": {
+    "stable_final_scope": "EXCLUDED",
+    "reason": "The connected Snowflake account does not support ROW ACCESS POLICY. ContractForge keeps table grants, comments/tags and validate-only governance in the supported Snowflake surface, but excludes row access and masking policy certification from stable-final on accounts where those native policy features are unavailable.",
+    "excluded_claims": [
+      "row_access_policy_positive_read",
+      "row_access_policy_negative_read",
+      "masking_policy_positive_read",
+      "masking_policy_negative_read"
+    ],
+    "supported_claims_retained": [
+      "table_grant_apply",
+      "validate_only_access_evidence",
+      "annotation_comments_and_tags"
+    ],
+    "planner_behavior": "Do not silently apply weaker filtering or masking semantics when Snowflake policy features are unavailable."
+  },
+  "implemented_smoke_command": "contractforge-snowflake smoke-access-policy",
+  "required_cases": [
+    "table_grant_apply",
+    "row_access_policy_positive_read",
+    "row_access_policy_negative_read",
+    "masking_policy_positive_read",
+    "masking_policy_negative_read",
+    "ctrl_ingestion_access_evidence"
+  ],
+  "required_before_promotion": [
+    "Rerun smoke-access-policy on a Snowflake account or edition where ROW ACCESS POLICY and masking policy features are available.",
+    "Record policy positive/negative read results, query ids and ctrl_ingestion_access evidence.",
+    "Keep masking-policy and table-grant checks in the same smoke payload when the row access policy blocker is removed."
+  ],
+  "open_items": [
+    "None for the current Snowflake stable-final claim; policy enforcement promotion requires a different Snowflake account feature set."
+  ]
+}

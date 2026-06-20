@@ -1,0 +1,68 @@
+{
+  "kind": "contractforge_gcp_bigquery_schema_policy_strict_smoke",
+  "schema_version": "1.0.0",
+  "adapter": "contractforge-gcp",
+  "subtarget": "gcp_bigquery",
+  "maturity_gate": "GCP-BQ-07D",
+  "status": "PASS_NEGATIVE",
+  "executed_at": "2026-06-16",
+  "project": "midyear-system-499521-p3",
+  "location": "us-east1",
+  "contract": {
+    "source": "midyear-system-499521-p3.contractforge_gcp_schema_policy_smoke.schema_policy_strict_source",
+    "target": "midyear-system-499521-p3.contractforge_gcp_schema_policy_smoke.schema_policy_strict_target",
+    "mode": "append",
+    "schema_policy": "strict"
+  },
+  "command": "python -m contractforge_gcp.cli smoke .tmp/gcp_schema_policy_strict_contract.yaml --environment .tmp/gcp_schema_policy_smoke_environment.yaml --execute --runtime bq --enforce-schema-policy --report .tmp/gcp-schema-policy-strict-smoke.json",
+  "operations": [
+    {
+      "name": "prepare_evidence",
+      "status": "SUCCEEDED"
+    },
+    {
+      "name": "schema_policy",
+      "status": "FAILED_EXPECTED",
+      "error_message": "Schema policy strict violation: added=['status'], removed=[], type_changes=[]",
+      "schema_changes": {
+        "added_columns": [
+          {
+            "column": "status",
+            "source_type": "STRING",
+            "target_type": null,
+            "change_type": "ADD_COLUMN",
+            "applied": false
+          }
+        ]
+      }
+    },
+    {
+      "name": "persist_schema_evidence",
+      "status": "SUCCEEDED",
+      "inserted_rows": 1
+    }
+  ],
+  "readback": {
+    "schema_evidence": {
+      "schema_policy": "strict",
+      "status": "FAILED",
+      "added_columns": [
+        "status"
+      ],
+      "removed_columns": [],
+      "added_column": "status",
+      "error_message": "Schema policy strict violation: added=['status'], removed=[], type_changes=[]"
+    }
+  },
+  "decision": {
+    "strict_schema_drift_e2e": "VALIDATED",
+    "failure_schema_evidence": "VALIDATED",
+    "target_write_after_drift": "BLOCKED_AS_EXPECTED",
+    "full_schema_policy_promotion": "PENDING"
+  },
+  "notes": [
+    "This smoke validates the opt-in schema-policy runtime hook for a strict BigQuery table-source drift case.",
+    "The runtime inspected source and target INFORMATION_SCHEMA.COLUMNS, blocked the append before data write and persisted failed schema evidence.",
+    "GCP-BQ-07 is promoted with automatic BigQuery type widening or mutation kept review-required outside the stable runtime path."
+  ]
+}

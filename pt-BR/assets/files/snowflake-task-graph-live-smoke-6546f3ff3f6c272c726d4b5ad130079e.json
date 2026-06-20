@@ -1,0 +1,79 @@
+{
+  "kind": "contractforge_snowflake_task_graph_live_smoke",
+  "schema_version": "1.0.0",
+  "adapter": "contractforge-snowflake",
+  "subtarget": "snowflake_sql_warehouse",
+  "maturity_gate": "SNOWFLAKE-TASK-GRAPH-LIVE",
+  "status": "PASS",
+  "executed_at": "2026-06-09",
+  "connection": {
+    "connection_name": "cfingestsvc-pat",
+    "account": "IW11590",
+    "user": "CFINGESTSVC",
+    "role": "CONTRACTFORGE_INGEST_ROLE",
+    "database": "CONTRACTFORGE_TEST_DB",
+    "warehouse": "COMPUTE_WH"
+  },
+  "command": "uv run --with snowflake-connector-python contractforge-snowflake smoke-task-graph --connection cfingestsvc-pat --core-wheel dist/contractforge_core-0.1.0-py3-none-any.whl --adapter-wheel adapters/snowflake/dist/contractforge_snowflake-0.1.0-py3-none-any.whl --table-prefix CF_SMOKE_TASK_MATURITY --execute --execute-cleanup",
+  "result": {
+    "status": "SUCCESS",
+    "stage": "@\"CONTRACTFORGE_TEST_DB\".\"PUBLIC\".\"CF_SMOKE_TASK_MATURITY_ARTIFACTS\"",
+    "prefix": "cf_smoke_task_maturity",
+    "procedure": "CONTRACTFORGE_TEST_DB.PUBLIC.CF_SMOKE_TASK_MATURITY_RUNNER",
+    "task_names": [
+      "bronze_customers",
+      "silver_customers"
+    ],
+    "artifact_counts": [
+      7,
+      7
+    ],
+    "deployment_command_count": 3,
+    "lifecycle_command_count": 3,
+    "history_rows": 2,
+    "bronze_count": 2,
+    "silver_count": 2,
+    "task_wait": {
+      "status": "SUCCESS",
+      "tasks": [
+        {
+          "name": "bronze_customers",
+          "state": "SUCCEEDED",
+          "query_id": "01c4f04d-0001-6b57-0001-084600154b76"
+        },
+        {
+          "name": "silver_customers",
+          "state": "SUCCEEDED",
+          "query_id": "01c4f04e-0001-6b9e-0001-084600155a2a"
+        }
+      ]
+    }
+  },
+  "grants": {
+    "status": "PASS",
+    "required_schema_grants": [
+      "CREATE TASK",
+      "CREATE STAGE",
+      "CREATE TABLE",
+      "CREATE PROCEDURE",
+      "USAGE"
+    ],
+    "required_account_grants": [
+      "EXECUTE TASK"
+    ]
+  },
+  "cleanup": {
+    "status": "PASS",
+    "commands": [
+      "ALTER TASK IF EXISTS \"CONTRACTFORGE_TEST_DB\".\"PUBLIC\".\"bronze_customers\" SUSPEND",
+      "ALTER TASK IF EXISTS \"CONTRACTFORGE_TEST_DB\".\"PUBLIC\".\"silver_customers\" SUSPEND",
+      "DROP TASK IF EXISTS \"CONTRACTFORGE_TEST_DB\".\"PUBLIC\".\"silver_customers\"",
+      "DROP TASK IF EXISTS \"CONTRACTFORGE_TEST_DB\".\"PUBLIC\".\"bronze_customers\"",
+      "DROP PROCEDURE IF EXISTS \"CONTRACTFORGE_TEST_DB\".\"PUBLIC\".\"CF_SMOKE_TASK_MATURITY_RUNNER\"(STRING, STRING)",
+      "DROP TABLE IF EXISTS CONTRACTFORGE_TEST_DB.PUBLIC.CF_SMOKE_TASK_MATURITY_TASK_SILVER",
+      "DROP TABLE IF EXISTS CONTRACTFORGE_TEST_DB.PUBLIC.CF_SMOKE_TASK_MATURITY_TASK_BRONZE",
+      "DROP TABLE IF EXISTS CONTRACTFORGE_TEST_DB.PUBLIC.CF_SMOKE_TASK_MATURITY_TASK_SOURCE",
+      "DROP STAGE IF EXISTS \"CONTRACTFORGE_TEST_DB\".\"PUBLIC\".\"CF_SMOKE_TASK_MATURITY_ARTIFACTS\""
+    ]
+  }
+}

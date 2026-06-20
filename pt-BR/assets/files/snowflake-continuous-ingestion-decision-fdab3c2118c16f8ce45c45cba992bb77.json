@@ -1,0 +1,44 @@
+{
+  "kind": "contractforge_snowflake_continuous_ingestion_decision",
+  "schema_version": "1.0.0",
+  "adapter": "contractforge-snowflake",
+  "subtarget": "snowflake_sql_warehouse",
+  "maturity_gate": "SNOWFLAKE-CONTINUOUS-INGESTION-DECISION",
+  "status": "EXCLUDED_FROM_STABLE_FINAL",
+  "executed_at": "2026-06-10",
+  "decision": {
+    "stable_final_scope": "EXCLUDED",
+    "reason": "The Snowflake stable surface certifies SQL warehouse, staged-file batch ingestion, hosted procedure execution, task graph execution and control-table evidence. Snowpipe, Streams, Snowpipe Streaming and Kafka connector ingestion require a separate connector/runtime design with different recovery, offset and evidence semantics.",
+    "excluded_sources": [
+      "kafka",
+      "kafka_bounded",
+      "kafka_available_now",
+      "eventhubs_bounded",
+      "eventhubs_available_now",
+      "snowpipe",
+      "snowpipe_streaming",
+      "streams"
+    ],
+    "planner_behavior": "Keep these sources REVIEW_REQUIRED or UNSUPPORTED for the Snowflake SQL warehouse runtime. Do not silently fall back to staged-file batch ingestion.",
+    "certified_alternative": "Use staged_files with named CSV, JSON or Parquet file formats for the current Snowflake stable surface."
+  },
+  "official_reference": [
+    {
+      "name": "Snowflake Connector for Kafka",
+      "url": "https://docs.snowflake.com/en/user-guide/kafka-connector",
+      "note": "Snowflake documents Kafka ingestion as a connector that reads Kafka topics and loads Snowflake tables."
+    },
+    {
+      "name": "Snowpipe Streaming",
+      "url": "https://docs.snowflake.com/en/user-guide/snowpipe-streaming",
+      "note": "Snowpipe Streaming is a separate ingestion API path from SQL warehouse batch contracts."
+    }
+  ],
+  "required_before_promotion": [
+    "Define a Snowflake connector/runtime mapping for Kafka/Snowpipe/Streams that preserves ContractForge available-now or streaming intent.",
+    "Record offset/checkpoint or channel state semantics in ContractForge evidence tables.",
+    "Validate first-run, no-input rerun, failure/redaction and cost/query-history evidence on a live Snowflake account.",
+    "Document any semantic difference from Databricks and AWS available-now stream behavior."
+  ],
+  "open_items": []
+}

@@ -1,0 +1,67 @@
+{
+  "kind": "contractforge_gcp_governance_stable_scope_decision",
+  "schema_version": "1.0.0",
+  "adapter": "contractforge-gcp",
+  "subtarget": "gcp_bigquery",
+  "maturity_gate": "GCP-BQ-17",
+  "status": "PASS_WITH_REVIEW_BOUNDARY",
+  "decided_at": "2026-06-15",
+  "decision": {
+    "stable_final_scope": "GOVERNANCE_READBACK_AND_RECONCILIATION_INCLUDED",
+    "included_surfaces": [
+      "bigquery_row_access_policy_apply_readback_enforcement",
+      "bigquery_direct_column_data_policy_masking",
+      "data_catalog_policy_tag_column_access",
+      "bigquery_table_column_descriptions",
+      "governance_ledger_artifact_planning",
+      "governance_ledger_evidence_write_readback",
+      "governance_ledger_reconciliation_artifact_planning",
+      "governance_ledger_reconciliation_command_readback",
+      "run_quality_annotation_failed_run_evidence"
+    ],
+    "excluded_surfaces": [
+      "tag_based_masking",
+      "policy_tag_backed_data_masking",
+      "dataplex_or_knowledge_catalog_aspects",
+      "overwrite_retention_for_row_policies_masks_and_policy_tags",
+      "automatic_governance_policy_repair_or_delete"
+    ],
+    "reason": "The GCP adapter has live evidence for row access policies, direct column data masking, policy-tag column access, BigQuery descriptions, core evidence writes and governance-ledger evidence write/readback for declared governance intent. It now exposes a non-mutating governance-reconcile command that reads native BigQuery row policies, data policies, policy tags, descriptions and ContractForge governance evidence, then compares them with declared contract intent. It has not validated tag-based masking, policy-tag-backed data masking, overwrite-retention behavior or automatic repair/delete flows.",
+    "planner_behavior": "Claim the validated BigQuery governance surfaces, deterministic governance ledger/reconciliation artifacts, smoke-runtime governance evidence write/readback and non-mutating reconciliation readback. Keep tag-based masking, policy-tag-backed masking, overwrite-retention governance and automatic repair/delete as REVIEW_REQUIRED."
+  },
+  "adapter_behavior": {
+    "governance_e2e": true,
+    "row_access_policy_smoke": true,
+    "direct_column_data_masking_smoke": true,
+    "policy_tag_column_access_smoke": true,
+    "annotations_description_smoke": true,
+    "governance_ledger_artifact_planning": true,
+    "governance_ledger_evidence_write_readback": true,
+    "governance_ledger_reconciliation_artifact_planning": true,
+    "governance_ledger_reconciliation_command_readback": true,
+    "tag_based_masking": false,
+    "automatic_governance_repair": false
+  },
+  "required_before_promotion": [
+    "Validate policy-tag-backed data masking if tag-based masking is promoted into stable scope.",
+    "Validate overwrite and replace-table behavior preserves or intentionally reapplies row policies, data policies and policy tags.",
+    "Validate automatic access-policy repair/delete behavior if ContractForge ever mutates unmanaged grants/policies.",
+    "Run a cross-adapter governance E2E project covering apply, readback, restricted-principal enforcement, evidence rows and failure evidence."
+  ],
+  "acceptance": "Stable-final GCP claims may include the validated governance smokes, deterministic governance ledger/reconciliation artifacts, smoke-runtime governance evidence write/readback and non-mutating governance-reconcile readback. They must explicitly exclude tag-based masking, overwrite retention and automatic governance repair/delete until linked evidence exists.",
+  "evidence": [
+    "docs/reports/gcp-bigquery-row-access-policy-smoke.json",
+    "docs/reports/gcp-bigquery-data-masking-smoke.json",
+    "docs/reports/gcp-bigquery-policy-tags-smoke.json",
+    "docs/reports/gcp-bigquery-annotations-smoke.json",
+    "docs/reports/gcp-governance-ledger-evidence-smoke.json",
+    "docs/reports/gcp-governance-ledger-reconciliation-plan.json",
+    "docs/reports/gcp-governance-ledger-reconciliation-smoke.json"
+  ],
+  "sources": [
+    "https://docs.cloud.google.com/bigquery/docs/column-data-masking-intro",
+    "https://docs.cloud.google.com/bigquery/docs/column-level-security-intro",
+    "https://docs.cloud.google.com/bigquery/docs/row-level-security-intro",
+    "https://docs.cloud.google.com/bigquery/docs/access-control"
+  ]
+}

@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="pt-BR" dir="ltr" class="docs-wrapper plugin-docs plugin-id-default docs-version-current docs-doc-page docs-doc-id-specs/aws-ga-criteria" data-has-hydrated="false">
+<head>
+<meta charset="UTF-8">
+<meta name="generator" content="Docusaurus v3.10.1">
+<title data-rh="true">Critérios de superfície estável AWS | ContractForge</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:image" content="https://marquesantero.github.io/contractforge/pt-BR/img/contractforge-logo.png"><meta data-rh="true" name="twitter:image" content="https://marquesantero.github.io/contractforge/pt-BR/img/contractforge-logo.png"><meta data-rh="true" property="og:url" content="https://marquesantero.github.io/contractforge/pt-BR/docs/specs/aws-ga-criteria/"><meta data-rh="true" property="og:locale" content="pt_BR"><meta data-rh="true" property="og:locale:alternate" content="en_US"><meta data-rh="true" name="docusaurus_locale" content="pt-BR"><meta data-rh="true" name="docsearch:language" content="pt-BR"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="Critérios de superfície estável AWS | ContractForge"><meta data-rh="true" name="description" content="Propósito"><meta data-rh="true" property="og:description" content="Propósito"><link data-rh="true" rel="icon" href="/contractforge/pt-BR/img/contractforge-mark.png"><link data-rh="true" rel="canonical" href="https://marquesantero.github.io/contractforge/pt-BR/docs/specs/aws-ga-criteria/"><link data-rh="true" rel="alternate" href="https://marquesantero.github.io/contractforge/docs/specs/aws-ga-criteria/" hreflang="en-US"><link data-rh="true" rel="alternate" href="https://marquesantero.github.io/contractforge/pt-BR/docs/specs/aws-ga-criteria/" hreflang="pt-BR"><link data-rh="true" rel="alternate" href="https://marquesantero.github.io/contractforge/docs/specs/aws-ga-criteria/" hreflang="x-default"><link rel="stylesheet" href="/contractforge/pt-BR/assets/css/styles.e35730a0.css">
+<script src="/contractforge/pt-BR/assets/js/runtime~main.7ac75648.js" defer="defer"></script>
+<script src="/contractforge/pt-BR/assets/js/main.99e9fe41.js" defer="defer"></script>
+</head>
+<body>
+<svg style="display: none;"><defs>
+<symbol id="theme-svg-external-link" viewBox="0 0 24 24"><path fill="currentColor" d="M21 13v10h-21v-19h12v2h-10v15h17v-8h2zm3-12h-10.988l4.035 4-6.977 7.07 2.828 2.828 6.977-7.07 4.125 4.172v-11z"/></symbol>
+</defs></svg>
+<script>!function(){var t=function(){try{return new URLSearchParams(window.location.search).get("docusaurus-theme")}catch(t){}}()||function(){try{return window.localStorage.getItem("theme")}catch(t){}}();document.documentElement.setAttribute("data-theme",t||"light"),document.documentElement.setAttribute("data-theme-choice",t||"light")}(),function(){try{const c=new URLSearchParams(window.location.search).entries();for(var[t,e]of c)if(t.startsWith("docusaurus-data-")){var a=t.replace("docusaurus-data-","data-");document.documentElement.setAttribute(a,e)}}catch(t){}}()</script><div id="__docusaurus"><div role="region" aria-label="Pular para o conteúdo principal"><a class="skipToContent_fXgn" href="#__docusaurus_skipToContent_fallback">Pular para o conteúdo principal</a></div><nav aria-label="Navegação principal" class="theme-layout-navbar navbar navbar--fixed-top"><div class="navbar__inner"><div class="theme-layout-navbar-left navbar__items"><button aria-label="Alternar painel de navegação" aria-expanded="false" class="navbar__toggle clean-btn" type="button"><svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><path stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="2" d="M4 7h22M4 15h22M4 23h22"></path></svg></button><a class="navbar__brand" href="/contractforge/pt-BR/"><div class="navbar__logo"><img src="/contractforge/pt-BR/img/contractforge-mark.png" alt="ContractForge" class="themedComponent_mlkZ themedComponent--light_NVdE"><img src="/contractforge/pt-BR/img/contractforge-mark.png" alt="ContractForge" class="themedComponent_mlkZ themedComponent--dark_xIcU"></div><b class="navbar__title text--truncate">ContractForge</b></a><a class="navbar__item navbar__link" href="/contractforge/pt-BR/docs/intro/">Documentação</a><a class="navbar__item navbar__link" href="/contractforge/pt-BR/docs/adapters/overview/">Adaptadores</a><a class="navbar__item navbar__link" href="/contractforge/pt-BR/docs/connectors/overview/">Conectores</a></div><div class="theme-layout-navbar-right navbar__items navbar__items--right"><div class="navbar__item dropdown dropdown--hoverable dropdown--right"><a href="#" aria-haspopup="true" aria-expanded="false" role="button" class="navbar__link"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" class="iconLanguage_nlXk"><path fill="currentColor" d="M12.87 15.07l-2.54-2.51.03-.03c1.74-1.94 2.98-4.17 3.71-6.53H17V4h-7V2H8v2H1v1.99h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2l-4.5-12zm-2.62 7l1.62-4.33L19.12 17h-3.24z"></path></svg>Português</a><ul class="dropdown__menu"><li><a href="/contractforge/docs/specs/aws-ga-criteria/" target="_self" rel="noopener noreferrer" class="dropdown__link" lang="en-US">English</a></li><li><a href="/contractforge/pt-BR/docs/specs/aws-ga-criteria/" target="_self" rel="noopener noreferrer" class="dropdown__link dropdown__link--active" lang="pt-BR">Português</a></li></ul></div><div class="navbarSearchContainer_Bca1"><div class="navbar__search searchBarContainer_NW3z" dir="ltr"><input placeholder="Pesquisar" aria-label="Search" class="navbar__search-input searchInput_YFbd" value=""><div class="loadingRing_RJI3 searchBarLoadingRing_YnHq"><div></div><div></div><div></div><div></div></div></div></div><a href="https://github.com/marquesantero/contractforge" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">GitHub<svg width="13.5" height="13.5" aria-label="(abre em nova aba)" class="iconExternalLink_nPIU"><use href="#theme-svg-external-link"></use></svg></a><div class="toggle_vylO colorModeToggle_DEke"><button class="clean-btn toggleButton_gllP toggleButtonDisabled_aARS" type="button" disabled="" title="modo do sistema" aria-label="Mudar entre modo claro e escuro (modo do sistema está ativo)"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" class="toggleIcon_g3eP lightToggleIcon_pyhR"><path fill="currentColor" d="M12,9c1.65,0,3,1.35,3,3s-1.35,3-3,3s-3-1.35-3-3S10.35,9,12,9 M12,7c-2.76,0-5,2.24-5,5s2.24,5,5,5s5-2.24,5-5 S14.76,7,12,7L12,7z M2,13l2,0c0.55,0,1-0.45,1-1s-0.45-1-1-1l-2,0c-0.55,0-1,0.45-1,1S1.45,13,2,13z M20,13l2,0c0.55,0,1-0.45,1-1 s-0.45-1-1-1l-2,0c-0.55,0-1,0.45-1,1S19.45,13,20,13z M11,2v2c0,0.55,0.45,1,1,1s1-0.45,1-1V2c0-0.55-0.45-1-1-1S11,1.45,11,2z M11,20v2c0,0.55,0.45,1,1,1s1-0.45,1-1v-2c0-0.55-0.45-1-1-1C11.45,19,11,19.45,11,20z M5.99,4.58c-0.39-0.39-1.03-0.39-1.41,0 c-0.39,0.39-0.39,1.03,0,1.41l1.06,1.06c0.39,0.39,1.03,0.39,1.41,0s0.39-1.03,0-1.41L5.99,4.58z M18.36,16.95 c-0.39-0.39-1.03-0.39-1.41,0c-0.39,0.39-0.39,1.03,0,1.41l1.06,1.06c0.39,0.39,1.03,0.39,1.41,0c0.39-0.39,0.39-1.03,0-1.41 L18.36,16.95z M19.42,5.99c0.39-0.39,0.39-1.03,0-1.41c-0.39-0.39-1.03-0.39-1.41,0l-1.06,1.06c-0.39,0.39-0.39,1.03,0,1.41 s1.03,0.39,1.41,0L19.42,5.99z M7.05,18.36c0.39-0.39,0.39-1.03,0-1.41c-0.39-0.39-1.03-0.39-1.41,0l-1.06,1.06 c-0.39,0.39-0.39,1.03,0,1.41s1.03,0.39,1.41,0L7.05,18.36z"></path></svg><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" class="toggleIcon_g3eP darkToggleIcon_wfgR"><path fill="currentColor" d="M9.37,5.51C9.19,6.15,9.1,6.82,9.1,7.5c0,4.08,3.32,7.4,7.4,7.4c0.68,0,1.35-0.09,1.99-0.27C17.45,17.19,14.93,19,12,19 c-3.86,0-7-3.14-7-7C5,9.07,6.81,6.55,9.37,5.51z M12,3c-4.97,0-9,4.03-9,9s4.03,9,9,9s9-4.03,9-9c0-0.46-0.04-0.92-0.1-1.36 c-0.98,1.37-2.58,2.26-4.4,2.26c-2.98,0-5.4-2.42-5.4-5.4c0-1.81,0.89-3.42,2.26-4.4C12.92,3.04,12.46,3,12,3L12,3z"></path></svg><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" class="toggleIcon_g3eP systemToggleIcon_QzmC"><path fill="currentColor" d="m12 21c4.971 0 9-4.029 9-9s-4.029-9-9-9-9 4.029-9 9 4.029 9 9 9zm4.95-13.95c1.313 1.313 2.05 3.093 2.05 4.95s-0.738 3.637-2.05 4.95c-1.313 1.313-3.093 2.05-4.95 2.05v-14c1.857 0 3.637 0.737 4.95 2.05z"></path></svg></button></div></div></div><div role="presentation" class="navbar-sidebar__backdrop"></div></nav><div id="__docusaurus_skipToContent_fallback" class="theme-layout-main main-wrapper mainWrapper_z2l0"><div class="docsWrapper_hBAB"><button aria-label="Voltar para o topo" class="clean-btn theme-back-to-top-button backToTopButton_sjWU" type="button"></button><div class="docRoot_UBD9"><main class="docMainContainer_TBSr docMainContainerEnhanced_lQrH"><div class="container padding-top--md padding-bottom--lg"><div class="row"><div class="col docItemCol_VOVn"><div class="docItemContainer_Djhp"><article><div class="tocCollapsible_ETCw theme-doc-toc-mobile tocMobile_ITEo"><button type="button" class="clean-btn tocCollapsibleButton_TO0P">Nesta página</button></div><div class="theme-doc-markdown markdown"><header><h1>Critérios de superfície estável AWS</h1></header>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="propósito">Propósito<a href="#propósito" class="hash-link" aria-label="Link direto para Propósito" title="Link direto para Propósito" translate="no">​</a></h2>
+<p>Este documento define as condições verificáveis ​​para o tratamento
+<code>contractforge-aws</code> é estável para sua superfície <code>aws_glue_iceberg</code> suportada.</p>
+<p>O portão tem escopo intencional. Não afirma que todo ContractForge
+a semântica suportada pelo adaptador de referência Databricks é certificada para produção
+em AWS. Diz que a superfície AWS Glue/Iceberg documentada aqui passou
+planejamento, renderização, implantação, tempo de execução, evidência, auditoria, ciclo de vida e
+verificações de paridade sem soluções alternativas específicas do contrato.</p>
+<p>A matriz de evidências detalhada reside em
+<a class="" href="/contractforge/pt-BR/docs/specs/aws-stabilization-matrix/">aws-stabilization-matrix.md</a>. Este arquivo é o
+lista de verificação de lançamento que converte esses resultados em uma decisão de estabilidade.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="scope">Scope<a href="#scope" class="hash-link" aria-label="Link direto para Scope" title="Link direto para Scope" translate="no">​</a></h2>
+<p>A superfície AWS estável é:</p>
+<ul>
+<li class="">Tempo de execução AWS Glue Spark;</li>
+<li class="">Apache Iceberg tables on Amazon S3;</li>
+<li class="">AWS Glue Data Catalog metadata;</li>
+<li class="">Evidência ContractForge como tabelas de controle legíveis por Iceberg/Athena;</li>
+<li class="">Lake Formation concede e avalia/candidata ajudantes onde a equivalência é comprovada
+ou explicitamente necessária para revisão.</li>
+</ul>
+<p>Famílias de origem estáveis:</p>
+<ul>
+<li class="">S3/arquivos de armazenamento de objetos e formatos de arquivo portáteis;</li>
+<li class=""><code>incremental_files</code> usando marcadores Glue quando elegível;</li>
+<li class="">JDBC/Postgres through Glue JDBC paths;</li>
+<li class="">caminhos <code>rest_api</code> e <code>http_file</code> limitados com SSRF e guardas de redirecionamento;</li>
+<li class="">os caminhos de streaming validados AWS MSK e Azure Event Hubs Kafka disponíveis agora.</li>
+</ul>
+<p>Modos de gravação estáveis:</p>
+<ul>
+<li class=""><code>append</code>;</li>
+<li class=""><code>overwrite</code>;</li>
+<li class=""><code>upsert</code>;</li>
+<li class=""><code>hash_diff_upsert</code> como <code>SUPPORTED_WITH_WARNINGS</code>; o valor de referência é
+validadas, enquanto as declarações SLA específicas da carga de trabalho exigem evidências anexadas.</li>
+</ul>
+<p>Limites excluídos ou específicos da carga de trabalho:</p>
+<ul>
+<li class=""><code>historical</code>;</li>
+<li class=""><code>snapshot_reconcile_soft_delete</code>;</li>
+<li class="">expressões arbitrárias de filtro de linha Lake Formation e máscara de coluna além do
+reviewed consumer matrix;</li>
+<li class="">reivindicações do provedor de compatibilidade não-MSK Kafka/Event Hubs além do validado
+paths.</li>
+</ul>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="inherited-preconditions">Inherited Preconditions<a href="#inherited-preconditions" class="hash-link" aria-label="Link direto para Inherited Preconditions" title="Link direto para Inherited Preconditions" translate="no">​</a></h2>
+<p>Essas invariantes do repositório devem ser aprovadas antes que a estabilidade do AWS possa ser avaliada.</p>
+<table><thead><tr><th>Precondition</th><th>Verification</th></tr></thead><tbody><tr><td>Core não tem importações de plataforma</td><td><code>tests/test_core_platform_independence.py</code></td></tr><tr><td>Adaptadores não importam uns aos outros</td><td><code>tests/test_adapter_independence.py</code></td></tr><tr><td>O formato da embalagem pública é estável</td><td><code>tests/test_publication_packaging.py</code></td></tr><tr><td>As versões do pacote declaradas correspondem aos metadados</td><td><code>tests/test_package_version.py</code></td></tr><tr><td>A arquitetura AWS permanece de propriedade do adaptador</td><td><code>tests/test_aws_architecture.py</code></td></tr><tr><td>AWS capability docs stay in sync</td><td><code>tests/test_aws_capability_parity_docs.py</code></td></tr><tr><td>CI constrói a roda adaptadora AWS</td><td>Pacote <code>.github/workflows/ci.yml</code>/escopos completos</td></tr></tbody></table>
+<p>If any precondition fails, AWS stability evaluation is paused.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="stability-criteria">Stability Criteria<a href="#stability-criteria" class="hash-link" aria-label="Link direto para Stability Criteria" title="Link direto para Stability Criteria" translate="no">​</a></h2>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="1-portões-locais-e-de-renderização">1. Portões locais e de renderização<a href="#1-portões-locais-e-de-renderização" class="hash-link" aria-label="Link direto para 1. Portões locais e de renderização" title="Link direto para 1. Portões locais e de renderização" translate="no">​</a></h3>
+<p><strong>O que deve ser mantido.</strong> Unidade, renderização, arquitetura, empacotamento e código gerado
+compilar portas passam para AWS.</p>
+<p><strong>Como verificar.</strong> Execute:</p>
+<div class="language-bash codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-bash codeBlock_bY9V thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:#393A34"><span class="token plain">uv run pytest tests/test_aws_*.py tests/test_adapter_source_support.py tests/test_adapter_extension_docs.py tests/test_publication_packaging.py tests/test_package_version.py</span><br></div><div class="token-line" style="color:#393A34"><span class="token plain">uv run contractforge-aws deploy-project examples/real-world/supabase-jdbc-medallion/project.yaml --dry-run --summary-only</span><br></div></code></pre></div></div>
+<p><strong>Status.</strong> <code>met</code>.</p>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="2-projetos-de-sucesso-em-tempo-de-execução">2. Projetos de sucesso em tempo de execução<a href="#2-projetos-de-sucesso-em-tempo-de-execução" class="hash-link" aria-label="Link direto para 2. Projetos de sucesso em tempo de execução" title="Link direto para 2. Projetos de sucesso em tempo de execução" translate="no">​</a></h3>
+<p><strong>O que deve ser válido.</strong> Os projetos de validação reais são executados por meio do ContractForge
+apenas comandos, sem edições do Glue Studio e sem código de tempo de execução manuscrito.</p>
+<p>Projetos necessários:</p>
+<ul>
+<li class=""><code>aws_supabase_jdbc_medallion</code>;</li>
+<li class=""><code>aws_usgs_rest_medallion</code>;</li>
+<li class=""><code>aws_s3_file_medallion</code>;</li>
+<li class=""><code>aws_incremental_files</code>;</li>
+<li class=""><code>aws_eventhubs_kafka_available_now</code>;</li>
+<li class=""><code>aws_msk_kafka_available_now</code>.</li>
+</ul>
+<p>Cada projeto deve criar/gravar tabelas Iceberg de destino, preencher
+<code>ctrl_ingestion_runs</code>, qualidade/estado/metadados/linhagem do registro quando aplicável,
+e preserve as contagens de linhas esperadas.</p>
+<p><strong>Como verificar.</strong> Use o fluxo AWS CLI no nível do projeto:</p>
+<div class="language-bash codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-bash codeBlock_bY9V thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:#393A34"><span class="token plain">contractforge-aws deploy-project </span><span class="token operator" style="color:#393A34">&lt;</span><span class="token plain">project.yaml</span><span class="token operator" style="color:#393A34">&gt;</span><span class="token plain"> </span><span class="token parameter variable" style="color:#36acaa">--run</span><span class="token plain"> </span><span class="token parameter variable" style="color:#36acaa">--wait</span><span class="token plain"> --record-cost-evidence --audit-evidence</span><br></div></code></pre></div></div>
+<p><strong>Status.</strong> <code>met</code>.</p>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="3-evidência-de-falha">3. Evidência de falha<a href="#3-evidência-de-falha" class="hash-link" aria-label="Link direto para 3. Evidência de falha" title="Link direto para 3. Evidência de falha" translate="no">​</a></h3>
+<p><strong>O que deve ser mantido.</strong> Falhas controladas produzem evidências de falha na execução e são editadas
+evidência de erro, preservando a falha do tempo de execução original.</p>
+<p>Casos necessários:</p>
+<ul>
+<li class="">credenciais inválidas ou ausentes;</li>
+<li class="">blocked REST/HTTP targets;</li>
+<li class="">aborto de qualidade;</li>
+<li class="">invalid merge key;</li>
+<li class="">caminho de origem ausente;</li>
+<li class="">falha de permissão de destino, quando disponível.</li>
+</ul>
+<p><strong>Como verificar.</strong> Execute o projeto de caminho de falha AWS com
+<code>--accept-expected-failures</code> e auditoria <code>ctrl_ingestion_runs</code>,
+<code>ctrl_ingestion_errors</code> e <code>ctrl_ingestion_quality</code>.</p>
+<p><strong>Status.</strong> <code>met</code>.</p>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="4-auditoria-de-evidências">4. Auditoria de evidências<a href="#4-auditoria-de-evidências" class="hash-link" aria-label="Link direto para 4. Auditoria de evidências" title="Link direto para 4. Auditoria de evidências" translate="no">​</a></h3>
+<p><strong>O que deve ser válido.</strong> As consultas de auditoria do Athena em tabelas de controle canônico passam por
+todos os projetos reais de validação.</p>
+<p>Tabelas obrigatórias:</p>
+<ul>
+<li class=""><code>ctrl_ingestion_runs</code>;</li>
+<li class=""><code>ctrl_ingestion_errors</code>;</li>
+<li class=""><code>ctrl_ingestion_quality</code>;</li>
+<li class=""><code>ctrl_ingestion_quarantine</code>;</li>
+<li class=""><code>ctrl_ingestion_schema_changes</code>;</li>
+<li class=""><code>ctrl_ingestion_metadata</code>;</li>
+<li class=""><code>ctrl_ingestion_lineage</code>;</li>
+<li class=""><code>ctrl_ingestion_access</code>;</li>
+<li class=""><code>ctrl_ingestion_operations</code>;</li>
+<li class=""><code>ctrl_ingestion_cost</code>;</li>
+<li class=""><code>ctrl_ingestion_state</code>;</li>
+<li class=""><code>ctrl_ingestion_locks</code>.</li>
+</ul>
+<p><strong>Como verificar.</strong></p>
+<div class="language-bash codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-bash codeBlock_bY9V thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:#393A34"><span class="token plain">contractforge-aws audit-evidence </span><span class="token parameter variable" style="color:#36acaa">--database</span><span class="token plain"> </span><span class="token operator" style="color:#393A34">&lt;</span><span class="token plain">evidence_database</span><span class="token operator" style="color:#393A34">&gt;</span><span class="token plain"> --athena-output-location </span><span class="token operator" style="color:#393A34">&lt;</span><span class="token plain">s3-uri</span><span class="token operator" style="color:#393A34">&gt;</span><br></div></code></pre></div></div>
+<p><strong>Status.</strong> <code>met</code>.</p>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="5-paridade-de-plataforma">5. Paridade de plataforma<a href="#5-paridade-de-plataforma" class="hash-link" aria-label="Link direto para 5. Paridade de plataforma" title="Link direto para 5. Paridade de plataforma" translate="no">​</a></h3>
+<p><strong>O que deve ser válido.</strong> A intenção de contrato ContractForge compartilhada produz o mesmo
+resultados lógicos em Databricks, AWS e Snowflake para o compartilhamento suportado
+superfície. As diferenças específicas do AWS são limitadas à ligação da fonte, ambiente,
+Configurações de armazém Iceberg e limites de revisão aceitos.</p>
+<p><strong>Como verificar.</strong></p>
+<div class="language-bash codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-bash codeBlock_bY9V thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:#393A34"><span class="token plain">uv run python </span><span class="token parameter variable" style="color:#36acaa">-m</span><span class="token plain"> tools.platform_parity.report</span><br></div><div class="token-line" style="color:#393A34"><span class="token plain">uv run pytest tests/test_platform_parity_contracts.py</span><br></div></code></pre></div></div>
+<p>Evidências reais de E2E dos mesmos contratos em todas as três plataformas devem ser
+anexado às notas de lançamento ou ao manifesto de evidências de lançamento em
+<a href="/contractforge/pt-BR/assets/files/aws-stable-surface-evidence-453333009ee9aa0ad7d3698ef88d2341.json/" target="_blank" class="">../reports/aws-stable-surface-evidence.json</a>.</p>
+<p><strong>Status.</strong> <code>met</code> para a superfície suportada.</p>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="6-limites-de-segurança-e-tempo-de-execução">6. Limites de segurança e tempo de execução<a href="#6-limites-de-segurança-e-tempo-de-execução" class="hash-link" aria-label="Link direto para 6. Limites de segurança e tempo de execução" title="Link direto para 6. Limites de segurança e tempo de execução" translate="no">​</a></h3>
+<p><strong>O que deve ser mantido.</strong></p>
+<ul>
+<li class="">O núcleo não importa SDKs AWS.</li>
+<li class="">O pacote AWS base não importa <code>boto3</code> avidamente.</li>
+<li class="">Os artefatos renderizados não contêm segredos de texto simples.</li>
+<li class="">A resolução de segredo em tempo de execução usa o Secrets Manager ou mecanismos de propriedade da plataforma.</li>
+<li class="">Os caminhos REST/HTTP rejeitam esquemas inseguros, hosts privados e redirecionamentos.</li>
+<li class="">O executor estável da biblioteca Glue valida o código de tempo de execução renderizado antes
+execução em processo.</li>
+</ul>
+<p><strong>Como verificar.</strong> Execute testes de arquitetura/segurança do AWS e mantenha a validação do AST
+tests around <code>runtime/library_runner.py</code> mandatory.</p>
+<p><strong>Status.</strong> <code>met</code>.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="limites-abertos-de-certificação-de-produção">Limites abertos de certificação de produção<a href="#limites-abertos-de-certificação-de-produção" class="hash-link" aria-label="Link direto para Limites abertos de certificação de produção" title="Link direto para Limites abertos de certificação de produção" translate="no">​</a></h2>
+<p>A superfície estável suportada está pronta e <code>stable_final</code> é verdadeiro para o
+reivindicação AWS Glue/Iceberg documentada. Reivindicações mais amplas permanecem exclusões explícitas ou
+workload-specific warnings:</p>
+<table><thead><tr><th>Limite</th><th>Decisão atual</th><th>Fechamento necessário</th></tr></thead><tbody><tr><td><code>hash_diff_upsert</code> workload-specific performance</td><td><code>SUPPORTED_WITH_WARNINGS</code></td><td>Referência de referência aprovada; anexe evidências específicas da carga de trabalho antes de reivindicar um SLA de produção para um novo contrato hash-diff.</td></tr><tr><td>Non-MSK Kafka/Event Hubs compatibility providers</td><td><code>EXCLUDED_FROM_STABLE_FINAL</code></td><td>Matriz de deslocamento/ponto de verificação específica do provedor além dos caminhos validados AWS MSK e Azure Event Hubs Kafka.</td></tr><tr><td>Filtros e máscaras de linha Lake Formation</td><td><code>EXCLUDED_FROM_STABLE_FINAL</code></td><td>Matriz de mecanismo do consumidor passada para Athena e Glue Spark; expressões contratuais arbitrárias ainda exigem revisão antes de reivindicações específicas de carga de trabalho.</td></tr><tr><td><code>historical</code> e <code>snapshot_reconcile_soft_delete</code></td><td><code>EXCLUDED_FROM_STABLE_FINAL</code></td><td>Exclusão de escopo estável documentada até a implementação do tempo de execução e evidências de equivalência E2E serem anexadas.</td></tr></tbody></table>
+<p>Estes não são defeitos ocultos. Eles são limites explícitos sobre o que o AWS estável
+surface claims.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="machine-readable-gate">Machine-Readable Gate<a href="#machine-readable-gate" class="hash-link" aria-label="Link direto para Machine-Readable Gate" title="Link direto para Machine-Readable Gate" translate="no">​</a></h2>
+<p>Usar:</p>
+<div class="language-bash codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-bash codeBlock_bY9V thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:#393A34"><span class="token plain">contractforge-aws stabilization-report</span><br></div></code></pre></div></div>
+<p>Resultado esperado de superfície estável:</p>
+<ul>
+<li class=""><code>classification = STABLE_SUPPORTED_SURFACE</code>;</li>
+<li class=""><code>supported_surface_ready = true</code>;</li>
+<li class=""><code>stable_final = true</code> para a reivindicação final estável documentada.</li>
+<li class=""><code>evidence_manifest = docs/reports/aws-stable-surface-evidence.json</code>.</li>
+</ul>
+<p>Use <code>--strict-final</code> em fluxos de trabalho que devem impor o final estável documentado
+claim.</p></div><footer class="theme-doc-footer docusaurus-mt-lg"><div class="row margin-top--sm theme-doc-footer-edit-meta-row"><div class="col noPrint_WFHX"><a href="https://github.com/marquesantero/contractforge/edit/main/site/docs/specs/aws-ga-criteria.md" target="_blank" rel="noopener noreferrer" class="theme-edit-this-page"><svg fill="currentColor" height="20" width="20" viewBox="0 0 40 40" class="iconEdit_Z9Sw" aria-hidden="true"><g><path d="m34.5 11.7l-3 3.1-6.3-6.3 3.1-3q0.5-0.5 1.2-0.5t1.1 0.5l3.9 3.9q0.5 0.4 0.5 1.1t-0.5 1.2z m-29.5 17.1l18.4-18.5 6.3 6.3-18.4 18.4h-6.3v-6.2z"></path></g></svg>Editar esta página</a></div><div class="col lastUpdated_JAkA"></div></div></footer></article><nav class="docusaurus-mt-lg pagination-nav" aria-label="Páginas de documento"></nav></div></div><div class="col col--3"><div class="tableOfContents_bqdL thin-scrollbar theme-doc-toc-desktop"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#propósito" class="table-of-contents__link toc-highlight">Propósito</a></li><li><a href="#scope" class="table-of-contents__link toc-highlight">Scope</a></li><li><a href="#inherited-preconditions" class="table-of-contents__link toc-highlight">Inherited Preconditions</a></li><li><a href="#stability-criteria" class="table-of-contents__link toc-highlight">Stability Criteria</a><ul><li><a href="#1-portões-locais-e-de-renderização" class="table-of-contents__link toc-highlight">1. Portões locais e de renderização</a></li><li><a href="#2-projetos-de-sucesso-em-tempo-de-execução" class="table-of-contents__link toc-highlight">2. Projetos de sucesso em tempo de execução</a></li><li><a href="#3-evidência-de-falha" class="table-of-contents__link toc-highlight">3. Evidência de falha</a></li><li><a href="#4-auditoria-de-evidências" class="table-of-contents__link toc-highlight">4. Auditoria de evidências</a></li><li><a href="#5-paridade-de-plataforma" class="table-of-contents__link toc-highlight">5. Paridade de plataforma</a></li><li><a href="#6-limites-de-segurança-e-tempo-de-execução" class="table-of-contents__link toc-highlight">6. Limites de segurança e tempo de execução</a></li></ul></li><li><a href="#limites-abertos-de-certificação-de-produção" class="table-of-contents__link toc-highlight">Limites abertos de certificação de produção</a></li><li><a href="#machine-readable-gate" class="table-of-contents__link toc-highlight">Machine-Readable Gate</a></li></ul></div></div></div></div></main></div></div></div><footer class="theme-layout-footer footer footer--dark"><div class="container container-fluid"><div class="row footer__links"><div class="theme-layout-footer-column col footer__col"><div class="footer__title">Documentação</div><ul class="footer__items clean-list"><li class="footer__item"><a class="footer__link-item" href="/contractforge/pt-BR/docs/start/quickstart/">Início rápido</a></li><li class="footer__item"><a class="footer__link-item" href="/contractforge/pt-BR/docs/contracts/overview/">Contratos</a></li><li class="footer__item"><a class="footer__link-item" href="/contractforge/pt-BR/docs/connectors/overview/">Conectores</a></li><li class="footer__item"><a class="footer__link-item" href="/contractforge/pt-BR/docs/operations/overview/">Operações</a></li></ul></div><div class="theme-layout-footer-column col footer__col"><div class="footer__title">Projeto</div><ul class="footer__items clean-list"><li class="footer__item"><a href="https://github.com/marquesantero/contractforge" target="_blank" rel="noopener noreferrer" class="footer__link-item">GitHub<svg width="13.5" height="13.5" aria-label="(abre em nova aba)" class="iconExternalLink_nPIU"><use href="#theme-svg-external-link"></use></svg></a></li><li class="footer__item"><a href="https://github.com/marquesantero/contractforge/issues" target="_blank" rel="noopener noreferrer" class="footer__link-item">Issues<svg width="13.5" height="13.5" aria-label="(abre em nova aba)" class="iconExternalLink_nPIU"><use href="#theme-svg-external-link"></use></svg></a></li><li class="footer__item"><a href="https://github.com/marquesantero/contractforge/releases" target="_blank" rel="noopener noreferrer" class="footer__link-item">Versões<svg width="13.5" height="13.5" aria-label="(abre em nova aba)" class="iconExternalLink_nPIU"><use href="#theme-svg-external-link"></use></svg></a></li></ul></div></div><div class="footer__bottom text--center"><div class="footer__copyright">Copyright © 2026 ContractForge contributors. Documentação publicada com Docusaurus.</div></div></div></footer></div>
+</body>
+</html>

@@ -1,0 +1,632 @@
+<!doctype html>
+<html lang="pt-BR" dir="ltr" class="docs-wrapper plugin-docs plugin-id-default docs-version-current docs-doc-page docs-doc-id-specs/snowflake-adapter-parity-execution-plan" data-has-hydrated="false">
+<head>
+<meta charset="UTF-8">
+<meta name="generator" content="Docusaurus v3.10.1">
+<title data-rh="true">Plano de execução de paridade do adaptador Snowflake | ContractForge</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:image" content="https://marquesantero.github.io/contractforge/pt-BR/img/contractforge-logo.png"><meta data-rh="true" name="twitter:image" content="https://marquesantero.github.io/contractforge/pt-BR/img/contractforge-logo.png"><meta data-rh="true" property="og:url" content="https://marquesantero.github.io/contractforge/pt-BR/docs/specs/snowflake-adapter-parity-execution-plan/"><meta data-rh="true" property="og:locale" content="pt_BR"><meta data-rh="true" property="og:locale:alternate" content="en_US"><meta data-rh="true" name="docusaurus_locale" content="pt-BR"><meta data-rh="true" name="docsearch:language" content="pt-BR"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="Plano de execução de paridade do adaptador Snowflake | ContractForge"><meta data-rh="true" name="description" content="Propósito"><meta data-rh="true" property="og:description" content="Propósito"><link data-rh="true" rel="icon" href="/contractforge/pt-BR/img/contractforge-mark.png"><link data-rh="true" rel="canonical" href="https://marquesantero.github.io/contractforge/pt-BR/docs/specs/snowflake-adapter-parity-execution-plan/"><link data-rh="true" rel="alternate" href="https://marquesantero.github.io/contractforge/docs/specs/snowflake-adapter-parity-execution-plan/" hreflang="en-US"><link data-rh="true" rel="alternate" href="https://marquesantero.github.io/contractforge/pt-BR/docs/specs/snowflake-adapter-parity-execution-plan/" hreflang="pt-BR"><link data-rh="true" rel="alternate" href="https://marquesantero.github.io/contractforge/docs/specs/snowflake-adapter-parity-execution-plan/" hreflang="x-default"><link rel="stylesheet" href="/contractforge/pt-BR/assets/css/styles.e35730a0.css">
+<script src="/contractforge/pt-BR/assets/js/runtime~main.7ac75648.js" defer="defer"></script>
+<script src="/contractforge/pt-BR/assets/js/main.99e9fe41.js" defer="defer"></script>
+</head>
+<body>
+<svg style="display: none;"><defs>
+<symbol id="theme-svg-external-link" viewBox="0 0 24 24"><path fill="currentColor" d="M21 13v10h-21v-19h12v2h-10v15h17v-8h2zm3-12h-10.988l4.035 4-6.977 7.07 2.828 2.828 6.977-7.07 4.125 4.172v-11z"/></symbol>
+</defs></svg>
+<script>!function(){var t=function(){try{return new URLSearchParams(window.location.search).get("docusaurus-theme")}catch(t){}}()||function(){try{return window.localStorage.getItem("theme")}catch(t){}}();document.documentElement.setAttribute("data-theme",t||"light"),document.documentElement.setAttribute("data-theme-choice",t||"light")}(),function(){try{const c=new URLSearchParams(window.location.search).entries();for(var[t,e]of c)if(t.startsWith("docusaurus-data-")){var a=t.replace("docusaurus-data-","data-");document.documentElement.setAttribute(a,e)}}catch(t){}}()</script><div id="__docusaurus"><div role="region" aria-label="Pular para o conteúdo principal"><a class="skipToContent_fXgn" href="#__docusaurus_skipToContent_fallback">Pular para o conteúdo principal</a></div><nav aria-label="Navegação principal" class="theme-layout-navbar navbar navbar--fixed-top"><div class="navbar__inner"><div class="theme-layout-navbar-left navbar__items"><button aria-label="Alternar painel de navegação" aria-expanded="false" class="navbar__toggle clean-btn" type="button"><svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><path stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="2" d="M4 7h22M4 15h22M4 23h22"></path></svg></button><a class="navbar__brand" href="/contractforge/pt-BR/"><div class="navbar__logo"><img src="/contractforge/pt-BR/img/contractforge-mark.png" alt="ContractForge" class="themedComponent_mlkZ themedComponent--light_NVdE"><img src="/contractforge/pt-BR/img/contractforge-mark.png" alt="ContractForge" class="themedComponent_mlkZ themedComponent--dark_xIcU"></div><b class="navbar__title text--truncate">ContractForge</b></a><a class="navbar__item navbar__link" href="/contractforge/pt-BR/docs/intro/">Documentação</a><a class="navbar__item navbar__link" href="/contractforge/pt-BR/docs/adapters/overview/">Adaptadores</a><a class="navbar__item navbar__link" href="/contractforge/pt-BR/docs/connectors/overview/">Conectores</a></div><div class="theme-layout-navbar-right navbar__items navbar__items--right"><div class="navbar__item dropdown dropdown--hoverable dropdown--right"><a href="#" aria-haspopup="true" aria-expanded="false" role="button" class="navbar__link"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" class="iconLanguage_nlXk"><path fill="currentColor" d="M12.87 15.07l-2.54-2.51.03-.03c1.74-1.94 2.98-4.17 3.71-6.53H17V4h-7V2H8v2H1v1.99h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2l-4.5-12zm-2.62 7l1.62-4.33L19.12 17h-3.24z"></path></svg>Português</a><ul class="dropdown__menu"><li><a href="/contractforge/docs/specs/snowflake-adapter-parity-execution-plan/" target="_self" rel="noopener noreferrer" class="dropdown__link" lang="en-US">English</a></li><li><a href="/contractforge/pt-BR/docs/specs/snowflake-adapter-parity-execution-plan/" target="_self" rel="noopener noreferrer" class="dropdown__link dropdown__link--active" lang="pt-BR">Português</a></li></ul></div><div class="navbarSearchContainer_Bca1"><div class="navbar__search searchBarContainer_NW3z" dir="ltr"><input placeholder="Pesquisar" aria-label="Search" class="navbar__search-input searchInput_YFbd" value=""><div class="loadingRing_RJI3 searchBarLoadingRing_YnHq"><div></div><div></div><div></div><div></div></div></div></div><a href="https://github.com/marquesantero/contractforge" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">GitHub<svg width="13.5" height="13.5" aria-label="(abre em nova aba)" class="iconExternalLink_nPIU"><use href="#theme-svg-external-link"></use></svg></a><div class="toggle_vylO colorModeToggle_DEke"><button class="clean-btn toggleButton_gllP toggleButtonDisabled_aARS" type="button" disabled="" title="modo do sistema" aria-label="Mudar entre modo claro e escuro (modo do sistema está ativo)"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" class="toggleIcon_g3eP lightToggleIcon_pyhR"><path fill="currentColor" d="M12,9c1.65,0,3,1.35,3,3s-1.35,3-3,3s-3-1.35-3-3S10.35,9,12,9 M12,7c-2.76,0-5,2.24-5,5s2.24,5,5,5s5-2.24,5-5 S14.76,7,12,7L12,7z M2,13l2,0c0.55,0,1-0.45,1-1s-0.45-1-1-1l-2,0c-0.55,0-1,0.45-1,1S1.45,13,2,13z M20,13l2,0c0.55,0,1-0.45,1-1 s-0.45-1-1-1l-2,0c-0.55,0-1,0.45-1,1S19.45,13,20,13z M11,2v2c0,0.55,0.45,1,1,1s1-0.45,1-1V2c0-0.55-0.45-1-1-1S11,1.45,11,2z M11,20v2c0,0.55,0.45,1,1,1s1-0.45,1-1v-2c0-0.55-0.45-1-1-1C11.45,19,11,19.45,11,20z M5.99,4.58c-0.39-0.39-1.03-0.39-1.41,0 c-0.39,0.39-0.39,1.03,0,1.41l1.06,1.06c0.39,0.39,1.03,0.39,1.41,0s0.39-1.03,0-1.41L5.99,4.58z M18.36,16.95 c-0.39-0.39-1.03-0.39-1.41,0c-0.39,0.39-0.39,1.03,0,1.41l1.06,1.06c0.39,0.39,1.03,0.39,1.41,0c0.39-0.39,0.39-1.03,0-1.41 L18.36,16.95z M19.42,5.99c0.39-0.39,0.39-1.03,0-1.41c-0.39-0.39-1.03-0.39-1.41,0l-1.06,1.06c-0.39,0.39-0.39,1.03,0,1.41 s1.03,0.39,1.41,0L19.42,5.99z M7.05,18.36c0.39-0.39,0.39-1.03,0-1.41c-0.39-0.39-1.03-0.39-1.41,0l-1.06,1.06 c-0.39,0.39-0.39,1.03,0,1.41s1.03,0.39,1.41,0L7.05,18.36z"></path></svg><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" class="toggleIcon_g3eP darkToggleIcon_wfgR"><path fill="currentColor" d="M9.37,5.51C9.19,6.15,9.1,6.82,9.1,7.5c0,4.08,3.32,7.4,7.4,7.4c0.68,0,1.35-0.09,1.99-0.27C17.45,17.19,14.93,19,12,19 c-3.86,0-7-3.14-7-7C5,9.07,6.81,6.55,9.37,5.51z M12,3c-4.97,0-9,4.03-9,9s4.03,9,9,9s9-4.03,9-9c0-0.46-0.04-0.92-0.1-1.36 c-0.98,1.37-2.58,2.26-4.4,2.26c-2.98,0-5.4-2.42-5.4-5.4c0-1.81,0.89-3.42,2.26-4.4C12.92,3.04,12.46,3,12,3L12,3z"></path></svg><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" class="toggleIcon_g3eP systemToggleIcon_QzmC"><path fill="currentColor" d="m12 21c4.971 0 9-4.029 9-9s-4.029-9-9-9-9 4.029-9 9 4.029 9 9 9zm4.95-13.95c1.313 1.313 2.05 3.093 2.05 4.95s-0.738 3.637-2.05 4.95c-1.313 1.313-3.093 2.05-4.95 2.05v-14c1.857 0 3.637 0.737 4.95 2.05z"></path></svg></button></div></div></div><div role="presentation" class="navbar-sidebar__backdrop"></div></nav><div id="__docusaurus_skipToContent_fallback" class="theme-layout-main main-wrapper mainWrapper_z2l0"><div class="docsWrapper_hBAB"><button aria-label="Voltar para o topo" class="clean-btn theme-back-to-top-button backToTopButton_sjWU" type="button"></button><div class="docRoot_UBD9"><main class="docMainContainer_TBSr docMainContainerEnhanced_lQrH"><div class="container padding-top--md padding-bottom--lg"><div class="row"><div class="col docItemCol_VOVn"><div class="docItemContainer_Djhp"><article><div class="tocCollapsible_ETCw theme-doc-toc-mobile tocMobile_ITEo"><button type="button" class="clean-btn tocCollapsibleButton_TO0P">Nesta página</button></div><div class="theme-doc-markdown markdown"><header><h1>Plano de execução de paridade do adaptador Snowflake</h1></header>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="propósito">Propósito<a href="#propósito" class="hash-link" aria-label="Link direto para Propósito" title="Link direto para Propósito" translate="no">​</a></h2>
+<p>Este é o plano local, compromisso por compromisso, para trazer
+<code>contractforge-snowflake</code> para o mesmo nível de maturidade do Databricks e AWS
+adaptadores.</p>
+<p>O objetivo é capacidade e paridade de disciplina de lançamento, e não nomes de arquivo idênticos.
+Snowflake deve manter um formato de pacote nativo do Snowflake, mas todos os pacotes suportados
+capacidade precisa dos mesmos sinais de maturidade:</p>
+<ol>
+<li class="">comportamento do planejador;</li>
+<li class="">implementation;</li>
+<li class="">CLI surface;</li>
+<li class="">unit tests;</li>
+<li class="">cobertura de smoke em conta real onde o comportamento toca Snowflake;</li>
+<li class="">documentos e exemplos;</li>
+<li class="">validação de evidências/tabela de controle.</li>
+</ol>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="linha-de-base-atual">Linha de base atual<a href="#linha-de-base-atual" class="hash-link" aria-label="Link direto para Linha de base atual" title="Link direto para Linha de base atual" translate="no">​</a></h2>
+<p>Desde a primeira smoke local ao vivo, Snowflake tem:</p>
+<ol>
+<li class="">planejamento e suporte a pacotes de publicação;</li>
+<li class="">execução do executor de biblioteca local por meio de uma sessão Snowflake;</li>
+<li class="">planejamento de origem de tabela, SQL e arquivo preparado;</li>
+<li class="">anexar, substituir, upsert do estado atual e caminhos de tempo de execução upsert hash-diff;</li>
+<li class="">qualidade básica, política de esquema, evidência de estado e tabela de controle;</li>
+<li class="">caminhos de código de renderização de tarefa/procedimento e publicação para estágio;</li>
+<li class="">reconciliação de custos e ajudantes de painel/manutenção;</li>
+<li class="">a temporary live smoke harness under <code>.tmp/snowflake-smoke</code>.</li>
+</ol>
+<p>Known baseline gaps:</p>
+<ol>
+<li class="">o harness de smoke local não é um pacote de primeira classe/comando CLI;</li>
+<li class="">CLI <code>run</code> ainda não abre uma sessão de conector real para execuções que não sejam de simulação;</li>
+<li class="">publicação de estágio, execução de procedimento Snowpark e execução de tarefa não são fumadas ao vivo;</li>
+<li class="">a cobertura em tempo real de governança/acesso/custo/caminho de falha está incompleta;</li>
+<li class="">a paridade fonte/preparação é muito mais fina que Databricks/AWS;</li>
+<li class="">state/idempotency/locking is thinner than Databricks;</li>
+<li class="">migrações de tabelas de controle e compatibilidade de tabelas existentes precisam ser reforçadas.</li>
+</ol>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="plano-de-compromisso">Plano de compromisso<a href="#plano-de-compromisso" class="hash-link" aria-label="Link direto para Plano de compromisso" title="Link direto para Plano de compromisso" translate="no">​</a></h2>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="compromisso-01-registrar-o-plano-de-execução-da-paridade">Compromisso 01: Registrar o Plano de Execução da Paridade<a href="#compromisso-01-registrar-o-plano-de-execução-da-paridade" class="hash-link" aria-label="Link direto para Compromisso 01: Registrar o Plano de Execução da Paridade" title="Link direto para Compromisso 01: Registrar o Plano de Execução da Paridade" translate="no">​</a></h3>
+<p>Objetivo: tornar este plano de execução numerado visível no repo.</p>
+<p>Implementation items:</p>
+<ol>
+<li class="">add <code>docs/specs/snowflake-adapter-parity-execution-plan.md</code>;</li>
+<li class="">vincule-o de <code>adapters/snowflake/README.md</code>;</li>
+<li class="">vincule-o de <code>docs/README.md</code>;</li>
+<li class="">não altere o comportamento do tempo de execução.</li>
+</ol>
+<p>Validação:</p>
+<ol>
+<li class="">inspect markdown links;</li>
+<li class="">nenhum teste de tempo de execução é necessário, a menos que as ferramentas de documentação sejam executadas.</li>
+</ol>
+<p>Commit message:</p>
+<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:#393A34"><span class="token plain">docs: add Snowflake parity execution plan</span><br></div></code></pre></div></div>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="confirmação-02-execução-cli-apoiada-por-conector">Confirmação 02: execução CLI apoiada por conector<a href="#confirmação-02-execução-cli-apoiada-por-conector" class="hash-link" aria-label="Link direto para Confirmação 02: execução CLI apoiada por conector" title="Link direto para Confirmação 02: execução CLI apoiada por conector" translate="no">​</a></h3>
+<p>Objetivo: fazer o <code>contractforge-snowflake run</code> executar uma execução real do executor de biblioteca local
+usando opções de conector Snowflake.</p>
+<p>Implementation items:</p>
+<ol>
+<li class="">divida o código CLI o suficiente para manter o <code>cli.py</code> fino ou adicionar auxiliares focados em
+<code>contractforge_snowflake/cli_run.py</code>;</li>
+<li class="">add <code>--connect-options</code> to <code>run</code>;</li>
+<li class="">abra uma conexão de conector preguiçosamente apenas para execução sem simulação;</li>
+<li class="">envolva conexões do conector com um adaptador de sessão que expõe
+<code>session.sql(...).collect()</code>;</li>
+<li class="">preservar o comportamento atual de funcionamento a seco;</li>
+<li class="">conexões próximas sobre sucesso e fracasso;</li>
+<li class="">redigir valores de opção de conexão de erros/saída.</li>
+</ol>
+<p>Tests:</p>
+<ol>
+<li class="">A simulação do CLI ainda evita a importação do conector;</li>
+<li class="">CLI sem simulação abre <code>_connect</code>, passa a sessão para
+<code>run_snowflake_contract</code> e fecha;</li>
+<li class="">wrapper de sessão do conector expõe <code>schema.names</code>/<code>schema.fields</code> do cursor
+metadata;</li>
+<li class="">connection failure returns a clear CLI error.</li>
+</ol>
+<p>Live smoke:</p>
+<div class="language-powershell codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-powershell codeBlock_bY9V thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:#393A34"><span class="token plain">contractforge-snowflake run `</span><br></div><div class="token-line" style="color:#393A34"><span class="token plain">  --contract-uri .tmp\snowflake-smoke\contracts\orders_append.contract.json `</span><br></div><div class="token-line" style="color:#393A34"><span class="token plain">  --environment-uri .tmp\snowflake-smoke\environment.json `</span><br></div><div class="token-line" style="color:#393A34"><span class="token plain">  --connect-options .tmp\snowflake-smoke\connect-options.yaml</span><br></div></code></pre></div></div>
+<p>Commit message:</p>
+<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:#393A34"><span class="token plain">feat(snowflake): run contracts through connector-backed CLI</span><br></div></code></pre></div></div>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="compromisso-03-promover-o-mínimo-de-smoke-em-pacotes-de-primeira-classe">Compromisso 03: Promover o mínimo de smoke em pacotes de primeira classe<a href="#compromisso-03-promover-o-mínimo-de-smoke-em-pacotes-de-primeira-classe" class="hash-link" aria-label="Link direto para Compromisso 03: Promover o mínimo de smoke em pacotes de primeira classe" title="Link direto para Compromisso 03: Promover o mínimo de smoke em pacotes de primeira classe" translate="no">​</a></h3>
+<p>Objetivo: substituir o harness de smoke temporário <code>.tmp</code> por um adaptador de smoke reutilizável
+comando.</p>
+<p>Implementation items:</p>
+<ol>
+<li class="">add <code>contractforge_snowflake/smoke/models.py</code>;</li>
+<li class="">add <code>contractforge_snowflake/smoke/minimal.py</code>;</li>
+<li class="">add <code>contractforge_snowflake/smoke/runner.py</code>;</li>
+<li class="">adicione o comando CLI <code>smoke</code>;</li>
+<li class="">suporte <code>--connection</code> para documentação de interoperabilidade Snowflake CLI e
+<code>--connect-options</code> para execução do conector;</li>
+<li class="">support <code>--database</code>, <code>--schema</code>, <code>--table-prefix</code>;</li>
+<li class="">default to non-destructive <code>CF_SMOKE_*</code> objects;</li>
+<li class="">escreva um resumo JSON com contagens de destino, contagens de tabela de controle, IDs de execução e
+warnings.</li>
+</ol>
+<p>Tests:</p>
+<ol>
+<li class="">a geração de contratos de smoke é determinística;</li>
+<li class="">a configuração do smoke toca apenas no esquema/prefixo configurado;</li>
+<li class="">smoke summary marks all scenarios pass/fail;</li>
+<li class="">O comando smoke recusa uma limpeza ampla, a menos que <code>--execute-cleanup</code> seja fornecido.</li>
+</ol>
+<p>Live smoke:</p>
+<div class="language-powershell codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-powershell codeBlock_bY9V thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:#393A34"><span class="token plain">contractforge-snowflake smoke --connect-options .tmp\snowflake-smoke\connect-options.yaml</span><br></div></code></pre></div></div>
+<p>Commit message:</p>
+<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:#393A34"><span class="token plain">feat(snowflake): add first-class minimal smoke runner</span><br></div></code></pre></div></div>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="commit-04-tabela-de-controle-ddl-e-fortalecimento-de-migração">Commit 04: Tabela de controle DDL e fortalecimento de migração<a href="#commit-04-tabela-de-controle-ddl-e-fortalecimento-de-migração" class="hash-link" aria-label="Link direto para Commit 04: Tabela de controle DDL e fortalecimento de migração" title="Link direto para Commit 04: Tabela de controle DDL e fortalecimento de migração" translate="no">​</a></h3>
+<p>Objetivo: tornar segura a criação de tabelas de evidências para contas Snowflake existentes.</p>
+<p>Implementation items:</p>
+<ol>
+<li class="">mantenha todos os identificadores de tabela de controle gerados entre aspas;</li>
+<li class="">adicionar inspeção de migração/compatibilidade para letras maiúsculas existentes sem aspas
+control tables;</li>
+<li class="">evite <code>CREATE DATABASE</code> incondicional quando a função atual possui apenas esquema
+objetos e o banco de dados já existem;</li>
+<li class="">adicione uma opção de implantação para DDL somente validado;</li>
+<li class="">record skipped bootstrap statements in smoke summary;</li>
+<li class="">documentar privilégios mínimos para usuários do serviço.</li>
+</ol>
+<p>Tests:</p>
+<ol>
+<li class="">reserved words such as <code>trigger</code> are quoted;</li>
+<li class="">existing incompatible tables produce actionable errors;</li>
+<li class="">existing compatible tables are reused;</li>
+<li class="">O bootstrap da função de serviço pode ignorar a criação de banco de dados/esquema existente.</li>
+</ol>
+<p>Live smoke:</p>
+<ol>
+<li class="">execute o mínimo de smoke com função de serviço no <code>PUBLIC</code> existente;</li>
+<li class="">execute o mínimo de smoke em um novo esquema com função de administrador.</li>
+</ol>
+<p>Commit message:</p>
+<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:#393A34"><span class="token plain">fix(snowflake): harden control table bootstrap</span><br></div></code></pre></div></div>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="commit-05-métricas-de-tempo-de-execução-e-integridade-de-evidências-de-execução">Commit 05: Métricas de tempo de execução e integridade de evidências de execução<a href="#commit-05-métricas-de-tempo-de-execução-e-integridade-de-evidências-de-execução" class="hash-link" aria-label="Link direto para Commit 05: Métricas de tempo de execução e integridade de evidências de execução" title="Link direto para Commit 05: Métricas de tempo de execução e integridade de evidências de execução" translate="no">​</a></h3>
+<p>Objetivo: preencher a evidência de execução com métricas de linha e contexto de consulta Snowflake mais próximo
+to AWS/Databricks.</p>
+<p>Implementation items:</p>
+<ol>
+<li class="">capturar linhas lidas antes dos filtros de qualidade;</li>
+<li class="">capturar linhas escritas para anexar/substituir;</li>
+<li class="">capturar contagens inseridas/atualizadas onde os metadados de resultado Snowflake suportam;</li>
+<li class="">armazenar IDs de consulta para instruções de propriedade do adaptador, quando disponíveis;</li>
+<li class="">incluir armazém, função, banco de dados, esquema e versão Snowflake nos metadados;</li>
+<li class="">incluir contagens de comando/consulta em <code>metrics_json</code>;</li>
+<li class="">preserve redaction in error paths.</li>
+</ol>
+<p>Tests:</p>
+<ol>
+<li class="">anexar evidência de sucesso tem contagens de linhas;</li>
+<li class="">a evidência de sucesso de substituição tem contagens de linhas;</li>
+<li class="">registros upsert/hash-diff métricas de gravação disponíveis;</li>
+<li class="">os metadados de resultados do conector são normalizados sem Snowpark.</li>
+</ol>
+<p>Live smoke:</p>
+<ol>
+<li class="">verify <code>ctrl_ingestion_runs.rows_read</code>;</li>
+<li class="">verifique se <code>metrics_json</code> contém IDs de consulta ou nulos documentados.</li>
+</ol>
+<p>Commit message:</p>
+<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:#393A34"><span class="token plain">feat(snowflake): record runtime row and query metrics</span><br></div></code></pre></div></div>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="commit-06-smoke-de-evidência-do-caminho-de-falha">Commit 06: smoke de Evidência do Caminho de Falha<a href="#commit-06-smoke-de-evidência-do-caminho-de-falha" class="hash-link" aria-label="Link direto para Commit 06: smoke de Evidência do Caminho de Falha" title="Link direto para Commit 06: smoke de Evidência do Caminho de Falha" translate="no">​</a></h3>
+<p>Objetivo: fazer com que o comportamento de falha do Snowflake corresponda à disciplina AWS/Databricks.</p>
+<p>Implementation items:</p>
+<ol>
+<li class="">adicionar cenário de smoke para tabela de origem ausente;</li>
+<li class="">adicionar cenário de smoke por falha na regra de qualidade;</li>
+<li class="">persist <code>ctrl_ingestion_errors</code>;</li>
+<li class="">persist failed <code>ctrl_ingestion_runs</code>;</li>
+<li class="">garantir que a exceção original ainda seja propagada para saída diferente de zero CLI;</li>
+<li class="">include redacted error text in summary.</li>
+</ol>
+<p>Tests:</p>
+<ol>
+<li class="">falha em tempo de execução grava evidência de erro;</li>
+<li class="">aborto de qualidade grava evidências de qualidade/erro/execução;</li>
+<li class="">secrets/password/token-like strings are redacted.</li>
+</ol>
+<p>Live smoke:</p>
+<div class="language-powershell codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-powershell codeBlock_bY9V thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:#393A34"><span class="token plain">contractforge-snowflake smoke-failure-paths --connect-options ...</span><br></div></code></pre></div></div>
+<p>Commit message:</p>
+<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:#393A34"><span class="token plain">feat(snowflake): validate failure path evidence</span><br></div></code></pre></div></div>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="commit-07-registro-de-origem-e-camada-de-paridade-de-origem">Commit 07: Registro de origem e camada de paridade de origem<a href="#commit-07-registro-de-origem-e-camada-de-paridade-de-origem" class="hash-link" aria-label="Link direto para Commit 07: Registro de origem e camada de paridade de origem" title="Link direto para Commit 07: Registro de origem e camada de paridade de origem" translate="no">​</a></h3>
+<p>Objetivo: remover o tratamento de origem do módulo de execução de tempo de execução monolítico.</p>
+<p>Implementation items:</p>
+<ol>
+<li class="">add <code>sources/registry.py</code>;</li>
+<li class="">add <code>sources/table.py</code>;</li>
+<li class="">add <code>sources/sql.py</code>;</li>
+<li class="">add <code>sources/stage_files.py</code>;</li>
+<li class="">adicione <code>sources/review.py</code> para famílias de origem não suportadas/requeridas para revisão;</li>
+<li class="">mantenha o comportamento idêntico para fontes atualmente suportadas;</li>
+<li class="">retornar metadados de origem estruturados para evidências.</li>
+</ol>
+<p>Tests:</p>
+<ol>
+<li class="">tabela/view/sql fonte SQL permanece inalterada;</li>
+<li class="">a fonte do estágio SQL permanece inalterada;</li>
+<li class="">tipos de origem não suportados produzem status de planejador existentes;</li>
+<li class="">os metadados de origem estão disponíveis para o redator da evidência.</li>
+</ol>
+<p>Commit message:</p>
+<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:#393A34"><span class="token plain">refactor(snowflake): introduce source registry</span><br></div></code></pre></div></div>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="commit-08-registro-de-preparação-e-transformações-compatíveis-com-sql">Commit 08: Registro de preparação e transformações compatíveis com SQL<a href="#commit-08-registro-de-preparação-e-transformações-compatíveis-com-sql" class="hash-link" aria-label="Link direto para Commit 08: Registro de preparação e transformações compatíveis com SQL" title="Link direto para Commit 08: Registro de preparação e transformações compatíveis com SQL" translate="no">​</a></h3>
+<p>Objetivo: alcançar a paridade de transformação de linha de base para operações compatíveis com Snowflake SQL.</p>
+<p>Implementation items:</p>
+<ol>
+<li class="">add <code>preparation/registry.py</code>;</li>
+<li class="">support projection/column selection;</li>
+<li class="">support <code>transform.cast</code>;</li>
+<li class="">support <code>transform.derive</code>;</li>
+<li class="">suporte <code>transform.standardize</code> para corte/inferior/superior;</li>
+<li class="">filtros de suporte quando representados pelo modelo semântico central;</li>
+<li class="">suporte à desduplicação determinística usando <code>QUALIFY ROW_NUMBER()</code>;</li>
+<li class="">keep complex nested shape as <code>REVIEW_REQUIRED</code> until live-tested.</li>
+</ol>
+<p>Tests:</p>
+<ol>
+<li class="">lança renderização Snowflake SQL;</li>
+<li class="">deriva renderização Snowflake SQL com aviso de dialeto;</li>
+<li class="">standardization renders SQL functions;</li>
+<li class="">deduplicate requires deterministic ordering;</li>
+<li class="">a forma aninhada não suportada permanece necessária para revisão.</li>
+</ol>
+<p>Live smoke:</p>
+<ol>
+<li class="">SQL-compatible transform scenario;</li>
+<li class="">deduplicate/upsert scenario.</li>
+</ol>
+<p>Commit message:</p>
+<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:#393A34"><span class="token plain">feat(snowflake): add SQL-compatible preparation registry</span><br></div></code></pre></div></div>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="commit-09-registro-em-modo-de-gravação">Commit 09: Registro em modo de gravação<a href="#commit-09-registro-em-modo-de-gravação" class="hash-link" aria-label="Link direto para Commit 09: Registro em modo de gravação" title="Link direto para Commit 09: Registro em modo de gravação" translate="no">​</a></h3>
+<p>Objetivo: dividir os modos de gravação e torná-los testáveis ​​de forma independente.</p>
+<p>Implementation items:</p>
+<ol>
+<li class="">add <code>write_modes/registry.py</code>;</li>
+<li class="">add <code>write_modes/append.py</code>;</li>
+<li class="">add <code>write_modes/overwrite.py</code>;</li>
+<li class="">add <code>write_modes/upsert.py</code>;</li>
+<li class="">add <code>write_modes/hash_diff.py</code>;</li>
+<li class="">manter explícitos os limites de revisão de exclusão reversível de histórico/instantâneo;</li>
+<li class="">centralizar a validação da chave de mesclagem.</li>
+</ol>
+<p>Tests:</p>
+<ol>
+<li class="">append SQL unchanged;</li>
+<li class="">overwrite SQL unchanged;</li>
+<li class="">upsert validates null/duplicate keys;</li>
+<li class="">hash-diff excludes declared columns;</li>
+<li class="">modos não suportados não podem ser executados silenciosamente.</li>
+</ol>
+<p>Commit message:</p>
+<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:#393A34"><span class="token plain">refactor(snowflake): split write mode execution</span><br></div></code></pre></div></div>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="compromisso-10-política-de-esquema-e-evidência-de-esquema">Compromisso 10: Política de Esquema e Evidência de Esquema<a href="#compromisso-10-política-de-esquema-e-evidência-de-esquema" class="hash-link" aria-label="Link direto para Compromisso 10: Política de Esquema e Evidência de Esquema" title="Link direto para Compromisso 10: Política de Esquema e Evidência de Esquema" translate="no">​</a></h3>
+<p>Objetivo: aproximar a política de esquema da maturidade Databricks/AWS.</p>
+<p>Implementation items:</p>
+<ol>
+<li class="">inspecionar o esquema de destino por meio de <code>INFORMATION_SCHEMA.COLUMNS</code> quando conectado;</li>
+<li class="">manter substituto de metadados do conector para wrapper de sessão local;</li>
+<li class="">enforce strict/additive/permissive consistently;</li>
+<li class="">escreva <code>ctrl_ingestion_schema_changes</code> para alterações aditivas;</li>
+<li class="">classify type widening/incompatible changes;</li>
+<li class="">adicione detalhes de alteração de esquema para executar evidências.</li>
+</ol>
+<p>Tests:</p>
+<ol>
+<li class="">strict added/removed columns fail;</li>
+<li class="">additive nullable columns are applied;</li>
+<li class="">alterações de tipo incompatíveis falham ou são revisadas de acordo com a política;</li>
+<li class="">a evidência de alterações de esquema é escrita.</li>
+</ol>
+<p>Live smoke:</p>
+<ol>
+<li class="">additive column smoke;</li>
+<li class="">strict failure smoke.</li>
+</ol>
+<p>Commit message:</p>
+<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:#393A34"><span class="token plain">feat(snowflake): add schema policy evidence</span><br></div></code></pre></div></div>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="compromisso-11-expansão-da-paridade-de-qualidade">Compromisso 11: Expansão da Paridade de Qualidade<a href="#compromisso-11-expansão-da-paridade-de-qualidade" class="hash-link" aria-label="Link direto para Compromisso 11: Expansão da Paridade de Qualidade" title="Link direto para Compromisso 11: Expansão da Paridade de Qualidade" translate="no">​</a></h3>
+<p>Objectivo: implementar e viver regras de qualidade apoiadas pelo fumo.</p>
+<p>Implementation items:</p>
+<ol>
+<li class="">confirm <code>not_null</code>, <code>required_columns</code>, <code>accepted_values</code>, <code>min_rows</code>,
+<code>unique_key</code>, <code>max_null_ratio</code> e expressões em nível de linha;</li>
+<li class="">rejeitar quarentena agregada sem predicado de linha;</li>
+<li class="">adicionar tratamento de status de aviso/falha/quarentena;</li>
+<li class="">persistir <code>ctrl_ingestion_quality</code> e <code>ctrl_ingestion_quarantine</code>;</li>
+<li class="">incluir resumo de qualidade nas evidências de execução.</li>
+</ol>
+<p>Tests:</p>
+<ol>
+<li class="">pass/warn/fail/quarantine unit tests;</li>
+<li class="">aggregate quarantine rejection;</li>
+<li class="">filtros de quarentena em nível de linha visam gravação.</li>
+</ol>
+<p>Live smoke:</p>
+<ol>
+<li class="">qualidade de passe;</li>
+<li class="">qualidade de linha em quarentena;</li>
+<li class="">qualidade de aborto.</li>
+</ol>
+<p>Commit message:</p>
+<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:#393A34"><span class="token plain">feat(snowflake): expand quality and quarantine runtime</span><br></div></code></pre></div></div>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="compromisso-12-estado-idempotência-e-bloqueios">Compromisso 12: Estado, Idempotência e Bloqueios<a href="#compromisso-12-estado-idempotência-e-bloqueios" class="hash-link" aria-label="Link direto para Compromisso 12: Estado, Idempotência e Bloqueios" title="Link direto para Compromisso 12: Estado, Idempotência e Bloqueios" translate="no">​</a></h3>
+<p>Goal: bring state handling toward Databricks maturity.</p>
+<p>Implementation items:</p>
+<ol>
+<li class="">persistir no último estado de sucesso para cada execução;</li>
+<li class="">support watermark candidate calculation;</li>
+<li class="">support previous watermark filtering;</li>
+<li class="">adicionar pesquisa de idempotência para execuções idempotentes declaradas;</li>
+<li class="">add lock acquire/release helpers;</li>
+<li class="">registrar evidências de bloqueio/estado em tabelas de controle.</li>
+</ol>
+<p>Tests:</p>
+<ol>
+<li class="">fonte de filtros de marca d&#x27;água anterior;</li>
+<li class="">successful run updates state;</li>
+<li class="">a repetição idempotente pode pular;</li>
+<li class="">lock acquisition detects active lock;</li>
+<li class="">a liberação do bloqueio não mascara as falhas originais.</li>
+</ol>
+<p>Live smoke:</p>
+<ol>
+<li class="">two-run watermark scenario;</li>
+<li class="">idempotent replay scenario.</li>
+</ol>
+<p>Commit message:</p>
+<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:#393A34"><span class="token plain">feat(snowflake): add state idempotency and locks</span><br></div></code></pre></div></div>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="compromisso-13-comentários-e-tags-de-governança">Compromisso 13: Comentários e tags de governança<a href="#compromisso-13-comentários-e-tags-de-governança" class="hash-link" aria-label="Link direto para Compromisso 13: Comentários e tags de governança" title="Link direto para Compromisso 13: Comentários e tags de governança" translate="no">​</a></h3>
+<p>Objetivo: validar anotações Snowflake ao vivo.</p>
+<p>Implementation items:</p>
+<ol>
+<li class="">implementar comentários de tabela;</li>
+<li class="">implement column comments;</li>
+<li class="">implementar aplicação de tag quando existirem objetos de tag;</li>
+<li class="">suporte ao modo somente validação para tags;</li>
+<li class="">persist <code>ctrl_ingestion_annotations</code>;</li>
+<li class="">document tag namespace requirements.</li>
+</ol>
+<p>Tests:</p>
+<ol>
+<li class="">comentários renderizados/aplicados;</li>
+<li class="">tag ausente pode avisar ou falhar por política;</li>
+<li class="">a evidência da anotação omite os valores.</li>
+</ol>
+<p>Live smoke:</p>
+<ol>
+<li class="">comments smoke;</li>
+<li class="">etiqueta somente smoke validada;</li>
+<li class="">tag opcional aplica smoke quando o objeto tag existe.</li>
+</ol>
+<p>Commit message:</p>
+<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:#393A34"><span class="token plain">feat(snowflake): apply comments and tag annotations</span><br></div></code></pre></div></div>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="compromisso-14-concessões-de-acesso-e-revisão-de-políticas">Compromisso 14: Concessões de acesso e revisão de políticas<a href="#compromisso-14-concessões-de-acesso-e-revisão-de-políticas" class="hash-link" aria-label="Link direto para Compromisso 14: Concessões de acesso e revisão de políticas" title="Link direto para Compromisso 14: Concessões de acesso e revisão de políticas" translate="no">​</a></h3>
+<p>Objetivo: tratamento de acesso maduro sem alterações destrutivas inseguras.</p>
+<p>Implementation items:</p>
+<ol>
+<li class="">map grants to Snowflake privileges;</li>
+<li class="">implementar plano de subsídio somente validado;</li>
+<li class="">implementar aplicar subsídios quando explicitamente solicitado;</li>
+<li class="">renderizar política de acesso de linha SQL;</li>
+<li class="">política de mascaramento de renderização SQL;</li>
+<li class="">manter revogações destrutivas obrigatórias para revisão;</li>
+<li class="">persist <code>ctrl_ingestion_access</code>.</li>
+</ol>
+<p>Tests:</p>
+<ol>
+<li class="">plano de concessão torna SQL seguro;</li>
+<li class="">evidências de registros somente validados sem concessão;</li>
+<li class="">a política de linha/máscara SQL valida os campos obrigatórios;</li>
+<li class="">a deriva destrutiva aumenta a necessidade de revisão.</li>
+</ol>
+<p>Live smoke:</p>
+<ol>
+<li class="">concessão de smoke somente para validação;</li>
+<li class="">optional grant apply smoke to test role.</li>
+</ol>
+<p>Commit message:</p>
+<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:#393A34"><span class="token plain">feat(snowflake): add access grant and policy evidence</span><br></div></code></pre></div></div>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="commit-15-stage-publish-live-smoke">Commit 15: Stage Publish Live Smoke<a href="#commit-15-stage-publish-live-smoke" class="hash-link" aria-label="Link direto para Commit 15: Stage Publish Live Smoke" title="Link direto para Commit 15: Stage Publish Live Smoke" translate="no">​</a></h3>
+<p>Objetivo: provar que os pacotes de publicação podem ser carregados e consumidos a partir de um estágio Snowflake.</p>
+<p>Implementation items:</p>
+<ol>
+<li class="">adicionar configuração de smoke para estágio interno;</li>
+<li class="">publicar artefatos no stage;</li>
+<li class="">carregar artefatos de contrato/ambiente de volta por meio do carregador de tempo de execução;</li>
+<li class="">executar um contrato de artefato preparado por meio de tempo de execução apoiado por conector local;</li>
+<li class="">resumir URIs de manifesto e artefato.</li>
+</ol>
+<p>Tests:</p>
+<ol>
+<li class="">validação do estágio URI;</li>
+<li class="">unsafe stage paths rejected;</li>
+<li class="">publish closes owned connections on failure.</li>
+</ol>
+<p>Live smoke:</p>
+<div class="language-powershell codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-powershell codeBlock_bY9V thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:#393A34"><span class="token plain">contractforge-snowflake smoke-stage-publish --connect-options ...</span><br></div></code></pre></div></div>
+<p>Commit message:</p>
+<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:#393A34"><span class="token plain">feat(snowflake): smoke stage publish artifacts</span><br></div></code></pre></div></div>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="compromisso-16-implantação-do-procedimento-snowpark">Compromisso 16: Implantação do procedimento Snowpark<a href="#compromisso-16-implantação-do-procedimento-snowpark" class="hash-link" aria-label="Link direto para Compromisso 16: Implantação do procedimento Snowpark" title="Link direto para Compromisso 16: Implantação do procedimento Snowpark" translate="no">​</a></h3>
+<p>Objetivo: implantar e executar o procedimento de tempo de execução estável Snowflake.</p>
+<p>Implementation items:</p>
+<ol>
+<li class="">construir/instalar roda adaptadora para importação de procedimento;</li>
+<li class="">upload wheel to stage;</li>
+<li class="">criar ou substituir procedimento de tempo de execução;</li>
+<li class="">procedimento de chamada com URIs de artefato de contrato/ambiente;</li>
+<li class="">capturar id e resultado da consulta do procedimento;</li>
+<li class="">documentar os pacotes/importações necessários.</li>
+</ol>
+<p>Tests:</p>
+<ol>
+<li class="">o procedimento SQL renderiza importações/pacotes determinísticos;</li>
+<li class="">unsafe wheel URIs are rejected;</li>
+<li class="">procedure call SQL is safe.</li>
+</ol>
+<p>Live smoke:</p>
+<ol>
+<li class="">procedimento de implantação;</li>
+<li class="">executar um contrato anexo por meio de procedimento;</li>
+<li class="">verificar alvo/evidência.</li>
+</ol>
+<p>Commit message:</p>
+<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:#393A34"><span class="token plain">feat(snowflake): deploy stable Snowpark runner procedure</span><br></div></code></pre></div></div>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="compromisso-17-implantação-e-execução-do-gráfico-de-tarefas">Compromisso 17: Implantação e execução do gráfico de tarefas<a href="#compromisso-17-implantação-e-execução-do-gráfico-de-tarefas" class="hash-link" aria-label="Link direto para Compromisso 17: Implantação e execução do gráfico de tarefas" title="Link direto para Compromisso 17: Implantação e execução do gráfico de tarefas" translate="no">​</a></h3>
+<p>Objetivo: provar a execução do projeto agendado/dependência em Snowflake real.</p>
+<p>Implementation items:</p>
+<ol>
+<li class="">criar gráfico de tarefas a partir do cronograma e dependências do projeto;</li>
+<li class="">implantar tarefas chamando procedimento de executor estável;</li>
+<li class="">support dry-run/apply/resume/suspend;</li>
+<li class="">execute a tarefa root manualmente para smoke;</li>
+<li class="">poll task history;</li>
+<li class="">persistir resumo de evidências de tarefas.</li>
+</ol>
+<p>Tests:</p>
+<ol>
+<li class="">schedule timezone renders correctly;</li>
+<li class="">dependency <code>AFTER</code> renders correctly;</li>
+<li class="">resume/suspend commands are explicit;</li>
+<li class="">task graph refuses missing artifact URI/procedure.</li>
+</ol>
+<p>Live smoke:</p>
+<div class="language-powershell codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-powershell codeBlock_bY9V thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:#393A34"><span class="token plain">contractforge-snowflake smoke-task-graph --connect-options ...</span><br></div></code></pre></div></div>
+<p>Commit message:</p>
+<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:#393A34"><span class="token plain">feat(snowflake): deploy and smoke task graph execution</span><br></div></code></pre></div></div>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="compromisso-18-paridade-do-projeto-cli">Compromisso 18: Paridade do Projeto CLI<a href="#compromisso-18-paridade-do-projeto-cli" class="hash-link" aria-label="Link direto para Compromisso 18: Paridade do Projeto CLI" title="Link direto para Compromisso 18: Paridade do Projeto CLI" translate="no">​</a></h3>
+<p>Goal: make Snowflake project commands as usable as AWS/Databricks equivalents.</p>
+<p>Implementation items:</p>
+<ol>
+<li class="">split <code>deploy-project</code> implementation if needed;</li>
+<li class="">adicione <code>run-project</code> ou comando de execução equivalente;</li>
+<li class="">adicione <code>--wait</code> e pesquisa de status;</li>
+<li class="">adicionar modos de saída somente resumo e JSON;</li>
+<li class="">adicione o comando plano de limpeza;</li>
+<li class="">adicione sinalizadores de aplicação com custo limitado.</li>
+</ol>
+<p>Tests:</p>
+<ol>
+<li class="">a simulação do projeto valida todas as etapas;</li>
+<li class="">implantação de blocos de etapas não suportados;</li>
+<li class="">apenas resumo omite artefatos barulhentos;</li>
+<li class="">o plano de limpeza é não destrutivo por padrão.</li>
+</ol>
+<p>Live smoke:</p>
+<ol>
+<li class="">implantar projeto em duas etapas;</li>
+<li class="">run/wait;</li>
+<li class="">verificar os alvos e as evidências.</li>
+</ol>
+<p>Commit message:</p>
+<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:#393A34"><span class="token plain">feat(snowflake): add project run and cleanup CLI</span><br></div></code></pre></div></div>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="commit-19-cost-reconciliation-live-smoke">Commit 19: Cost Reconciliation Live Smoke<a href="#commit-19-cost-reconciliation-live-smoke" class="hash-link" aria-label="Link direto para Commit 19: Cost Reconciliation Live Smoke" title="Link direto para Commit 19: Cost Reconciliation Live Smoke" translate="no">​</a></h3>
+<p>Objetivo: validar a evidência de custo Snowflake após a latência de uso da conta.</p>
+<p>Implementation items:</p>
+<ol>
+<li class="">reconcile by structured query tag;</li>
+<li class="">record query history signals;</li>
+<li class="">registrar sinais de atribuição de consulta quando disponíveis;</li>
+<li class="">incluir metadados de medição/tarefa do armazém, quando disponíveis;</li>
+<li class="">support delayed poll/retry configuration.</li>
+</ol>
+<p>Tests:</p>
+<ol>
+<li class="">query history SQL filters by run id;</li>
+<li class="">linhas de uso da conta ausentes retornam status atrasado/pendente;</li>
+<li class="">a inserção de evidência de custo é idempotente o suficiente para reconciliação repetida.</li>
+</ol>
+<p>Live smoke:</p>
+<ol>
+<li class="">run minimal smoke;</li>
+<li class="">reconciliar o custo para um ID de execução;</li>
+<li class="">verifique as linhas <code>ctrl_ingestion_cost</code> ou o status pendente documentado.</li>
+</ol>
+<p>Commit message:</p>
+<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:#393A34"><span class="token plain">feat(snowflake): smoke query history cost reconciliation</span><br></div></code></pre></div></div>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="commit-20-expansão-de-fontes-para-formatos-de-stage">Commit 20: Expansão de fontes para formatos de stage<a href="#commit-20-expansão-de-fontes-para-formatos-de-stage" class="hash-link" aria-label="Link direto para Commit 20: Expansão de fontes para formatos de stage" title="Link direto para Commit 20: Expansão de fontes para formatos de stage" translate="no">​</a></h3>
+<p>Objetivo: ampliar o suporte à fonte de arquivos, mantendo a extração não-Snowflake
+review-first.</p>
+<p>Implementation items:</p>
+<ol>
+<li class="">suporte CSV preparado com formato de arquivo;</li>
+<li class="">suporte JSON encenado com projeção <code>VARIANT</code>;</li>
+<li class="">apoiar a projeção Parquet encenada sempre que viável;</li>
+<li class="">classify external stage requirements;</li>
+<li class="">manter HTTP/JDBC/Kafka necessária para revisão, a menos que seja pré-preparado.</li>
+</ol>
+<p>Tests:</p>
+<ol>
+<li class="">CSV staged read;</li>
+<li class="">JSON staged read;</li>
+<li class="">Parquet leitura encenada ou revisão explícita;</li>
+<li class="">unsafe file format/stage rejected.</li>
+</ol>
+<p>Live smoke:</p>
+<ol>
+<li class="">stage small CSV;</li>
+<li class="">run bronze staged-file append;</li>
+<li class="">validar evidências de destino e cópia/fonte.</li>
+</ol>
+<p>Commit message:</p>
+<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:#393A34"><span class="token plain">feat(snowflake): expand staged file source support</span><br></div></code></pre></div></div>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="commit-21-linhagem-e-explicação-de-evidências">Commit 21: Linhagem e explicação de evidências<a href="#commit-21-linhagem-e-explicação-de-evidências" class="hash-link" aria-label="Link direto para Commit 21: Linhagem e explicação de evidências" title="Link direto para Commit 21: Linhagem e explicação de evidências" translate="no">​</a></h3>
+<p>Goal: populate lineage/explain control tables.</p>
+<p>Implementation items:</p>
+<ol>
+<li class="">escrever a linhagem ContractForge imediata durante a execução;</li>
+<li class="">add optional delayed <code>ACCESS_HISTORY</code> reconciliation;</li>
+<li class="">capture a saída <code>EXPLAIN</code> para instruções suportadas;</li>
+<li class="">persist <code>ctrl_ingestion_lineage</code>;</li>
+<li class="">persist <code>ctrl_ingestion_explain</code>.</li>
+</ol>
+<p>Tests:</p>
+<ol>
+<li class="">o evento de linhagem inclui ID de origem/destino/execução;</li>
+<li class="">explicar o texto do plano de armazenamento de captura;</li>
+<li class="">Account Usage latency is handled as pending.</li>
+</ol>
+<p>Live smoke:</p>
+<ol>
+<li class="">verificar linhas de linhagem;</li>
+<li class="">verifique as linhas explicativas.</li>
+</ol>
+<p>Commit message:</p>
+<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:#393A34"><span class="token plain">feat(snowflake): record lineage and explain evidence</span><br></div></code></pre></div></div>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="commit-22-documentação-e-exemplos">Commit 22: Documentação e Exemplos<a href="#commit-22-documentação-e-exemplos" class="hash-link" aria-label="Link direto para Commit 22: Documentação e Exemplos" title="Link direto para Commit 22: Documentação e Exemplos" translate="no">​</a></h3>
+<p>Objetivo: documentar a operação do Snowflake no mesmo padrão do AWS/Databricks.</p>
+<p>Implementation items:</p>
+<ol>
+<li class="">add <code>docs/adapters/snowflake.md</code>;</li>
+<li class="">add service-user/PAT/key-pair setup guide;</li>
+<li class="">add minimal smoke guide;</li>
+<li class="">adicionar guia de implantação do projeto;</li>
+<li class="">adicionar guia de governança/acesso;</li>
+<li class="">add cost reconciliation guide;</li>
+<li class="">update site docs if applicable;</li>
+<li class="">adicione projeto de exemplo Snowflake do mundo real.</li>
+</ol>
+<p>Validação:</p>
+<ol>
+<li class="">os links docs passam nos testes de documentação existentes;</li>
+<li class="">exemplos são renderizados com CLI atual.</li>
+</ol>
+<p>Commit message:</p>
+<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:#393A34"><span class="token plain">docs: add Snowflake adapter operations guide</span><br></div></code></pre></div></div>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="commit-23-matriz-de-estabilização-e-ci-gates">Commit 23: Matriz de Estabilização e CI Gates<a href="#commit-23-matriz-de-estabilização-e-ci-gates" class="hash-link" aria-label="Link direto para Commit 23: Matriz de Estabilização e CI Gates" title="Link direto para Commit 23: Matriz de Estabilização e CI Gates" translate="no">​</a></h3>
+<p>Goal: make readiness measurable.</p>
+<p>Implementation items:</p>
+<ol>
+<li class="">add <code>docs/specs/snowflake-stabilization-matrix.md</code>;</li>
+<li class="">listar o status de suporte para cada recurso de fonte/gravação/governança/evidência;</li>
+<li class="">mapeie cada linha para testes e comando de smoke;</li>
+<li class="">adicionar fluxo de trabalho GitHub opcional/manual para smoke Snowflake;</li>
+<li class="">adicione verificação de embalagem para extras de tempo de execução.</li>
+</ol>
+<p>Tests:</p>
+<ol>
+<li class="">mapa de documentação inclui matriz;</li>
+<li class="">os testes de embalagem incluem <code>contractforge-snowflake[runtime]</code> sempre que viável;</li>
+<li class="">A sintaxe do fluxo de trabalho do CI é válida.</li>
+</ol>
+<p>Commit message:</p>
+<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:#393A34"><span class="token plain">docs: add Snowflake stabilization matrix</span><br></div></code></pre></div></div>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="commit-24-release-candidate-cleanup">Commit 24: Release Candidate Cleanup<a href="#commit-24-release-candidate-cleanup" class="hash-link" aria-label="Link direto para Commit 24: Release Candidate Cleanup" title="Link direto para Commit 24: Release Candidate Cleanup" translate="no">​</a></h3>
+<p>Objetivo: terminar a disciplina de lançamento com qualidade alfa.</p>
+<p>Implementation items:</p>
+<ol>
+<li class="">remover dependências temporárias do <code>.tmp</code> smoke dos documentos;</li>
+<li class="">garantir que as exportações públicas de API sejam estáveis;</li>
+<li class="">run full tests;</li>
+<li class="">run live minimal smoke;</li>
+<li class="">run live failure smoke;</li>
+<li class="">execute estágio/procedimento/tarefa ao vivo onde as credenciais permitirem;</li>
+<li class="">atualizar o status de vencimento do README;</li>
+<li class="">marque limitações conhecidas de necessidade de revisão.</li>
+</ol>
+<p>Validação:</p>
+<ol>
+<li class=""><code>uv run pytest</code>;</li>
+<li class=""><code>uv build</code>;</li>
+<li class="">resumo do smoke real do Snowflake anexado às notas de release;</li>
+<li class="">nenhuma importação do SDK Snowflake no caminho de importação padrão.</li>
+</ol>
+<p>Commit message:</p>
+<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:#393A34"><span class="token plain">chore(snowflake): prepare adapter alpha release</span><br></div></code></pre></div></div>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="running-status">Running Status<a href="#running-status" class="hash-link" aria-label="Link direto para Running Status" title="Link direto para Running Status" translate="no">​</a></h2>
+<p>Use esta seção como terreno de compromisso.</p>
+<table><thead><tr><th>Commit</th><th>Status</th><th>Notes</th></tr></thead><tbody><tr><td>01</td><td>Complete</td><td>Documento de plano e links adicionados.</td></tr><tr><td>02</td><td>Complete</td><td>CLI apoiado por conector é executado e testes focados são aprovados. A execução da função de serviço é desbloqueada pelo Commit 04.</td></tr><tr><td>03</td><td>Complete</td><td>Pacote <code>smoke</code> de primeira classe e CLI adicionados; smoke embalada ao vivo passada com <code>CFINGESTSVC</code>.</td></tr><tr><td>04</td><td>Complete</td><td>A tabela de controle DDL pode ignorar a inicialização do banco de dados/esquema existente; smoke de função de serviço ao vivo passada em <code>CONTRACTFORGE_TEST_DB.PUBLIC</code>.</td></tr><tr><td>05</td><td>Complete</td><td>Linhas de tempo de execução/métricas de consulta registradas em evidências de execução; linhas verificadas de smoke embaladas ao vivo e IDs de consulta.</td></tr><tr><td>06</td><td>Complete</td><td><code>smoke-failure-paths</code> adicionado; smoke viva verificou evidências de falta de fonte e aborto de qualidade.</td></tr><tr><td>07</td><td>Complete</td><td>Registro de origem adicionado para fontes de tabela/view/sql/stage; sucesso e fracasso ao vivo passam após a refatoração.</td></tr><tr><td>08</td><td>Complete</td><td>Registro de preparação adicionado com projeção de metadados, filtros, transformações de substituição nativas do Snowflake, desduplicação determinística e passagem de smoke de transformação/desduplicação ao vivo.</td></tr><tr><td>09</td><td>Complete</td><td>Modos de gravação divididos em módulos de registro anexar/substituir/upsert/hash-diff; testes focados e smoke de sucesso/fracasso ao vivo foram aprovados.</td></tr><tr><td>08</td><td>Pending</td><td>Preparation registry.</td></tr><tr><td>09</td><td>Pending</td><td>Registro em modo de gravação.</td></tr><tr><td>10</td><td>Complete</td><td>A política de esquema agora inspeciona INFORMATION_SCHEMA com fallback de conector, registra evidências aditivas de alteração de esquema/métricas de execução, rejeita alterações de tipo incompatíveis e passagens aditivas/estritas em tempo real são aprovadas.</td></tr><tr><td>11</td><td>Complete</td><td>O tempo de execução de qualidade agora registra resumos por regra, propaga quality_status em evidências de execução, rejeita quarentena agregada, filtra gravações de quarentena em nível de linha, relata métricas de linha em quarentena e passa/quarentena/aborta smokes passadas ao vivo.</td></tr><tr><td>12</td><td>Complete</td><td>O tempo de execução de estado agora cita colunas da tabela de controle, registra linhas de estado com falha, suporta filtragem de marca d&#x27;água/gravação de candidato anterior, ignora replays de idempotência bem-sucedidos com evidências e fornece aquisição/liberação de bloqueio opcional com marca d&#x27;água/fumos de idempotência ao vivo.</td></tr><tr><td>13</td><td>Complete</td><td>Comentários de tabela/coluna, tag qualificada SQL, evidência somente de validação de tag, políticas de ignorar/avisar/reprovar, redação de evidências de anotação, documentos e smoke de comentários ao vivo/validação de tag aprovada.</td></tr><tr><td>14</td><td>Complete</td><td>Concessões, evidência de acesso somente validação, política de acesso de linha SQL, política de mascaramento SQL, controle de revisão de revogação destrutiva, redação de evidência de acesso, documentos e smoke de acesso somente validação ao vivo aprovada.</td></tr><tr><td>15</td><td>Complete</td><td><code>smoke-stage-publish</code> cria um estágio interno temporário, publica o pacote do executor de biblioteca, recarrega artefatos de manifesto/contrato/ambiente de <code>@stage</code> por meio de GET apoiado por conector, executa o contrato de teste e passa a smoke ao vivo.</td></tr><tr><td>16</td><td>Complete</td><td>O comando do procedimento smoke agora prepara importações ZIP compatíveis com Snowflake para as rodas do núcleo/adaptador construídas, padroniza os pacotes de procedimento para o conjunto de dependências de tempo de execução, ignora a mutação da tag de consulta somente do conector dentro do manipulador Snowpark e o smoke do procedimento hospedado ao vivo passado com o ID de consulta <code>01c4ea61-0001-6b57-0001-084600149952</code>.</td></tr><tr><td>17</td><td>Complete</td><td>Ciclo de vida da tarefa SQL, consulta de histórico de tarefas em nível de gráfico, <code>smoke-task-graph</code>, testes de simulação e conjunto focado aprovados. A smoke do gráfico de tarefas ao vivo passou depois que as concessões de tarefas foram provisionadas.</td></tr><tr><td>18</td><td>Complete</td><td>Adicionada execução de tarefa simulada/ao vivo <code>run-project</code> com espera de histórico de tarefa limitada opcional, saída JSON somente resumo, <code>cleanup-plan</code> não destrutivo, testes e documentos.</td></tr><tr><td>19</td><td>Complete</td><td>A reconciliação de custos agora investiga IDs de execução estruturados do <code>QUERY_TAG</code>, retorna <code>PENDING</code> para uso de conta atrasado ou indisponível, exclui sinais de custo anteriores de propriedade do adaptador antes da inserção, registra o histórico de consultas e sinais opcionais de atribuição de consulta, expõe sinalizadores de espera/pesquisa CLI e passa nos testes focados. As concessões de uso de conta ativa foram validadas para <code>SNOWFLAKE.ACCOUNT_USAGE.QUERY_HISTORY</code> e <code>QUERY_ATTRIBUTION_HISTORY</code>. Tags de consulta em tempo de execução foram corrigidas para armazenar JSON analisáveis ​​usando nomes de destino sem aspas; smoke mínima fresca passada com a execução <code>d8bc24b9-f36e-4e44-8383-115ca89a925a</code>, e a reconciliação permanece corretamente <code>PENDING</code> até que a latência de uso da conta exponha esse novo ID de execução.</td></tr><tr><td>20</td><td>Complete</td><td>A renderização de origem de arquivo preparada agora suporta projeções posicionais CSV, projeções tipadas/carga útil JSON e projeções tipadas Parquet com formatos de arquivo Snowflake nomeados ou padrões de estágio; formatos de teste não suportados são necessários para revisão e caminhos de teste/expressões de coluna/mapeamentos de formato de arquivo inseguros são rejeitados. Os testes de origem focada são aprovados. O anexo de arquivo de teste Live CSV passou com a execução <code>0159e736-5c5e-4dfd-91cb-3b5373c36369</code>, gravou 2 linhas em <code>CF_SMOKE_STAGEFMT_ORDERS</code> e os objetos temporários de estágio/formato de arquivo/destino foram limpos.</td></tr><tr><td>21</td><td>Complete</td><td>A execução em tempo de execução agora grava linhas de linhagem imediatas no estilo ContractForge/OpenLineage e evidências <code>EXPLAIN USING TEXT</code>, expõe a reconciliação atrasada de <code>ACCESS_HISTORY</code> por meio de API/CLI com manipulação de <code>PENDING</code> e aprovação nos testes Snowflake focados. A smoke mínima ao vivo escreveu 5 linhas de linhagem e 5 linhas explicativas; <code>ACCESS_HISTORY</code> estava acessível, mas ainda tinha 0 linhas para executar <code>5a8c49dc-2ccd-439e-9ae0-58bc7fcb02d0</code>, correspondendo ao caminho pendente atrasado.</td></tr><tr><td>22</td><td>Complete</td><td>Adicionado guia de operações <code>docs/adapters/snowflake.md</code>, matriz de estabilização e links atualizados de índice/documentos do adaptador.</td></tr><tr><td>23</td><td>Complete</td><td>Adicionado <code>docs/specs/snowflake-stabilization-matrix.md</code> com escopo, portões de liberação e plano de desbloqueio de portão bloqueado.</td></tr><tr><td>24</td><td>Complete</td><td>Status de maturidade do README atualizado de &quot;Planejamento&quot; para &quot;Alfa com validação real do Snowflake&quot;. Limitações conhecidas de necessidade de revisão marcadas para portas de procedimentos/tarefas bloqueadas. Testes focados foram aprovados.</td></tr><tr><td>25</td><td>Complete</td><td>Real Snowflake executor de biblioteca de procedimento hospedado USGS GeoJSON medalhão congelado executado de bronze a ouro contra a mesma linha de base de 30 recursos usada para paridade AWS/Databricks. As contagens Snowflake foram bronze = 1, prata = 30, ouro diariamente = 2, faixas de ouro = 3 com 4 linhas de execução bem-sucedidas, 16 linhas de qualidade, sem linhas de quarentena e sem erros. As evidências de destino/execução AWS e Databricks corresponderam às quatro contagens de resultados e aos status <code>SUCCESS/PASSED</code>. Testes completos aprovados.</td></tr></tbody></table>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="regra-de-execução">Regra de Execução<a href="#regra-de-execução" class="hash-link" aria-label="Link direto para Regra de Execução" title="Link direto para Regra de Execução" translate="no">​</a></h2>
+<p>Trabalhe neste arquivo em ordem, a menos que uma dependência de bloqueio force um local
+trocar. Cada commit deve atualizar a tabela de status, incluir testes para sua alteração,
+e registre qualquer comando live-smoke que foi executado.</p></div><footer class="theme-doc-footer docusaurus-mt-lg"><div class="row margin-top--sm theme-doc-footer-edit-meta-row"><div class="col noPrint_WFHX"><a href="https://github.com/marquesantero/contractforge/edit/main/site/docs/specs/snowflake-adapter-parity-execution-plan.md" target="_blank" rel="noopener noreferrer" class="theme-edit-this-page"><svg fill="currentColor" height="20" width="20" viewBox="0 0 40 40" class="iconEdit_Z9Sw" aria-hidden="true"><g><path d="m34.5 11.7l-3 3.1-6.3-6.3 3.1-3q0.5-0.5 1.2-0.5t1.1 0.5l3.9 3.9q0.5 0.4 0.5 1.1t-0.5 1.2z m-29.5 17.1l18.4-18.5 6.3 6.3-18.4 18.4h-6.3v-6.2z"></path></g></svg>Editar esta página</a></div><div class="col lastUpdated_JAkA"></div></div></footer></article><nav class="docusaurus-mt-lg pagination-nav" aria-label="Páginas de documento"></nav></div></div><div class="col col--3"><div class="tableOfContents_bqdL thin-scrollbar theme-doc-toc-desktop"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#propósito" class="table-of-contents__link toc-highlight">Propósito</a></li><li><a href="#linha-de-base-atual" class="table-of-contents__link toc-highlight">Linha de base atual</a></li><li><a href="#plano-de-compromisso" class="table-of-contents__link toc-highlight">Plano de compromisso</a><ul><li><a href="#compromisso-01-registrar-o-plano-de-execução-da-paridade" class="table-of-contents__link toc-highlight">Compromisso 01: Registrar o Plano de Execução da Paridade</a></li><li><a href="#confirmação-02-execução-cli-apoiada-por-conector" class="table-of-contents__link toc-highlight">Confirmação 02: execução CLI apoiada por conector</a></li><li><a href="#compromisso-03-promover-o-mínimo-de-smoke-em-pacotes-de-primeira-classe" class="table-of-contents__link toc-highlight">Compromisso 03: Promover o mínimo de smoke em pacotes de primeira classe</a></li><li><a href="#commit-04-tabela-de-controle-ddl-e-fortalecimento-de-migração" class="table-of-contents__link toc-highlight">Commit 04: Tabela de controle DDL e fortalecimento de migração</a></li><li><a href="#commit-05-métricas-de-tempo-de-execução-e-integridade-de-evidências-de-execução" class="table-of-contents__link toc-highlight">Commit 05: Métricas de tempo de execução e integridade de evidências de execução</a></li><li><a href="#commit-06-smoke-de-evidência-do-caminho-de-falha" class="table-of-contents__link toc-highlight">Commit 06: smoke de Evidência do Caminho de Falha</a></li><li><a href="#commit-07-registro-de-origem-e-camada-de-paridade-de-origem" class="table-of-contents__link toc-highlight">Commit 07: Registro de origem e camada de paridade de origem</a></li><li><a href="#commit-08-registro-de-preparação-e-transformações-compatíveis-com-sql" class="table-of-contents__link toc-highlight">Commit 08: Registro de preparação e transformações compatíveis com SQL</a></li><li><a href="#commit-09-registro-em-modo-de-gravação" class="table-of-contents__link toc-highlight">Commit 09: Registro em modo de gravação</a></li><li><a href="#compromisso-10-política-de-esquema-e-evidência-de-esquema" class="table-of-contents__link toc-highlight">Compromisso 10: Política de Esquema e Evidência de Esquema</a></li><li><a href="#compromisso-11-expansão-da-paridade-de-qualidade" class="table-of-contents__link toc-highlight">Compromisso 11: Expansão da Paridade de Qualidade</a></li><li><a href="#compromisso-12-estado-idempotência-e-bloqueios" class="table-of-contents__link toc-highlight">Compromisso 12: Estado, Idempotência e Bloqueios</a></li><li><a href="#compromisso-13-comentários-e-tags-de-governança" class="table-of-contents__link toc-highlight">Compromisso 13: Comentários e tags de governança</a></li><li><a href="#compromisso-14-concessões-de-acesso-e-revisão-de-políticas" class="table-of-contents__link toc-highlight">Compromisso 14: Concessões de acesso e revisão de políticas</a></li><li><a href="#commit-15-stage-publish-live-smoke" class="table-of-contents__link toc-highlight">Commit 15: Stage Publish Live Smoke</a></li><li><a href="#compromisso-16-implantação-do-procedimento-snowpark" class="table-of-contents__link toc-highlight">Compromisso 16: Implantação do procedimento Snowpark</a></li><li><a href="#compromisso-17-implantação-e-execução-do-gráfico-de-tarefas" class="table-of-contents__link toc-highlight">Compromisso 17: Implantação e execução do gráfico de tarefas</a></li><li><a href="#compromisso-18-paridade-do-projeto-cli" class="table-of-contents__link toc-highlight">Compromisso 18: Paridade do Projeto CLI</a></li><li><a href="#commit-19-cost-reconciliation-live-smoke" class="table-of-contents__link toc-highlight">Commit 19: Cost Reconciliation Live Smoke</a></li><li><a href="#commit-20-expansão-de-fontes-para-formatos-de-stage" class="table-of-contents__link toc-highlight">Commit 20: Expansão de fontes para formatos de stage</a></li><li><a href="#commit-21-linhagem-e-explicação-de-evidências" class="table-of-contents__link toc-highlight">Commit 21: Linhagem e explicação de evidências</a></li><li><a href="#commit-22-documentação-e-exemplos" class="table-of-contents__link toc-highlight">Commit 22: Documentação e Exemplos</a></li><li><a href="#commit-23-matriz-de-estabilização-e-ci-gates" class="table-of-contents__link toc-highlight">Commit 23: Matriz de Estabilização e CI Gates</a></li><li><a href="#commit-24-release-candidate-cleanup" class="table-of-contents__link toc-highlight">Commit 24: Release Candidate Cleanup</a></li></ul></li><li><a href="#running-status" class="table-of-contents__link toc-highlight">Running Status</a></li><li><a href="#regra-de-execução" class="table-of-contents__link toc-highlight">Regra de Execução</a></li></ul></div></div></div></div></main></div></div></div><footer class="theme-layout-footer footer footer--dark"><div class="container container-fluid"><div class="row footer__links"><div class="theme-layout-footer-column col footer__col"><div class="footer__title">Documentação</div><ul class="footer__items clean-list"><li class="footer__item"><a class="footer__link-item" href="/contractforge/pt-BR/docs/start/quickstart/">Início rápido</a></li><li class="footer__item"><a class="footer__link-item" href="/contractforge/pt-BR/docs/contracts/overview/">Contratos</a></li><li class="footer__item"><a class="footer__link-item" href="/contractforge/pt-BR/docs/connectors/overview/">Conectores</a></li><li class="footer__item"><a class="footer__link-item" href="/contractforge/pt-BR/docs/operations/overview/">Operações</a></li></ul></div><div class="theme-layout-footer-column col footer__col"><div class="footer__title">Projeto</div><ul class="footer__items clean-list"><li class="footer__item"><a href="https://github.com/marquesantero/contractforge" target="_blank" rel="noopener noreferrer" class="footer__link-item">GitHub<svg width="13.5" height="13.5" aria-label="(abre em nova aba)" class="iconExternalLink_nPIU"><use href="#theme-svg-external-link"></use></svg></a></li><li class="footer__item"><a href="https://github.com/marquesantero/contractforge/issues" target="_blank" rel="noopener noreferrer" class="footer__link-item">Issues<svg width="13.5" height="13.5" aria-label="(abre em nova aba)" class="iconExternalLink_nPIU"><use href="#theme-svg-external-link"></use></svg></a></li><li class="footer__item"><a href="https://github.com/marquesantero/contractforge/releases" target="_blank" rel="noopener noreferrer" class="footer__link-item">Versões<svg width="13.5" height="13.5" aria-label="(abre em nova aba)" class="iconExternalLink_nPIU"><use href="#theme-svg-external-link"></use></svg></a></li></ul></div></div><div class="footer__bottom text--center"><div class="footer__copyright">Copyright © 2026 ContractForge contributors. Documentação publicada com Docusaurus.</div></div></div></footer></div>
+</body>
+</html>

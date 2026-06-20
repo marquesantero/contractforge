@@ -1,0 +1,116 @@
+{
+  "kind": "contractforge_gcp_workflows_runner_smoke",
+  "schema_version": "1.0.0",
+  "adapter": "contractforge-gcp",
+  "subtarget": "gcp_bigquery",
+  "maturity_gate": "GCP-BQ-15B",
+  "status": "PASS",
+  "executed_at": "2026-06-16T17:30:49Z",
+  "project_id": "midyear-system-499521-p3",
+  "workflow": {
+    "name": "cf-gcp-workflows-smoke-runner",
+    "location": "us-central1",
+    "revision_id": "000004-26f",
+    "execution_id": "3533e6c3-5804-497c-8cd9-a6ba284ed944",
+    "execution_state": "SUCCEEDED",
+    "duration_seconds": 19.219853772,
+    "result": {
+      "operation_count": 6,
+      "project": "gcp-workflows-smoke",
+      "status": "PLANNED_REVIEW_REQUIRED",
+      "wait_polling_included": true
+    }
+  },
+  "contract_basis": {
+    "project": ".tmp/gcp-workflows-smoke/project.yaml",
+    "environment": ".tmp/gcp-workflows-smoke/gcp.environment.yaml",
+    "generated_workflow_artifact": ".tmp/gcp-workflows-smoke/bundle/deployment/gcp_workflows_runner.yaml",
+    "manual_workflow_edits": false,
+    "contracts": [
+      ".tmp/gcp-workflows-smoke/contracts/01_bronze.ingestion.yaml",
+      ".tmp/gcp-workflows-smoke/contracts/02_gold.ingestion.yaml"
+    ]
+  },
+  "validated": {
+    "workflows_api_enabled": true,
+    "workflows_service_identity_created": true,
+    "workflow_deployed_from_generated_artifact": true,
+    "workflow_execution_succeeded": true,
+    "bigquery_jobs_polled_with_location": true,
+    "multiline_sql_preserved_as_yaml_literal_blocks": true,
+    "bronze_to_gold_order_preserved": true,
+    "target_table_readback": true,
+    "evidence_table_ddl_readback": true
+  },
+  "iam_prerequisites": {
+    "runtime_service_account": "897279804928-compute@developer.gserviceaccount.com",
+    "roles_granted_for_smoke": [
+      "roles/bigquery.jobUser",
+      "roles/bigquery.dataEditor"
+    ],
+    "workflows_service_agent": "service-897279804928@gcp-sa-workflows.iam.gserviceaccount.com"
+  },
+  "readback": {
+    "dataset_location": "us-east1",
+    "target_counts": [
+      {
+        "layer": "bronze",
+        "row_count": 3
+      },
+      {
+        "layer": "gold",
+        "row_count": 2
+      }
+    ],
+    "gold_rows": [
+      {
+        "status": "new",
+        "order_count": 1,
+        "amount_total": 7.25
+      },
+      {
+        "status": "paid",
+        "order_count": 2,
+        "amount_total": 27.25
+      }
+    ],
+    "evidence_tables": [
+      "contractforge_annotation_evidence",
+      "contractforge_governance_evidence",
+      "contractforge_lineage_evidence",
+      "contractforge_quality_evidence",
+      "contractforge_run_evidence",
+      "contractforge_schema_evidence"
+    ]
+  },
+  "resolved_during_smoke": [
+    {
+      "issue": "Workflows service agent did not exist immediately after API enablement.",
+      "resolution": "Created the service identity with gcloud beta services identity create --service=workflows.googleapis.com."
+    },
+    {
+      "issue": "Workflow runtime service account initially lacked BigQuery permissions.",
+      "resolution": "Granted BigQuery job and data edit roles to the workflow runtime service account for the smoke project."
+    },
+    {
+      "issue": "Wrapped YAML strings inserted stray backslash continuations into BigQuery SQL.",
+      "resolution": "Disabled YAML wrapping for generated Workflows YAML and added a regression check."
+    },
+    {
+      "issue": "Folded multiline SQL made SQL comments swallow quality queries.",
+      "resolution": "Emitted multiline workflow strings as YAML literal block scalars."
+    },
+    {
+      "issue": "BigQuery jobs.get polling returned not found without job location.",
+      "resolution": "Passed jobReference.location from jobs.insert to jobs.get."
+    }
+  ],
+  "remaining_review_boundary": "This historical smoke proved generated-runner deployment, execution, BigQuery polling and target/evidence-table readback. GCP-BQ-15C is now closed by docs/reports/gcp-workflows-certified-runner-smoke.json.",
+  "commands": [
+    "gcloud services enable workflows.googleapis.com workflowexecutions.googleapis.com --project=midyear-system-499521-p3",
+    "gcloud beta services identity create --service=workflows.googleapis.com --project=midyear-system-499521-p3",
+    "uv run python -m contractforge_gcp.cli deploy-project .tmp/gcp-workflows-smoke/project.yaml --environment-key gcp --dry-run --output-dir .tmp/gcp-workflows-smoke/bundle --summary-only",
+    "gcloud workflows deploy cf-gcp-workflows-smoke-runner --project=midyear-system-499521-p3 --location=us-central1 --source=.tmp/gcp-workflows-smoke/bundle/deployment/gcp_workflows_runner.yaml",
+    "gcloud workflows run cf-gcp-workflows-smoke-runner --project=midyear-system-499521-p3 --location=us-central1 --format=json"
+  ]
+}

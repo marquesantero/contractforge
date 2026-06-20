@@ -1,0 +1,62 @@
+{
+  "kind": "contractforge_fabric_platform_parity",
+  "adapter": "contractforge-fabric",
+  "status": "PASS_WITH_REVIEW_BOUNDARIES",
+  "platforms": [
+    "databricks",
+    "aws",
+    "snowflake",
+    "fabric"
+  ],
+  "generator": "uv run python -m tools.platform_parity.report",
+  "source_of_truth": "tools/platform_parity/contracts.py",
+  "scenario_count": 5,
+  "portable_signature_equal_all": true,
+  "results": [
+    {
+      "scenario": "orders_append_quality",
+      "databricks_status": "SUPPORTED",
+      "aws_status": "SUPPORTED",
+      "snowflake_status": "SUPPORTED",
+      "fabric_status": "SUPPORTED_WITH_WARNINGS",
+      "portable_signature_equal": true
+    },
+    {
+      "scenario": "orders_overwrite_shape",
+      "databricks_status": "SUPPORTED",
+      "aws_status": "SUPPORTED_WITH_WARNINGS",
+      "snowflake_status": "REVIEW_REQUIRED",
+      "fabric_status": "SUPPORTED_WITH_WARNINGS",
+      "portable_signature_equal": true
+    },
+    {
+      "scenario": "customers_upsert",
+      "databricks_status": "SUPPORTED",
+      "aws_status": "SUPPORTED",
+      "snowflake_status": "SUPPORTED",
+      "fabric_status": "SUPPORTED_WITH_WARNINGS",
+      "portable_signature_equal": true
+    },
+    {
+      "scenario": "customers_hash_diff",
+      "databricks_status": "SUPPORTED",
+      "aws_status": "SUPPORTED_WITH_WARNINGS",
+      "snowflake_status": "SUPPORTED_WITH_WARNINGS",
+      "fabric_status": "SUPPORTED_WITH_WARNINGS",
+      "portable_signature_equal": true
+    },
+    {
+      "scenario": "governance_review_boundary",
+      "databricks_status": "SUPPORTED",
+      "aws_status": "REVIEW_REQUIRED",
+      "snowflake_status": "SUPPORTED",
+      "fabric_status": "REVIEW_REQUIRED",
+      "portable_signature_equal": true
+    }
+  ],
+  "review_boundaries": [
+    "Fabric executable shared scenarios still report SUPPORTED_WITH_WARNINGS because the adapter keeps FABRIC_RUNTIME_PARITY_PENDING until adapter-wide runtime parity is claimed.",
+    "Fabric shared governance scenario remains REVIEW_REQUIRED because the portable scenario declares abstract row-filter and column-mask functions. Explicit Fabric-native OneLake row and column policy payloads are certified separately in docs/reports/fabric-onelake-row-column-policy-smoke.json.",
+    "This report closes the machine-readable parity-report gate. Fabric stable_final is true for the documented notebook-first stable surface; source families listed in docs/reports/fabric-source-expansion-stable-scope-decision.json remain excluded unless separately certified."
+  ]
+}

@@ -1,0 +1,948 @@
+{
+  "artifacts": [
+    "testebig-496714_contractforge_gcp_smoke_orders_csv.gcp.capabilities.json",
+    "testebig-496714_contractforge_gcp_smoke_orders_csv.gcp.contract.json",
+    "testebig-496714_contractforge_gcp_smoke_orders_csv.gcp.evidence_ddl.sql",
+    "testebig-496714_contractforge_gcp_smoke_orders_csv.gcp.load_job.json",
+    "testebig-496714_contractforge_gcp_smoke_orders_csv.gcp.manifest.json",
+    "testebig-496714_contractforge_gcp_smoke_orders_csv.gcp.quality.sql",
+    "testebig-496714_contractforge_gcp_smoke_orders_csv.gcp.review.md",
+    "testebig-496714_contractforge_gcp_smoke_orders_csv.gcp.source_review.json",
+    "testebig-496714_contractforge_gcp_smoke_orders_csv.gcp.source_support.json",
+    "testebig-496714_contractforge_gcp_smoke_orders_csv.gcp.write.sql"
+  ],
+  "blockers": [],
+  "executed": true,
+  "ok": true,
+  "operations": [
+    {
+      "artifact": "testebig-496714_contractforge_gcp_smoke_orders_csv.gcp.evidence_ddl.sql",
+      "executed": true,
+      "job": {
+        "deleted_rows": null,
+        "error_message": null,
+        "finished_at_ms": 1781536998705,
+        "inserted_rows": null,
+        "job_id": "cf_gcp_smoke_query_5c3f12969dab436e90b0",
+        "job_type": "QUERY",
+        "output_rows": null,
+        "raw": {
+          "configuration": {
+            "jobType": "QUERY",
+            "query": {
+              "destinationTable": {
+                "datasetId": "contractforge_gcp_smoke_ops",
+                "projectId": "testebig-496714",
+                "tableId": "contractforge_quality_evidence"
+              },
+              "priority": "INTERACTIVE",
+              "query": "CREATE TABLE IF NOT EXISTS `testebig-496714.contractforge_gcp_smoke_ops.contractforge_quality_evidence` ( run_id STRING NOT NULL, contract_name STRING NOT NULL, rule_name STRING NOT NULL, rule_type STRING NOT NULL, status STRING NOT NULL, failed_rows INT64, evaluated_at TIMESTAMP )",
+              "useLegacySql": false
+            }
+          },
+          "etag": "vicUdKPMl/ixrWxjmEMv9A==",
+          "id": "testebig-496714:us-east1.cf_gcp_smoke_query_5c3f12969dab436e90b0",
+          "jobCreationReason": {
+            "code": "REQUESTED"
+          },
+          "jobReference": {
+            "jobId": "cf_gcp_smoke_query_5c3f12969dab436e90b0",
+            "location": "us-east1",
+            "projectId": "testebig-496714"
+          },
+          "kind": "bigquery#job",
+          "principal_subject": "REDACTED",
+          "selfLink": "https://bigquery.googleapis.com/bigquery/v2/projects/testebig-496714/jobs/cf_gcp_smoke_query_5c3f12969dab436e90b0?location=us-east1",
+          "statistics": {
+            "creationTime": "1781536998536",
+            "endTime": "1781536998705",
+            "query": {
+              "billingTier": 0,
+              "cacheHit": false,
+              "ddlOperationPerformed": "SKIP",
+              "ddlTargetTable": {
+                "datasetId": "contractforge_gcp_smoke_ops",
+                "projectId": "testebig-496714",
+                "tableId": "contractforge_quality_evidence"
+              },
+              "performanceInsights": {},
+              "schema": {
+                "fields": [
+                  {
+                    "mode": "REQUIRED",
+                    "name": "run_id",
+                    "type": "STRING"
+                  },
+                  {
+                    "mode": "REQUIRED",
+                    "name": "contract_name",
+                    "type": "STRING"
+                  },
+                  {
+                    "mode": "REQUIRED",
+                    "name": "rule_name",
+                    "type": "STRING"
+                  },
+                  {
+                    "mode": "REQUIRED",
+                    "name": "rule_type",
+                    "type": "STRING"
+                  },
+                  {
+                    "mode": "REQUIRED",
+                    "name": "status",
+                    "type": "STRING"
+                  },
+                  {
+                    "name": "failed_rows",
+                    "type": "INTEGER"
+                  },
+                  {
+                    "name": "evaluated_at",
+                    "type": "TIMESTAMP"
+                  }
+                ]
+              },
+              "statementType": "CREATE_TABLE",
+              "totalBytesBilled": "0",
+              "totalBytesProcessed": "0",
+              "totalPartitionsProcessed": "0",
+              "totalSlotMs": "0",
+              "transferredBytes": "0"
+            },
+            "startTime": "1781536998602",
+            "totalBytesProcessed": "0",
+            "totalSlotMs": "0"
+          },
+          "status": {
+            "state": "DONE"
+          },
+          "user_email": "REDACTED"
+        },
+        "result_rows": null,
+        "started_at_ms": 1781536998602,
+        "state": "DONE",
+        "statement_type": "CREATE_TABLE",
+        "total_bytes_billed": 0,
+        "total_bytes_processed": 0,
+        "total_slot_ms": 0,
+        "updated_rows": null
+      },
+      "kind": "QUERY",
+      "name": "prepare_evidence"
+    },
+    {
+      "artifact": "testebig-496714_contractforge_gcp_smoke_orders_csv.gcp.load_job.json",
+      "executed": true,
+      "job": {
+        "deleted_rows": null,
+        "error_message": null,
+        "finished_at_ms": 1781537009330,
+        "inserted_rows": null,
+        "job_id": "cf_gcp_smoke_load_7da39eb17725429d8234",
+        "job_type": "LOAD",
+        "output_rows": 3,
+        "raw": {
+          "configuration": {
+            "jobType": "LOAD",
+            "load": {
+              "autodetect": true,
+              "destinationTable": {
+                "datasetId": "contractforge_gcp_smoke",
+                "projectId": "testebig-496714",
+                "tableId": "orders_csv"
+              },
+              "skipLeadingRows": 1,
+              "sourceFormat": "CSV",
+              "sourceUris": [
+                "gs://contractforge-fabric-gcs-testebig-496714/contractforge/gcp-smoke/orders.csv"
+              ],
+              "writeDisposition": "WRITE_TRUNCATE"
+            }
+          },
+          "etag": "7/xv04yX4xoasox4su7K4A==",
+          "id": "testebig-496714:us-east1.cf_gcp_smoke_load_7da39eb17725429d8234",
+          "jobCreationReason": {
+            "code": "REQUESTED"
+          },
+          "jobReference": {
+            "jobId": "cf_gcp_smoke_load_7da39eb17725429d8234",
+            "location": "us-east1",
+            "projectId": "testebig-496714"
+          },
+          "kind": "bigquery#job",
+          "principal_subject": "REDACTED",
+          "selfLink": "https://bigquery.googleapis.com/bigquery/v2/projects/testebig-496714/jobs/cf_gcp_smoke_load_7da39eb17725429d8234?location=us-east1",
+          "statistics": {
+            "completionRatio": 0,
+            "creationTime": "1781537006262",
+            "endTime": "1781537009330",
+            "finalExecutionDurationMs": "1793",
+            "load": {
+              "badRecords": "0",
+              "inputFileBytes": "69",
+              "inputFiles": "1",
+              "outputBytes": "68",
+              "outputRows": "3",
+              "timeline": [
+                {
+                  "activeUnits": "0",
+                  "completedUnits": "0",
+                  "elapsedMs": "621",
+                  "estimatedRunnableUnits": "0",
+                  "pendingUnits": "0",
+                  "totalSlotMs": "833"
+                },
+                {
+                  "activeUnits": "1",
+                  "completedUnits": "1",
+                  "elapsedMs": "2123",
+                  "estimatedRunnableUnits": "0",
+                  "pendingUnits": "0",
+                  "shuffleRamUsageRatio": 3.0517578125e-05,
+                  "totalSlotMs": "833"
+                }
+              ]
+            },
+            "reservation_id": "default-pipeline",
+            "startTime": "1781537006379",
+            "totalSlotMs": "833"
+          },
+          "status": {
+            "state": "DONE"
+          },
+          "user_email": "REDACTED"
+        },
+        "result_rows": null,
+        "started_at_ms": 1781537006379,
+        "state": "DONE",
+        "statement_type": null,
+        "total_bytes_billed": null,
+        "total_bytes_processed": null,
+        "total_slot_ms": 833,
+        "updated_rows": null
+      },
+      "kind": "LOAD",
+      "name": "load_source"
+    },
+    {
+      "artifact": "inline:gcp.run_evidence",
+      "executed": true,
+      "job": {
+        "deleted_rows": null,
+        "error_message": null,
+        "finished_at_ms": 1781537019307,
+        "inserted_rows": 1,
+        "job_id": "cf_gcp_smoke_query_949ec4b5c06540d2900d",
+        "job_type": "QUERY",
+        "output_rows": null,
+        "raw": {
+          "configuration": {
+            "jobType": "QUERY",
+            "query": {
+              "destinationTable": {
+                "datasetId": "contractforge_gcp_smoke_ops",
+                "projectId": "testebig-496714",
+                "tableId": "contractforge_run_evidence"
+              },
+              "priority": "INTERACTIVE",
+              "query": "INSERT INTO `testebig-496714.contractforge_gcp_smoke_ops.contractforge_run_evidence` (`run_id`, `contract_name`, `target_table`, `adapter`, `status`, `started_at`, `finished_at`, `total_bytes_processed`, `total_bytes_billed`, `total_slot_ms`, `job_id`, `statement_type`, `inserted_rows`, `updated_rows`, `deleted_rows`, `error_message`) VALUES ('cf_gcp_smoke_load_7da39eb17725429d8234', 'orders_csv', 'testebig-496714.contractforge_gcp_smoke.orders_csv', 'gcp_bigquery', 'SUCCEEDED', TIMESTAMP_MILLIS(1781537006379), TIMESTAMP_MILLIS(1781537009330), NULL, NULL, 833, 'cf_gcp_smoke_load_7da39eb17725429d8234', 'LOAD', NULL, NULL, NULL, NULL);",
+              "useLegacySql": false
+            }
+          },
+          "etag": "6AdBWqJsFJeKVX8fuoBT7g==",
+          "id": "testebig-496714:us-east1.cf_gcp_smoke_query_949ec4b5c06540d2900d",
+          "jobCreationReason": {
+            "code": "REQUESTED"
+          },
+          "jobReference": {
+            "jobId": "cf_gcp_smoke_query_949ec4b5c06540d2900d",
+            "location": "us-east1",
+            "projectId": "testebig-496714"
+          },
+          "kind": "bigquery#job",
+          "principal_subject": "REDACTED",
+          "selfLink": "https://bigquery.googleapis.com/bigquery/v2/projects/testebig-496714/jobs/cf_gcp_smoke_query_949ec4b5c06540d2900d?location=us-east1",
+          "statistics": {
+            "creationTime": "1781537017810",
+            "endTime": "1781537019307",
+            "finalExecutionDurationMs": "684",
+            "query": {
+              "billingTier": 0,
+              "cacheHit": false,
+              "dmlStats": {
+                "dmlMode": "COARSE_GRAINED_DML",
+                "insertedRowCount": "1"
+              },
+              "estimatedBytesProcessed": "0",
+              "numDmlAffectedRows": "1",
+              "queryInfo": {
+                "optimizationDetails": {
+                  "optimizations": [
+                    {
+                      "enhanced_vectorization": "applied"
+                    }
+                  ]
+                }
+              },
+              "queryPlan": [
+                {
+                  "completedParallelInputs": "1",
+                  "computeMode": "BIGQUERY",
+                  "computeMsAvg": "10",
+                  "computeMsMax": "10",
+                  "computeRatioAvg": 0.053763440860215055,
+                  "computeRatioMax": 0.053763440860215055,
+                  "endMs": "1781537018077",
+                  "id": "0",
+                  "name": "S00: Input",
+                  "parallelInputs": "1",
+                  "readMsAvg": "0",
+                  "readMsMax": "0",
+                  "readRatioAvg": 0,
+                  "readRatioMax": 0,
+                  "recordsRead": "0",
+                  "recordsWritten": "1",
+                  "shuffleOutputBytes": "173",
+                  "shuffleOutputBytesSpilled": "0",
+                  "slotMs": "13",
+                  "startMs": "1781537018068",
+                  "status": "COMPLETE",
+                  "steps": [
+                    {
+                      "kind": "COMPUTE",
+                      "substeps": [
+                        "$1 := 'orders_csv'",
+                        "$2 := 'testebig-496714.contractforge_gcp_smoke.orders_csv'",
+                        "$3 := 'gcp_bigquery'",
+                        "$4 := 'SUCCEEDED'",
+                        "$5 := 1781537006.379000000",
+                        "$6 := 1781537009.330000000",
+                        "$7 := 833",
+                        "$8 := 'cf_gcp_smoke_load_7da39eb17725429d8234'",
+                        "$9 := 'LOAD'",
+                        "$10 := NULL",
+                        "$11 := NULL"
+                      ]
+                    },
+                    {
+                      "kind": "WRITE",
+                      "substeps": [
+                        "$1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11",
+                        "TO __stage00_output"
+                      ]
+                    }
+                  ],
+                  "waitMsAvg": "2",
+                  "waitMsMax": "2",
+                  "waitRatioAvg": 0.010752688172043012,
+                  "waitRatioMax": 0.010752688172043012,
+                  "writeMsAvg": "3",
+                  "writeMsMax": "3",
+                  "writeRatioAvg": 0.016129032258064516,
+                  "writeRatioMax": 0.016129032258064516
+                },
+                {
+                  "completedParallelInputs": "50",
+                  "computeMode": "BIGQUERY",
+                  "computeMsAvg": "8",
+                  "computeMsMax": "18",
+                  "computeRatioAvg": 0.043010752688172046,
+                  "computeRatioMax": 0.0967741935483871,
+                  "endMs": "1781537018120",
+                  "id": "1",
+                  "inputStages": [
+                    "0"
+                  ],
+                  "name": "S01: Coalesce",
+                  "parallelInputs": "50",
+                  "readMsAvg": "0",
+                  "readMsMax": "0",
+                  "readRatioAvg": 0,
+                  "readRatioMax": 0,
+                  "recordsRead": "1",
+                  "recordsWritten": "1",
+                  "shuffleOutputBytes": "173",
+                  "shuffleOutputBytesSpilled": "0",
+                  "slotMs": "669",
+                  "startMs": "1781537018093",
+                  "status": "COMPLETE",
+                  "steps": [
+                    {
+                      "kind": "READ",
+                      "substeps": [
+                        "FROM __stage00_output"
+                      ]
+                    }
+                  ],
+                  "waitMsAvg": "12",
+                  "waitMsMax": "17",
+                  "waitRatioAvg": 0.06451612903225806,
+                  "waitRatioMax": 0.0913978494623656,
+                  "writeMsAvg": "1",
+                  "writeMsMax": "9",
+                  "writeRatioAvg": 0.005376344086021506,
+                  "writeRatioMax": 0.04838709677419355
+                },
+                {
+                  "completedParallelInputs": "1",
+                  "computeMode": "BIGQUERY",
+                  "computeMsAvg": "19",
+                  "computeMsMax": "19",
+                  "computeRatioAvg": 0.10215053763440861,
+                  "computeRatioMax": 0.10215053763440861,
+                  "endMs": "1781537018435",
+                  "id": "2",
+                  "inputStages": [
+                    "1"
+                  ],
+                  "name": "S02: Output",
+                  "parallelInputs": "1",
+                  "readMsAvg": "0",
+                  "readMsMax": "0",
+                  "readRatioAvg": 0,
+                  "readRatioMax": 0,
+                  "recordsRead": "1",
+                  "recordsWritten": "1",
+                  "shuffleOutputBytes": "0",
+                  "shuffleOutputBytesSpilled": "0",
+                  "slotMs": "273",
+                  "startMs": "1781537018278",
+                  "status": "COMPLETE",
+                  "steps": [
+                    {
+                      "kind": "READ",
+                      "substeps": [
+                        "$1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11",
+                        "FROM __stage01_output"
+                      ]
+                    },
+                    {
+                      "kind": "EXPORT",
+                      "substeps": [
+                        "$8:run_id, $1:contract_name, $2:target_table, $3:adapter, $4:status, $5:started_at, $6:finished_at, $10:total_bytes_processed, $10:total_bytes_billed, $7:total_slot_ms, $8:job_id, $9:statement_type, $10:inserted_rows, $10:updated_rows, $10:deleted_rows, $11:error_message",
+                        "TO contractforge_gcp_smoke_ops.contractforge_run_evidence"
+                      ]
+                    },
+                    {
+                      "kind": "WRITE",
+                      "substeps": [
+                        "$1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11",
+                        "TO __stage02_output"
+                      ]
+                    }
+                  ],
+                  "waitMsAvg": "186",
+                  "waitMsMax": "186",
+                  "waitRatioAvg": 1,
+                  "waitRatioMax": 1,
+                  "writeMsAvg": "1",
+                  "writeMsMax": "1",
+                  "writeRatioAvg": 0.005376344086021506,
+                  "writeRatioMax": 0.005376344086021506
+                }
+              ],
+              "referencedTables": [
+                {
+                  "datasetId": "contractforge_gcp_smoke_ops",
+                  "projectId": "testebig-496714",
+                  "tableId": "contractforge_run_evidence"
+                }
+              ],
+              "statementType": "INSERT",
+              "timeline": [
+                {
+                  "completedUnits": "52",
+                  "elapsedMs": "464",
+                  "estimatedRunnableUnits": "0",
+                  "pendingUnits": "0",
+                  "totalSlotMs": "956"
+                }
+              ],
+              "totalBytesBilled": "0",
+              "totalBytesProcessed": "0",
+              "totalPartitionsProcessed": "0",
+              "totalSlotMs": "956",
+              "transferredBytes": "0"
+            },
+            "startTime": "1781537018017",
+            "totalBytesProcessed": "0",
+            "totalSlotMs": "956"
+          },
+          "status": {
+            "state": "DONE"
+          },
+          "user_email": "REDACTED"
+        },
+        "result_rows": null,
+        "started_at_ms": 1781537018017,
+        "state": "DONE",
+        "statement_type": "INSERT",
+        "total_bytes_billed": 0,
+        "total_bytes_processed": 0,
+        "total_slot_ms": 956,
+        "updated_rows": null
+      },
+      "kind": "QUERY",
+      "name": "persist_run_evidence"
+    },
+    {
+      "artifact": "testebig-496714_contractforge_gcp_smoke_orders_csv.gcp.quality.sql",
+      "executed": true,
+      "job": {
+        "deleted_rows": null,
+        "error_message": null,
+        "finished_at_ms": 1781537027498,
+        "inserted_rows": null,
+        "job_id": "cf_gcp_smoke_query_360228cfb0304bfc860a",
+        "job_type": "QUERY",
+        "output_rows": null,
+        "raw": {
+          "configuration": {
+            "jobType": "QUERY",
+            "query": {
+              "destinationTable": {
+                "datasetId": "_9c74134de4f7c55cacdbd6a2eb6cca48e1d010d1",
+                "projectId": "testebig-496714",
+                "tableId": "anon84e0eda6da2b24a1bd264b0c81dfa9aa5ffb3e917e5f0fc982283b76d52166d1"
+              },
+              "priority": "INTERACTIVE",
+              "query": "SELECT COUNT(*) AS failed_rows FROM `testebig-496714.contractforge_gcp_smoke.orders_csv` WHERE `order_id` IS NULL",
+              "useLegacySql": false,
+              "writeDisposition": "WRITE_TRUNCATE"
+            }
+          },
+          "etag": "pdUkvUz/sVyMjbiAbzswrg==",
+          "id": "testebig-496714:us-east1.cf_gcp_smoke_query_360228cfb0304bfc860a",
+          "jobCreationReason": {
+            "code": "REQUESTED"
+          },
+          "jobReference": {
+            "jobId": "cf_gcp_smoke_query_360228cfb0304bfc860a",
+            "location": "us-east1",
+            "projectId": "testebig-496714"
+          },
+          "kind": "bigquery#job",
+          "principal_subject": "REDACTED",
+          "selfLink": "https://bigquery.googleapis.com/bigquery/v2/projects/testebig-496714/jobs/cf_gcp_smoke_query_360228cfb0304bfc860a?location=us-east1",
+          "statistics": {
+            "creationTime": "1781537027179",
+            "endTime": "1781537027498",
+            "finalExecutionDurationMs": "34",
+            "query": {
+              "billingTier": 1,
+              "cacheHit": false,
+              "estimatedBytesProcessed": "24",
+              "metadataCacheStatistics": {
+                "tableMetadataCacheUsage": [
+                  {
+                    "explanation": "Table does not have CMETA.",
+                    "tableReference": {
+                      "datasetId": "contractforge_gcp_smoke",
+                      "projectId": "testebig-496714",
+                      "tableId": "orders_csv"
+                    },
+                    "unusedReason": "OTHER_REASON"
+                  }
+                ]
+              },
+              "performanceInsights": {
+                "avgPreviousExecutionMs": "40"
+              },
+              "queryInfo": {
+                "optimizationDetails": {
+                  "optimizations": [
+                    {
+                      "enhanced_vectorization": "applied"
+                    },
+                    {
+                      "short_query_optimization": "applied"
+                    }
+                  ]
+                }
+              },
+              "queryPlan": [
+                {
+                  "completedParallelInputs": "1",
+                  "computeMode": "BIGQUERY",
+                  "computeMsAvg": "12",
+                  "computeMsMax": "12",
+                  "computeRatioAvg": 0.8571428571428571,
+                  "computeRatioMax": 0.8571428571428571,
+                  "endMs": "1781537027420",
+                  "id": "0",
+                  "name": "S00: Output",
+                  "parallelInputs": "1",
+                  "readMsAvg": "14",
+                  "readMsMax": "14",
+                  "readRatioAvg": 1,
+                  "readRatioMax": 1,
+                  "recordsRead": "0",
+                  "recordsWritten": "1",
+                  "shuffleOutputBytes": "9",
+                  "shuffleOutputBytesSpilled": "0",
+                  "slotMs": "19",
+                  "startMs": "1781537027398",
+                  "status": "COMPLETE",
+                  "steps": [
+                    {
+                      "kind": "READ",
+                      "substeps": [
+                        "$1:order_id",
+                        "FROM testebig-496714.contractforge_gcp_smoke.orders_csv",
+                        "WHERE is_null($1)"
+                      ]
+                    },
+                    {
+                      "kind": "AGGREGATE",
+                      "substeps": [
+                        "$10 := SUM_OF_COUNTS($20)"
+                      ]
+                    },
+                    {
+                      "kind": "AGGREGATE",
+                      "substeps": [
+                        "$20 := COUNT_STAR()"
+                      ]
+                    },
+                    {
+                      "kind": "WRITE",
+                      "substeps": [
+                        "$10",
+                        "TO __stage00_output"
+                      ]
+                    }
+                  ],
+                  "waitMsAvg": "1",
+                  "waitMsMax": "1",
+                  "waitRatioAvg": 0.07142857142857142,
+                  "waitRatioMax": 0.07142857142857142,
+                  "writeMsAvg": "2",
+                  "writeMsMax": "2",
+                  "writeRatioAvg": 0.14285714285714285,
+                  "writeRatioMax": 0.14285714285714285
+                }
+              ],
+              "referencedTables": [
+                {
+                  "datasetId": "contractforge_gcp_smoke",
+                  "projectId": "testebig-496714",
+                  "tableId": "orders_csv"
+                }
+              ],
+              "statementType": "SELECT",
+              "timeline": [
+                {
+                  "completedUnits": "1",
+                  "elapsedMs": "119",
+                  "estimatedRunnableUnits": "0",
+                  "pendingUnits": "0",
+                  "totalSlotMs": "19"
+                }
+              ],
+              "totalBytesBilled": "10485760",
+              "totalBytesProcessed": "24",
+              "totalPartitionsProcessed": "0",
+              "totalSlotMs": "19",
+              "transferredBytes": "0"
+            },
+            "startTime": "1781537027308",
+            "totalBytesProcessed": "24",
+            "totalSlotMs": "19"
+          },
+          "status": {
+            "state": "DONE"
+          },
+          "user_email": "REDACTED"
+        },
+        "result_rows": [
+          {
+            "failed_rows": "0"
+          }
+        ],
+        "started_at_ms": 1781537027308,
+        "state": "DONE",
+        "statement_type": "SELECT",
+        "total_bytes_billed": 10485760,
+        "total_bytes_processed": 24,
+        "total_slot_ms": 19,
+        "updated_rows": null
+      },
+      "kind": "QUERY",
+      "name": "quality"
+    },
+    {
+      "artifact": "inline:gcp.quality_evidence",
+      "executed": true,
+      "job": {
+        "deleted_rows": null,
+        "error_message": null,
+        "finished_at_ms": 1781537036482,
+        "inserted_rows": 1,
+        "job_id": "cf_gcp_smoke_query_2d73c428288048feab26",
+        "job_type": "QUERY",
+        "output_rows": null,
+        "raw": {
+          "configuration": {
+            "jobType": "QUERY",
+            "query": {
+              "destinationTable": {
+                "datasetId": "contractforge_gcp_smoke_ops",
+                "projectId": "testebig-496714",
+                "tableId": "contractforge_quality_evidence"
+              },
+              "priority": "INTERACTIVE",
+              "query": "INSERT INTO `testebig-496714.contractforge_gcp_smoke_ops.contractforge_quality_evidence` (`run_id`, `contract_name`, `rule_name`, `rule_type`, `status`, `failed_rows`, `evaluated_at`) VALUES ('cf_gcp_smoke_query_360228cfb0304bfc860a', 'orders_csv', 'order_id_not_null', 'not_null', 'PASSED', 0, TIMESTAMP_MILLIS(1781537027498));",
+              "useLegacySql": false
+            }
+          },
+          "etag": "e6fQa/Megy3PiIWapRsWXA==",
+          "id": "testebig-496714:us-east1.cf_gcp_smoke_query_2d73c428288048feab26",
+          "jobCreationReason": {
+            "code": "REQUESTED"
+          },
+          "jobReference": {
+            "jobId": "cf_gcp_smoke_query_2d73c428288048feab26",
+            "location": "us-east1",
+            "projectId": "testebig-496714"
+          },
+          "kind": "bigquery#job",
+          "principal_subject": "REDACTED",
+          "selfLink": "https://bigquery.googleapis.com/bigquery/v2/projects/testebig-496714/jobs/cf_gcp_smoke_query_2d73c428288048feab26?location=us-east1",
+          "statistics": {
+            "creationTime": "1781537035168",
+            "endTime": "1781537036482",
+            "finalExecutionDurationMs": "653",
+            "query": {
+              "billingTier": 0,
+              "cacheHit": false,
+              "dmlStats": {
+                "dmlMode": "COARSE_GRAINED_DML",
+                "insertedRowCount": "1"
+              },
+              "estimatedBytesProcessed": "0",
+              "numDmlAffectedRows": "1",
+              "queryInfo": {
+                "optimizationDetails": {
+                  "optimizations": [
+                    {
+                      "enhanced_vectorization": "applied"
+                    }
+                  ]
+                }
+              },
+              "queryPlan": [
+                {
+                  "completedParallelInputs": "1",
+                  "computeMode": "BIGQUERY",
+                  "computeMsAvg": "5",
+                  "computeMsMax": "5",
+                  "computeRatioAvg": 0.02262443438914027,
+                  "computeRatioMax": 0.02262443438914027,
+                  "endMs": "1781537035392",
+                  "id": "0",
+                  "name": "S00: Input",
+                  "parallelInputs": "1",
+                  "readMsAvg": "0",
+                  "readMsMax": "0",
+                  "readRatioAvg": 0,
+                  "readRatioMax": 0,
+                  "recordsRead": "0",
+                  "recordsWritten": "1",
+                  "shuffleOutputBytes": "117",
+                  "shuffleOutputBytesSpilled": "0",
+                  "slotMs": "7",
+                  "startMs": "1781537035384",
+                  "status": "COMPLETE",
+                  "steps": [
+                    {
+                      "kind": "COMPUTE",
+                      "substeps": [
+                        "$1 := 'cf_gcp_smoke_query_360228cfb0304bfc860a'",
+                        "$2 := 'orders_csv'",
+                        "$3 := 'order_id_not_null'",
+                        "$4 := 'not_null'",
+                        "$5 := 'PASSED'",
+                        "$6 := 0",
+                        "$7 := 1781537027.498000000"
+                      ]
+                    },
+                    {
+                      "kind": "WRITE",
+                      "substeps": [
+                        "$1, $2, $3, $4, $5, $6, $7",
+                        "TO __stage00_output"
+                      ]
+                    }
+                  ],
+                  "waitMsAvg": "1",
+                  "waitMsMax": "1",
+                  "waitRatioAvg": 0.004524886877828055,
+                  "waitRatioMax": 0.004524886877828055,
+                  "writeMsAvg": "3",
+                  "writeMsMax": "3",
+                  "writeRatioAvg": 0.013574660633484163,
+                  "writeRatioMax": 0.013574660633484163
+                },
+                {
+                  "completedParallelInputs": "50",
+                  "computeMode": "BIGQUERY",
+                  "computeMsAvg": "7",
+                  "computeMsMax": "12",
+                  "computeRatioAvg": 0.03167420814479638,
+                  "computeRatioMax": 0.05429864253393665,
+                  "endMs": "1781537035417",
+                  "id": "1",
+                  "inputStages": [
+                    "0"
+                  ],
+                  "name": "S01: Coalesce",
+                  "parallelInputs": "50",
+                  "readMsAvg": "0",
+                  "readMsMax": "0",
+                  "readRatioAvg": 0,
+                  "readRatioMax": 0,
+                  "recordsRead": "1",
+                  "recordsWritten": "1",
+                  "shuffleOutputBytes": "117",
+                  "shuffleOutputBytesSpilled": "0",
+                  "slotMs": "572",
+                  "startMs": "1781537035399",
+                  "status": "COMPLETE",
+                  "steps": [
+                    {
+                      "kind": "READ",
+                      "substeps": [
+                        "FROM __stage00_output"
+                      ]
+                    }
+                  ],
+                  "waitMsAvg": "4",
+                  "waitMsMax": "4",
+                  "waitRatioAvg": 0.01809954751131222,
+                  "waitRatioMax": 0.01809954751131222,
+                  "writeMsAvg": "1",
+                  "writeMsMax": "3",
+                  "writeRatioAvg": 0.004524886877828055,
+                  "writeRatioMax": 0.013574660633484163
+                },
+                {
+                  "completedParallelInputs": "1",
+                  "computeMode": "BIGQUERY",
+                  "computeMsAvg": "18",
+                  "computeMsMax": "18",
+                  "computeRatioAvg": 0.08144796380090498,
+                  "computeRatioMax": 0.08144796380090498,
+                  "endMs": "1781537035754",
+                  "id": "2",
+                  "inputStages": [
+                    "1"
+                  ],
+                  "name": "S02: Output",
+                  "parallelInputs": "1",
+                  "readMsAvg": "0",
+                  "readMsMax": "0",
+                  "readRatioAvg": 0,
+                  "readRatioMax": 0,
+                  "recordsRead": "1",
+                  "recordsWritten": "1",
+                  "shuffleOutputBytes": "0",
+                  "shuffleOutputBytesSpilled": "0",
+                  "slotMs": "244",
+                  "startMs": "1781537035619",
+                  "status": "COMPLETE",
+                  "steps": [
+                    {
+                      "kind": "READ",
+                      "substeps": [
+                        "$1, $2, $3, $4, $5, $6, $7",
+                        "FROM __stage01_output"
+                      ]
+                    },
+                    {
+                      "kind": "EXPORT",
+                      "substeps": [
+                        "$1:run_id, $2:contract_name, $3:rule_name, $4:rule_type, $5:status, $6:failed_rows, $7:evaluated_at",
+                        "TO contractforge_gcp_smoke_ops.contractforge_quality_evidence"
+                      ]
+                    },
+                    {
+                      "kind": "WRITE",
+                      "substeps": [
+                        "$1, $2, $3, $4, $5, $6, $7",
+                        "TO __stage02_output"
+                      ]
+                    }
+                  ],
+                  "waitMsAvg": "221",
+                  "waitMsMax": "221",
+                  "waitRatioAvg": 1,
+                  "waitRatioMax": 1,
+                  "writeMsAvg": "4",
+                  "writeMsMax": "4",
+                  "writeRatioAvg": 0.01809954751131222,
+                  "writeRatioMax": 0.01809954751131222
+                }
+              ],
+              "referencedTables": [
+                {
+                  "datasetId": "contractforge_gcp_smoke_ops",
+                  "projectId": "testebig-496714",
+                  "tableId": "contractforge_quality_evidence"
+                }
+              ],
+              "statementType": "INSERT",
+              "timeline": [
+                {
+                  "activeUnits": "0",
+                  "completedUnits": "52",
+                  "elapsedMs": "654",
+                  "pendingUnits": "0",
+                  "totalSlotMs": "824"
+                },
+                {
+                  "completedUnits": "52",
+                  "elapsedMs": "422",
+                  "estimatedRunnableUnits": "0",
+                  "pendingUnits": "0",
+                  "totalSlotMs": "824"
+                }
+              ],
+              "totalBytesBilled": "0",
+              "totalBytesProcessed": "0",
+              "totalPartitionsProcessed": "0",
+              "totalSlotMs": "824",
+              "transferredBytes": "0"
+            },
+            "startTime": "1781537035346",
+            "totalBytesProcessed": "0",
+            "totalSlotMs": "824"
+          },
+          "status": {
+            "state": "DONE"
+          },
+          "user_email": "REDACTED"
+        },
+        "result_rows": null,
+        "started_at_ms": 1781537035346,
+        "state": "DONE",
+        "statement_type": "INSERT",
+        "total_bytes_billed": 0,
+        "total_bytes_processed": 0,
+        "total_slot_ms": 824,
+        "updated_rows": null
+      },
+      "kind": "QUERY",
+      "name": "persist_quality_evidence"
+    }
+  ],
+  "planning_status": "SUPPORTED_WITH_WARNINGS",
+  "status": "SUCCEEDED",
+  "warnings": [
+    {
+      "code": "GCP_STABLE_SURFACE_SCOPE",
+      "message": "GCP BigQuery is stable-final for the documented batch BigQuery surface. Streaming, advanced write modes, deployment runners, native Dataplex integrations, governance auto-repair/delete and overwrite-retention certification are explicitly outside this scoped claim."
+    }
+  ]
+}
+

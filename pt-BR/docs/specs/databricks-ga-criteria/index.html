@@ -1,0 +1,332 @@
+<!doctype html>
+<html lang="pt-BR" dir="ltr" class="docs-wrapper plugin-docs plugin-id-default docs-version-current docs-doc-page docs-doc-id-specs/databricks-ga-criteria" data-has-hydrated="false">
+<head>
+<meta charset="UTF-8">
+<meta name="generator" content="Docusaurus v3.10.1">
+<title data-rh="true">Critérios GA do adaptador Databricks | ContractForge</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:image" content="https://marquesantero.github.io/contractforge/pt-BR/img/contractforge-logo.png"><meta data-rh="true" name="twitter:image" content="https://marquesantero.github.io/contractforge/pt-BR/img/contractforge-logo.png"><meta data-rh="true" property="og:url" content="https://marquesantero.github.io/contractforge/pt-BR/docs/specs/databricks-ga-criteria/"><meta data-rh="true" property="og:locale" content="pt_BR"><meta data-rh="true" property="og:locale:alternate" content="en_US"><meta data-rh="true" name="docusaurus_locale" content="pt-BR"><meta data-rh="true" name="docsearch:language" content="pt-BR"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="Critérios GA do adaptador Databricks | ContractForge"><meta data-rh="true" name="description" content="Propósito"><meta data-rh="true" property="og:description" content="Propósito"><link data-rh="true" rel="icon" href="/contractforge/pt-BR/img/contractforge-mark.png"><link data-rh="true" rel="canonical" href="https://marquesantero.github.io/contractforge/pt-BR/docs/specs/databricks-ga-criteria/"><link data-rh="true" rel="alternate" href="https://marquesantero.github.io/contractforge/docs/specs/databricks-ga-criteria/" hreflang="en-US"><link data-rh="true" rel="alternate" href="https://marquesantero.github.io/contractforge/pt-BR/docs/specs/databricks-ga-criteria/" hreflang="pt-BR"><link data-rh="true" rel="alternate" href="https://marquesantero.github.io/contractforge/docs/specs/databricks-ga-criteria/" hreflang="x-default"><link rel="stylesheet" href="/contractforge/pt-BR/assets/css/styles.e35730a0.css">
+<script src="/contractforge/pt-BR/assets/js/runtime~main.7ac75648.js" defer="defer"></script>
+<script src="/contractforge/pt-BR/assets/js/main.99e9fe41.js" defer="defer"></script>
+</head>
+<body>
+<svg style="display: none;"><defs>
+<symbol id="theme-svg-external-link" viewBox="0 0 24 24"><path fill="currentColor" d="M21 13v10h-21v-19h12v2h-10v15h17v-8h2zm3-12h-10.988l4.035 4-6.977 7.07 2.828 2.828 6.977-7.07 4.125 4.172v-11z"/></symbol>
+</defs></svg>
+<script>!function(){var t=function(){try{return new URLSearchParams(window.location.search).get("docusaurus-theme")}catch(t){}}()||function(){try{return window.localStorage.getItem("theme")}catch(t){}}();document.documentElement.setAttribute("data-theme",t||"light"),document.documentElement.setAttribute("data-theme-choice",t||"light")}(),function(){try{const c=new URLSearchParams(window.location.search).entries();for(var[t,e]of c)if(t.startsWith("docusaurus-data-")){var a=t.replace("docusaurus-data-","data-");document.documentElement.setAttribute(a,e)}}catch(t){}}()</script><div id="__docusaurus"><div role="region" aria-label="Pular para o conteúdo principal"><a class="skipToContent_fXgn" href="#__docusaurus_skipToContent_fallback">Pular para o conteúdo principal</a></div><nav aria-label="Navegação principal" class="theme-layout-navbar navbar navbar--fixed-top"><div class="navbar__inner"><div class="theme-layout-navbar-left navbar__items"><button aria-label="Alternar painel de navegação" aria-expanded="false" class="navbar__toggle clean-btn" type="button"><svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><path stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="2" d="M4 7h22M4 15h22M4 23h22"></path></svg></button><a class="navbar__brand" href="/contractforge/pt-BR/"><div class="navbar__logo"><img src="/contractforge/pt-BR/img/contractforge-mark.png" alt="ContractForge" class="themedComponent_mlkZ themedComponent--light_NVdE"><img src="/contractforge/pt-BR/img/contractforge-mark.png" alt="ContractForge" class="themedComponent_mlkZ themedComponent--dark_xIcU"></div><b class="navbar__title text--truncate">ContractForge</b></a><a class="navbar__item navbar__link" href="/contractforge/pt-BR/docs/intro/">Documentação</a><a class="navbar__item navbar__link" href="/contractforge/pt-BR/docs/adapters/overview/">Adaptadores</a><a class="navbar__item navbar__link" href="/contractforge/pt-BR/docs/connectors/overview/">Conectores</a></div><div class="theme-layout-navbar-right navbar__items navbar__items--right"><div class="navbar__item dropdown dropdown--hoverable dropdown--right"><a href="#" aria-haspopup="true" aria-expanded="false" role="button" class="navbar__link"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" class="iconLanguage_nlXk"><path fill="currentColor" d="M12.87 15.07l-2.54-2.51.03-.03c1.74-1.94 2.98-4.17 3.71-6.53H17V4h-7V2H8v2H1v1.99h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2l-4.5-12zm-2.62 7l1.62-4.33L19.12 17h-3.24z"></path></svg>Português</a><ul class="dropdown__menu"><li><a href="/contractforge/docs/specs/databricks-ga-criteria/" target="_self" rel="noopener noreferrer" class="dropdown__link" lang="en-US">English</a></li><li><a href="/contractforge/pt-BR/docs/specs/databricks-ga-criteria/" target="_self" rel="noopener noreferrer" class="dropdown__link dropdown__link--active" lang="pt-BR">Português</a></li></ul></div><div class="navbarSearchContainer_Bca1"><div class="navbar__search searchBarContainer_NW3z" dir="ltr"><input placeholder="Pesquisar" aria-label="Search" class="navbar__search-input searchInput_YFbd" value=""><div class="loadingRing_RJI3 searchBarLoadingRing_YnHq"><div></div><div></div><div></div><div></div></div></div></div><a href="https://github.com/marquesantero/contractforge" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">GitHub<svg width="13.5" height="13.5" aria-label="(abre em nova aba)" class="iconExternalLink_nPIU"><use href="#theme-svg-external-link"></use></svg></a><div class="toggle_vylO colorModeToggle_DEke"><button class="clean-btn toggleButton_gllP toggleButtonDisabled_aARS" type="button" disabled="" title="modo do sistema" aria-label="Mudar entre modo claro e escuro (modo do sistema está ativo)"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" class="toggleIcon_g3eP lightToggleIcon_pyhR"><path fill="currentColor" d="M12,9c1.65,0,3,1.35,3,3s-1.35,3-3,3s-3-1.35-3-3S10.35,9,12,9 M12,7c-2.76,0-5,2.24-5,5s2.24,5,5,5s5-2.24,5-5 S14.76,7,12,7L12,7z M2,13l2,0c0.55,0,1-0.45,1-1s-0.45-1-1-1l-2,0c-0.55,0-1,0.45-1,1S1.45,13,2,13z M20,13l2,0c0.55,0,1-0.45,1-1 s-0.45-1-1-1l-2,0c-0.55,0-1,0.45-1,1S19.45,13,20,13z M11,2v2c0,0.55,0.45,1,1,1s1-0.45,1-1V2c0-0.55-0.45-1-1-1S11,1.45,11,2z M11,20v2c0,0.55,0.45,1,1,1s1-0.45,1-1v-2c0-0.55-0.45-1-1-1C11.45,19,11,19.45,11,20z M5.99,4.58c-0.39-0.39-1.03-0.39-1.41,0 c-0.39,0.39-0.39,1.03,0,1.41l1.06,1.06c0.39,0.39,1.03,0.39,1.41,0s0.39-1.03,0-1.41L5.99,4.58z M18.36,16.95 c-0.39-0.39-1.03-0.39-1.41,0c-0.39,0.39-0.39,1.03,0,1.41l1.06,1.06c0.39,0.39,1.03,0.39,1.41,0c0.39-0.39,0.39-1.03,0-1.41 L18.36,16.95z M19.42,5.99c0.39-0.39,0.39-1.03,0-1.41c-0.39-0.39-1.03-0.39-1.41,0l-1.06,1.06c-0.39,0.39-0.39,1.03,0,1.41 s1.03,0.39,1.41,0L19.42,5.99z M7.05,18.36c0.39-0.39,0.39-1.03,0-1.41c-0.39-0.39-1.03-0.39-1.41,0l-1.06,1.06 c-0.39,0.39-0.39,1.03,0,1.41s1.03,0.39,1.41,0L7.05,18.36z"></path></svg><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" class="toggleIcon_g3eP darkToggleIcon_wfgR"><path fill="currentColor" d="M9.37,5.51C9.19,6.15,9.1,6.82,9.1,7.5c0,4.08,3.32,7.4,7.4,7.4c0.68,0,1.35-0.09,1.99-0.27C17.45,17.19,14.93,19,12,19 c-3.86,0-7-3.14-7-7C5,9.07,6.81,6.55,9.37,5.51z M12,3c-4.97,0-9,4.03-9,9s4.03,9,9,9s9-4.03,9-9c0-0.46-0.04-0.92-0.1-1.36 c-0.98,1.37-2.58,2.26-4.4,2.26c-2.98,0-5.4-2.42-5.4-5.4c0-1.81,0.89-3.42,2.26-4.4C12.92,3.04,12.46,3,12,3L12,3z"></path></svg><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" class="toggleIcon_g3eP systemToggleIcon_QzmC"><path fill="currentColor" d="m12 21c4.971 0 9-4.029 9-9s-4.029-9-9-9-9 4.029-9 9 4.029 9 9 9zm4.95-13.95c1.313 1.313 2.05 3.093 2.05 4.95s-0.738 3.637-2.05 4.95c-1.313 1.313-3.093 2.05-4.95 2.05v-14c1.857 0 3.637 0.737 4.95 2.05z"></path></svg></button></div></div></div><div role="presentation" class="navbar-sidebar__backdrop"></div></nav><div id="__docusaurus_skipToContent_fallback" class="theme-layout-main main-wrapper mainWrapper_z2l0"><div class="docsWrapper_hBAB"><button aria-label="Voltar para o topo" class="clean-btn theme-back-to-top-button backToTopButton_sjWU" type="button"></button><div class="docRoot_UBD9"><main class="docMainContainer_TBSr docMainContainerEnhanced_lQrH"><div class="container padding-top--md padding-bottom--lg"><div class="row"><div class="col docItemCol_VOVn"><div class="docItemContainer_Djhp"><article><div class="tocCollapsible_ETCw theme-doc-toc-mobile tocMobile_ITEo"><button type="button" class="clean-btn tocCollapsibleButton_TO0P">Nesta página</button></div><div class="theme-doc-markdown markdown"><header><h1>Critérios GA do adaptador Databricks</h1></header>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="propósito">Propósito<a href="#propósito" class="hash-link" aria-label="Link direto para Propósito" title="Link direto para Propósito" translate="no">​</a></h2>
+<p>Este documento define as condições verificáveis ​​sob as quais
+<code>contractforge-databricks</code> é promovido de <code>Development Status:: 3 - Alpha</code>
+to General Availability (<code>Development Status :: 5 - Production/Stable</code>,
+versão do pacote <code>1.0.0</code>).</p>
+<p>É um portão, não uma descrição de recursos. O escopo implementado é
+documentado em <a class="" href="/contractforge/pt-BR/docs/specs/databricks-adapter/">databricks-adapter.md</a>. O funcional
+parity matrix lives in
+<a class="" href="/contractforge/pt-BR/docs/specs/databricks-contractforge-parity/">databricks-contractforge-parity.md</a>.
+Este arquivo os complementa listando as condições <strong>devem ser verdadeiras</strong> e as
+<strong>como verificar</strong> cada um.</p>
+<p>Um critério é considerado atendido somente quando a etapa de verificação é implementada,
+rodando em CI e verde por pelo menos quatro ciclos semanais consecutivos após o
+criterion is added.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="escopo-deste-portão">Escopo deste portão<a href="#escopo-deste-portão" class="hash-link" aria-label="Link direto para Escopo deste portão" title="Link direto para Escopo deste portão" translate="no">​</a></h2>
+<p>Esta porta cobre apenas o pacote <code>contractforge-databricks</code>. AWS, Snowflake
+e os pacotes de IA têm seus próprios portões. Núcleo (<code>contractforge-core</code>) GA está vinculado
+para Databricks GA porque o adaptador Databricks é a referência
+implementação: quando Databricks atinge <code>1.0.0</code>, o núcleo é promovido para <code>1.0.0</code>
+na mesma janela de lançamento.</p>
+<p>Este portão não requer:</p>
+<ul>
+<li class="">adaptadores diferentes de Databricks para alcançar GA;</li>
+<li class="">Lakeflow AUTO CDC deve ser validado em tempo de execução para o estado atual (apenas o histórico está no escopo);</li>
+<li class="">mutação do espaço de trabalho através do <code>contractforge-databricks</code> CLI (implantação
+remains a customer-owned concern);</li>
+<li class="">a GUI;</li>
+<li class="">streaming contínuo. Somente o comportamento disponível agora/fluxo limitado está em
+escopo, consistente com as especificações do adaptador.</li>
+</ul>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="inherited-preconditions">Inherited Preconditions<a href="#inherited-preconditions" class="hash-link" aria-label="Link direto para Inherited Preconditions" title="Link direto para Inherited Preconditions" translate="no">​</a></h2>
+<p>O seguinte deve estar verde antes que qualquer critério do GA seja avaliado. Estes são
+não específico do GA; eles são invariantes de repositório.</p>
+<table><thead><tr><th>Precondition</th><th>Verification</th></tr></thead><tbody><tr><td>Core não tem importações de plataforma</td><td><code>tests/test_core_platform_independence.py</code></td></tr><tr><td>Adaptadores não importam uns aos outros</td><td><code>tests/test_adapter_independence.py</code></td></tr><tr><td>O módulo AI não possui adaptador ou importações de nível superior SDK</td><td><code>ai/tests/test_architecture_boundaries.py</code></td></tr><tr><td>O formato da embalagem pública é estável</td><td><code>tests/test_publication_packaging.py</code></td></tr><tr><td>As versões do pacote declaradas correspondem a <code>pyproject.toml</code></td><td><code>tests/test_package_version.py</code></td></tr><tr><td>A especificação do adaptador Databricks é consistente</td><td><code>tests/test_databricks_contractforge_parity_docs.py</code></td></tr><tr><td>Matriz de teste de instalação de CI passa no Python 3.10/3.11/3.12 × Linux/Windows</td><td><code>.github/workflows/ci.yml</code> <code>install-matrix</code> job</td></tr></tbody></table>
+<p>Se alguma pré-condição estiver vermelha, a avaliação do GA será pausada. Corrija a pré-condição
+primeiro; não renuncie a isso.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="ga-criteria">GA Criteria<a href="#ga-criteria" class="hash-link" aria-label="Link direto para GA Criteria" title="Link direto para GA Criteria" translate="no">​</a></h2>
+<p>Cada critério abaixo tem três partes: <strong>o que deve ser válido</strong>, <strong>como verificar</strong>
+e <strong>status</strong>. O status é <code>not_started</code>, <code>in_progress</code>, <code>met</code> ou
+<code>waived</code> (com razão). As isenções são caso a caso, nunca gerais.</p>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="1-modos-de-gravação--execução-ponta-a-ponta">1. Modos de gravação – Execução ponta a ponta<a href="#1-modos-de-gravação--execução-ponta-a-ponta" class="hash-link" aria-label="Link direto para 1. Modos de gravação – Execução ponta a ponta" title="Link direto para 1. Modos de gravação – Execução ponta a ponta" translate="no">​</a></h3>
+<p><strong>O que deve ser mantido.</strong> Todos os seis modos de gravação portáteis são executados de ponta a ponta
+um espaço de trabalho Databricks real com o mecanismo suportado selecionado por
+<code>write_modes/strategy.py:choose_write_strategy</code>:</p>
+<ul>
+<li class=""><code>append</code> → Acrescento Delta (nativo)</li>
+<li class=""><code>overwrite</code> → substituição de Delta (nativo)</li>
+<li class=""><code>upsert</code> → Databricks SQL MERGE (nativo)</li>
+<li class=""><code>hash_diff_upsert</code> → ContractForge hash-diff Delta MERGE (algorithm)</li>
+<li class=""><code>historical</code> → ContractForge historical Delta MERGE (algorithm); Lakeflow
+AUTO CDC permanece renderizado pelo adaptador, mas não está na porta de execução GA</li>
+<li class=""><code>snapshot_reconcile_soft_delete</code> → ContractForge snapshot soft-delete Delta MERGE
+(algorithm)</li>
+</ul>
+<p>Each successful run produces:</p>
+<ul>
+<li class="">uma tabela de destino Delta no nome UC de três partes do contrato;</li>
+<li class="">uma linha em <code>ctrl_ingestion_runs</code> com <code>status = &#x27;SUCCEEDED&#x27;</code>;</li>
+<li class="">métricas de gravação normalizadas
+(<code>rows_inserted</code> / <code>rows_updated</code> / <code>rows_deleted</code> / <code>rows_expired</code> /
+<code>rows_affected</code>) as defined in
+<a class="" href="/contractforge/pt-BR/docs/specs/databricks-adapter/">databricks-adapter.md §Gravar Métricas</a>;</li>
+<li class="">stage durations recorded in <code>stage_durations_json</code>.</li>
+</ul>
+<p><strong>Como verificar.</strong> O trabalho de smoke do espaço de trabalho ativo (consulte a seção 11) executa um
+contrato de fixação por modo de gravação. Testes off-line existentes
+(<code>tests/test_databricks_delta_basic_execution.py</code>,
+<code>tests/test_databricks_sql_merge_execution.py</code>,
+<code>tests/test_databricks_hash_diff_execution.py</code>,
+<code>tests/test_databricks_scd2_execution.py</code>,
+<code>tests/test_databricks_snapshot_execution.py</code>,
+<code>tests/test_databricks_replace_partitions_execution.py</code>) stay green in
+PR CI.</p>
+<p><strong>Fora do escopo do GA.</strong> Os modos de gravação <code>custom:*</code> são fornecidos como uma extensão estável
+apontam, mas não estão no portão GA; os consumidores carregam sua própria cobertura.</p>
+<p><strong>Status.</strong> <code>not_started</code>.</p>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="2-conectores-de-origem--status-declarado-honrado">2. Conectores de Origem – Status Declarado Honrado<a href="#2-conectores-de-origem--status-declarado-honrado" class="hash-link" aria-label="Link direto para 2. Conectores de Origem – Status Declarado Honrado" title="Link direto para 2. Conectores de Origem – Status Declarado Honrado" translate="no">​</a></h3>
+<p><strong>O que deve ser válido.</strong> Todas as fontes declaradas por
+<code>sources/support.py:list_databricks_source_support</code> behaves according to its
+declared status:</p>
+<table><thead><tr><th>Status declared</th><th>GA requirement</th></tr></thead><tbody><tr><td><code>SUPPORTED</code></td><td>Um equipamento de espaço de trabalho ativo por família de origem é executado de ponta a ponta (leitura + gravação em Delta)</td></tr><tr><td><code>REVIEW_REQUIRED</code></td><td>O renderizador emite o artefato de revisão esperado e um aviso de planejamento; nenhuma execução silenciosa</td></tr><tr><td><code>UNSUPPORTED</code></td><td>Adaptador retorna um bloqueador de planejamento; nenhum artefato é emitido</td></tr></tbody></table>
+<p>Famílias de origem cobertas pelo GA:</p>
+<ul>
+<li class=""><code>incremental_files</code> (Auto Loader)</li>
+<li class=""><code>jdbc</code> family (<code>postgres</code>, <code>mysql</code>/<code>mariadb</code>, <code>sqlserver</code>, <code>oracle</code>,
+<code>redshift</code>)</li>
+<li class="">catalog (<code>table</code>, <code>view</code>, <code>sql</code>, <code>delta_table</code>, <code>iceberg_table</code>)</li>
+<li class=""><code>http_file</code> / <code>http_csv</code> / <code>http_json</code> / <code>http_text</code></li>
+<li class=""><code>rest_api</code> (bounded resolver only)</li>
+<li class="">bounded streams (<code>kafka_bounded</code>, <code>eventhubs_bounded</code>)</li>
+<li class=""><code>delta_share</code></li>
+<li class="">batch file/object-storage (<code>csv</code>, <code>json</code>/<code>jsonl</code>/<code>ndjson</code>, <code>parquet</code>,
+<code>delta</code>, <code>orc</code>, <code>text</code>, <code>avro</code>, <code>xml</code>, <code>s3</code>, <code>adls</code>, <code>azure_blob</code>, <code>gcs</code>)</li>
+<li class=""><code>native_passthrough</code> (somente artefato REVIEW_REQUIRED)</li>
+</ul>
+<p>Driver responsibilities (e.g. Oracle JDBC driver, XML format jar) remain a
+preocupação de implantação e estão explicitamente fora do escopo do portão do adaptador, mas
+o espaço de trabalho utilizado pela defumação deve fornecê-los para que as luminárias possam
+executar.</p>
+<p><strong>Como verificar.</strong> A smoke viva opera uma luminária por família. Testes off-line
+(<code>tests/test_databricks_*_source.py</code>,
+<code>tests/test_databricks_source_*.py</code>,
+<code>tests/test_databricks_runtime_sources.py</code>) stay green.</p>
+<p><strong>Status.</strong> <code>not_started</code>.</p>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="3-política-de-esquema--planejar-aplicar-auditar">3. Política de Esquema – Planejar, Aplicar, Auditar<a href="#3-política-de-esquema--planejar-aplicar-auditar" class="hash-link" aria-label="Link direto para 3. Política de Esquema – Planejar, Aplicar, Auditar" title="Link direto para 3. Política de Esquema – Planejar, Aplicar, Auditar" translate="no">​</a></h3>
+<p><strong>O que deve ser válido.</strong> As três políticas de esquema principais se comportam conforme especificado:</p>
+<ul>
+<li class=""><code>additive_only</code> — aplicam-se alterações aditivas; quebras estruturais falham com
+a blocker; <code>ctrl_ingestion_schema_changes</code> records each applied change</li>
+<li class=""><code>permissive</code> — todas as diferenças detectadas são registradas, mas não bloqueadas</li>
+<li class=""><code>fail</code> — qualquer diferença detectada falha na execução antes da gravação</li>
+</ul>
+<p>Os registros de alteração de esquema incluem <code>change_type</code>, <code>column_name</code>, <code>previous_type</code>,
+<code>current_type</code> e o ID de execução.</p>
+<p><strong>Como verificar.</strong> <code>tests/test_databricks_schema_diff.py</code>,
+<code>tests/test_databricks_schema_policy.py</code> e um fumo vivo por apólice
+comportamento.</p>
+<p><strong>Status.</strong> <code>not_started</code>.</p>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="4-regras-de-qualidade--renderização-execução-quarentena-evidência">4. Regras de Qualidade – Renderização, Execução, Quarentena, Evidência<a href="#4-regras-de-qualidade--renderização-execução-quarentena-evidência" class="hash-link" aria-label="Link direto para 4. Regras de Qualidade – Renderização, Execução, Quarentena, Evidência" title="Link direto para 4. Regras de Qualidade – Renderização, Execução, Quarentena, Evidência" translate="no">​</a></h3>
+<p><strong>O que deve ser válido.</strong> Todos os sete tipos principais de regras de qualidade — <code>required_columns</code>,
+<code>not_null</code>, <code>unique_key</code>, <code>accepted_values</code>, <code>row_count_minimum</code>,
+<code>max_null_ratio</code>, <code>expression</code> — executado em Databricks e o resultado
+is recorded:</p>
+<ul>
+<li class=""><code>ctrl_ingestion_quality</code> recebe uma linha por regra por execução com
+<code>status</code>, <code>failed_records</code> e metadados de regras;</li>
+<li class=""><code>on_quality_fail = fail</code> aborta a gravação;</li>
+<li class=""><code>on_quality_fail = warn</code> registra a falha e continua;</li>
+<li class=""><code>on_quality_fail = quarantine</code> grava linhas com falha no contrato
+destino de quarentena antes que a gravação principal prossiga.</li>
+</ul>
+<p><strong>Como verificar.</strong> <code>tests/test_databricks_quality_*.py</code> e uma smoke viva
+que exercita cada ramificação <code>on_quality_fail</code>.</p>
+<p><strong>Status.</strong> <code>not_started</code>.</p>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="5-governança-e-anotações--aplicar-e-auditar">5. Governança e anotações – Aplicar e auditar<a href="#5-governança-e-anotações--aplicar-e-auditar" class="hash-link" aria-label="Link direto para 5. Governança e anotações – Aplicar e auditar" title="Link direto para 5. Governança e anotações – Aplicar e auditar" translate="no">​</a></h3>
+<p><strong>O que deve ser válido.</strong> Unity Catalog SQL é renderizado e aplicado para:</p>
+<ul>
+<li class="">comentários de tabela, comentários de coluna, tags de tabela, tags de coluna, aliases, PII
+metadados e marcadores de descontinuação (anotações);</li>
+<li class="">concessões, filtros de linha e máscaras de coluna (acesso);</li>
+<li class="">owner review notes.</li>
+</ul>
+<p>Comportamentos necessários para GA:</p>
+<ul>
+<li class="">anotações <code>policy=ignore|warn|falhar</code> produzir o resultado documentado
+e linha de auditoria em <code>ctrl_ingestion_annotations</code>;</li>
+<li class="">acesse <code>mode = ignorar|validate_only|apply</code> produz o resultado documentado
+e linha de auditoria em <code>ctrl_ingestion_access</code>;</li>
+<li class="">acessar <code>on_drift=fail</code> rejeita desvio detectado quando o runner suporta
+<code>query()</code>;</li>
+<li class="">acessar <code>revoke_unmanaged=true</code> requer o tempo de execução documentado
+confirmation before issuing REVOKE.</li>
+</ul>
+<p><strong>Como verificar.</strong> <code>tests/test_databricks_annotations_sql.py</code>,
+<code>tests/test_databricks_governance_application.py</code>,
+<code>tests/test_databricks_governance_log.py</code>,
+<code>tests/test_databricks_access_audit_sql.py</code> e uma smoke viva que vira
+cada modo.</p>
+<p><strong>Status.</strong> <code>not_started</code>.</p>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="6-metadados-de-operações--registrados">6. Metadados de Operações – Registrados<a href="#6-metadados-de-operações--registrados" class="hash-link" aria-label="Link direto para 6. Metadados de Operações – Registrados" title="Link direto para 6. Metadados de Operações – Registrados" translate="no">​</a></h3>
+<p><strong>O que deve ser mantido.</strong> Metadados de operações (criticalidade, frequência esperada,
+atualização SLA, sinalizadores de alerta, runbook URL, propriedade, proprietários, grupos,
+tags) é gravado em <code>ctrl_ingestion_operations</code> quando declarado, e
+retorna <code>NOT_CONFIGURED</code> quando ausente.</p>
+<p><strong>Como verificar.</strong> <code>tests/test_databricks_operations_application.py</code>,
+<code>tests/test_databricks_operations_sql.py</code> e uma luminária de smoke com total
+metadados de operações.</p>
+<p><strong>Status.</strong> <code>not_started</code>.</p>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="7-armazenamentos-de-evidências--esquemas-ddl-migração">7. Armazenamentos de Evidências – Esquemas, DDL, Migração<a href="#7-armazenamentos-de-evidências--esquemas-ddl-migração" class="hash-link" aria-label="Link direto para 7. Armazenamentos de Evidências – Esquemas, DDL, Migração" title="Link direto para 7. Armazenamentos de Evidências – Esquemas, DDL, Migração" translate="no">​</a></h3>
+<p><strong>O que deve ser válido.</strong> Todas as doze tabelas de evidências/controle podem ser criadas,
+escrito e migrado adicionalmente em um espaço de trabalho real:</p>
+<p><code>ctrl_ingestion_runs</code>, <code>ctrl_ingestion_errors</code>, <code>ctrl_ingestion_quality</code>,
+<code>ctrl_ingestion_state</code>, <code>ctrl_ingestion_locks</code>,
+<code>ctrl_ingestion_schema_changes</code>, <code>ctrl_ingestion_lineage</code>,
+<code>ctrl_ingestion_streams</code>, <code>ctrl_ingestion_annotations</code>,
+<code>ctrl_ingestion_access</code>, <code>ctrl_ingestion_operations</code>,
+<code>ctrl_ingestion_explain</code>.</p>
+<p>A migração SQL renderizada por <code>state/migrations.py</code> é idempotente em um
+workspace que já possui a versão anterior da tabela de controle instalada.</p>
+<p><strong>Como verificar.</strong> <code>tests/test_databricks_evidence_ddl.py</code>,
+<code>tests/test_databricks_evidence_sql.py</code>,
+<code>tests/test_databricks_control_table_schema_parity.py</code>,
+<code>tests/test_databricks_state_sql.py</code> e uma smoke viva que percorre o
+migração SQL em um espaço de trabalho com tabelas anteriores instaladas.</p>
+<p><strong>Status.</strong> <code>not_started</code>.</p>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="8-lineage--openlineage-event-per-run">8. Lineage — OpenLineage Event Per Run<a href="#8-lineage--openlineage-event-per-run" class="hash-link" aria-label="Link direto para 8. Lineage — OpenLineage Event Per Run" title="Link direto para 8. Lineage — OpenLineage Event Per Run" translate="no">​</a></h3>
+<p><strong>O que deve ser mantido.</strong> Para cada execução bem-sucedida, o tempo de execução emite um
+OpenLineage-compatible record persisted through <code>ctrl_ingestion_lineage</code>
+com namespace <code>databricks://&lt;catalog&gt;</code>, resultado de execução correspondente <code>eventType</code>
+(<code>COMPLETE</code> ou <code>FAIL</code>), facetas do esquema de entrada/saída e a linha de saída
+contam como uma faceta métrica de qualidade de dados.</p>
+<p><strong>Como verificar.</strong> <code>tests/test_databricks_lineage.py</code> e smoke viva
+emite pelo menos um registro válido por dispositivo de modo de gravação.</p>
+<p><strong>Status.</strong> <code>not_started</code>.</p>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="9-cost-signals--reportable">9. Cost Signals — Reportable<a href="#9-cost-signals--reportable" class="hash-link" aria-label="Link direto para 9. Cost Signals — Reportable" title="Link direto para 9. Cost Signals — Reportable" translate="no">​</a></h3>
+<p><strong>O que deve ser mantido.</strong> <code>cost/sql.py:render_operational_cost_query</code> produz
+SQL que é executado nas tabelas de evidências preenchidas e retorna um
+conjunto de resultados não vazio quando chamado com <code>dbu_per_hour</code> válido,
+<code>currency_per_dbu</code> e <code>currency</code>.</p>
+<p>Esta é uma estimativa de custos operacionais, não uma reconciliação de faturamento do fornecedor;
+isso permanece fora do escopo explícito.</p>
+<p><strong>Como verificar.</strong> <code>tests/test_databricks_cost.py</code> e smoke ao vivo
+a consulta de custo após pelo menos uma execução bem-sucedida.</p>
+<p><strong>Status.</strong> <code>not_started</code>.</p>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="10-parity-scenarios--validated-live">10. Parity Scenarios — Validated Live<a href="#10-parity-scenarios--validated-live" class="hash-link" aria-label="Link direto para 10. Parity Scenarios — Validated Live" title="Link direto para 10. Parity Scenarios — Validated Live" translate="no">​</a></h3>
+<p><strong>O que deve ser válido.</strong> Todos os oito cenários declarados em
+<code>adapters/databricks/src/contractforge_databricks/parity/scenarios.py</code>
+ter uma execução de espaço de trabalho ao vivo correspondente que produza o
+resultado esperado:</p>
+<ul>
+<li class="">seis cenários <code>must_match</code> (3× SQL MERGE do estado atual, 3× ​​Lakeflow histórico AUTO
+CDC) produzem métricas que correspondem à execução de referência ContractForge Delta;</li>
+<li class="">one <code>unsupported</code> scenario
+(<code>hash_diff_auto_cdc_non_equivalence</code>) is correctly blocked at
+tempo de planejamento;</li>
+<li class="">one <code>intentional_difference</code> scenario
+(<code>snapshot_reconcile_soft_delete_auto_cdc_difference</code>) é renderizado com o
+bloqueador declarado registrado na evidência de corrida.</li>
+</ul>
+<p><strong>Como verificar.</strong> O trabalho de smoke ao vivo executa o harness de paridade semanalmente. Off-line
+test <code>tests/test_databricks_parity_catalog.py</code> continua a impor o
+catalog shape in PR CI.</p>
+<p><strong>Status.</strong> <code>not_started</code>.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="live-workspace-smoke">Live Workspace Smoke<a href="#live-workspace-smoke" class="hash-link" aria-label="Link direto para Live Workspace Smoke" title="Link direto para Live Workspace Smoke" translate="no">​</a></h2>
+<p>O portão GA depende de um trabalho de smoke recorrente. Decisões para o primeiro
+release window:</p>
+<table><thead><tr><th>Item</th><th>Decision</th></tr></thead><tbody><tr><td>Workspace</td><td>O mesmo espaço de trabalho já utilizado para validar <code>examples/real-world/supabase-jdbc-medallion</code> ponta a ponta em Databricks e AWS.</td></tr><tr><td>Catálogo e esquema</td><td>Reutiliza o esquema de evidência de exemplo existente (<code>cf_supabase_jdbc_e2e_v2_ops</code>) e o catálogo de destino (<code>workspace</code>). Nenhuma nova nomenclatura.</td></tr><tr><td>Frequency</td><td>Weekly cron (Sunday 06:00 UTC) plus on-demand <code>workflow_dispatch</code>. Daily is intentionally out of scope due to compute cost.</td></tr><tr><td>Acionar fluxo de trabalho</td><td>Novo <code>.github/workflows/databricks-smoke.yml</code> (a ser criado como parte da Fase 1; ainda não presente).</td></tr><tr><td>Secrets</td><td><code>DATABRICKS_HOST</code>, <code>DATABRICKS_TOKEN</code>, <code>DATABRICKS_WAREHOUSE_ID</code> injetados como segredos do repositório; não ecoou; nunca logado.</td></tr><tr><td>Failure handling</td><td>Uma execução semanal com falha bloqueia o próximo ciclo de revisão do GA até que a execução fique verde ou a falha seja explicitamente dispensada com um motivo registrado.</td></tr><tr><td>Teardown</td><td>O trabalho smoke descarta apenas objetos criados no esquema dedicado. Os artefatos de exemplo existentes são preservados.</td></tr><tr><td>Cost envelope</td><td>Documentado no fluxo de trabalho de smoke. Uma execução que exceda o envelope é investigada antes do próximo ciclo.</td></tr></tbody></table>
+<p>O fluxo de trabalho de smoke executa uma matriz de teste fixa derivada dos critérios do GA
+acima. Novos critérios exigem um teste off-line e uma entrada na matriz de smoke
+antes que o critério possa ser marcado como <code>met</code>.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="política-de-alterações-significativas-pós-ga">Política de alterações significativas pós-GA<a href="#política-de-alterações-significativas-pós-ga" class="hash-link" aria-label="Link direto para Política de alterações significativas pós-GA" title="Link direto para Política de alterações significativas pós-GA" translate="no">​</a></h2>
+<p>Once <code>contractforge-databricks</code> reaches <code>1.0.0</code>:</p>
+<ul>
+<li class="">Public API surface (everything documented in
+<a class="" href="/contractforge/pt-BR/docs/specs/databricks-adapter/">databricks-adapter.md</a> e acessível sem um
+underscore prefix) follows SemVer.</li>
+<li class="">Breaking changes require a <code>2.0.0</code> bump; no exceptions absent a
+documented security carveout.</li>
+<li class="">As descontinuações atingem um menor antes da remoção, com um <code>DeprecationWarning</code>
+emitido na importação ou no momento da chamada. Janela mínima de depreciação: 90 dias.</li>
+<li class="">Os esquemas de tabelas de evidências/controle evoluem de forma aditiva. Migrações destrutivas
+não são permitidos em versões secundárias.</li>
+<li class="">As superfícies de extensão sob <code>extensions.databricks.*</code> seguem o
+<a class="" href="/contractforge/pt-BR/docs/specs/adapter-parameter-policy/">política de parâmetros do adaptador</a> e são regidos
+pelo mesmo contrato SemVer.</li>
+<li class="">As declarações de capacidade em
+<code>adapters/databricks/src/contractforge_databricks/capabilities/</code> form
+parte do API público. Renomear um recurso é uma mudança significativa.</li>
+<li class="">Parity scenarios in
+<code>adapters/databricks/src/contractforge_databricks/parity/scenarios.py</code>
+pode ser adicionado sem colisão. Alterando um valor <code>expectation</code> ou
+removing a scenario is a breaking change.</li>
+</ul>
+<p>A política é aplicada pelo <code>tests/test_publication_packaging.py</code> existente
+verificações e por revisão durante a liberação.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="de-ga-criteria">De-GA Criteria<a href="#de-ga-criteria" class="hash-link" aria-label="Link direto para De-GA Criteria" title="Link direto para De-GA Criteria" translate="no">​</a></h2>
+<p>O status <code>1.0.0</code> é revogado e o pacote retorna à semântica <code>0.x</code>,
+se alguma das seguintes situações se tornar verdadeira:</p>
+<ul>
+<li class="">quatro corridas de smoke semanais consecutivas falham sem uma renúncia aceita;</li>
+<li class="">a security vulnerability requires a breaking change inside a minor;</li>
+<li class="">um modo de gravação que estava na porta GA é removido ou sua semântica
+alterações contratuais;</li>
+<li class="">o isolamento da plataforma principal foi violado (uma versão <code>contractforge-core</code>
+começa a importar uma plataforma SDK).</li>
+</ul>
+<p>Um evento de-GA deve ser registrado no pacote CHANGELOG com o
+triggering condition cited.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="100-release-checklist">1.0.0 Release Checklist<a href="#100-release-checklist" class="hash-link" aria-label="Link direto para 1.0.0 Release Checklist" title="Link direto para 1.0.0 Release Checklist" translate="no">​</a></h2>
+<p>Lista de verificação binária para a tag de lançamento real <code>v1.0.0-databricks</code>:</p>
+<ul class="contains-task-list containsTaskList_mC6p">
+<li class="">[] Todas as seções 1–10 acima marcadas como <code>met</code> com histórico de smoke verde para
+at least four consecutive weeks.</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> <!-- -->All inherited preconditions green.</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> <code>pyproject.toml</code> updated:
+<code>version = &quot;1.0.0&quot;</code> e
+<code>Development Status :: 5 - Production/Stable</code>.</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> <code>adapters/databricks/CHANGELOG.md</code> includes a <code>[1.0.0]</code> entry
+que lista o limite de estabilidade API e faz referência a esta porta
+document.</li>
+<li class="">[] <a class="" href="/contractforge/pt-BR/docs/specs/databricks-adapter/">databricks-adapter.md</a> revisado e qualquer
+desvio da implementação reconciliado.</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> <a class="" href="/contractforge/pt-BR/docs/specs/databricks-contractforge-parity/">databricks-contractforge-parity.md</a>
+reviewed.</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> <code>docs/specs/api-stability.md</code> updated to reflect Databricks as a
+superfície estável.</li>
+<li class="">[] Tabela de status <code>README.md</code> para o adaptador Databricks alterada de
+&quot;Reference implementation&quot; to &quot;GA&quot;.</li>
+<li class="">[] <code>contractforge-core</code> passou para <code>1.0.0</code> na mesma janela de lançamento;
+<code>4 - Beta</code> becomes <code>5 - Production/Stable</code>.</li>
+<li class="">[] Lançamento do PyPI enviado via <code>release.yml</code> com tag
+<code>v1.0.0-databricks</code> (e <code>v1.0.0-core</code>); instalar smoke, correr
+Python 3.10/3.11/3.12 Linux + Windows; ambas as páginas são renderizadas corretamente.</li>
+<li class="">[] Trusted Publisher confirmado ativo para ambos os pacotes.</li>
+<li class="">[] Lançamento anunciado na página do projeto e na documentação
+índice. As páginas dos adaptadores AI, AWS e Snowflake afirmam claramente que são
+ainda não está no portão GA.</li>
+</ul>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="não-objetivos-deste-portão">Não objetivos deste portão<a href="#não-objetivos-deste-portão" class="hash-link" aria-label="Link direto para Não objetivos deste portão" title="Link direto para Não objetivos deste portão" translate="no">​</a></h2>
+<ul>
+<li class="">GA de <code>contractforge-aws</code>, <code>contractforge-snowflake</code> ou
+<code>contractforge-ai</code> (each has its own gate).</li>
+<li class="">Uma garantia de que todo contrato que passa no AWS ou Snowflake
+o adaptador também funciona em Databricks; a portabilidade permanece no nível do contrato,
+não equivalência de adaptador.</li>
+<li class="">Validação de tempo de execução ao vivo do estado atual do Lakeflow AUTO CDC, personalizado semelhante ao EMR
+motores, streaming contínuo ou adaptadores Fabric / GCP.</li>
+<li class="">Um planejador ou tempo de execução de orquestração de propriedade de ContractForge.</li>
+</ul>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="itens-abertos-antes-que-o-portão-esteja-ativo">Itens abertos antes que o portão esteja ativo<a href="#itens-abertos-antes-que-o-portão-esteja-ativo" class="hash-link" aria-label="Link direto para Itens abertos antes que o portão esteja ativo" title="Link direto para Itens abertos antes que o portão esteja ativo" translate="no">​</a></h2>
+<ul>
+<li class="">Fluxo de trabalho <code>.github/workflows/databricks-smoke.yml</code> a ser criado.</li>
+<li class="">Envelope de custo por ciclo de smoke a ser calibrado em relação ao espaço de trabalho.</li>
+<li class="">Primeira entrada de isenção real para validar o formato do registro em
+<code>docs/specs/databricks-ga-waivers.md</code> se uma renúncia for necessária.</li>
+</ul></div><footer class="theme-doc-footer docusaurus-mt-lg"><div class="row margin-top--sm theme-doc-footer-edit-meta-row"><div class="col noPrint_WFHX"><a href="https://github.com/marquesantero/contractforge/edit/main/site/docs/specs/databricks-ga-criteria.md" target="_blank" rel="noopener noreferrer" class="theme-edit-this-page"><svg fill="currentColor" height="20" width="20" viewBox="0 0 40 40" class="iconEdit_Z9Sw" aria-hidden="true"><g><path d="m34.5 11.7l-3 3.1-6.3-6.3 3.1-3q0.5-0.5 1.2-0.5t1.1 0.5l3.9 3.9q0.5 0.4 0.5 1.1t-0.5 1.2z m-29.5 17.1l18.4-18.5 6.3 6.3-18.4 18.4h-6.3v-6.2z"></path></g></svg>Editar esta página</a></div><div class="col lastUpdated_JAkA"></div></div></footer></article><nav class="docusaurus-mt-lg pagination-nav" aria-label="Páginas de documento"></nav></div></div><div class="col col--3"><div class="tableOfContents_bqdL thin-scrollbar theme-doc-toc-desktop"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#propósito" class="table-of-contents__link toc-highlight">Propósito</a></li><li><a href="#escopo-deste-portão" class="table-of-contents__link toc-highlight">Escopo deste portão</a></li><li><a href="#inherited-preconditions" class="table-of-contents__link toc-highlight">Inherited Preconditions</a></li><li><a href="#ga-criteria" class="table-of-contents__link toc-highlight">GA Criteria</a><ul><li><a href="#1-modos-de-gravação--execução-ponta-a-ponta" class="table-of-contents__link toc-highlight">1. Modos de gravação – Execução ponta a ponta</a></li><li><a href="#2-conectores-de-origem--status-declarado-honrado" class="table-of-contents__link toc-highlight">2. Conectores de Origem – Status Declarado Honrado</a></li><li><a href="#3-política-de-esquema--planejar-aplicar-auditar" class="table-of-contents__link toc-highlight">3. Política de Esquema – Planejar, Aplicar, Auditar</a></li><li><a href="#4-regras-de-qualidade--renderização-execuç ão-quarentena-evidência" class="table-of-contents__link toc-highlight">4. Regras de Qualidade – Renderização, Execução, Quarentena, Evidência</a></li><li><a href="#5-governança-e-anotações--aplicar-e-auditar" class="table-of-contents__link toc-highlight">5. Governança e anotações – Aplicar e auditar</a></li><li><a href="#6-metadados-de-operações--registrados" class="table-of-contents__link toc-highlight">6. Metadados de Operações – Registrados</a></li><li><a href="#7-armazenamentos-de-evidências--esquemas-ddl-migração" class="table-of-contents__link toc-highlight">7. Armazenamentos de Evidências – Esquemas, DDL, Migração</a></li><li><a href="#8-lineage--openlineage-event-per-run" class="table-of-contents__link toc-highlight">8. Lineage — OpenLineage Event Per Run</a></li><li><a href="#9-cost-signals--reportable" class="table-of-contents__link toc-highlight">9. Cost Signals — Reportable</a></li><li><a href="#10-parity-scenarios--validated-live" class="table-of-contents__link toc-highlight">10. Parity Scenarios — Validated Live</a></li></ul></li><li><a href="#live-workspace-smoke" class="table-of-contents__link toc-highlight">Live Workspace Smoke</a></li><li><a href="#política-de-alterações-significativas-pós-ga" class="table-of-contents__link toc-highlight">Política de alterações significativas pós-GA</a></li><li><a href="#de-ga-criteria" class="table-of-contents__link toc-highlight">De-GA Criteria</a></li><li><a href="#100-release-checklist" class="table-of-contents__link toc-highlight">1.0.0 Release Checklist</a></li><li><a href="#não-objetivos-deste-portão" class="table-of-contents__link toc-highlight">Não objetivos deste portão</a></li><li><a href="#itens-abertos-antes-que-o-portão-esteja-ativo" class="table-of-contents__link toc-highlight">Itens abertos antes que o portão esteja ativo</a></li></ul></div></div></div></div></main></div></div></div><footer class="theme-layout-footer footer footer--dark"><div class="container container-fluid"><div class="row footer__links"><div class="theme-layout-footer-column col footer__col"><div class="footer__title">Documentação</div><ul class="footer__items clean-list"><li class="footer__item"><a class="footer__link-item" href="/contractforge/pt-BR/docs/start/quickstart/">Início rápido</a></li><li class="footer__item"><a class="footer__link-item" href="/contractforge/pt-BR/docs/contracts/overview/">Contratos</a></li><li class="footer__item"><a class="footer__link-item" href="/contractforge/pt-BR/docs/connectors/overview/">Conectores</a></li><li class="footer__item"><a class="footer__link-item" href="/contractforge/pt-BR/docs/operations/overview/">Operações</a></li></ul></div><div class="theme-layout-footer-column col footer__col"><div class="footer__title">Projeto</div><ul class="footer__items clean-list"><li class="footer__item"><a href="https://github.com/marquesantero/contractforge" target="_blank" rel="noopener noreferrer" class="footer__link-item">GitHub<svg width="13.5" height="13.5" aria-label="(abre em nova aba)" class="iconExternalLink_nPIU"><use href="#theme-svg-external-link"></use></svg></a></li><li class="footer__item"><a href="https://github.com/marquesantero/contractforge/issues" target="_blank" rel="noopener noreferrer" class="footer__link-item">Issues<svg width="13.5" height="13.5" aria-label="(abre em nova aba)" class="iconExternalLink_nPIU"><use href="#theme-svg-external-link"></use></svg></a></li><li class="footer__item"><a href="https://github.com/marquesantero/contractforge/releases" target="_blank" rel="noopener noreferrer" class="footer__link-item">Versões<svg width="13.5" height="13.5" aria-label="(abre em nova aba)" class="iconExternalLink_nPIU"><use href="#theme-svg-external-link"></use></svg></a></li></ul></div></div><div class="footer__bottom text--center"><div class="footer__copyright">Copyright © 2026 ContractForge contributors. Documentação publicada com Docusaurus.</div></div></div></footer></div>
+</body>
+</html>

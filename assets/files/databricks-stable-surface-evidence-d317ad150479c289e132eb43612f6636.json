@@ -1,0 +1,111 @@
+{
+  "kind": "contractforge_databricks_stable_surface_evidence",
+  "schema_version": "1.0.0",
+  "adapter": "contractforge-databricks",
+  "subtarget": "databricks_serverless_delta",
+  "classification": "STABLE_SUPPORTED_SURFACE",
+  "supported_surface_ready": true,
+  "stable_final": true,
+  "evidence_date": "2026-06-10",
+  "stability_criteria": "docs/specs/databricks-ga-criteria.md",
+  "waiver_registry": "docs/specs/databricks-ga-waivers.md",
+  "summary": {
+    "decision": "The documented Databricks serverless Delta surface is stable-supported.",
+    "basis": "Databricks adapter runtime, rendering, governance, evidence and available-now contract-runtime paths are implemented in the adapter, guarded by local tests and backed by live contract-only Kafka evidence.",
+    "scope_limit": "Full 1.0 GA, unbounded continuous streaming and broader Kafka provider-equivalence claims remain explicit exclusions from the stable-final claim."
+  },
+  "verification_commands": [
+    {
+      "name": "local_databricks_suite",
+      "command": "uv run pytest tests/test_databricks_*.py",
+      "expected": "all tests pass"
+    },
+    {
+      "name": "databricks_status_report",
+      "command": "uv run contractforge-databricks stabilization-report",
+      "expected": "classification=STABLE_SUPPORTED_SURFACE, supported_surface_ready=true, stable_final=true"
+    },
+    {
+      "name": "strict_final_boundary",
+      "command": "uv run contractforge-databricks stabilization-report --strict-final",
+      "expected": "exit 0 while stable_final=true"
+    }
+  ],
+  "real_validation_projects": [
+    {
+      "name": "databricks_reference_runtime_suite",
+      "status": "PASS",
+      "source_family": "local_runtime_and_render_suite",
+      "contracts": "tests/test_databricks_*.py",
+      "validated_surfaces": [
+        "Delta write helpers",
+        "runtime orchestration",
+        "schema policy",
+        "quality evidence",
+        "state and idempotency",
+        "governance artifacts",
+        "cost and operations SQL",
+        "bundle rendering"
+      ],
+      "required_result": "Databricks adapter local suite protects the stable serverless Delta surface without importing Spark at package import time."
+    },
+    {
+      "name": "databricks_same_contract_e2e",
+      "status": "PASS",
+      "source_family": "same_contract_e2e",
+      "contracts": "same contracts executed on Databricks, AWS and Snowflake",
+      "validated_surfaces": [
+        "shared contract semantics",
+        "logical row-count equivalence",
+        "adapter-owned runtime deltas"
+      ],
+      "required_result": "User-reported same-contract E2E execution returned the same results on all three platforms."
+    },
+    {
+      "name": "databricks_confluent_kafka_available_now",
+      "status": "PASS",
+      "source_family": "kafka_available_now",
+      "contracts": "examples/real-world/databricks-confluent-kafka-available-now",
+      "evidence": "docs/reports/databricks-kafka-provider-smoke.json",
+      "validated_surfaces": [
+        "contract-only runtime execution",
+        "Spark Structured Streaming availableNow",
+        "Confluent Cloud Kafka",
+        "Unity Catalog managed-volume checkpoint",
+        "no-input rerun",
+        "stream evidence",
+        "secret redaction"
+      ],
+      "required_result": "First contract run consumed three Kafka messages, checkpoint rerun consumed zero rows and target/evidence readback confirmed three target rows."
+    }
+  ],
+  "accepted_review_boundaries": [
+    {
+      "code": "DATABRICKS_FULL_GA_GATE",
+      "area": "1.0.0 general availability",
+      "decision": "EXCLUDED_FROM_STABLE_FINAL",
+      "reason": "The stable-final claim covers the documented v0.1.0 serverless Delta surface. The broader 1.0 GA gate remains governed by the Databricks GA criteria."
+    },
+    {
+      "code": "DATABRICKS_CONTINUOUS_STREAMING_REVIEW",
+      "area": "continuous streaming",
+      "decision": "EXCLUDED_FROM_STABLE_FINAL",
+      "reason": "The stable stream claim covers checkpointed available-now contract runtime. Unbounded continuous streaming remains outside stable-final."
+    },
+    {
+      "code": "DATABRICKS_PROVIDER_MATRIX_REVIEW",
+      "area": "Kafka provider compatibility beyond validated Confluent Cloud",
+      "decision": "EXCLUDED_FROM_STABLE_FINAL",
+      "reason": "Confluent Cloud available-now contract runtime is validated. Additional Kafka-compatible providers require separate certification before provider-equivalence claims."
+    }
+  ],
+  "release_decision": {
+    "promote_package_classifier": "Development Status :: 4 - Beta",
+    "do_not_claim": [
+      "General Availability",
+      "unbounded continuous streaming support",
+      "generic Kafka provider equivalence beyond validated Confluent Cloud",
+      "1.0.0 API freeze"
+    ]
+  }
+}

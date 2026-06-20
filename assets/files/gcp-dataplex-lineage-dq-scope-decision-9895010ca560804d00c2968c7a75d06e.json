@@ -1,0 +1,74 @@
+{
+  "kind": "contractforge_gcp_dataplex_lineage_dq_scope_decision",
+  "schema_version": "1.0.0",
+  "adapter": "contractforge-gcp",
+  "subtarget": "gcp_bigquery",
+  "maturity_gate": "GCP-BQ-16",
+  "status": "PASS_WITH_REVIEW_BOUNDARY",
+  "decided_at": "2026-06-15",
+  "decision": {
+    "stable_final_scope": "EXPLICIT_COMMAND_SURFACE_INCLUDED",
+    "included_surfaces": [
+      "dataplex_data_quality_scans",
+      "dataplex_data_quality_bigquery_exports",
+      "dataplex_lineage_artifact_planning",
+      "dataplex_aspect_artifact_planning",
+      "dataplex_lineage_aspect_command_surface",
+      "native_lineage_event_publication_readback",
+      "knowledge_catalog_aspect_modify_entry_readback"
+    ],
+    "excluded_surfaces": [
+      "automatic_native_lineage_aspect_emission_for_every_contract_run"
+    ],
+    "reason": "The GCP adapter renders and executes SQL quality checks with BigQuery evidence, generates deterministic Dataplex DataScan create plus execution/readback command artifacts, and has live native DataScan execution/readback evidence for a 10,000-row target. It also renders deterministic native Dataplex Data Lineage publication/readback plans and Dataplex aspect taxonomy/apply/readback plans, exposes an explicit adapter-owned command surface, and now has real-account native lineage event readback plus Knowledge Catalog/Dataplex aspect modifyEntry/readback evidence against the same bronze-to-gold target table.",
+    "planner_behavior": "Treat Dataplex data-quality execution/readback and explicit Dataplex lineage/aspect execution/readback as validated when the adapter-owned command is used. Do not treat SQL quality evidence, injected-client command tests or BigQuery job metadata as native Dataplex lineage parity. Automatic native lineage/aspect emission for every contract run remains a separate future integration choice."
+  },
+  "adapter_behavior": {
+    "sql_quality_checks": true,
+    "bigquery_quality_evidence": true,
+    "dataplex_data_scan_artifact_planning": true,
+    "dataplex_data_scan_execution_artifact_planning": true,
+    "dataplex_data_scans": true,
+    "dataplex_data_quality_bigquery_exports": true,
+    "dataplex_lineage_artifact_planning": true,
+    "dataplex_aspect_artifact_planning": true,
+    "dataplex_lineage_aspect_command_surface": true,
+    "native_lineage_events": true,
+    "knowledge_catalog_aspects": true,
+    "automatic_native_lineage_aspect_emission": false
+  },
+  "execution_evidence": {
+    "report": "docs/reports/gcp-dataplex-data-quality-execution-smoke.json",
+    "data_scan_id": "cf-contractforge-gcp-advanced-prod-customers-snapshot-target-dq",
+    "job_id": "057cfa5a-b30b-4ec7-8f52-01654dbf3fd1",
+    "job_state": "SUCCEEDED",
+    "target_table": "midyear-system-499521-p3.contractforge_gcp_advanced_prod.customers_snapshot_target",
+    "rows_scanned": 10000,
+    "export_rows_read": 7
+  },
+  "lineage_aspect_execution_evidence": {
+    "report": "docs/reports/gcp-dataplex-lineage-aspects-smoke.json",
+    "lineage_run_id": "cf_gcp_dataplex_lineage_aspects_smoke_20260617_b",
+    "aspect_run_id": "cf_gcp_dataplex_aspects_smoke_20260617_e",
+    "target_table": "midyear-system-499521-p3.contractforge_gcp_smoke.workflow_gold_orders_by_status",
+    "lineage_events_read": 1,
+    "aspect_type": "projects/midyear-system-499521-p3/locations/us-east1/aspectTypes/contractforge-governance",
+    "entry_search_total_size": 1,
+    "modify_entry_readback": true
+  },
+  "required_before_promotion": [
+    "Decide whether native Dataplex lineage/aspect emission should be automatic in normal contract runs or remain an explicit command.",
+    "Add production-sized or multi-contract native lineage/aspect validation if these surfaces become part of default runtime execution.",
+    "Keep aspect schema evolution additive because Dataplex AspectType field indexes are immutable."
+  ],
+  "acceptance": "Stable-final GCP claims can rely on SQL quality evidence, native Dataplex data-quality execution/readback evidence, deterministic native lineage/aspect planning artifacts and the explicit non-mutating-by-default command surface. Native Dataplex lineage event publication/readback and Knowledge Catalog/Dataplex aspect modifyEntry/readback are validated for the explicit command path; automatic emission during every contract run remains outside the scoped claim.",
+  "sources": [
+    "https://docs.cloud.google.com/dataplex/docs/reference/rest",
+    "https://docs.cloud.google.com/dataplex/docs/check-data-quality",
+    "https://docs.cloud.google.com/data-catalog/docs/data-lineage",
+    "https://cloud.google.com/data-catalog/docs/reference/data-lineage/rest",
+    "https://docs.cloud.google.com/dataplex/docs/reference/rest/v1/Aspect",
+    "https://docs.cloud.google.com/dataplex/docs/reference/rest/v1/projects.locations/modifyEntry",
+    "https://docs.cloud.google.com/dataplex/docs/reference/rest/v1/projects.locations.aspectTypes"
+  ]
+}

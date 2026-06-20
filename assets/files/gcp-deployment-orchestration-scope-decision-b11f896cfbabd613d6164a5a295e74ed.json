@@ -1,0 +1,64 @@
+{
+  "kind": "contractforge_gcp_deployment_orchestration_scope_decision",
+  "schema_version": "1.0.0",
+  "adapter": "contractforge-gcp",
+  "subtarget": "gcp_bigquery",
+  "maturity_gate": "GCP-BQ-15",
+  "status": "PASS_WITH_NON_WORKFLOWS_EXCLUSIONS",
+  "decided_at": "2026-06-15",
+  "decision": {
+    "stable_final_scope": "WORKFLOWS_INCLUDED",
+    "included_surfaces": [
+      "workflows_project_runner"
+    ],
+    "excluded_surfaces": [
+      "cloud_run_jobs_runner",
+      "composer_dag_runner",
+      "bigquery_scheduled_queries"
+    ],
+    "reason": "The GCP adapter has contract render and smoke execution evidence, generates a deterministic Google Workflows source plan that orders multi-contract project jobs, polls submitted BigQuery jobs until DONE with a bounded timeout, includes connector retry blocks, emits execution-plan, broad/execution-scoped evidence-readback and cleanup-plan artifacts, exposes adapter-owned deploy/run/wait/readback/reset/cleanup flags, and has live evidence for generated-runner deploy/execute, command-path readback, runner-side run/quality/schema evidence, quality failed-row semantics, execution-scoped evidence ids, workflow cleanup, write-failure evidence, target/evidence cleanup and repeated full-project rerun execution/readback. Google Workflows is now the certified GCP project deployment runner.",
+    "planner_behavior": "Treat the generated Google Workflows runner as the promoted GCP deployment orchestration path for the stable BigQuery batch surface. Keep Cloud Run Jobs, Composer DAGs and BigQuery scheduled-query runners outside the stable claim until they have separate real-account evidence."
+  },
+  "adapter_behavior": {
+    "rendered_bundle_deployable": true,
+    "workflows_runner_artifact_planning": true,
+    "workflows_execution_plan_artifact": true,
+    "workflows_evidence_readback_artifact": true,
+    "workflows_execution_scoped_readback_templates": true,
+    "workflows_evidence_readback_command": true,
+    "workflows_live_command_readback_smoke": true,
+    "workflows_runner_evidence_persistence": true,
+    "workflows_quality_failed_row_semantics": true,
+    "workflows_execution_scoped_evidence_ids": true,
+    "workflows_schema_evidence_persistence": true,
+    "workflows_cleanup_command_surface": true,
+    "workflows_write_failure_run_evidence": true,
+    "workflows_target_evidence_cleanup": true,
+    "workflows_target_evidence_reset_command": true,
+    "workflows_certified_runner_smoke": true,
+    "adapter_owned_workflows_command_surface": true,
+    "workflows_connector_retry_planning": true,
+    "workflows_bigquery_job_polling_planning": true,
+    "workflows_live_deploy_execute_smoke": true,
+    "single_contract_smoke": true,
+    "project_deployment_runner": true,
+    "stable_orchestration_surface": "google_workflows",
+    "uncertified_orchestration_surface": [
+      "cloud_run_jobs_runner",
+      "composer_dag_runner",
+      "bigquery_scheduled_queries"
+    ]
+  },
+  "required_before_promotion": [
+    "Validate Cloud Run Jobs, Composer DAGs or BigQuery scheduled queries separately before claiming those orchestration surfaces.",
+    "Keep full automatic type-widening or type-mutation enforcement in the schema-policy gate instead of the deployment-runner gate.",
+    "Keep advanced write modes and streaming provider parity in their dedicated gates."
+  ],
+  "acceptance": "Stable-final GCP claims include the adapter-owned Google Workflows project runner for the documented BigQuery batch surface. Other GCP orchestration surfaces remain explicit non-claims.",
+  "sources": [
+    "https://cloud.google.com/workflows/docs",
+    "https://cloud.google.com/workflows/docs/reference/googleapis/bigquery/Overview",
+    "https://docs.cloud.google.com/workflows/docs/reference/syntax/retrying",
+    "https://github.com/GoogleCloudPlatform/workflows-samples"
+  ]
+}

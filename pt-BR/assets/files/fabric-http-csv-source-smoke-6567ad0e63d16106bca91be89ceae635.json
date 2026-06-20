@@ -1,0 +1,83 @@
+{
+  "kind": "contractforge_fabric_source_expansion_evidence",
+  "adapter": "fabric",
+  "source_family": "http_csv",
+  "authentication": "none",
+  "validated_at_utc": "2026-06-12T16:05:38Z",
+  "status": "SUCCEEDED",
+  "project": "examples/source-expansion/fabric-http-csv/project.yaml",
+  "environment": "examples/source-expansion/fabric-http-csv/environments/fabric.environment.yaml",
+  "workspace": {
+    "id": "061fd0c8-c248-4628-a332-6adf16623533",
+    "name": "Manager",
+    "capacity_id": "2139f1ea-2676-46bf-ab4f-ab248c768056",
+    "capacity_region": "Brazil South"
+  },
+  "lakehouse": {
+    "id": "07067d3f-d5e2-48c1-b526-634620e57d4b",
+    "name": "contractforge_lh"
+  },
+  "source_infrastructure": {
+    "provider": "httpbingo",
+    "endpoint": "https://httpbingo.org/base64/b3JkZXJfaWQsYW1vdW50CjEsMTAKMiwyMAo=",
+    "response_shape": "CSV body with order_id and amount columns",
+    "fixture_rows": 2
+  },
+  "commands": [
+    "contractforge-fabric smoke-project examples/source-expansion/fabric-http-csv/project.yaml --environment-key fabric --max-attempts 35 --retry-after-seconds 30"
+  ],
+  "contract_source": {
+    "basis": "Contract-only public bounded HTTP CSV source plus SQL evidence probe",
+    "workaround_code_used": false,
+    "source_type": "http_csv",
+    "runtime_path": "Generated Fabric Notebook using contractforge_core.connectors.read_http_file_payload"
+  },
+  "coverage": {
+    "source_read": [
+      "public_http_csv",
+      "bounded_csv_parse"
+    ],
+    "target_table": "cf_fabric_source_expansion.http_csv_orders",
+    "probe_table": "cf_fabric_source_expansion.http_csv_evidence_probe",
+    "probe_checks": [
+      "target_rows",
+      "run_rows",
+      "quality_rows",
+      "schema_rows",
+      "source_metadata_rows"
+    ]
+  },
+  "result_summary": {
+    "submitted_steps": 2,
+    "fabric_job_status_completed": 2,
+    "evidence_probe_result": "SUCCEEDED",
+    "evidence_probe_checks": 5
+  },
+  "steps": [
+    {
+      "name": "http_csv_orders",
+      "contract": "contracts/01_http_csv_orders.ingestion.yaml",
+      "notebook": "cf_workspace_cf_fabric_source_expansion_http_csv_orders",
+      "item_id": "6a4bbb5a-1975-42dd-8735-957c12d2b2e0",
+      "job_instance_id": "424ccc97-b7b9-4281-8813-0b1839b7d416",
+      "job_status": "Completed",
+      "started_at_utc": "2026-06-12T15:57:08.7433249",
+      "ended_at_utc": "2026-06-12T16:01:03.4709261"
+    },
+    {
+      "name": "http_csv_evidence_probe",
+      "contract": "contracts/02_http_csv_evidence_probe.ingestion.yaml",
+      "notebook": "cf_workspace_cf_fabric_source_expansion_http_csv_evidence_probe",
+      "item_id": "6832ffe3-d0a9-4754-a1b9-a514b929b0c6",
+      "job_instance_id": "f41662e8-86fe-4eee-8678-61b6b234cec7",
+      "job_status": "Completed",
+      "started_at_utc": "2026-06-12T16:01:55.996676",
+      "ended_at_utc": "2026-06-12T16:05:38.4552062"
+    }
+  ],
+  "known_limitations": [
+    "This validates public/no-auth bounded HTTP CSV only.",
+    "Authenticated HTTP CSV variants are tracked in fabric-auth-http-csv-variants-source-smoke.json.",
+    "Fabric stable_final is true for the documented notebook-first surface. Source families outside this stable scope are excluded by docs/reports/fabric-source-expansion-stable-scope-decision.json. Explicit Fabric-native OneLake row and column policy apply is covered separately by docs/reports/fabric-onelake-row-column-policy-smoke.json, and deployment-pipeline stage promotion is covered by docs/reports/fabric-deployment-pipeline-stage-promotion-smoke.json."
+  ]
+}

@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkcontractforge_docs_site=self.webpackChunkcontractforge_docs_site||[]).push([[9647],{7121(e,s,r){r.r(s),r.d(s,{default:()=>d});r(96540);var c=r(34164),t=r(17559),a=r(45500),o=r(22831),n=r(75048),u=r(74848);function d(e){return(0,u.jsx)(a.e3,{className:(0,c.A)(t.G.wrapper.docsPages),children:(0,u.jsx)(n.A,{children:(0,o.v)(e.route.routes)})})}}}]);

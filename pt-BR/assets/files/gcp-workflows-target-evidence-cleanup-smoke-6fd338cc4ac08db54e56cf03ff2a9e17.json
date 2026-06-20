@@ -1,0 +1,75 @@
+{
+  "kind": "contractforge_gcp_workflows_target_evidence_cleanup_smoke",
+  "schema_version": "1.0.0",
+  "adapter": "contractforge-gcp",
+  "subtarget": "gcp_bigquery",
+  "maturity_gate": "GCP-BQ-15C10",
+  "status": "PASS",
+  "executed_at": "2026-06-16T20:55:00Z",
+  "project_id": "midyear-system-499521-p3",
+  "workflow": {
+    "name": "cf-gcp-workflows-write-failure-runner",
+    "location": "us-central1"
+  },
+  "contract": {
+    "name": "workflow_bronze_orders_write_failure",
+    "target_table": "midyear-system-499521-p3.contractforge_gcp_smoke.workflow_bronze_orders_write_failure"
+  },
+  "validated": {
+    "generated_cleanup_plan_artifact": true,
+    "adapter_owned_cleanup_data_command": true,
+    "adapter_owned_reset_data_command": true,
+    "target_table_cleanup_statement_scoped": true,
+    "evidence_cleanup_statement_scoped": true,
+    "evidence_rows_removed": true,
+    "dataset_wide_cleanup_not_generated": true,
+    "workflow_resource_cleanup": false,
+    "multi_contract_rerun_execution_readback_certification": false,
+    "transient_retry_behavior": false,
+    "full_schema_drift_enforcement": false
+  },
+  "cleanup": {
+    "status": "SUCCEEDED",
+    "query_count": 7,
+    "query_names": [
+      "01_drop_target_bronze_orders_write_failure",
+      "02_delete_run_evidence_by_target",
+      "03_delete_schema_evidence_by_target",
+      "04_delete_annotation_evidence_by_target",
+      "05_delete_governance_evidence_by_target",
+      "06_delete_lineage_evidence_by_target",
+      "07_delete_quality_evidence_by_contract"
+    ],
+    "evidence_before_count": 6,
+    "evidence_after_count": 0
+  },
+  "commands": {
+    "run": "PYTHONPATH=.;src;adapters/gcp/src uv run python .tmp/run_gcp_workflows_cleanup_data_smoke.py",
+    "cleanup_data": [
+      "bq",
+      "--project_id=midyear-system-499521-p3",
+      "--location=us-east1",
+      "--format=json",
+      "query",
+      "--use_legacy_sql=false",
+      "<generated cleanup SQL>"
+    ]
+  },
+  "review_boundary": {
+    "certified_now": [
+      "deploy-project emits deployment/gcp_workflows_cleanup_plan.json",
+      "contractforge-gcp deploy-project exposes --cleanup-orchestration-data",
+      "contractforge-gcp deploy-project exposes --reset-orchestration-data for pre-run reset",
+      "cleanup SQL is scoped to target tables and evidence filters from the deployment plan",
+      "a live cleanup-data smoke removed controlled write-failure evidence rows",
+      "no generated cleanup statement drops a dataset or uses unfiltered evidence DELETE"
+    ],
+    "superseded_by_certified_runner_smoke": "docs/reports/gcp-workflows-certified-runner-smoke.json",
+    "remaining_before_runner_promotion": []
+  },
+  "sources": [
+    "https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language",
+    "https://cloud.google.com/bigquery/docs/reference/standard-sql/dml-syntax",
+    "https://docs.cloud.google.com/sdk/gcloud/reference/workflows"
+  ]
+}

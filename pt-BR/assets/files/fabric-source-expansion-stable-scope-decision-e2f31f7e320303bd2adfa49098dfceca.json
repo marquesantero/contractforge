@@ -1,0 +1,100 @@
+{
+  "adapter": "contractforge-fabric",
+  "kind": "contractforge_fabric_source_expansion_stable_scope_decision",
+  "status": "EXCLUDED_FROM_STABLE_FINAL",
+  "validated_at_utc": "2026-06-15T12:30:00Z",
+  "decision": {
+    "stable_final_scope": "EXCLUDED",
+    "scope": "Non-notebook-first and provider-native source variants outside the documented Fabric Lakehouse stable surface.",
+    "reason": "The Fabric stable-final claim covers contract-generated Notebook execution over the validated Lakehouse, shortcut, JDBC, HTTP/REST, Kafka-compatible and Iceberg table shortcut paths. Private-network shortcut variants, managed identity/OAuth object-storage credentials, Delta Sharing client materialization, direct OneLake Iceberg REST catalog reads and native Fabric Real-Time/Eventstream routing require separate runtime mappings and evidence, and must remain REVIEW_REQUIRED rather than silently widening the stable surface."
+  },
+  "covered_by_f11": [
+    "public/no-auth rest_api",
+    "public/no-auth http_json",
+    "public/no-auth http_csv",
+    "public/no-auth http_text",
+    "Lakehouse text/orc/avro/xml file reads",
+    "internal OneLake shortcut reads",
+    "authenticated REST Basic/bearer/API-key/OAuth with Key Vault placeholders",
+    "authenticated HTTP JSON Basic/bearer/API-key with Key Vault placeholders",
+    "authenticated HTTP CSV Basic/bearer/API-key with Key Vault placeholders",
+    "endpoint-enforced HTTP text Basic/bearer/API-key",
+    "SQL Server JDBC with Key Vault placeholder credentials",
+    "PostgreSQL JDBC with Key Vault placeholder credentials",
+    "public Azure Blob CSV through Fabric-readable runtime path",
+    "private Azure Blob CSV with Key Vault-backed storage account key",
+    "external Azure Blob shortcut reads",
+    "external ADLS Gen2 shortcut reads",
+    "external Google Cloud Storage shortcut reads",
+    "external Amazon S3 shortcut reads",
+    "external S3-compatible shortcut reads",
+    "ADLS Gen2 Iceberg table shortcut reads",
+    "Amazon S3 Iceberg table shortcut reads",
+    "Google Cloud Storage Iceberg table shortcut reads",
+    "bounded Confluent Kafka replay",
+    "Confluent Kafka available-now catch-up",
+    "Azure Event Hubs Kafka-compatible available-now catch-up"
+  ],
+  "excluded_from_stable_final": [
+    {
+      "source_family": "private_network_shortcuts",
+      "planner_behavior": "Keep REVIEW_REQUIRED until Fabric private endpoint/network isolation, connection binding and evidence semantics are validated per provider."
+    },
+    {
+      "source_family": "managed_identity_or_oauth_object_storage",
+      "planner_behavior": "Keep REVIEW_REQUIRED until Fabric connection credential semantics and Notebook runtime access are certified for each object-store provider."
+    },
+    {
+      "source_family": "delta_sharing",
+      "planner_behavior": "Keep REVIEW_REQUIRED until dependency, credential and materialization behavior are validated in Fabric."
+    },
+    {
+      "source_family": "direct_catalog_iceberg",
+      "planner_behavior": "Keep REVIEW_REQUIRED until direct OneLake Iceberg REST catalog reads are mapped to ContractForge source semantics. The stable surface uses Fabric Iceberg table shortcuts instead."
+    },
+    {
+      "source_family": "native_fabric_realtime_or_eventstream",
+      "planner_behavior": "Keep REVIEW_REQUIRED until native Fabric Real-Time/Eventstream routing is mapped to bounded or available-now contract semantics. The stable surface uses Kafka-compatible bounded and available-now paths."
+    },
+    {
+      "source_family": "additional_jdbc_dialects",
+      "planner_behavior": "Keep REVIEW_REQUIRED until driver, network and credential behavior are validated per dialect."
+    },
+    {
+      "source_family": "oauth_http_file_sources",
+      "planner_behavior": "Keep outside the stable claim because OAuth is not currently part of the HTTP-file source vocabulary."
+    }
+  ],
+  "evidence": [
+    "docs/reports/fabric-http-json-source-smoke.json",
+    "docs/reports/fabric-http-csv-source-smoke.json",
+    "docs/reports/fabric-http-text-source-smoke.json",
+    "docs/reports/fabric-lakehouse-text-source-smoke.json",
+    "docs/reports/fabric-lakehouse-file-formats-source-smoke.json",
+    "docs/reports/fabric-onelake-shortcut-source-smoke.json",
+    "docs/reports/fabric-auth-rest-source-smoke.json",
+    "docs/reports/fabric-auth-rest-variants-source-smoke.json",
+    "docs/reports/fabric-auth-rest-oauth-source-smoke.json",
+    "docs/reports/fabric-auth-http-json-source-smoke.json",
+    "docs/reports/fabric-auth-http-json-variants-source-smoke.json",
+    "docs/reports/fabric-auth-http-csv-variants-source-smoke.json",
+    "docs/reports/fabric-auth-http-text-basic-source-smoke.json",
+    "docs/reports/fabric-auth-http-text-bearer-source-smoke.json",
+    "docs/reports/fabric-auth-http-text-api-key-source-smoke.json",
+    "docs/reports/fabric-sqlserver-jdbc-source-smoke.json",
+    "docs/reports/fabric-postgres-jdbc-source-smoke.json",
+    "docs/reports/fabric-azure-blob-source-smoke.json",
+    "docs/reports/fabric-private-azure-blob-source-smoke.json",
+    "docs/reports/fabric-external-azure-blob-shortcut-source-smoke.json",
+    "docs/reports/fabric-adls-shortcut-source-smoke.json",
+    "docs/reports/fabric-gcs-shortcut-source-smoke.json",
+    "docs/reports/fabric-external-s3-shortcut-source-smoke.json",
+    "docs/reports/fabric-s3-compatible-shortcut-source-smoke.json",
+    "docs/reports/fabric-iceberg-table-shortcut-source-smoke.json",
+    "docs/reports/fabric-adls-iceberg-table-shortcut-source-smoke.json",
+    "docs/reports/fabric-gcs-iceberg-table-shortcut-source-smoke.json",
+    "docs/reports/fabric-confluent-kafka-bounded-source-smoke.json",
+    "docs/reports/fabric-confluent-kafka-available-now-source-smoke.json",
+    "docs/reports/fabric-eventhubs-kafka-available-now-source-smoke.json"
+  ]
+}

@@ -1,0 +1,285 @@
+<!doctype html>
+<html lang="en-US" dir="ltr" class="docs-wrapper plugin-docs plugin-id-default docs-version-current docs-doc-page docs-doc-id-adapters/gcp" data-has-hydrated="false">
+<head>
+<meta charset="UTF-8">
+<meta name="generator" content="Docusaurus v3.10.1">
+<title data-rh="true">GCP Adapter | ContractForge</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:image" content="https://marquesantero.github.io/contractforge/img/contractforge-logo.png"><meta data-rh="true" name="twitter:image" content="https://marquesantero.github.io/contractforge/img/contractforge-logo.png"><meta data-rh="true" property="og:url" content="https://marquesantero.github.io/contractforge/docs/adapters/gcp/"><meta data-rh="true" property="og:locale" content="en_US"><meta data-rh="true" property="og:locale:alternate" content="pt_BR"><meta data-rh="true" name="docusaurus_locale" content="en"><meta data-rh="true" name="docsearch:language" content="en"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="GCP Adapter | ContractForge"><meta data-rh="true" name="description" content="contractforge-gcp starts with the gcp_bigquery subtarget."><meta data-rh="true" property="og:description" content="contractforge-gcp starts with the gcp_bigquery subtarget."><link data-rh="true" rel="icon" href="/contractforge/img/contractforge-mark.png"><link data-rh="true" rel="canonical" href="https://marquesantero.github.io/contractforge/docs/adapters/gcp/"><link data-rh="true" rel="alternate" href="https://marquesantero.github.io/contractforge/docs/adapters/gcp/" hreflang="en-US"><link data-rh="true" rel="alternate" href="https://marquesantero.github.io/contractforge/pt-BR/docs/adapters/gcp/" hreflang="pt-BR"><link data-rh="true" rel="alternate" href="https://marquesantero.github.io/contractforge/docs/adapters/gcp/" hreflang="x-default"><script data-rh="true" type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"GCP Adapter","item":"https://marquesantero.github.io/contractforge/docs/adapters/gcp"}]}</script><link rel="stylesheet" href="/contractforge/assets/css/styles.e35730a0.css">
+<script src="/contractforge/assets/js/runtime~main.6fc30d92.js" defer="defer"></script>
+<script src="/contractforge/assets/js/main.d725e8b0.js" defer="defer"></script>
+</head>
+<body>
+<svg style="display: none;"><defs>
+<symbol id="theme-svg-external-link" viewBox="0 0 24 24"><path fill="currentColor" d="M21 13v10h-21v-19h12v2h-10v15h17v-8h2zm3-12h-10.988l4.035 4-6.977 7.07 2.828 2.828 6.977-7.07 4.125 4.172v-11z"/></symbol>
+</defs></svg>
+<script>!function(){var t=function(){try{return new URLSearchParams(window.location.search).get("docusaurus-theme")}catch(t){}}()||function(){try{return window.localStorage.getItem("theme")}catch(t){}}();document.documentElement.setAttribute("data-theme",t||"light"),document.documentElement.setAttribute("data-theme-choice",t||"light")}(),function(){try{const c=new URLSearchParams(window.location.search).entries();for(var[t,e]of c)if(t.startsWith("docusaurus-data-")){var a=t.replace("docusaurus-data-","data-");document.documentElement.setAttribute(a,e)}}catch(t){}}()</script><div id="__docusaurus"><div role="region" aria-label="Skip to main content"><a class="skipToContent_fXgn" href="#__docusaurus_skipToContent_fallback">Skip to main content</a></div><nav aria-label="Main" class="theme-layout-navbar navbar navbar--fixed-top"><div class="navbar__inner"><div class="theme-layout-navbar-left navbar__items"><button aria-label="Toggle navigation bar" aria-expanded="false" class="navbar__toggle clean-btn" type="button"><svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><path stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="2" d="M4 7h22M4 15h22M4 23h22"></path></svg></button><a class="navbar__brand" href="/contractforge/"><div class="navbar__logo"><img src="/contractforge/img/contractforge-mark.png" alt="ContractForge" class="themedComponent_mlkZ themedComponent--light_NVdE"><img src="/contractforge/img/contractforge-mark.png" alt="ContractForge" class="themedComponent_mlkZ themedComponent--dark_xIcU"></div><b class="navbar__title text--truncate">ContractForge</b></a><a class="navbar__item navbar__link" href="/contractforge/docs/intro/">Docs</a><a class="navbar__item navbar__link" href="/contractforge/docs/adapters/overview/">Adapters</a><a class="navbar__item navbar__link" href="/contractforge/docs/connectors/overview/">Connectors</a></div><div class="theme-layout-navbar-right navbar__items navbar__items--right"><div class="navbar__item dropdown dropdown--hoverable dropdown--right"><a href="#" aria-haspopup="true" aria-expanded="false" role="button" class="navbar__link"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" class="iconLanguage_nlXk"><path fill="currentColor" d="M12.87 15.07l-2.54-2.51.03-.03c1.74-1.94 2.98-4.17 3.71-6.53H17V4h-7V2H8v2H1v1.99h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2l-4.5-12zm-2.62 7l1.62-4.33L19.12 17h-3.24z"></path></svg>English</a><ul class="dropdown__menu"><li><a href="/contractforge/docs/adapters/gcp/" target="_self" rel="noopener noreferrer" class="dropdown__link dropdown__link--active" lang="en-US">English</a></li><li><a href="/contractforge/pt-BR/docs/adapters/gcp/" target="_self" rel="noopener noreferrer" class="dropdown__link" lang="pt-BR">Português</a></li></ul></div><div class="navbarSearchContainer_Bca1"><div class="navbar__search searchBarContainer_NW3z" dir="ltr"><input placeholder="Search" aria-label="Search" class="navbar__search-input searchInput_YFbd" value=""><div class="loadingRing_RJI3 searchBarLoadingRing_YnHq"><div></div><div></div><div></div><div></div></div></div></div><a href="https://github.com/marquesantero/contractforge" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">GitHub<svg width="13.5" height="13.5" aria-label="(opens in new tab)" class="iconExternalLink_nPIU"><use href="#theme-svg-external-link"></use></svg></a><div class="toggle_vylO colorModeToggle_DEke"><button class="clean-btn toggleButton_gllP toggleButtonDisabled_aARS" type="button" disabled="" title="system mode" aria-label="Switch between dark and light mode (currently system mode)"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" class="toggleIcon_g3eP lightToggleIcon_pyhR"><path fill="currentColor" d="M12,9c1.65,0,3,1.35,3,3s-1.35,3-3,3s-3-1.35-3-3S10.35,9,12,9 M12,7c-2.76,0-5,2.24-5,5s2.24,5,5,5s5-2.24,5-5 S14.76,7,12,7L12,7z M2,13l2,0c0.55,0,1-0.45,1-1s-0.45-1-1-1l-2,0c-0.55,0-1,0.45-1,1S1.45,13,2,13z M20,13l2,0c0.55,0,1-0.45,1-1 s-0.45-1-1-1l-2,0c-0.55,0-1,0.45-1,1S19.45,13,20,13z M11,2v2c0,0.55,0.45,1,1,1s1-0.45,1-1V2c0-0.55-0.45-1-1-1S11,1.45,11,2z M11,20v2c0,0.55,0.45,1,1,1s1-0.45,1-1v-2c0-0.55-0.45-1-1-1C11.45,19,11,19.45,11,20z M5.99,4.58c-0.39-0.39-1.03-0.39-1.41,0 c-0.39,0.39-0.39,1.03,0,1.41l1.06,1.06c0.39,0.39,1.03,0.39,1.41,0s0.39-1.03,0-1.41L5.99,4.58z M18.36,16.95 c-0.39-0.39-1.03-0.39-1.41,0c-0.39,0.39-0.39,1.03,0,1.41l1.06,1.06c0.39,0.39,1.03,0.39,1.41,0c0.39-0.39,0.39-1.03,0-1.41 L18.36,16.95z M19.42,5.99c0.39-0.39,0.39-1.03,0-1.41c-0.39-0.39-1.03-0.39-1.41,0l-1.06,1.06c-0.39,0.39-0.39,1.03,0,1.41 s1.03,0.39,1.41,0L19.42,5.99z M7.05,18.36c0.39-0.39,0.39-1.03,0-1.41c-0.39-0.39-1.03-0.39-1.41,0l-1.06,1.06 c-0.39,0.39-0.39,1.03,0,1.41s1.03,0.39,1.41,0L7.05,18.36z"></path></svg><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" class="toggleIcon_g3eP darkToggleIcon_wfgR"><path fill="currentColor" d="M9.37,5.51C9.19,6.15,9.1,6.82,9.1,7.5c0,4.08,3.32,7.4,7.4,7.4c0.68,0,1.35-0.09,1.99-0.27C17.45,17.19,14.93,19,12,19 c-3.86,0-7-3.14-7-7C5,9.07,6.81,6.55,9.37,5.51z M12,3c-4.97,0-9,4.03-9,9s4.03,9,9,9s9-4.03,9-9c0-0.46-0.04-0.92-0.1-1.36 c-0.98,1.37-2.58,2.26-4.4,2.26c-2.98,0-5.4-2.42-5.4-5.4c0-1.81,0.89-3.42,2.26-4.4C12.92,3.04,12.46,3,12,3L12,3z"></path></svg><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" class="toggleIcon_g3eP systemToggleIcon_QzmC"><path fill="currentColor" d="m12 21c4.971 0 9-4.029 9-9s-4.029-9-9-9-9 4.029-9 9 4.029 9 9 9zm4.95-13.95c1.313 1.313 2.05 3.093 2.05 4.95s-0.738 3.637-2.05 4.95c-1.313 1.313-3.093 2.05-4.95 2.05v-14c1.857 0 3.637 0.737 4.95 2.05z"></path></svg></button></div></div></div><div role="presentation" class="navbar-sidebar__backdrop"></div></nav><div id="__docusaurus_skipToContent_fallback" class="theme-layout-main main-wrapper mainWrapper_z2l0"><div class="docsWrapper_hBAB"><button aria-label="Scroll back to top" class="clean-btn theme-back-to-top-button backToTopButton_sjWU" type="button"></button><div class="docRoot_UBD9"><aside class="theme-doc-sidebar-container docSidebarContainer_YfHR"><div class="sidebarViewport_aRkj"><div class="sidebar_njMd"><nav aria-label="Docs sidebar" class="menu thin-scrollbar menu_SIkG"><ul class="theme-doc-sidebar-menu menu__list"><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item"><div class="menu__list-item-collapsible"><a class="categoryLink_byQd menu__link menu__link--sublist menu__link--sublist-caret" role="button" aria-expanded="true" href="/contractforge/docs/intro/"><span title="Start" class="categoryLinkLabel_W154">Start</span></a></div><ul class="menu__list"><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/contractforge/docs/intro/"><span title="Overview" class="linkLabel_WmDU">Overview</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/contractforge/docs/start/installation/"><span title="Installation" class="linkLabel_WmDU">Installation</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/contractforge/docs/start/quickstart/"><span title="Run a contract in five minutes." class="linkLabel_WmDU">Run a contract in five minutes.</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/contractforge/docs/start/concepts/"><span title="The vocabulary behind a ContractForge pipeline." class="linkLabel_WmDU">The vocabulary behind a ContractForge pipeline.</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/contractforge/docs/cli/"><span title="Adapter CLI Reference" class="linkLabel_WmDU">Adapter CLI Reference</span></a></li></ul></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item"><div class="menu__list-item-collapsible"><a class="categoryLink_byQd menu__link menu__link--sublist menu__link--sublist-caret" role="button" aria-expanded="true" href="/contractforge/docs/contracts/overview/"><span title="Contracts" class="categoryLinkLabel_W154">Contracts</span></a></div><ul class="menu__list"><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/contractforge/docs/contracts/overview/"><span title="Contracts are the source of truth." class="linkLabel_WmDU">Contracts are the source of truth.</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/contractforge/docs/contracts/full-contract/"><span title="Full contract example." class="linkLabel_WmDU">Full contract example.</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/contractforge/docs/contracts/ingestion/"><span title="Ingestion contract." class="linkLabel_WmDU">Ingestion contract.</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/contractforge/docs/contracts/annotations/"><span title="Annotations contract." class="linkLabel_WmDU">Annotations contract.</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/contractforge/docs/contracts/operations/"><span title="Operations contract." class="linkLabel_WmDU">Operations contract.</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/contractforge/docs/contracts/access/"><span title="Access contract." class="linkLabel_WmDU">Access contract.</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/contractforge/docs/contracts/environment/"><span title="Environment contract." class="linkLabel_WmDU">Environment contract.</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/contractforge/docs/contracts/project/"><span title="Project YAML Reference" class="linkLabel_WmDU">Project YAML Reference</span></a></li></ul></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_byQd menu__link menu__link--sublist menu__link--sublist-caret" role="button" aria-expanded="false" href="/contractforge/docs/core/naming/"><span title="Core behavior" class="categoryLinkLabel_W154">Core behavior</span></a></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item"><div class="menu__list-item-collapsible"><a class="categoryLink_byQd menu__link menu__link--sublist menu__link--sublist-caret menu__link--active" role="button" aria-expanded="true" href="/contractforge/docs/adapters/overview/"><span title="Adapters" class="categoryLinkLabel_W154">Adapters</span></a></div><ul class="menu__list"><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/contractforge/docs/adapters/overview/"><span title="Adapters" class="linkLabel_WmDU">Adapters</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/contractforge/docs/adapters/databricks/"><span title="Databricks adapter" class="linkLabel_WmDU">Databricks adapter</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/contractforge/docs/adapters/aws/"><span title="AWS Adapter" class="linkLabel_WmDU">AWS Adapter</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/contractforge/docs/adapters/snowflake/"><span title="Snowflake Adapter" class="linkLabel_WmDU">Snowflake Adapter</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/contractforge/docs/adapters/fabric/"><span title="Fabric Adapter" class="linkLabel_WmDU">Fabric Adapter</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link menu__link--active" aria-current="page" tabindex="0" href="/contractforge/docs/adapters/gcp/"><span title="GCP Adapter" class="linkLabel_WmDU">GCP Adapter</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/contractforge/docs/adapters/test-contracts-across-adapters/"><span title="Test Contracts Across Adapters" class="linkLabel_WmDU">Test Contracts Across Adapters</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/contractforge/docs/adapters/authoring/"><span title="Adapter authoring" class="linkLabel_WmDU">Adapter authoring</span></a></li></ul></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item"><div class="menu__list-item-collapsible"><a class="categoryLink_byQd menu__link menu__link--sublist menu__link--sublist-caret" role="button" aria-expanded="true" href="/contractforge/docs/ai/overview/"><span title="ContractForge AI" class="categoryLinkLabel_W154">ContractForge AI</span></a></div><ul class="menu__list"><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/contractforge/docs/ai/overview/"><span title="ContractForge AI overview" class="linkLabel_WmDU">ContractForge AI overview</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/contractforge/docs/ai/project-generation/"><span title="AI project generation" class="linkLabel_WmDU">AI project generation</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/contractforge/docs/ai/prompts/"><span title="Prompt workflows" class="linkLabel_WmDU">Prompt workflows</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/contractforge/docs/ai/validation-reports/"><span title="Validation and reports" class="linkLabel_WmDU">Validation and reports</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/contractforge/docs/ai/providers-guardrails/"><span title="Providers and guardrails" class="linkLabel_WmDU">Providers and guardrails</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/contractforge/docs/ai/examples/"><span title="End-to-end examples" class="linkLabel_WmDU">End-to-end examples</span></a></li></ul></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_byQd menu__link menu__link--sublist menu__link--sublist-caret" role="button" aria-expanded="false" href="/contractforge/docs/connectors/overview/"><span title="Connectors" class="categoryLinkLabel_W154">Connectors</span></a></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_byQd menu__link menu__link--sublist menu__link--sublist-caret" role="button" aria-expanded="false" href="/contractforge/docs/operations/governance/"><span title="Operations" class="categoryLinkLabel_W154">Operations</span></a></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_byQd menu__link menu__link--sublist menu__link--sublist-caret" role="button" aria-expanded="false" href="/contractforge/docs/develop/api-result/"><span title="Develop" class="categoryLinkLabel_W154">Develop</span></a></div></li></ul></nav></div></div></aside><main class="docMainContainer_TBSr"><div class="container padding-top--md padding-bottom--lg"><div class="row"><div class="col docItemCol_VOVn"><div class="docItemContainer_Djhp"><article><nav class="theme-doc-breadcrumbs breadcrumbsContainer_Z_bl" aria-label="Breadcrumbs"><ul class="breadcrumbs"><li class="breadcrumbs__item"><a aria-label="Home page" class="breadcrumbs__link" href="/contractforge/"><svg viewBox="0 0 24 24" class="breadcrumbHomeIcon_YNFT"><path d="M10 19v-5h4v5c0 .55.45 1 1 1h3c.55 0 1-.45 1-1v-7h1.7c.46 0 .68-.57.33-.87L12.67 3.6c-.38-.34-.96-.34-1.34 0l-8.36 7.53c-.34.3-.13.87.33.87H5v7c0 .55.45 1 1 1h3c.55 0 1-.45 1-1z" fill="currentColor"></path></svg></a></li><li class="breadcrumbs__item"><span class="breadcrumbs__link">Adapters</span></li><li class="breadcrumbs__item breadcrumbs__item--active"><span class="breadcrumbs__link">GCP Adapter</span></li></ul></nav><div class="theme-doc-markdown markdown"><header><h1>GCP Adapter</h1></header>
+<p><code>contractforge-gcp</code> starts with the <code>gcp_bigquery</code> subtarget.</p>
+<p>The current surface is a stable-supported BigQuery render and smoke-execution surface:</p>
+<ul>
+<li class="">plan contracts against BigQuery capabilities;</li>
+<li class="">render BigQuery SQL for <code>append</code>, <code>overwrite</code> and <code>upsert</code>;</li>
+<li class="">render advanced write-mode review artifacts for <code>hash_diff_upsert</code>, <code>historical</code> and <code>snapshot_reconcile_soft_delete</code>;</li>
+<li class="">render GCS load-job JSON for CSV, JSON/JSONL/NDJSON, Parquet, Avro and ORC;</li>
+<li class="">render registered BigQuery/BigLake Iceberg table sources as normal BigQuery table reads;</li>
+<li class="">render redacted source-review JSON and Markdown artifacts with runtime path, prerequisites, graduation gates and non-JDBC source-family promotion paths;</li>
+<li class="">render source-family promotion-plan JSON for review-required raw Iceberg, Delta/Delta Sharing, undeclared/unsupported HTTP file variants and streaming sources;</li>
+<li class="">execute raw Iceberg BigLake registration and metadata readback through <code>source-promotion --execute --readback</code>;</li>
+<li class="">render authenticated REST/HTTP Secret Manager review artifacts and resolve placeholders at runtime when credentials use <code>{{ secret:scope/key }}</code>;</li>
+<li class="">render BigQuery evidence DDL for run and quality records;</li>
+<li class="">render BigQuery schema-policy planning artifacts and schema evidence DDL;</li>
+<li class="">optionally enforce schema policy for BigQuery table/view/SQL sources and declared-schema GCS load sources during smoke execution with <code>--enforce-schema-policy</code>;</li>
+<li class="">render Dataplex DataScan data-quality create and execution/readback planning artifacts from ContractForge quality rules;</li>
+<li class="">execute native Dataplex data-quality DataScans and read back BigQuery export rows through <code>dataplex-quality --execute --wait --readback</code>;</li>
+<li class="">render native Dataplex Data Lineage publication/readback plans and Dataplex aspect taxonomy/apply/readback plans from normal contracts;</li>
+<li class="">render or explicitly execute those native lineage/aspect plans through <code>dataplex-lineage-aspects</code>;</li>
+<li class="">render deterministic governance ledger/reconciliation artifacts, non-mutating governance reconciliation readback and governance evidence DDL;</li>
+<li class="">persist and read back governance evidence rows for declared governance intent during smoke execution;</li>
+<li class="">render query-only operational cost reports from BigQuery run evidence;</li>
+<li class="">render a deterministic deployment manifest that documents the single-contract BigQuery apply order;</li>
+<li class="">render dry-run project deployment manifests with per-contract BigQuery bundles, a Google Workflows source plan, an execution-plan artifact, an evidence-readback artifact, bounded BigQuery job polling, connector retry planning and an optional <code>bq</code> readback command path;</li>
+<li class="">persist run and quality evidence rows from BigQuery job results during executed smoke tests;</li>
+<li class="">persist neutral OpenLineage control-table evidence from executed load/write smoke operations;</li>
+<li class="">run project execution-order smokes sequentially through the same contract-only BigQuery runtime;</li>
+<li class="">apply, read back and enforce a BigQuery row access policy in the live governance smoke;</li>
+<li class="">create, attach, read back and enforce BigQuery/Data Catalog policy tags for column-level access;</li>
+<li class="">render, apply and read back BigQuery table/column descriptions for annotation contracts;</li>
+<li class="">classify unsupported or review-required sources, including canonical Delta, Delta Sharing, JDBC dialect, inline authenticated REST/HTTP credentials and streaming names, without pretending they are stable;</li>
+<li class="">dry-run or execute BigQuery contract smoke runs through <code>contractforge-gcp smoke</code>.</li>
+</ul>
+<p>The adapter is stable-final for this documented surface. Direct raw Iceberg path execution without registration,
+streaming, JDBC/Dataflow, inline authenticated REST/HTTP credentials,
+historical/snapshot advanced write modes, non-Workflows deployment
+runners, automatic type widening/mutation, automatic native Dataplex
+lineage/aspect emission during every contract run, live governance-ledger reconciliation and tag-based masking
+remain explicit exclusions from the scoped stable claim. The generated
+Workflows source plan includes bounded BigQuery job polling and one generated
+runner has passed live deploy/execute/readback. A second command-path smoke
+validated <code>--deploy-orchestration --run-orchestration --wait-orchestration --readback-orchestration</code> with a <code>bq</code> evidence readback. A third smoke validated
+runner-side run and quality evidence persistence for generated Workflows. A
+fourth smoke validated quality failed-row semantics through generated
+Workflows: zero failed rows persist PASSED evidence, non-zero failed rows persist
+FAILED evidence and then fail the Workflows execution. A fifth smoke validated
+execution-scoped evidence ids based on the native Workflows execution id. A
+sixth smoke validated schema evidence persistence from the generated schema
+policy plan with execution-scoped evidence ids. A seventh smoke validated the
+workflow-resource cleanup command path and missing-workflow idempotency. An
+eighth smoke validated failed write/load run evidence before a generated
+Workflows execution raises. A ninth smoke validated scoped target/evidence
+cleanup through <code>--cleanup-orchestration-data</code>. The command surface also exposes
+<code>--reset-orchestration-data</code> to run the same generated target/evidence cleanup
+before deployment/execution when an operator wants a deterministic rerun.
+The certified runner smoke ran the same ordered project twice through
+<code>--reset-orchestration-data --deploy-orchestration --run-orchestration --wait-orchestration --readback-orchestration</code>, with execution-scoped run,
+quality and schema evidence readback for both executions.
+<code>deploy-project</code> now exposes
+explicit Workflows orchestration flags, generated YAML includes Workflows retry
+blocks for BigQuery job submission and polling, and <code>--readback-orchestration</code>
+can run the generated target/evidence queries through <code>bq</code>; when a workflow
+execution id is available, run/quality/schema evidence readback is scoped to
+that execution id. The Google Workflows deployment runner is certified for the
+stable BigQuery batch surface; Cloud Run Jobs, Composer DAGs and scheduled
+queries remain excluded until separately validated through the
+adapter-owned command path.</p>
+<p>Deployment manifests expose <code>execution_ready: true</code> only for supported planning
+results. Review-required or blocked contracts still include deterministic
+review artifacts and boundaries, but their <code>apply_order</code> is empty so generated
+manifests do not imply executable BigQuery steps.</p>
+<p>BigQuery <code>upsert</code> rendering is executable only when the contract declares
+source columns through <code>select_columns</code> or <code>source.read.columns</code>. BigQuery MERGE
+requires explicit update assignments, so the adapter emits a review-required SQL
+comment instead of an invalid placeholder when columns are unknown.</p>
+<p>Schema-policy planning artifacts are emitted for every rendered contract.
+<code>strict</code> plans require a source/target preflight match. <code>additive_only</code> and
+<code>permissive</code> plans document BigQuery nullable field-addition options and
+<code>ALTER TABLE ADD COLUMN</code> review hints. The smoke runner also has an explicit
+<code>--enforce-schema-policy</code> mode for BigQuery table/view/SQL sources and
+declared-schema GCS load sources: it reads source and target schemas through
+<code>INFORMATION_SCHEMA.COLUMNS</code>, applies additive nullable columns for
+<code>additive_only</code> and <code>permissive</code>, blocks strict drift and writes
+<code>contractforge_schema_evidence</code>. The additive nullable path passed live
+validation in <a href="/contractforge/assets/files/gcp-bigquery-schema-policy-smoke-6f2e244252a715c4583e2d634c301e35.json/" target="_blank" class="">GCP BigQuery schema-policy smoke</a>.
+The strict negative path passed live validation in
+<a href="/contractforge/assets/files/gcp-bigquery-schema-policy-strict-smoke-1b0494423bce5b268b2d479b9f4124d5.json/" target="_blank" class="">GCP BigQuery schema-policy strict smoke</a>.
+The permissive nullable path passed live validation in
+<a href="/contractforge/assets/files/gcp-bigquery-schema-policy-permissive-smoke-c241c63f989a4524f32280d8415d709d.json/" target="_blank" class="">GCP BigQuery schema-policy permissive smoke</a>.
+The destructive type-change path passed live validation in
+<a href="/contractforge/assets/files/gcp-bigquery-schema-policy-type-change-smoke-858ca2062d9967f9e605affa2dcea486.json/" target="_blank" class="">GCP BigQuery schema-policy type-change smoke</a>.
+The SQL-source path passed live validation in
+<a href="/contractforge/assets/files/gcp-bigquery-schema-policy-sql-source-smoke-1e7b8bd57d80e762a4e81c271b618a0b.json/" target="_blank" class="">GCP BigQuery schema-policy SQL source smoke</a>.
+The GCS/load-source path passed live validation in
+<a href="/contractforge/assets/files/gcp-bigquery-schema-policy-gcs-source-smoke-df11c859479082925bf5c506de6064e4.json/" target="_blank" class="">GCP BigQuery schema-policy GCS source smoke</a>.
+Automatic BigQuery type widening or mutation is an explicit review-required
+non-claim outside the stable schema-policy path, recorded in
+<a href="/contractforge/assets/files/gcp-schema-policy-type-mutation-decision-4b6c5dd9f6ee1dd56ec77d0cfd518d8f.json/" target="_blank" class="">GCP schema-policy type mutation decision</a>.</p>
+<p>Detailed parity tracking is in <a class="" href="/contractforge/docs/specs/gcp-capability-parity/">GCP capability parity</a>.
+The stable-surface evidence manifest is <a href="/contractforge/assets/files/gcp-stable-surface-evidence-cb78a1eb5da108cf220dff222029f736.json/" target="_blank" class="">GCP stable-surface evidence</a>.
+Future promotion gates are exposed by <code>contractforge-gcp stabilization-report</code>
+and mirrored in the stable-surface evidence manifest.</p>
+<p>The first real smoke evidence is <a href="/contractforge/assets/files/gcp-bigquery-csv-smoke-3cc10764be6e4755b29e54e5e74373fd.json/" target="_blank" class="">GCP BigQuery CSV smoke</a>:
+one GCS CSV contract loaded three rows into BigQuery, ran evidence DDL, and
+validated a not-null quality rule with <code>failed_rows = 0</code>. The current smoke also
+persists run and quality evidence rows into the GCP evidence tables.</p>
+<p>The file-format smoke is <a href="/contractforge/assets/files/gcp-bigquery-file-formats-smoke-e09f0346bbf615480666abaa38b80640.json/" target="_blank" class="">GCP BigQuery file formats smoke</a>:
+CSV, NDJSON, Parquet, Avro and ORC fixtures loaded from GCS into BigQuery, each
+with three rows, zero not-null failures and persisted run/quality evidence rows.</p>
+<p>The upsert smoke is <a href="/contractforge/assets/files/gcp-bigquery-upsert-smoke-f3607556ba976b4216324dfcf654e18a.json/" target="_blank" class="">GCP BigQuery upsert smoke</a>:
+an explicit-column <code>MERGE</code> updated one row, inserted one row, preserved three
+target rows, produced zero not-null failures and persisted run/quality evidence.</p>
+<p>The bronze-to-gold smoke is <a href="/contractforge/assets/files/gcp-bigquery-bronze-to-gold-smoke-1b065374a0cb70dbd22309367acbc937.json/" target="_blank" class="">GCP BigQuery bronze-to-gold smoke</a>:
+bronze loads the GCS CSV fixture, silver reads bronze through a SQL contract,
+and gold aggregates silver by status. The run validated row counts, quality
+checks and run evidence rows for every layer.</p>
+<p>The governance smoke is <a href="/contractforge/assets/files/gcp-bigquery-row-access-policy-smoke-6fb5f81a03d35e584b93489b54268374.json/" target="_blank" class="">GCP BigQuery row access policy smoke</a>:
+the adapter test applied a BigQuery row access policy to the silver table,
+read it back through <code>bq ls --row_access_policies</code>, and queried as an
+impersonated reader service account. The restricted principal saw only the two
+<code>paid</code> rows allowed by the policy.</p>
+<p>The failed-run evidence smoke is <a href="/contractforge/assets/files/gcp-bigquery-error-evidence-smoke-a2ecbbee7349087fc53a1269a11ff6c9.json/" target="_blank" class="">GCP BigQuery error evidence smoke</a>:
+a normal SQL-source contract intentionally referenced a missing BigQuery table.
+The write failed as expected, and the adapter persisted a <code>FAILED</code> run evidence
+row with the native error message after escaping multi-line BigQuery text for
+SQL insertion.</p>
+<p>The canonical <code>cost-report</code> command renders a BigQuery SQL report over
+<code>contractforge_run_evidence</code>, grouped by adapter, contract, statement, status or
+target table. The adapter does not hard-code rates; estimated values are present
+only when the operator supplies bytes-processed and/or slot-hour rates.</p>
+<p>The direct column data masking smoke is <a href="/contractforge/assets/files/gcp-bigquery-data-masking-smoke-e807a28f09afc123c91b323ac359d5af.json/" target="_blank" class="">GCP BigQuery data masking smoke</a>:
+the adapter maturity run created a BigQuery V2 data masking policy, attached it
+directly to a column, granted fine-grained read to a restricted service account,
+and queried through impersonation. The protected <code>amount</code> column returned
+<code>NULL</code> under the <code>ALWAYS_NULL</code> masking rule. The earlier non-organization
+project blocker remains documented in <a href="/contractforge/assets/files/gcp-bigquery-data-masking-blocker-e9edf6cba96e070dad4016d580ed5362.json/" target="_blank" class="">GCP BigQuery data masking blocker</a>.</p>
+<p>The policy-tag smoke is <a href="/contractforge/assets/files/gcp-bigquery-policy-tags-smoke-1622d6eff54fbb7bf60bc9870be7e7dd.json/" target="_blank" class="">GCP BigQuery policy tags smoke</a>:
+the adapter maturity run created a regional Data Catalog taxonomy and policy
+tag, attached the policy tag to a BigQuery column, read it back through
+<code>INFORMATION_SCHEMA.COLUMN_FIELD_PATHS</code>, verified denied protected-column access
+before fine-grained access was granted, then verified access after granting
+<code>roles/datacatalog.categoryFineGrainedReader</code>. This validates policy tags as a
+column-level access surface, not as a substitute for direct masking policies.</p>
+<p>The BigLake Iceberg smoke is <a href="/contractforge/assets/files/gcp-biglake-iceberg-smoke-341b801c43e32c6a64613cf10d7b2613.json/" target="_blank" class="">GCP BigLake Iceberg smoke</a>:
+the adapter maturity run created a BigLake managed Iceberg table backed by a
+dedicated Cloud Storage prefix and BigQuery Cloud Resource connection, appended
+rows, ran a <code>MERGE</code>, queried the final rows, read back <code>biglakeConfiguration</code>,
+and observed Iceberg <code>metadata/</code> plus Parquet <code>data/</code> objects. The supported
+adapter surface is registered BigQuery/BigLake Iceberg table references.
+For raw <code>source.type: iceberg_table</code> contracts with a <code>gs://</code> <code>path</code>, rendered
+bundles include a deterministic BigLake registration plan with the required
+Cloud Resource connection, connection service-account storage role, <code>bq mk</code>
+flags (<code>--managed_table_type=BIGLAKE</code>, <code>--table_format=ICEBERG</code>,
+<code>--file_format=PARQUET</code>, <code>--storage_uri</code>) and the post-registration
+<code>source.type: iceberg_table</code> table reference that should replace the raw path
+after readback passes. The raw registration command is validated in
+<a href="/contractforge/assets/files/gcp-raw-iceberg-registration-smoke-57f05fdf3c7db1cf1b7f4245c9f7bf6a.json/" target="_blank" class="">GCP raw Iceberg registration smoke</a>:
+<code>contractforge-gcp source-promotion --execute --readback</code> creates a BigLake
+Iceberg table from a declared <code>gs://</code> prefix with explicit schema, reads back
+<code>biglakeConfiguration</code> and verifies the registered table is queryable. Direct
+raw-path query execution without registration remains excluded.</p>
+<p>The authenticated REST Secret Manager smoke is
+<a href="/contractforge/assets/files/gcp-authenticated-rest-secret-manager-smoke-2af986d1d52698535d8313e734e7efb8.json/" target="_blank" class="">GCP authenticated REST Secret Manager smoke</a>:
+the adapter resolved a <code>{{ secret:scope/key }}</code> credential through Google
+Secret Manager at runtime, used the shared core REST reader and loaded the
+materialized records into BigQuery without writing the secret value to evidence.</p>
+<p>The streaming scope decision is <a href="/contractforge/assets/files/gcp-streaming-scope-decision-53b6f34878a4e2479660b399c623c7e3.json/" target="_blank" class="">GCP streaming scope decision</a>:
+Confluent/Dataflow <code>kafka_available_now</code> provider parity is validated with a
+contract-owned Dataflow Kafka-to-BigQuery run, BigQuery row ingestion, zero-DLQ
+reconciliation and a same-consumer-group no-input replay. Direct Pub/Sub
+BigQuery subscriptions are native, but they are not equivalent to ContractForge
+<code>kafka_available_now</code>; broader Pub/Sub, Event Hubs and production streaming
+operations remain review-scoped outside the first stable GCP surface. Rendered
+promotion plans for Kafka/Event Hubs sources include the Google-provided
+Dataflow Kafka-to-BigQuery template parameters, Secret Manager auth hooks,
+consumer group, checkpoint location, offset evidence requirements and explicit
+non-claims for continuous streaming.</p>
+<p>Delta and Delta Sharing contracts remain review-required on GCP. Their
+promotion plans now describe the Dataproc Serverless Spark materialization
+track: dependency set, landing prefix, credential boundary, post-materialization
+BigQuery table source and the version/snapshot, row-count and failure evidence
+needed before execution can be promoted.</p>
+<p>The write-mode scope decision is <a href="/contractforge/assets/files/gcp-write-mode-scope-decision-0255d2e75176508006b50a508b0f22e3.json/" target="_blank" class="">GCP write-mode scope decision</a>:
+the first stable GCP surface is limited to <code>append</code>, <code>overwrite</code> and
+explicit-column <code>upsert</code>. <code>hash_diff_upsert</code> production parity is accepted in
+<a href="/contractforge/assets/files/gcp-hashdiff-cross-adapter-production-parity-a7271f37b5fc366a289f7c0712677deb.json/" target="_blank" class="">GCP hash-diff cross-adapter production parity</a>
+using GCP, AWS, Snowflake and Fabric evidence, but it remains review-gated by
+default until the stable execution surface is explicitly widened. <code>historical</code>
+and <code>snapshot_reconcile_soft_delete</code> stay review-required until cross-adapter
+production contracts prove validity windows and tombstone semantics. Rendered
+bundles now include deterministic advanced
+write-mode review artifacts with candidate BigQuery SQL, blockers and promotion
+evidence requirements; deployment manifests still keep execution blocked.</p>
+<p>The deployment/orchestration scope decision is <a href="/contractforge/assets/files/gcp-deployment-orchestration-scope-decision-b11f896cfbabd613d6164a5a295e74ed.json/" target="_blank" class="">GCP deployment/orchestration scope decision</a>:
+single-contract smoke execution is available, and <code>deploy-project</code> now
+materializes per-contract bundles, a project deployment manifest and a generated
+Google Workflows source plan with bounded BigQuery job polling. It also exposes
+<code>--render-orchestration</code>, <code>--deploy-orchestration</code>, <code>--run-orchestration</code>,
+<code>--wait-orchestration</code>, <code>--readback-orchestration</code> and
+<code>--reset-orchestration-data</code>, <code>--cleanup-orchestration</code> and
+<code>--cleanup-orchestration-data</code> for the generated
+Workflows runner. The generated YAML
+uses <code>http.default_retry_predicate_non_idempotent</code> for BigQuery job submission
+and <code>http.default_retry_predicate</code> for job polling, and emits a
+<code>gcp_workflows_evidence_readback.json</code> artifact with target-count,
+run-evidence, quality-evidence, schema-evidence and evidence-table presence
+queries, execution-scoped readback templates plus a
+<code>gcp_workflows_cleanup_plan.json</code> artifact with scoped target and
+evidence cleanup statements. <code>--readback-orchestration</code> executes those queries with <code>bq</code> after the
+runner path, and <code>--readback-location</code> can override a stale environment
+location for the readback or cleanup queries. One generated runner
+passed live deploy/execute/readback in
+<a href="/contractforge/assets/files/gcp-workflows-runner-smoke-57d34a379e29f58e438c61614254f474.json/" target="_blank" class="">GCP Workflows runner smoke</a>, and
+the adapter-owned command path passed
+<a href="/contractforge/assets/files/gcp-workflows-command-readback-smoke-611ffa6400e62c284586aee4d9f716d4.json/" target="_blank" class="">GCP Workflows command readback smoke</a>,
+and runner-side run/quality evidence persistence passed
+<a href="/contractforge/assets/files/gcp-workflows-runner-evidence-smoke-2232db19fafff32056e2e40f713f2904.json/" target="_blank" class="">GCP Workflows runner evidence smoke</a>.
+Quality failed-row semantics passed
+<a href="/contractforge/assets/files/gcp-workflows-quality-semantics-smoke-477ac02aff06fba6928d8e5c2f8c727a.json/" target="_blank" class="">GCP Workflows quality semantics smoke</a>.
+Execution-scoped evidence ids passed
+<a href="/contractforge/assets/files/gcp-workflows-execution-runid-smoke-782889be9a50a73897e3cde5592b1c99.json/" target="_blank" class="">GCP Workflows execution run-id smoke</a>.
+Schema evidence persistence passed
+<a href="/contractforge/assets/files/gcp-workflows-schema-evidence-smoke-06c8f0742d34affe193ad8e8113cbbb2.json/" target="_blank" class="">GCP Workflows schema evidence smoke</a>.
+Workflow cleanup command validation passed
+<a href="/contractforge/assets/files/gcp-workflows-cleanup-command-smoke-fe0d154931a43b06ccff396d555dc0e0.json/" target="_blank" class="">GCP Workflows cleanup command smoke</a>. A
+controlled write-failure path passed
+<a href="/contractforge/assets/files/gcp-workflows-write-failure-evidence-smoke-f4c0de1f301050460cb70c05c8667abb.json/" target="_blank" class="">GCP Workflows write-failure evidence smoke</a>. A
+scoped target/evidence cleanup path passed
+<a href="/contractforge/assets/files/gcp-workflows-target-evidence-cleanup-smoke-6fd338cc4ac08db54e56cf03ff2a9e17.json/" target="_blank" class="">GCP Workflows target/evidence cleanup smoke</a>. The
+certified Workflows runner passed
+<a href="/contractforge/assets/files/gcp-workflows-certified-runner-smoke-b70c71a1b5eada3b82e7c3d7d4d843f2.json/" target="_blank" class="">GCP Workflows certified runner smoke</a>.
+Cloud Run Jobs, Composer DAGs and BigQuery scheduled-query runners remain
+outside this stable claim until separately certified.</p>
+<p>The canonical <code>run-project</code> command executes the project <code>execution_order</code>
+sequentially through the same contract-only smoke runtime used by
+<code>smoke</code>. This is validation workflow support, not a native
+Composer, Cloud Run Jobs or scheduled-query deployment runner.</p>
+<p>The Dataplex lineage and data-quality scope decision is <a href="/contractforge/assets/files/gcp-dataplex-lineage-dq-scope-decision-9895010ca560804d00c2968c7a75d06e.json/" target="_blank" class="">GCP Dataplex lineage and DQ scope decision</a>:
+SQL quality checks and BigQuery control-table evidence, including neutral
+OpenLineage event payloads, are in scope. Rendered bundles now include
+deterministic Dataplex DataScan create-request JSON plus command/readback
+metadata, native Dataplex Data Lineage publication/readback plans and Dataplex
+aspect taxonomy/apply/readback plans for review. The <code>dataplex-lineage-aspects</code>
+command is non-mutating by default and only publishes lineage or applies aspects
+when <code>--execute</code> is set; <code>--readback</code> requests native API readback. The adapter-owned Dataplex
+quality command passed a live native DataScan run over a 10,000-row BigQuery
+target and read back seven exported rule-result rows. The adapter-owned
+<code>dataplex-lineage-aspects --execute --readback</code> command passed native lineage
+event readback and Knowledge Catalog/Dataplex aspect <code>modifyEntry</code> readback in
+<a href="/contractforge/assets/files/gcp-dataplex-lineage-aspects-smoke-d8bb766d62e889510f78c03b6cc09375.json/" target="_blank" class="">GCP Dataplex lineage/aspects smoke</a>.
+Automatic native lineage/aspect emission during every contract run remains
+outside the scoped stable claim.</p>
+<p>The governance stable-scope decision is <a href="/contractforge/assets/files/gcp-governance-stable-scope-decision-a04aff88bc23b9582467f1c746b2383c.json/" target="_blank" class="">GCP governance stable-scope decision</a>:
+validated row access policies, direct column data policies, policy-tag column
+access, table/column descriptions, deterministic governance ledger planning,
+non-mutating governance reconciliation readback, governance evidence
+write/readback for declared governance intent and core evidence writes are in
+scope.
+Tag-based masking, policy-tag-backed masking, automatic governance repair/delete
+and overwrite-retention behavior remain excluded from the first stable GCP
+surface.</p>
+<p>The annotation smoke is <a href="/contractforge/assets/files/gcp-bigquery-annotations-smoke-0b98746586247117c957846fdc0df00d.json/" target="_blank" class="">GCP BigQuery annotations smoke</a>:
+the adapter maturity run applied a table description and a column description
+with native BigQuery <code>OPTIONS(description)</code>, then read them back through
+<code>INFORMATION_SCHEMA.TABLE_OPTIONS</code> and <code>INFORMATION_SCHEMA.COLUMN_FIELD_PATHS</code>.
+It also persisted two annotation audit rows to <code>contractforge_annotation_evidence</code>.
+Aliases, tags, PII metadata and operations metadata render Dataplex aspect
+plans, and explicit command-path AspectType creation, <code>modifyEntry</code> execution
+and aspect readback are validated in the Dataplex lineage/aspects smoke.</p></div><footer class="theme-doc-footer docusaurus-mt-lg"><div class="row margin-top--sm theme-doc-footer-edit-meta-row"><div class="col noPrint_WFHX"><a href="https://github.com/marquesantero/contractforge/edit/main/site/docs/adapters/gcp.mdx" target="_blank" rel="noopener noreferrer" class="theme-edit-this-page"><svg fill="currentColor" height="20" width="20" viewBox="0 0 40 40" class="iconEdit_Z9Sw" aria-hidden="true"><g><path d="m34.5 11.7l-3 3.1-6.3-6.3 3.1-3q0.5-0.5 1.2-0.5t1.1 0.5l3.9 3.9q0.5 0.4 0.5 1.1t-0.5 1.2z m-29.5 17.1l18.4-18.5 6.3 6.3-18.4 18.4h-6.3v-6.2z"></path></g></svg>Edit this page</a></div><div class="col lastUpdated_JAkA"></div></div></footer></article><nav class="docusaurus-mt-lg pagination-nav" aria-label="Docs pages"><a class="pagination-nav__link pagination-nav__link--prev" href="/contractforge/docs/adapters/fabric/"><div class="pagination-nav__sublabel">Previous</div><div class="pagination-nav__label">Fabric Adapter</div></a><a class="pagination-nav__link pagination-nav__link--next" href="/contractforge/docs/adapters/test-contracts-across-adapters/"><div class="pagination-nav__sublabel">Next</div><div class="pagination-nav__label">Test Contracts Across Adapters</div></a></nav></div></div></div></div></main></div></div></div><footer class="theme-layout-footer footer footer--dark"><div class="container container-fluid"><div class="row footer__links"><div class="theme-layout-footer-column col footer__col"><div class="footer__title">Documentation</div><ul class="footer__items clean-list"><li class="footer__item"><a class="footer__link-item" href="/contractforge/docs/start/quickstart/">Quick start</a></li><li class="footer__item"><a class="footer__link-item" href="/contractforge/docs/contracts/overview/">Contracts</a></li><li class="footer__item"><a class="footer__link-item" href="/contractforge/docs/connectors/overview/">Connectors</a></li><li class="footer__item"><a class="footer__link-item" href="/contractforge/docs/operations/overview/">Operations</a></li></ul></div><div class="theme-layout-footer-column col footer__col"><div class="footer__title">Project</div><ul class="footer__items clean-list"><li class="footer__item"><a href="https://github.com/marquesantero/contractforge" target="_blank" rel="noopener noreferrer" class="footer__link-item">GitHub<svg width="13.5" height="13.5" aria-label="(opens in new tab)" class="iconExternalLink_nPIU"><use href="#theme-svg-external-link"></use></svg></a></li><li class="footer__item"><a href="https://github.com/marquesantero/contractforge/issues" target="_blank" rel="noopener noreferrer" class="footer__link-item">Issues<svg width="13.5" height="13.5" aria-label="(opens in new tab)" class="iconExternalLink_nPIU"><use href="#theme-svg-external-link"></use></svg></a></li><li class="footer__item"><a href="https://github.com/marquesantero/contractforge/releases" target="_blank" rel="noopener noreferrer" class="footer__link-item">Releases<svg width="13.5" height="13.5" aria-label="(opens in new tab)" class="iconExternalLink_nPIU"><use href="#theme-svg-external-link"></use></svg></a></li></ul></div></div><div class="footer__bottom text--center"><div class="footer__copyright">Copyright © 2026 ContractForge contributors. Documentation powered by Docusaurus.</div></div></div></footer></div>
+</body>
+</html>

@@ -1,0 +1,643 @@
+<!doctype html>
+<html lang="pt-BR" dir="ltr" class="docs-wrapper plugin-docs plugin-id-default docs-version-current docs-doc-page docs-doc-id-specs/databricks-adapter" data-has-hydrated="false">
+<head>
+<meta charset="UTF-8">
+<meta name="generator" content="Docusaurus v3.10.1">
+<title data-rh="true">Especificação do adaptador Databricks | ContractForge</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:image" content="https://marquesantero.github.io/contractforge/pt-BR/img/contractforge-logo.png"><meta data-rh="true" name="twitter:image" content="https://marquesantero.github.io/contractforge/pt-BR/img/contractforge-logo.png"><meta data-rh="true" property="og:url" content="https://marquesantero.github.io/contractforge/pt-BR/docs/specs/databricks-adapter/"><meta data-rh="true" property="og:locale" content="pt_BR"><meta data-rh="true" property="og:locale:alternate" content="en_US"><meta data-rh="true" name="docusaurus_locale" content="pt-BR"><meta data-rh="true" name="docsearch:language" content="pt-BR"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="Especificação do adaptador Databricks | ContractForge"><meta data-rh="true" name="description" content="Propósito"><meta data-rh="true" property="og:description" content="Propósito"><link data-rh="true" rel="icon" href="/contractforge/pt-BR/img/contractforge-mark.png"><link data-rh="true" rel="canonical" href="https://marquesantero.github.io/contractforge/pt-BR/docs/specs/databricks-adapter/"><link data-rh="true" rel="alternate" href="https://marquesantero.github.io/contractforge/docs/specs/databricks-adapter/" hreflang="en-US"><link data-rh="true" rel="alternate" href="https://marquesantero.github.io/contractforge/pt-BR/docs/specs/databricks-adapter/" hreflang="pt-BR"><link data-rh="true" rel="alternate" href="https://marquesantero.github.io/contractforge/docs/specs/databricks-adapter/" hreflang="x-default"><link rel="stylesheet" href="/contractforge/pt-BR/assets/css/styles.e35730a0.css">
+<script src="/contractforge/pt-BR/assets/js/runtime~main.7ac75648.js" defer="defer"></script>
+<script src="/contractforge/pt-BR/assets/js/main.99e9fe41.js" defer="defer"></script>
+</head>
+<body>
+<svg style="display: none;"><defs>
+<symbol id="theme-svg-external-link" viewBox="0 0 24 24"><path fill="currentColor" d="M21 13v10h-21v-19h12v2h-10v15h17v-8h2zm3-12h-10.988l4.035 4-6.977 7.07 2.828 2.828 6.977-7.07 4.125 4.172v-11z"/></symbol>
+</defs></svg>
+<script>!function(){var t=function(){try{return new URLSearchParams(window.location.search).get("docusaurus-theme")}catch(t){}}()||function(){try{return window.localStorage.getItem("theme")}catch(t){}}();document.documentElement.setAttribute("data-theme",t||"light"),document.documentElement.setAttribute("data-theme-choice",t||"light")}(),function(){try{const c=new URLSearchParams(window.location.search).entries();for(var[t,e]of c)if(t.startsWith("docusaurus-data-")){var a=t.replace("docusaurus-data-","data-");document.documentElement.setAttribute(a,e)}}catch(t){}}()</script><div id="__docusaurus"><div role="region" aria-label="Pular para o conteúdo principal"><a class="skipToContent_fXgn" href="#__docusaurus_skipToContent_fallback">Pular para o conteúdo principal</a></div><nav aria-label="Navegação principal" class="theme-layout-navbar navbar navbar--fixed-top"><div class="navbar__inner"><div class="theme-layout-navbar-left navbar__items"><button aria-label="Alternar painel de navegação" aria-expanded="false" class="navbar__toggle clean-btn" type="button"><svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><path stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="2" d="M4 7h22M4 15h22M4 23h22"></path></svg></button><a class="navbar__brand" href="/contractforge/pt-BR/"><div class="navbar__logo"><img src="/contractforge/pt-BR/img/contractforge-mark.png" alt="ContractForge" class="themedComponent_mlkZ themedComponent--light_NVdE"><img src="/contractforge/pt-BR/img/contractforge-mark.png" alt="ContractForge" class="themedComponent_mlkZ themedComponent--dark_xIcU"></div><b class="navbar__title text--truncate">ContractForge</b></a><a class="navbar__item navbar__link" href="/contractforge/pt-BR/docs/intro/">Documentação</a><a class="navbar__item navbar__link" href="/contractforge/pt-BR/docs/adapters/overview/">Adaptadores</a><a class="navbar__item navbar__link" href="/contractforge/pt-BR/docs/connectors/overview/">Conectores</a></div><div class="theme-layout-navbar-right navbar__items navbar__items--right"><div class="navbar__item dropdown dropdown--hoverable dropdown--right"><a href="#" aria-haspopup="true" aria-expanded="false" role="button" class="navbar__link"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" class="iconLanguage_nlXk"><path fill="currentColor" d="M12.87 15.07l-2.54-2.51.03-.03c1.74-1.94 2.98-4.17 3.71-6.53H17V4h-7V2H8v2H1v1.99h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2l-4.5-12zm-2.62 7l1.62-4.33L19.12 17h-3.24z"></path></svg>Português</a><ul class="dropdown__menu"><li><a href="/contractforge/docs/specs/databricks-adapter/" target="_self" rel="noopener noreferrer" class="dropdown__link" lang="en-US">English</a></li><li><a href="/contractforge/pt-BR/docs/specs/databricks-adapter/" target="_self" rel="noopener noreferrer" class="dropdown__link dropdown__link--active" lang="pt-BR">Português</a></li></ul></div><div class="navbarSearchContainer_Bca1"><div class="navbar__search searchBarContainer_NW3z" dir="ltr"><input placeholder="Pesquisar" aria-label="Search" class="navbar__search-input searchInput_YFbd" value=""><div class="loadingRing_RJI3 searchBarLoadingRing_YnHq"><div></div><div></div><div></div><div></div></div></div></div><a href="https://github.com/marquesantero/contractforge" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">GitHub<svg width="13.5" height="13.5" aria-label="(abre em nova aba)" class="iconExternalLink_nPIU"><use href="#theme-svg-external-link"></use></svg></a><div class="toggle_vylO colorModeToggle_DEke"><button class="clean-btn toggleButton_gllP toggleButtonDisabled_aARS" type="button" disabled="" title="modo do sistema" aria-label="Mudar entre modo claro e escuro (modo do sistema está ativo)"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" class="toggleIcon_g3eP lightToggleIcon_pyhR"><path fill="currentColor" d="M12,9c1.65,0,3,1.35,3,3s-1.35,3-3,3s-3-1.35-3-3S10.35,9,12,9 M12,7c-2.76,0-5,2.24-5,5s2.24,5,5,5s5-2.24,5-5 S14.76,7,12,7L12,7z M2,13l2,0c0.55,0,1-0.45,1-1s-0.45-1-1-1l-2,0c-0.55,0-1,0.45-1,1S1.45,13,2,13z M20,13l2,0c0.55,0,1-0.45,1-1 s-0.45-1-1-1l-2,0c-0.55,0-1,0.45-1,1S19.45,13,20,13z M11,2v2c0,0.55,0.45,1,1,1s1-0.45,1-1V2c0-0.55-0.45-1-1-1S11,1.45,11,2z M11,20v2c0,0.55,0.45,1,1,1s1-0.45,1-1v-2c0-0.55-0.45-1-1-1C11.45,19,11,19.45,11,20z M5.99,4.58c-0.39-0.39-1.03-0.39-1.41,0 c-0.39,0.39-0.39,1.03,0,1.41l1.06,1.06c0.39,0.39,1.03,0.39,1.41,0s0.39-1.03,0-1.41L5.99,4.58z M18.36,16.95 c-0.39-0.39-1.03-0.39-1.41,0c-0.39,0.39-0.39,1.03,0,1.41l1.06,1.06c0.39,0.39,1.03,0.39,1.41,0c0.39-0.39,0.39-1.03,0-1.41 L18.36,16.95z M19.42,5.99c0.39-0.39,0.39-1.03,0-1.41c-0.39-0.39-1.03-0.39-1.41,0l-1.06,1.06c-0.39,0.39-0.39,1.03,0,1.41 s1.03,0.39,1.41,0L19.42,5.99z M7.05,18.36c0.39-0.39,0.39-1.03,0-1.41c-0.39-0.39-1.03-0.39-1.41,0l-1.06,1.06 c-0.39,0.39-0.39,1.03,0,1.41s1.03,0.39,1.41,0L7.05,18.36z"></path></svg><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" class="toggleIcon_g3eP darkToggleIcon_wfgR"><path fill="currentColor" d="M9.37,5.51C9.19,6.15,9.1,6.82,9.1,7.5c0,4.08,3.32,7.4,7.4,7.4c0.68,0,1.35-0.09,1.99-0.27C17.45,17.19,14.93,19,12,19 c-3.86,0-7-3.14-7-7C5,9.07,6.81,6.55,9.37,5.51z M12,3c-4.97,0-9,4.03-9,9s4.03,9,9,9s9-4.03,9-9c0-0.46-0.04-0.92-0.1-1.36 c-0.98,1.37-2.58,2.26-4.4,2.26c-2.98,0-5.4-2.42-5.4-5.4c0-1.81,0.89-3.42,2.26-4.4C12.92,3.04,12.46,3,12,3L12,3z"></path></svg><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" class="toggleIcon_g3eP systemToggleIcon_QzmC"><path fill="currentColor" d="m12 21c4.971 0 9-4.029 9-9s-4.029-9-9-9-9 4.029-9 9 4.029 9 9 9zm4.95-13.95c1.313 1.313 2.05 3.093 2.05 4.95s-0.738 3.637-2.05 4.95c-1.313 1.313-3.093 2.05-4.95 2.05v-14c1.857 0 3.637 0.737 4.95 2.05z"></path></svg></button></div></div></div><div role="presentation" class="navbar-sidebar__backdrop"></div></nav><div id="__docusaurus_skipToContent_fallback" class="theme-layout-main main-wrapper mainWrapper_z2l0"><div class="docsWrapper_hBAB"><button aria-label="Voltar para o topo" class="clean-btn theme-back-to-top-button backToTopButton_sjWU" type="button"></button><div class="docRoot_UBD9"><main class="docMainContainer_TBSr docMainContainerEnhanced_lQrH"><div class="container padding-top--md padding-bottom--lg"><div class="row"><div class="col docItemCol_VOVn"><div class="docItemContainer_Djhp"><article><div class="tocCollapsible_ETCw theme-doc-toc-mobile tocMobile_ITEo"><button type="button" class="clean-btn tocCollapsibleButton_TO0P">Nesta página</button></div><div class="theme-doc-markdown markdown"><header><h1>Especificação do adaptador Databricks</h1></header>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="propósito">Propósito<a href="#propósito" class="hash-link" aria-label="Link direto para Propósito" title="Link direto para Propósito" translate="no">​</a></h2>
+<p><code>contractforge_databricks</code> é a camada de implementação Databricks para ContractForge Core.</p>
+<p>Ele pode compreender conceitos nativos do Databricks, mas deve consumir contratos ContractForge por meio de modelos principais públicos:</p>
+<ul>
+<li class=""><code>SemanticContract</code></li>
+<li class=""><code>PlatformCapabilities</code></li>
+<li class=""><code>PlanningResult</code></li>
+<li class=""><code>ExecutionPlan</code></li>
+<li class=""><code>RenderedArtifacts</code></li>
+</ul>
+<p>A paridade do recurso Databricks em relação à linha de base do adaptador Databricks é rastreada em <a class="" href="/contractforge/pt-BR/docs/specs/databricks-contractforge-parity/">databricks-contractforge-parity.md</a>.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="domain-layout">Domain Layout<a href="#domain-layout" class="hash-link" aria-label="Link direto para Domain Layout" title="Link direto para Domain Layout" translate="no">​</a></h2>
+<p>O adaptador é intencionalmente dividido por domínio:</p>
+<ul>
+<li class=""><code>adapter.py</code>: pequena fachada de adaptador.</li>
+<li class=""><code>cli.py</code>: Adaptador Databricks CLI para registro, modelo, painel e utilitários de renderização.</li>
+<li class=""><code>capabilities/</code>: Evidência de capacidade nativa do Databricks e mapeamento para capacidades principais.</li>
+<li class=""><code>runtime/</code>: detecção de tempo de execução opcional. Este é o único local onde PySpark pode ser importado.</li>
+<li class=""><code>runtime/orchestrator.py</code>: harness de ingestão de visualização preparada equivalente ao limite de tempo de execução do estilo <code>ingest_plan</code>.</li>
+<li class=""><code>rendering/</code>: agrupamento de artefatos e renderização de relatório de revisão.</li>
+<li class=""><code>write_modes/</code>: notas de renderização do modo de gravação Databricks e futuras implementações de gravação.</li>
+<li class=""><code>annotations/</code>: comentários Unity Catalog, tags, aliases, tags PII e metadados de ciclo de vida.</li>
+<li class=""><code>governance/</code>: renderização de governança Unity Catalog e lógica de aplicação futura.</li>
+<li class=""><code>evidence/</code>: implementação Databricks do modelo de evidência principal.</li>
+<li class=""><code>lakeflow/</code>: Lakeflow AUTO Compatibilidade CDC e planejamento de artefatos.</li>
+<li class=""><code>parity/</code>: catálogo determinístico de paridade de mecanismo de gravação portado de ContractForge.</li>
+<li class=""><code>sources/</code>: renderização de origem Databricks e roteamento de artefato de origem, incluindo carregador automático para <code>incremental_files</code> portátil.</li>
+<li class=""><code>presets/</code>: padrões predefinidos de propriedade do Databricks portados do ContractForge.</li>
+<li class=""><code>templates/</code>: Catálogo de modelos de contrato dividido Databricks portado de ContractForge.</li>
+<li class=""><code>maintenance/</code>: manutenção de tabela Databricks SQL e planejamento de retenção de tabela de controle.</li>
+<li class=""><code>bundles/</code>: Databricks Asset Bundle YAML rendering.</li>
+<li class=""><code>quality/</code>: Databricks Renderização SQL para verificações de qualidade portáteis.</li>
+<li class=""><code>schema/</code>: planejamento de política de esquema Databricks e mapeamento de opções de gravador.</li>
+<li class=""><code>state/</code>: Databricks Estado Delta, bloqueio e idempotência Auxiliares SQL.</li>
+<li class=""><code>lineage/</code>: construção de evento OpenLineage e evidência de linhagem SQL.</li>
+<li class=""><code>operations/</code>: propriedade, SLA, suporte e renderização de metadados de runbook para evidências Databricks.</li>
+<li class=""><code>security/</code>: auxiliares de redação para artefatos renderizados e cargas úteis de evidências.</li>
+<li class=""><code>diagnostics/</code>: Databricks explica o plano de diagnóstico e suporta DDL.</li>
+<li class=""><code>metrics/</code>: Normalização da métrica de operação Delta pelo modo de gravação ContractForge.</li>
+<li class=""><code>partitioning/</code>: predicado de partição e renderização <code>replaceWhere</code>.</li>
+<li class=""><code>cost/</code>: custo operacional lógico e throughput SQL sobre evidência Databricks.</li>
+<li class=""><code>dashboards/</code>: Databricks Artefatos do painel de controle da tabela de controle SQL/Lakeview.</li>
+<li class=""><code>watermark/</code>: Databricks Predicados SQL e cálculo candidato para marcas d&#x27;água tipadas principais.</li>
+<li class=""><code>transforms/</code>: Databricks SQL revisão de renderização para intenção de transformação principal.</li>
+<li class=""><code>shapes/</code>: Databricks SQL revisão de renderização para intenção de forma central.</li>
+</ul>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="limites">Limites<a href="#limites" class="hash-link" aria-label="Link direto para Limites" title="Link direto para Limites" translate="no">​</a></h2>
+<p>O adaptador Databricks pode importar bibliotecas de tempo de execução da plataforma. O núcleo pode não.</p>
+<p>As importações em tempo de execução devem ser lentas e isoladas. A importação de <code>contractforge_databricks</code> em um processo Python local não deve exigir PySpark ou Databricks Connect.</p>
+<p>Databricks se adapta ao ContractForge, e não o contrário. Conceitos como anotações, operações, política de desvio de acesso, modos SCD, evidências e intenção de origem governada permanecem semânticas ContractForge mesmo quando o adaptador Databricks possui atualmente a implementação mais rica.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="environment-binding">Environment Binding<a href="#environment-binding" class="hash-link" aria-label="Link direto para Environment Binding" title="Link direto para Environment Binding" translate="no">​</a></h2>
+<p>O adaptador Databricks pode consumir o contrato principal <code>environment</code>.</p>
+<p>Interpretações de propriedade do adaptador:</p>
+<ul>
+<li class=""><code>environment.runtime.kind</code> pode fornecer evidências de tempo de execução quando evidências explícitas de tempo de execução não são transmitidas pelo chamador.</li>
+<li class=""><code>environment.deployment.workspace_path</code> controla caminhos de notebook gerados em artefatos Databricks Asset Bundle.</li>
+<li class=""><code>environment.deployment.target</code> controla o nome de destino do pacote configurável gerado.</li>
+<li class=""><code>environment.evidence.catalog</code> e <code>environment.evidence.schema</code> controlam evidências, estado, diagnóstico, linhagem e locais de artefatos de custo do Delta.</li>
+<li class=""><code>environment.parameters.databricks</code> é reservado para padrões nativos e parâmetros de implantação do Databricks.</li>
+</ul>
+<p>O contrato de ambiente não altera origem, tabela de destino, modo de gravação, anotações, operações ou semântica de acesso.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="naming-binding">Naming Binding<a href="#naming-binding" class="hash-link" aria-label="Link direto para Naming Binding" title="Link direto para Naming Binding" translate="no">​</a></h2>
+<p>O adaptador Databricks usa a política de nomenclatura principal apenas para artefatos Databricks derivados:</p>
+<ul>
+<li class="">artifact prefix</li>
+<li class="">Databricks Asset Bundle name</li>
+<li class="">job name</li>
+<li class="">task key</li>
+</ul>
+<p>Ele não reescreve a tabela de destino física. O catálogo, esquema e tabela de destino vêm da intenção de destino principal.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="escopo-atual">Escopo Atual<a href="#escopo-atual" class="hash-link" aria-label="Link direto para Escopo Atual" title="Link direto para Escopo Atual" translate="no">​</a></h2>
+<p>O adaptador atual suporta planejamento seco e renderização de artefatos revisáveis:</p>
+<ul>
+<li class="">evidência de capacidade JSON</li>
+<li class="">revisão de planejamento Markdown</li>
+<li class="">modo de gravação notas SQL</li>
+<li class="">anotações notas SQL</li>
+<li class="">modelo de inserção SQL de auditoria de anotações</li>
+<li class="">notas de governança SQL</li>
+<li class="">modelo de inserção SQL de auditoria de acesso</li>
+<li class="">política de esquema JSON</li>
+<li class="">metadados de origem JSON</li>
+<li class="">notas de mapeamento da tabela de evidências</li>
+<li class="">tabela de estado e bloqueio DDL</li>
+<li class="">OpenLineage insert template</li>
+<li class="">mesa de diagnóstico DDL</li>
+<li class="">operational cost query</li>
+<li class="">modelo de inserção de evidências de metadados de operações JSON e SQL</li>
+<li class="">marca d&#x27;água tipada predicado SQL e cálculo de candidato</li>
+<li class="">transform SQL review artifact</li>
+<li class="">shape SQL review artifact</li>
+<li class="">Catálogo de predefinições e modelos de propriedade do Databricks para contratos divididos</li>
+<li class="">painel da tabela de controle SQL e artefatos de blueprint</li>
+<li class="">Aproveitamento de ingestão de tempo de execução Databricks sobre visualizações de origem preparadas</li>
+<li class="">Adaptador Databricks Ponto de entrada CLI para registro, painel e renderização de artefatos</li>
+<li class="">retenção de tabela de controle planejamento SQL</li>
+<li class="">relatório de custos SQL planejamento sobre evidência de execução da tabela de controle</li>
+<li class="">política de nomenclatura principal para nomes de pacotes, trabalhos, tarefas e artefatos</li>
+<li class="">Lakeflow compatibility report</li>
+<li class="">consultas de catálogo de paridade para harnesses de validação de gravação nativa</li>
+</ul>
+<p>A avaliação de capacidade é intencionalmente não destrutiva. Ele classifica a evidência de tempo de execução passiva e o formato de nomenclatura do alvo para:</p>
+<ul>
+<li class="">Tempo de execução Databricks e tempo de execução sem servidor</li>
+<li class="">Tabelas Delta e SQL MERGE</li>
+<li class="">Comentários, tags, concessões, filtros de linha e máscaras de coluna Unity Catalog</li>
+<li class="">Unity Catalog Políticas ABAC, locais externos e volumes</li>
+<li class="">Databricks Connections</li>
+<li class="">Auto Loader <code>cloudFiles</code></li>
+<li class="">Pipelines declarativos Lakeflow e AUTO CDC</li>
+<li class="">Liquid Clustering</li>
+<li class="">Databricks Armazenamento de evidências Delta e elegibilidade de exclusão reversível de snapshot para MERGE</li>
+</ul>
+<p>Os recursos com escopo de espaço de trabalho geralmente retornam <code>unknown</code> quando o tempo de execução e o destino são elegíveis, mas as permissões/configuração não foram investigadas. Esse status é uma evidência de revisão deliberada, não um fracasso.</p>
+<p>Também inclui um auxiliar de execução restrito para <code>upsert</code> por meio de Databricks SQL MERGE:</p>
+<ul>
+<li class=""><code>execution/sql_merge.py</code></li>
+<li class="">deterministic SQL rendering</li>
+<li class="">injected SQL runner protocol</li>
+<li class="">nenhuma dependência Spark ou Databricks SDK de nível superior</li>
+</ul>
+<p>Auxiliares adicionais de execução no modo de gravação seguem o mesmo padrão:</p>
+<ul>
+<li class=""><code>execution/delta_basic.py</code>: <code>append</code> e <code>overwrite</code></li>
+<li class=""><code>execution/hash_diff.py</code>: ContractForge-compatible <code>hash_diff_upsert</code> insert over a prepared hash staging view</li>
+<li class=""><code>execution/scd2.py</code>: ContractForge-compatible <code>historical</code> Delta MERGE over a prepared historical staging view</li>
+<li class=""><code>execution/snapshot.py</code>: ContractForge-compatible <code>snapshot_reconcile_soft_delete</code> Delta MERGE over a prepared snapshot staging view</li>
+</ul>
+<p>A gravação final SQL pressupõe que a preparação do PySpark já produziu as colunas e visualizações de teste necessárias.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="escrever-métricas">Escrever métricas<a href="#escrever-métricas" class="hash-link" aria-label="Link direto para Escrever métricas" title="Link direto para Escrever métricas" translate="no">​</a></h2>
+<p>O adaptador normaliza Databricks Delta <code>operationMetrics</code> em contadores de linha ContractForge:</p>
+<ul>
+<li class=""><code>rows_inserted</code></li>
+<li class=""><code>rows_updated</code></li>
+<li class=""><code>rows_deleted</code></li>
+<li class=""><code>rows_expired</code></li>
+<li class=""><code>rows_affected</code></li>
+</ul>
+<p>Quando o histórico Delta está disponível, o adaptador combina métricas Delta físicas com contagens de linhas lógicas. Para <code>historical</code>, as linhas atualizadas também são tratadas como linhas históricas expiradas para evidências normalizadas. Quando as métricas Delta estão faltando, o adaptador retorna às métricas lógicas derivadas do modo de gravação e das linhas gravadas.</p>
+<p>A normalização da métrica é de propriedade do adaptador porque os nomes das métricas da operação Delta e o comportamento da atualização física são específicos da plataforma.</p>
+<p>O código de tempo de execução pode usar <code>render_delta_history_query()</code> para coletar a linha <code>DESCRIBE HISTORY</code> mais recente e <code>latest_operation_metrics_from_history_row()</code> para extrair a carga estável consumida por <code>resolve_write_metrics()</code>.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="cost-signals">Cost Signals<a href="#cost-signals" class="hash-link" aria-label="Link direto para Cost Signals" title="Link direto para Cost Signals" translate="no">​</a></h2>
+<p>O adaptador renderiza o custo operacional lógico SQL em tabelas de evidências Databricks.</p>
+<p>O modelo de custo aceita:</p>
+<ul>
+<li class=""><code>dbu_per_hour</code></li>
+<li class=""><code>currency_per_dbu</code></li>
+<li class=""><code>currency</code></li>
+</ul>
+<p>Esta não é uma reconciliação de faturamento do provedor. Ele estima o custo de computação a partir da duração da execução registrada e de uma taxa DBU horária fornecida pelo usuário e, em seguida, deriva sinais de rendimento e custo por milhão de linhas. As junções de faturamento reais continuam sendo um trabalho futuro específico da plataforma/espaço de trabalho.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="módulos-de-execução-futura">Módulos de Execução Futura<a href="#módulos-de-execução-futura" class="hash-link" aria-label="Link direto para Módulos de Execução Futura" title="Link direto para Módulos de Execução Futura" translate="no">​</a></h2>
+<p>A execução deve ser adicionada atrás de módulos explícitos, por exemplo:</p>
+<ul>
+<li class=""><code>execution/delta_writes.py</code></li>
+<li class=""><code>execution/sql_merge.py</code></li>
+<li class=""><code>execution/scd2_merge.py</code></li>
+<li class=""><code>execution/snapshot_reconcile_soft_delete.py</code></li>
+<li class=""><code>execution/governance_apply.py</code></li>
+<li class=""><code>execution/evidence_writer.py</code></li>
+</ul>
+<p>Esses módulos não devem ser importados pelo pacote de nível superior, a menos que suas dependências de plataforma sejam opcionais e lentas.</p>
+<p>Os módulos de execução devem aceitar pequenas dependências injetadas, como um executor SQL, sessão Spark, cliente de sistema de arquivos ou cliente de espaço de trabalho. Isso mantém a semântica de negócios testável sem um espaço de trabalho Databricks ativo.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="padrão-de-preparação-vs-execução">Padrão de Preparação vs Execução<a href="#padrão-de-preparação-vs-execução" class="hash-link" aria-label="Link direto para Padrão de Preparação vs Execução" title="Link direto para Padrão de Preparação vs Execução" translate="no">​</a></h2>
+<p>O adaptador Databricks usa um padrão híbrido:</p>
+<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:#393A34"><span class="token plain">source/read/shape/quality/hash/dedup</span><br></div><div class="token-line" style="color:#393A34"><span class="token plain">        PySpark preparation</span><br></div><div class="token-line" style="color:#393A34"><span class="token plain">          |</span><br></div><div class="token-line" style="color:#393A34"><span class="token plain">prepared temp view or staged Delta table</span><br></div><div class="token-line" style="color:#393A34"><span class="token plain">          |</span><br></div><div class="token-line" style="color:#393A34"><span class="token plain">write-mode execution</span><br></div><div class="token-line" style="color:#393A34"><span class="token plain">        SQL MERGE / INSERT / ALTER</span><br></div><div class="token-line" style="color:#393A34"><span class="token plain">          |</span><br></div><div class="token-line" style="color:#393A34"><span class="token plain">evidence/governance</span><br></div><div class="token-line" style="color:#393A34"><span class="token plain">        SQL artifacts and small runtime helpers</span><br></div></code></pre></div></div>
+<p>Use SQL para operações de mesa final:</p>
+<ul>
+<li class=""><code>MERGE</code></li>
+<li class=""><code>INSERT INTO</code></li>
+<li class=""><code>INSERT OVERWRITE</code></li>
+<li class=""><code>ALTER TABLE</code></li>
+<li class="">comentários, tags, aliases, metadados PII e marcadores de descontinuação</li>
+<li class="">concessões, filtros de linha e máscaras</li>
+<li class="">tabela de evidências/controle DDL</li>
+<li class="">migração de tabela de evidência/controle aditiva SQL</li>
+<li class="">predicados de partição e revisão de substituição com escopo</li>
+</ul>
+<p>Use PySpark para preparação:</p>
+<ul>
+<li class="">leituras do conector</li>
+<li class="">Auto Loader</li>
+<li class="">operações de modelar e achatar</li>
+<li class="">execução de transformação complexa onde a revisão SQL não é suficiente</li>
+<li class="">preparação de hash de linha e diferença de hash</li>
+<li class="">deduplication</li>
+<li class="">verificações de qualidade e preparação para quarentena</li>
+<li class="">normalização de esquema</li>
+<li class="">emergency string encoding repair through <code>extensions.databricks.fix_encoding</code></li>
+</ul>
+<p>Isso mantém as operações finais do Databricks auditáveis, preservando os algoritmos ContractForge maduros, onde os recursos nativos do Databricks não são semanticamente equivalentes.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="harness-de-ingestão-de-tempo-de-execução">harness de ingestão de tempo de execução<a href="#harness-de-ingestão-de-tempo-de-execução" class="hash-link" aria-label="Link direto para harness de ingestão de tempo de execução" title="Link direto para harness de ingestão de tempo de execução" translate="no">​</a></h2>
+<p>O adaptador expõe <code>runtime.ingest_databricks_contract()</code> como o equivalente Databricks do limite de orquestração <code>ingest_plan</code> da linha de base do adaptador Databricks.</p>
+<p>O arnês aceita:</p>
+<ul>
+<li class="">um contrato semântico central ou mapeamento de contrato validado</li>
+<li class="">an injected SQL runner</li>
+<li class="">um <code>PreparedViewInput</code> descrevendo uma visualização temporária ou visualização temporária Databricks já preparada</li>
+<li class=""><code>DatabricksIngestOptions</code> para localização de evidências, bloqueios, idempotência, simulação e metadados de tempo de execução</li>
+<li class="">resultados de qualidade opcionais e um retorno de chamada de pesquisa de idempotência</li>
+</ul>
+<p>Comportamento implementado:</p>
+<ul>
+<li class="">planejar a validação em relação aos recursos do Databricks antes da execução</li>
+<li class="">comportamento idempotente de pular/falha sobre <code>ctrl_ingestion_runs</code></li>
+<li class="">optional lock acquire/release over <code>ctrl_ingestion_locks</code></li>
+<li class="">despacho para executores de modo de gravação Databricks para acréscimo, substituição, estado atual, comparação de hash, histórico e exclusão suave de instantâneo</li>
+<li class="">run ledger persistence through <code>ctrl_ingestion_runs</code></li>
+<li class="">failure persistence through <code>ctrl_ingestion_errors</code></li>
+<li class="">state persistence through <code>ctrl_ingestion_state</code></li>
+</ul>
+<p>O harness começa deliberadamente após a leitura da fonte e a preparação do PySpark. Leituras de conectores, normalização de forma, preparação de hash de linha, preparação histórica e materialização de quarentena continuam sendo preocupações de preparação de tempo de execução do Databricks. Isso mantém a plataforma central neutra enquanto preserva o ciclo de vida de execução da linha de base do adaptador Databricks no adaptador Databricks.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="databricks-cli">Databricks CLI<a href="#databricks-cli" class="hash-link" aria-label="Link direto para Databricks CLI" title="Link direto para Databricks CLI" translate="no">​</a></h2>
+<p>A roda do adaptador expõe um script de console <code>contractforge-databricks</code> apoiado por <code>contractforge_databricks.cli:main</code>.</p>
+<p>Este ponto de entrada pertence à distribuição <code>contractforge-databricks</code>, não à roda <code>contractforge-core</code>.</p>
+<p>Implemented commands:</p>
+<ul>
+<li class=""><code>presets list|show</code></li>
+<li class=""><code>templates list|show|write|wizard</code></li>
+<li class=""><code>dashboard</code></li>
+<li class=""><code>render</code></li>
+</ul>
+<p>O CLI tem escopo de adaptador. Ele não torna o núcleo executável e não requer Spark, Databricks SDK ou credenciais de espaço de trabalho no momento da importação.</p>
+<p>A mutação do espaço de trabalho, a implantação de pacotes e a execução de trabalhos em tempo real continuam sendo preocupações de implantação. O CLI renderiza artefatos revisáveis ​​e exemplos de contrato dividido que um pipeline de CI/CD ou fluxo de trabalho de espaço de trabalho Databricks pode consumir.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="transform-interpretation">Transform Interpretation<a href="#transform-interpretation" class="hash-link" aria-label="Link direto para Transform Interpretation" title="Link direto para Transform Interpretation" translate="no">​</a></h2>
+<p>O núcleo carrega a intenção de transformar; o adaptador Databricks o interpreta.</p>
+<p>Implemented review artifact:</p>
+<ul>
+<li class=""><code>transforms.render_transform_sql()</code></li>
+<li class=""><code>transform.cast</code></li>
+<li class=""><code>transform.standardize</code></li>
+<li class=""><code>transform.derive</code></li>
+<li class=""><code>transform.deduplicate</code></li>
+</ul>
+<p>O SQL gerado é uma representação Databricks revisável da intenção. O código de tempo de execução pode executar a preparação PySpark equivalente quando for mais seguro para esquemas complexos, interações de forma ou preparação de DataFrame específica do conector.</p>
+<p>A execução da forma permanece orientada para a preparação de PySpark para Databricks porque as operações de análise, matrizes, nivelamento e alteração de cardinalidade do JSON são semânticas em forma de DataFrame. O núcleo preserva o contrato; o adaptador possui a execução.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="shape-interpretation">Shape Interpretation<a href="#shape-interpretation" class="hash-link" aria-label="Link direto para Shape Interpretation" title="Link direto para Shape Interpretation" translate="no">​</a></h2>
+<p>O adaptador Databricks renderiza um artefato de revisão <code>*.shape.sql</code> para intenção de formato principal.</p>
+<p>Implemented review coverage:</p>
+<ul>
+<li class=""><code>shape.parse_json</code> as <code>from_json(...)</code></li>
+<li class=""><code>shape.zip_arrays</code> as <code>arrays_zip(...)</code></li>
+<li class=""><code>shape.arrays</code> as <code>to_json</code>, <code>size</code>, <code>element_at</code>, <code>explode</code> or <code>explode_outer</code></li>
+<li class=""><code>shape.columns</code> como projeção, expressão e elenco</li>
+<li class="">operações de nivelamento e mudança de cardinalidade como notas de revisão explícitas</li>
+</ul>
+<p>O artefato SQL não é uma promessa de que toda operação de forma aninhada deva ser executada como SQL. Espera-se que operações complexas de nivelamento, expansão aninhada com reconhecimento de esquema e alteração de cardinalidade sejam executadas por meio da preparação PySpark de propriedade do adaptador em Databricks quando necessário.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="tradução-de-origem">Tradução de origem<a href="#tradução-de-origem" class="hash-link" aria-label="Link direto para Tradução de origem" title="Link direto para Tradução de origem" translate="no">​</a></h2>
+<p>O adaptador Databricks traduz a intenção da fonte portátil em leituras nativas do Databricks quando seguro.</p>
+<p><code>source.type: incremental_files</code> renderiza um artefato de leitura <code>cloudFiles</code> do Auto Loader. Esta é a superfície de contrato portátil preferida quando a própria fonte é uma fonte de arquivo incremental.</p>
+<p>O adaptador também trata o armazenamento de objetos e as fontes de arquivo com <code>source.intent: file_stream</code> como semântica de arquivo incremental Databricks. Por exemplo, <code>source.type: s3</code> mais <code>source.intent: file_stream</code> renderiza o mesmo caminho do carregador automático, preservando o tipo de fonte principal bruto para evidência. Esta é uma tradução de adaptador de primeira classe, não um alias de compatibilidade: o contrato declara a intenção portátil e o adaptador mapeia essa intenção para o recurso nativo do Databricks.</p>
+<p>As ferramentas de migração Databricks locais do adaptador podem reconhecer o vocabulário nativo do Auto Loader, mas <code>contractforge_core</code> não o define. Os contratos portáteis devem usar <code>source.type: incremental_files</code>.</p>
+<p>O adaptador interpreta os principais parâmetros de origem antes da renderização:</p>
+<table><thead><tr><th>Parâmetro principal</th><th>Databricks rendering</th></tr></thead><tbody><tr><td><code>source.progress_location</code></td><td>available-now/stream checkpoint location variable</td></tr><tr><td><code>source.state.location.path</code> onde <code>source.state.storage: external</code></td><td>localização do ponto de verificação de fluxo disponível agora/fluxo para <code>source.intent: file_stream</code></td></tr><tr><td><code>source.schema_tracking_location</code></td><td><code>cloudFiles.schemaLocation</code></td></tr><tr><td><code>source.schema_hints</code></td><td><code>cloudFiles.schemaHints</code></td></tr><tr><td><code>source.max_files_per_trigger</code></td><td><code>cloudFiles.maxFilesPerTrigger</code></td></tr><tr><td><code>source.options.infer_column_types</code></td><td><code>cloudFiles.inferColumnTypes</code></td></tr><tr><td><code>environment.parameters.databricks.incremental_files.*</code></td><td>Padrões de origem Databricks</td></tr></tbody></table>
+<p>Esta camada de interpretação pertence ao adaptador. O núcleo não valida nem conhece os parâmetros <code>cloudFiles</code>.</p>
+<p>As fontes em lote JDBC renderizam um artefato Databricks PySpark <code>spark.read.format(&quot;jdbc&quot;)</code> para:</p>
+<ul>
+<li class=""><code>jdbc</code></li>
+<li class=""><code>postgres</code></li>
+<li class=""><code>mysql</code> / <code>mariadb</code></li>
+<li class=""><code>sqlserver</code></li>
+<li class=""><code>oracle</code></li>
+<li class=""><code>redshift</code></li>
+</ul>
+<p>O renderizador valida a exclusividade <code>table</code>/<code>query</code>, mapeia opções de leitura particionadas e emite opções de revisão editadas. O Oracle continua sendo suportado como um tipo de contrato/fonte, mas o adaptador não agrupa drivers Oracle JDBC; o tempo de execução Databricks ou a implantação de trabalho devem fornecer o driver.</p>
+<p>Databricks Fontes JDBC não devem declarar credenciais in-line. URLs <code>auth.password</code>, <code>options.password</code>, <code>options.sfpassword</code> e JDBC contendo <code>user:password@host</code> são rejeitados, a menos que o valor seja expresso com um espaço reservado <code>{{ secret:scope/key }}</code> ou um mecanismo de autenticação de tempo de execução de propriedade do adaptador, como RDS IAM. Isso corresponde ao princípio do adaptador AWS de que arquivos de contrato e artefatos renderizados não devem conter credenciais reais.</p>
+<p>Para autenticação RDS IAM JDBC, o adaptador preserva o limite de linha de base do adaptador Databricks:</p>
+<ul>
+<li class=""><code>auth.type: rds_iam</code> is recognized.</li>
+<li class="">host, porta e região AWS são derivados do JDBC URL quando possível.</li>
+<li class="">as opções de revisão renderizadas usam <code>{{rds_iam_token}}</code> em vez de incorporar um token.</li>
+<li class=""><code>sources.generate_rds_iam_auth_token()</code> fornece um auxiliar SigV4 puro para código de tempo de execução que escolhe gerar tokens dentro da tarefa Databricks.</li>
+</ul>
+<p>O adaptador não requer credenciais <code>boto3</code>, <code>botocore</code> ou AWS no momento da importação/renderização.</p>
+<p>Fontes de armazenamento de objetos e arquivos em lote renderizam artefatos Databricks <code>spark.read</code> para:</p>
+<ul>
+<li class=""><code>csv</code></li>
+<li class=""><code>json</code> / <code>jsonl</code> / <code>ndjson</code></li>
+<li class=""><code>parquet</code></li>
+<li class=""><code>delta</code></li>
+<li class=""><code>orc</code></li>
+<li class=""><code>text</code></li>
+<li class=""><code>avro</code></li>
+<li class=""><code>xml</code></li>
+<li class="">aliases de armazenamento de objetos, como <code>s3</code>, <code>adls</code>, <code>azure_blob</code>, <code>gcs</code>, <code>blob</code> e <code>object_storage</code> quando <code>format</code> e <code>path</code> são declarados</li>
+</ul>
+<p>A renderização XML usa <code>spark.read.format(&quot;xml&quot;)</code> e passa opções do analisador de <code>source.options</code>. Os tempos de execução do Databricks devem fornecer suporte nativo ao XML ou um analisador compatível equivalente; caso contrário, o adaptador deverá exibir um aviso de tempo de execução/capacidade em vez de alterar silenciosamente o formato.</p>
+<p>As fontes de catálogo renderizam artefatos <code>spark.table(...)</code>, <code>spark.sql(...)</code> ou <code>spark.read.format(...).load(...)</code> baseados em caminho para contratos <code>table</code>, <code>view</code>, <code>sql</code>, <code>delta_table</code> e <code>iceberg_table</code>.</p>
+<p>Delta O compartilhamento de fontes de consumo renderiza artefatos <code>spark.read.format(&quot;deltaSharing&quot;)</code> para contratos <code>delta_share</code> com arquivo de perfil e identificadores de tabela compartilhada. Arquivos de perfil e credenciais continuam sendo preocupações de implantação/tempo de execução.</p>
+<p>As origens do arquivo HTTP renderizam artefatos de busca Python <code>urllib</code> limitados seguidos pelas leituras do arquivo Spark:</p>
+<ul>
+<li class=""><code>http_file</code></li>
+<li class=""><code>http_csv</code></li>
+<li class=""><code>http_json</code></li>
+<li class=""><code>http_text</code></li>
+</ul>
+<p>O renderizador suporta cabeçalhos de solicitação, autenticação de token de portador, autenticação de cabeçalho de chave API, tempo limite e proteções de bytes máximos. A renderização de arquivo HTTP destina-se a arquivos limitados pequenos e médios, não à paginação SaaS API ou à extração API de longa duração.</p>
+<p>O artefato Databricks gerado também preserva o comportamento do arquivo limitado da linha de base do adaptador Databricks para:</p>
+<ul>
+<li class="">parâmetros de consulta de <code>source.request.params</code></li>
+<li class="">GET-only enforcement</li>
+<li class="">novas tentativas e espera linear para HTTP/erros de rede transitórios</li>
+<li class="">Opções do leitor Spark, como cabeçalhos CSV, delimitadores e opções JSON</li>
+</ul>
+<p>Os contratos genéricos do conector REST API renderizam um artefato de revisão e expõem um resolvedor de tempo de execução limitado:</p>
+<ul>
+<li class=""><code>connector: rest_api</code></li>
+<li class=""><code>connector: api</code></li>
+<li class=""><code>connector: http_api</code></li>
+</ul>
+<p>O artefato recomenda:</p>
+<ul>
+<li class=""><code>http_file</code>/<code>http_json</code>/<code>http_csv</code> quando a origem é um arquivo público ou autenticado limitado.</li>
+<li class=""><code>native_passthrough</code> para APIs SaaS proprietários.</li>
+<li class="">a reviewed landing step to object storage followed by <code>incremental_files</code>.</li>
+</ul>
+<p>O resolvedor de tempo de execução é intencionalmente limitado e suporta a semântica REST genérica da linha de base do adaptador Databricks que pode ser executada com segurança sem um conector específico de SaaS:</p>
+<ul>
+<li class="">Solicitações GET e POST</li>
+<li class="">solicitar parâmetros, cabeçalhos, cargas úteis JSON/corpo e evidências de autenticação editadas</li>
+<li class="">token de portador, chave API, autenticação básica e credenciais de cliente OAuth</li>
+<li class="">página, deslocamento, cursor e paginação de cabeçalho de link</li>
+<li class="">caminho de registros de resposta ou modo de carga bruta</li>
+<li class="">máximo de bytes de página, máximo de bytes totais, máximo de registros, tentativas de repetição, espera de repetição e espaçamento de limite de taxa por meio de <code>limits.rate_limit_per_minute</code></li>
+<li class="">injeção incremental de marca d&#x27;água em parâmetros de consulta, cabeçalhos ou campos de corpo JSON</li>
+</ul>
+<p>Para o modo de resposta bruto, <code>source.response.raw_column</code> deve ser um nome de coluna simples. A semântica complexa de SaaS ainda pertence ao <code>native_passthrough</code> ou a uma etapa de aterrissagem revisada para o armazenamento de objetos seguido pelo <code>incremental_files</code>.</p>
+<p>O pacote emite <code>*.source_metadata.json</code> para cada contrato. Este artefato normaliza a evidência de origem para fluxos de trabalho de controle/evidência Databricks:</p>
+<ul>
+<li class="">tipo de fonte e tipo</li>
+<li class="">conector e provedor</li>
+<li class="">caminho, URL, tabela, consulta ou identificadores de objeto</li>
+<li class="">seções de leitura/opções/solicitação/autenticação/paginação/resposta</li>
+<li class="">metadados incrementais e de limite</li>
+<li class="">dicas de capacidade de origem, como passagem limitada, incremental e nativa</li>
+</ul>
+<p>Os valores confidenciais são editados antes da renderização. Isso transporta a disciplina de metadados de origem da linha de base do adaptador Databricks para o adaptador Databricks sem exigir que o núcleo entenda as colunas da tabela de controle Delta.</p>
+<p>Fontes de fluxo limitadas renderizam artefatos de leitura em lote Databricks finitos:</p>
+<ul>
+<li class=""><code>kafka_bounded</code> renderiza <code>spark.read.format(&quot;kafka&quot;)</code> com opções de tópico/atribuição e deslocamento inicial/final ou carimbo de data/hora.</li>
+<li class=""><code>eventhubs_bounded</code> renderiza <code>spark.read.format(&quot;eventhubs&quot;)</code> com opções de conector Event Hubs revisadas.</li>
+</ul>
+<p>Esses artefatos são apenas para atualização/reprodução. Eles usam <code>spark.read</code> intencionalmente, não <code>spark.readStream</code>, e não devem ser tratados como trabalhos de streaming contínuo.</p>
+<p>As fontes de passagem nativas não são intencionalmente implementadas como clientes Python API customizados no adaptador. Trabalhos futuros devem renderizar Lakeflow Connect, Databricks Connections ou outros artefatos nativos do espaço de trabalho, quando disponíveis.</p>
+<p>Para <code>source.type: native_passthrough</code>, o adaptador emite um artefato de planejamento:</p>
+<ul>
+<li class=""><code>*.native_passthrough.json</code></li>
+</ul>
+<p>O artefato registra:</p>
+<ul>
+<li class="">sistema de origem</li>
+<li class="">objeto de origem</li>
+<li class="">alvos nativos Databricks recomendados</li>
+<li class="">watermark intent</li>
+<li class="">redacted auth metadata</li>
+<li class="">notes preventing accidental custom SaaS client implementation</li>
+</ul>
+<p>Exemplo de recomendação:</p>
+<table><thead><tr><th>Sistema de origem</th><th>Alvo Databricks recomendado</th></tr></thead><tbody><tr><td>Salesforce</td><td>Lakeflow Connect</td></tr><tr><td>Workday</td><td>Lakeflow Connect</td></tr><tr><td>ServiceNow</td><td>Lakeflow Connect</td></tr><tr><td>SFTP/FTP</td><td>Databricks Connection + Auto Loader</td></tr><tr><td>Other systems</td><td>Conexão Databricks ou Lakeflow Connect, se disponível</td></tr></tbody></table>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="lakeflow-auto-cdc-artefatos">Lakeflow AUTO CDC Artefatos<a href="#lakeflow-auto-cdc-artefatos" class="hash-link" aria-label="Link direto para Lakeflow AUTO CDC Artefatos" title="Link direto para Lakeflow AUTO CDC Artefatos" translate="no">​</a></h2>
+<p>O adaptador expõe um renderizador Lakeflow AUTO CDC Python explícito.</p>
+<p>It requires:</p>
+<ul>
+<li class="">nome da tabela/visualização de origem revisada ou função de instantâneo</li>
+<li class="">keys</li>
+<li class=""><code>sequence_by</code> para fluxos históricos de feed de alterações</li>
+<li class="">verificação de compatibilidade passando sem bloqueadores não suportados</li>
+</ul>
+<p>Caminhos de renderização suportados:</p>
+<ul>
+<li class=""><code>source_kind=&quot;change_feed&quot;</code> renders <code>dp.create_auto_cdc_flow(...)</code>.</li>
+<li class=""><code>source_kind=&quot;snapshot&quot;</code> renders <code>dp.create_auto_cdc_from_snapshot_flow(...)</code>.</li>
+</ul>
+<p><code>render_lakeflow_auto_cdc_artifact()</code> retorna um artefato de revisão serializável com:</p>
+<ul>
+<li class="">language</li>
+<li class="">tipo de origem</li>
+<li class="">generated Python code</li>
+<li class="">compatibility status</li>
+<li class="">mapped Lakeflow fields</li>
+<li class="">campos obrigatórios</li>
+<li class="">campos obrigatórios para tradução</li>
+<li class="">unsupported fields</li>
+<li class="">warnings</li>
+</ul>
+<p><code>render_lakeflow_auto_cdc_python()</code> continua sendo um wrapper conveniente que retorna apenas o código gerado.</p>
+<p>O renderizador usa a intenção de destino principal como o nome da tabela Databricks. Quando o contrato declara catálogo e esquema, o artefato Lakeflow gerado tem como alvo o nome completo da tabela.</p>
+<p>Opções de propriedade do adaptador suportadas:</p>
+<ul>
+<li class=""><code>ignore_null_updates</code></li>
+<li class=""><code>once</code></li>
+<li class=""><code>apply_as_deletes</code> da intenção de gravação histórica ContractForge para fluxos de feed de alteração</li>
+<li class=""><code>apply_as_truncates</code> para fluxos de alimentação de mudança de estado atual</li>
+<li class=""><code>track_history_column_list</code> de <code>scd2_change_columns</code></li>
+</ul>
+<p>Explicit semantic blockers:</p>
+<ul>
+<li class=""><code>apply_as_truncates</code> foi rejeitado para histórico porque é uma opção Lakeflow do estado atual.</li>
+<li class="">os fluxos de snapshot rejeitam predicados de exclusão CDC porque as exclusões são derivadas da comparação de snapshot.</li>
+<li class="">forma, transformação, projeção, mapeamento de coluna, filtro, marca d&#x27;água e intenção de qualidade exigem materialização upstream ou aplicação externa antes que AUTO CDC consuma a tabela/visualização de origem preparada.</li>
+</ul>
+<p>O renderizador intencionalmente não é adicionado automaticamente ao pacote configurável do contrato porque a execução do Lakeflow requer semântica de origem CDC/instantâneo e preparação do pipeline do espaço de trabalho que devem ser revisados ​​separadamente.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="implementação-de-evidências">Implementação de evidências<a href="#implementação-de-evidências" class="hash-link" aria-label="Link direto para Implementação de evidências" title="Link direto para Implementação de evidências" translate="no">​</a></h2>
+<p>O adaptador Databricks implementa o modelo de evidência principal com tabelas Delta.</p>
+<p>Implemented pieces:</p>
+<ul>
+<li class=""><code>evidence/ddl.py</code>: <code>CREATE SCHEMA</code> e <code>CREATE TABLE... USING DELTA</code>.</li>
+<li class=""><code>evidence/schemas.py</code>: catálogo completo de esquema de tabela de controle ContractForge para tabelas de evidências Databricks Delta.</li>
+<li class=""><code>evidence/records.py</code>: registros de execução, erro, qualidade, linhagem, mudança de esquema e evidências de custo.</li>
+<li class=""><code>evidence/sql.py</code>: deterministic <code>INSERT INTO</code> statements.</li>
+<li class=""><code>evidence/run_log.py</code>: renderização completa de inserção <code>ctrl_ingestion_runs</code> de cargas úteis de tempo de execução com coerção e redação de tipo.</li>
+<li class=""><code>evidence/ops_log.py</code>: renderização completa de <code>ctrl_ingestion_errors</code>, <code>ctrl_ingestion_schema_changes</code> e <code>ctrl_ingestion_streams</code>, além de agregação de métrica de fluxo executada por filhos SQL.</li>
+<li class=""><code>evidence/governance_log.py</code>: renderização completa do log de tempo de execução <code>ctrl_ingestion_annotations</code>, <code>ctrl_ingestion_access</code> e <code>ctrl_ingestion_operations</code>.</li>
+<li class=""><code>evidence/writer.py</code>: SQL runner based writer.</li>
+<li class=""><code>operations/sql.py</code>: normalização de metadados de operações e modelo de inserção <code>ctrl_ingestion_operations</code>.</li>
+<li class=""><code>state/migrations.py</code>: planejamento de migração de tabela de controle aditivo portado de ContractForge.</li>
+</ul>
+<p>O núcleo ainda usa o modelo de evidência de termo neutro em termos de plataforma. As tabelas de controle Delta são apenas a implementação de persistência do adaptador Databricks.</p>
+<p>Novas tabelas de evidências Databricks são criadas com as colunas maduras da tabela de controle ContractForge, onde são locais de tabela. O Databricks DDL mantém o particionamento Databricks Delta para livros razão de alto volume: <code>ctrl_ingestion_runs</code> por <code>run_date</code> e <code>ctrl_ingestion_errors</code> por <code>error_date</code>. O pacote também emite <code>*.control_table_migrations.sql</code> como um artefato de revisão para instalações existentes. Ele contém instruções <code>ALTER TABLE... ADD COLUMNS</code> aditivas para campos como metadados de idempotência, evidência de tempo de execução, metadados de origem, seleção de mecanismo de gravação, tempo de gravação/evidência de versão, hierarquia de execução pai, marcadores de gravação de estado, resultados de anotação, propriedade, política de desvio de acesso e metadados de liberação de bloqueio. Os operadores devem aplicar apenas as colunas que estão faltando; o núcleo nunca sofre mutação direta no armazenamento de evidências.</p>
+<p>O código de tempo de execução pode usar <code>EvidenceWriter.write_run_log()</code> ou <code>render_run_log_insert_sql()</code> para persistir uma linha <code>ctrl_ingestion_runs</code> completa a partir de cargas úteis de tempo de execução do adaptador. Esses auxiliares forçam campos inteiros, booleanos, de data e carimbo de data/hora, serializam campos <code>*_json</code> e editam valores confidenciais antes de renderizar SQL. O tempo de execução Databricks preenche carimbos de data/hora de início/término de gravação e <code>stage_durations_json</code> para configuração de esquema, simulação de mesclagem, execução de gravação, manutenção pós-gravação e efeitos colaterais de governança.</p>
+<p>O código de tempo de execução também pode usar:</p>
+<ul>
+<li class=""><code>EvidenceWriter.write_error_log()</code> / <code>render_error_log_insert_sql()</code></li>
+<li class=""><code>EvidenceWriter.write_schema_change_log()</code> / <code>render_schema_change_log_insert_sql()</code></li>
+<li class=""><code>render_schema_change_log_insert_sqls()</code> para cargas úteis de comparação de esquema no estilo ContractForge</li>
+<li class=""><code>EvidenceWriter.write_stream_log()</code> / <code>render_stream_log_insert_sql()</code></li>
+<li class=""><code>EvidenceWriter.finish_stream_log()</code> / <code>render_stream_finish_update_sql()</code></li>
+<li class=""><code>render_stream_child_run_metrics_sql()</code></li>
+<li class=""><code>EvidenceWriter.write_annotation_log()</code> / <code>render_annotation_log_insert_sql()</code></li>
+<li class=""><code>render_annotation_log_insert_sqls()</code> para entradas de comentários/tags aplicadas</li>
+<li class=""><code>EvidenceWriter.write_access_log()</code> / <code>render_access_log_insert_sql()</code></li>
+<li class=""><code>render_access_log_insert_sqls()</code> para concessões, filtros de linha e máscaras</li>
+<li class=""><code>EvidenceWriter.write_operations_log()</code> / <code>render_operations_log_insert_sql()</code></li>
+</ul>
+<p>Eles portam o comportamento de registro da tabela de controle de linha de base do adaptador Databricks sem importar Spark no momento da importação do módulo. O tempo de execução possui a execução passando um executor Databricks SQL/Spark que implementa <code>sql(statement)</code>.</p>
+<p>A ingestão de pacotes oferece suporte a contratos <code>execution.window</code> principais e <code>execution.catchup</code> habilitados. O adaptador Databricks expande o contrato pai em execuções filho, adiciona um predicado de janela de carimbo de data/hora Databricks SQL ao <code>filter_expression</code> canônico, cria uma visualização de origem preparada separada por janela e persiste cada filho em <code>ctrl_ingestion_runs</code> com:</p>
+<ul>
+<li class=""><code>parent_run_id</code> apontando para a execução do pacote pai</li>
+<li class="">Valores <code>idempotency_key</code> com escopo de janela quando o contrato pai declara idempotência</li>
+<li class=""><code>_contractforge_window_label</code>, <code>_contractforge_window_column</code>, <code>_contractforge_window_start</code> e <code>_contractforge_window_end</code> em <code>runtime_parameters_json</code></li>
+</ul>
+<p>Este é o comportamento de execução de propriedade do adaptador. O núcleo apenas valida e carrega a intenção de execução portátil.</p>
+<p>O streaming disponível agora preserva o padrão de observabilidade do fluxo de linha de base do adaptador Databricks quando um <code>EvidenceWriter</code> é fornecido ao <code>run_available_now_stream()</code>:</p>
+<ul>
+<li class="">uma linha <code>RUNNING</code> é inserida em <code>ctrl_ingestion_streams</code> antes do início da consulta de streaming estruturado</li>
+<li class="">a linha final do stream é atualizada por meio de <code>finish_stream_log()</code> após o término</li>
+<li class="">fluxos com falha gravam uma linha de erro completa em <code>ctrl_ingestion_errors</code></li>
+<li class="">métricas locais de microlote são reconciliadas com métricas persistentes de execução infantil do <code>ctrl_ingestion_runs.parent_run_id</code> quando um leitor <code>query_one</code> é fornecido</li>
+</ul>
+<p>Isso mantém o comportamento do serverless/Spark Connect da implementação do tempo de execução do Databricks: se o estado de retorno de chamada do <code>foreachBatch</code> não for confiável no processo do driver, as tabelas de evidências permanecerão a fonte da verdade para contagens de lote e totais de linhas.</p>
+<p><code>ctrl_ingestion_operations</code> preserva o padrão de metadados operacionais de linha de base do adaptador Databricks: criticidade, frequência esperada, atualização SLA, sinalizadores de alerta, runbook URL, propriedade, proprietários, grupos e tags. O núcleo carrega isso como metadados de operações semânticas; Databricks possui o formato de persistência Delta.</p>
+<p><code>ctrl_ingestion_annotations</code> preserva o limite de auditoria de anotação de linha de base do adaptador Databricks para comentários, tags, aliases, metadados PII e marcadores de descontinuação. O adaptador renderiza os artefatos SQL e expõe a tabela Delta DDL; o aplicativo de tempo de execução pode registrar o status por etapa sem que o núcleo conheça o Unity Catalog.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="anotações-e-governança">Anotações e governança<a href="#anotações-e-governança" class="hash-link" aria-label="Link direto para Anotações e governança" title="Link direto para Anotações e governança" translate="no">​</a></h2>
+<p>O adaptador mantém anotações descritivas separadas da governança de acesso.</p>
+<p><code>annotations/</code> renders Unity Catalog metadata:</p>
+<ul>
+<li class="">comentários da tabela</li>
+<li class="">column comments</li>
+<li class="">tags de tabela</li>
+<li class="">column tags</li>
+<li class="">aliases rendered as deterministic <code>alias_N</code> tags</li>
+<li class="">PII metadata rendered as column tags</li>
+<li class="">metadados do ciclo de vida de descontinuação renderizados como tags de tabela ou coluna</li>
+<li class="">modelos de inserção de auditoria por etapa para <code>ctrl_ingestion_annotations</code></li>
+</ul>
+<p><code>governance/</code> renderiza controles de acesso:</p>
+<ul>
+<li class="">grants</li>
+<li class="">row filters</li>
+<li class="">column masks</li>
+<li class="">owner review notes</li>
+<li class="">modelos de inserção de auditoria por etapa para <code>ctrl_ingestion_access</code></li>
+</ul>
+<p>O pacote emite <code>*.annotations.sql</code>, <code>*.annotations_audit.sql</code>, <code>*.governance.sql</code> e <code>*.access_audit.sql</code>. Para compatibilidade de revisão retroativa, <code>*.governance.sql</code> também inclui as anotações SQL quando as anotações são declaradas.</p>
+<p>Esses artefatos permanecem SQL revisáveis. O núcleo carrega apenas governança semântica e intenção de anotação; Unity Catalog SQL pertence ao adaptador.</p>
+<p>O modelo de auditoria de acesso segue o formato da tabela de controle de linha de base do adaptador Databricks: tipo de acesso, principal, privilégio, nomes de coluna/função/objeto, SQL aplicado, modo, política de desvio e intenção revogada não gerenciada. A execução em tempo de execução pode marcar cada etapa como aplicada, validada, avisada, com falha ou ignorada.</p>
+<p>Os auxiliares de aplicativos de tempo de execução pertencem ao adaptador e usam executores SQL injetados:</p>
+<ul>
+<li class=""><code>annotations.apply_annotations_contract()</code></li>
+<li class=""><code>governance.apply_access_contract()</code></li>
+<li class=""><code>operations.record_operations_contract()</code></li>
+</ul>
+<p>Eles não importam SDKs Spark ou Databricks. O código de tempo de execução passa por um executor Databricks SQL/Spark que implementa <code>sql(statement)</code>. A inspeção de desvio de acesso também pode usar um método <code>query(statement)</code> fornecido pelo executor para ler <code>SHOW GRANTS ON TABLE...</code>; executores que não expõem suporte a consultas ainda renderizam e aplicam o acesso declarado SQL sem tentar a inspeção de desvio de catálogo.</p>
+<p>Os auxiliares do aplicativo executam metadados nativos SQL e retornam objetos de status. Os auxiliares de log de evidência/governança persistem linhas detalhadas de auditoria de tempo de execução. Mantê-los separados permite que as implantações escolham explicitamente o comportamento somente aplicação, somente evidência ou aplicação e registro.</p>
+<p>Comportamento de aplicativo compatível:</p>
+<ul>
+<li class="">anotações <code>policy=ignore</code> retorna <code>IGNORED</code> sem execução</li>
+<li class="">anotações <code>policy=warn</code> registra falhas no resultado e continua</li>
+<li class="">anotações <code>policy=fail</code> retorna <code>FAILED</code> na primeira instrução com falha</li>
+<li class="">acessar <code>mode=ignore</code> retorna <code>IGNORED</code> sem execução</li>
+<li class="">acessar <code>mode=validate_only</code> retorna <code>VALIDATED</code> sem execução</li>
+<li class="">o modo de aplicação de acesso executa concessões, filtros de linha e máscaras</li>
+<li class="">acessar <code>on_drift=fail</code> retorna <code>FAILED</code> no desvio de concessão detectado versus declarado quando o suporte à consulta está disponível ou na primeira instrução com falha durante a aplicação</li>
+<li class="">access <code>revoke_unmanaged=true</code> pode renderizar e executar etapas <code>REVOKE</code> para concessões não gerenciadas, mas somente quando o chamador passa explicitamente a confirmação de tempo de execução do adaptador para reconciliação destrutiva</li>
+<li class="">os metadados das operações são registrados no local de evidência Databricks resolvido no contrato ambiental</li>
+<li class="">o registro de operações retorna <code>NOT_CONFIGURED</code> quando o contrato não possui metadados de operações</li>
+<li class="">erros do auxiliar de tempo de execução são reduzidos e editados antes de serem retornados em objetos de resultado</li>
+</ul>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="operational-error-handling">Operational Error Handling<a href="#operational-error-handling" class="hash-link" aria-label="Link direto para Operational Error Handling" title="Link direto para Operational Error Handling" translate="no">​</a></h2>
+<p>O adaptador Databricks normaliza erros operacionais antes de expô-los em resultados de tempo de execução ou cargas úteis de evidência.</p>
+<p>Comportamento implementado:</p>
+<ul>
+<li class="">secret-bearing strings are redacted</li>
+<li class="">rastreamentos de pilha são reduzidos à linha final mais relevante</li>
+<li class="">Linhas de erro <code>Caused by</code>, armazenamento, SQL, análise e Delta são preferidas quando presentes</li>
+<li class="">normalized messages are bounded in length</li>
+</ul>
+<p>Isso é de propriedade do adaptador porque Databricks, Spark, JVM e falhas de conector têm formatos de rastreamento de pilha específicos da plataforma. O modelo de evidência central requer apenas um conceito de erro; ele não prescreve a análise de erros Databricks.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="operational-state">Operational State<a href="#operational-state" class="hash-link" aria-label="Link direto para Operational State" title="Link direto para Operational State" translate="no">​</a></h2>
+<p>O adaptador fornece Databricks Delta SQL para estado operacional que ContractForge armazena historicamente em tabelas de controle:</p>
+<ul>
+<li class="">estado da marca d&#x27;água de destino</li>
+<li class="">last successful run metadata</li>
+<li class="">bloqueios de alvo de melhor esforço</li>
+<li class="">idempotent run lookup SQL</li>
+<li class="">idempotent stream lookup SQL</li>
+<li class="">leitura de status de bloqueio SQL</li>
+<li class="">successful-run existence SQL</li>
+<li class="">registro de metadados do esquema de controle SQL</li>
+</ul>
+<p>Esses auxiliares residem em <code>contractforge_databricks.state</code> e usam executores SQL injetados para execução. O núcleo não importa este pacote e não requer tabelas Delta.</p>
+<p><code>StateWriter.record_control_metadata()</code> registra a linha do componente <code>contractforge</code> em <code>ctrl_ingestion_metadata</code>, correspondendo ao padrão de registro da versão da tabela de controle de linha de base do adaptador Databricks. A aquisição de bloqueio continua sendo o melhor esforço: o adaptador renderiza a instrução <code>MERGE</code> e <code>render_lock_status_sql()</code> para que o código de tempo de execução possa verificar se o <code>run_id</code> atual possui o bloqueio ativo após a mesclagem.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="watermarks">Watermarks<a href="#watermarks" class="hash-link" aria-label="Link direto para Watermarks" title="Link direto para Watermarks" translate="no">​</a></h2>
+<p>O núcleo possui o formato de marca d&#x27;água tipado JSON. O adaptador Databricks possui o aplicativo SQL:</p>
+<ul>
+<li class=""><code>watermark.render_watermark_filter_predicate()</code> renderiza predicados lexicográficos simples e compostos.</li>
+<li class=""><code>watermark.render_select_watermark_candidate_sql()</code> renderiza SQL para calcular o próximo candidato tipado de uma tabela Databricks.</li>
+<li class=""><code>state.render_select_previous_watermark_sql()</code> lê a última marca d&#x27;água de destino confirmada do <code>ctrl_ingestion_state</code>.</li>
+</ul>
+<p>Isso transfere o comportamento de marca d&#x27;água simples/composto da linha de base do adaptador Databricks, mantendo a execução do Spark fora do núcleo. A preparação da origem do pacote Databricks pode ler o valor do estado anterior por meio de um executor de consulta injetado, aplicar o predicado SQL de propriedade do adaptador antes de registrar a visualização preparada e persistir <code>watermark_previous</code> e <code>watermark_current</code> em <code>ctrl_ingestion_runs</code> após uma gravação bem-sucedida.</p>
+<p>O tempo de execução aplica o predicado de marca d&#x27;água anterior após projeção, mapeamento de colunas, manipulação de formas, conversões, padronização, colunas derivadas, expressão de filtro e construção de chave composta e antes da desduplicação. Isso preserva a ordem de preparação da linha de base do adaptador Databricks enquanto permite que colunas de marca d&#x27;água canônicas sejam produzidas pela etapa de preparação do contrato.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="lineage">Lineage<a href="#lineage" class="hash-link" aria-label="Link direto para Lineage" title="Link direto para Lineage" translate="no">​</a></h2>
+<p>O adaptador pode renderizar eventos compatíveis com OpenLineage e persisti-los como evidência Databricks.</p>
+<p>Implemented pieces:</p>
+<ul>
+<li class="">namespace defaults to <code>databricks://&lt;catalog&gt;</code></li>
+<li class="">tipo de evento mapeia execuções bem-sucedidas para <code>COMPLETE</code> e falhas para <code>FAIL</code></li>
+<li class="">facetas do esquema de entrada/saída podem ser fornecidas pelo código de tempo de execução</li>
+<li class="">a contagem de linhas de saída é emitida como uma faceta métrica de qualidade de dados</li>
+<li class="">ContractForge-specific metrics are redacted before persistence</li>
+</ul>
+<p>O pacote emite <code>*.openlineage.sql</code> como modelo de revisão. O código de tempo de execução deve preencher IDs de execução reais, carimbos de data/hora, contagens de linhas, esquemas e métricas de operação antes de escrever evidências de linhagem.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="diagnostics">Diagnostics<a href="#diagnostics" class="hash-link" aria-label="Link direto para Diagnostics" title="Link direto para Diagnostics" translate="no">​</a></h2>
+<p>O adaptador suporta artefatos de diagnóstico específicos do Databricks sem tornar o diagnóstico uma preocupação de execução central portátil.</p>
+<p>Implemented pieces:</p>
+<ul>
+<li class=""><code>ctrl_ingestion_explain</code> DDL</li>
+<li class="">inserção de plano explicativo determinístico SQL</li>
+<li class="">redação e truncamento antes da persistência</li>
+</ul>
+<p>Spark A captura de <code>DataFrame.explain()</code> não é implementada intencionalmente no momento da importação. O código de tempo de execução pode capturar o texto explicativo dentro do Databricks e passar o texto para o renderizador de diagnóstico.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="qualidade">Qualidade<a href="#qualidade" class="hash-link" aria-label="Link direto para Qualidade" title="Link direto para Qualidade" translate="no">​</a></h2>
+<p>O adaptador renderiza verificações SQL para regras de qualidade portáteis normalizadas pelo núcleo:</p>
+<ul>
+<li class=""><code>required_columns</code></li>
+<li class=""><code>not_null</code></li>
+<li class=""><code>unique_key</code></li>
+<li class=""><code>accepted_values</code></li>
+<li class=""><code>row_count_minimum</code></li>
+<li class=""><code>max_null_ratio</code></li>
+<li class=""><code>expression</code></li>
+</ul>
+<p>A execução de qualidade e a persistência de evidências são de propriedade do adaptador. O núcleo carrega apenas a intenção semântica.</p>
+<p>Implemented pieces:</p>
+<ul>
+<li class="">SQL verifica renderização para revisão e execução em tempo de execução.</li>
+<li class="">verificações de colunas obrigatórias de tabela qualificada por meio de <code>system.information_schema.columns</code>.</li>
+<li class="">comentários de revisão de coluna obrigatória para visualizações temporárias em que SQL não pode inspecionar o esquema.</li>
+<li class="">Normalização <code>QualityRuleResult</code> com status agregado <code>PASSED</code>, <code>WARNED</code>, <code>FAILED</code> e <code>NOT_CONFIGURED</code>.</li>
+<li class="">filtragem de quarentena para regras com falha com <code>severity=quarantine</code>.</li>
+<li class="">Renderização SQL para inserções de evidências de qualidade.</li>
+<li class="">Renderização SQL para inserções de referência de quarentena.</li>
+</ul>
+<p>O adaptador armazena referências de quarentena, e não cargas úteis de origem arbitrárias, nesta camada. O código de tempo de execução pode persistir cargas de linha em um local de plataforma seguro e passar a referência para o renderizador de evidências.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="política-de-esquema">Política de esquema<a href="#política-de-esquema" class="hash-link" aria-label="Link direto para Política de esquema" title="Link direto para Política de esquema" translate="no">​</a></h2>
+<p>O adaptador mapeia a intenção da política do esquema principal para requisitos de execução específicos do Databricks:</p>
+<ul>
+<li class=""><code>strict</code>: requer comparação de esquema de simulação e não habilita Delta <code>mergeSchema</code>.</li>
+<li class=""><code>additive_only</code>: requer validação de simulação e habilita <code>mergeSchema</code> para colunas aditivas anuláveis.</li>
+<li class=""><code>permissive</code>: habilita <code>mergeSchema</code>, requer comprovação e registra ampliação de tipo ou outras alterações como evidência de alteração de esquema.</li>
+</ul>
+<p>O pacote emite <code>*.schema_policy.json</code> para que a revisão da implantação possa ver as opções do gravador, avisos e verificações necessárias antes da execução.</p>
+<p>A simulação do esquema é implementada como pura lógica de comparação:</p>
+<ul>
+<li class=""><code>compare_schema()</code> compara mapas <code>column -&gt; type</code> de origem e destino.</li>
+<li class=""><code>validate_schema_diff()</code> impõe <code>strict</code>, <code>additive_only</code> e <code>permissive</code>.</li>
+<li class=""><code>render_add_columns_sql()</code> renders additive Delta evolution.</li>
+<li class=""><code>render_type_widening_sql()</code> renders reviewed type widening.</li>
+</ul>
+<p>O código de tempo de execução é responsável por ler os esquemas reais da tabela Databricks e passar mapas de tipos normalizados para esses auxiliares.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="maintenance">Maintenance<a href="#maintenance" class="hash-link" aria-label="Link direto para Maintenance" title="Link direto para Maintenance" translate="no">​</a></h2>
+<p>O adaptador expõe auxiliares SQL de manutenção de tabela:</p>
+<ul>
+<li class=""><code>ALTER TABLE ... SET TBLPROPERTIES</code></li>
+<li class=""><code>OPTIMIZE</code></li>
+<li class=""><code>VACUUM</code></li>
+<li class=""><code>ANALYZE TABLE ... COMPUTE STATISTICS</code></li>
+<li class="">declarações históricas <code>DELETE</code> de retenção de tabela de controle</li>
+<li class="">instruções opcionais <code>VACUUM</code> da tabela de controle</li>
+<li class="">relatórios de custos operacionais somente de consulta do <code>ctrl_ingestion_runs</code>, incluindo agrupamento, filtragem somente de sucesso, estimativa de moeda/taxa e metadados de limite de linha para superfícies de execução opcionais</li>
+</ul>
+<p>A manutenção permanece de propriedade do adaptador porque os recursos de otimização e as políticas de retenção são específicos da plataforma.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="databricks-asset-bundles">Databricks Asset Bundles<a href="#databricks-asset-bundles" class="hash-link" aria-label="Link direto para Databricks Asset Bundles" title="Link direto para Databricks Asset Bundles" translate="no">​</a></h2>
+<p>O adaptador pode renderizar um artefato <code>databricks.yml</code> revisável para um contrato.</p>
+<p>Esta é apenas a geração de artefatos. O adaptador não chama Databricks CLI, implementa tarefas ou altera a área de trabalho do caminho de planejamento principal.</p>
+<p>Os artefatos de pacote configurável gerados devem ser verificados em um repositório de implementação ou passados ​​para um estágio CI/CD que possui credenciais de implementação Databricks.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="modelos-e-predefinições">Modelos e predefinições<a href="#modelos-e-predefinições" class="hash-link" aria-label="Link direto para Modelos e predefinições" title="Link direto para Modelos e predefinições" translate="no">​</a></h2>
+<p>O adaptador porta as predefinições integradas maduras do ContractForge e os modelos de contrato dividido como artefatos de catálogo de propriedade do Databricks.</p>
+<p>Implemented pieces:</p>
+<ul>
+<li class=""><code>presets.list_presets()</code>, <code>get_preset()</code>, <code>preset_details()</code> e <code>apply_preset()</code></li>
+<li class=""><code>templates.list_contract_templates()</code>, <code>get_contract_template()</code>, <code>contract_template_details()</code>, <code>contract_template_files()</code> e <code>recommend_contract_templates()</code></li>
+<li class="">cobertura de cenário bronze, prata e ouro para carregador automático/arquivos incrementais, instantâneos de arquivo HTTP, armazenamento de objetos, estado atual do JDBC, diferença de hash, histórico, exclusão suave de instantâneo, Lakeflow AUTO artefatos de revisão do CDC e atualização completa dourada</li>
+<li class="">a contagem completa de predefinições de linha de base do adaptador Databricks é representada: 29 predefinições de propriedade do Databricks cobrindo ingestão de bronze, modos de gravação/SCD prateados, padrões de veiculação de ouro, propriedades do Delta, política de qualidade, padrões de tempo de execução, padrões de governança e seleção de visualização do mecanismo de gravação</li>
+<li class="">A paridade CLI inclui recomendações <code>templates wizard</code> e materialização de pacote opcional por meio do <code>--output</code>, combinando o fluxo de trabalho interativo sem mover modelos para o CLI principal</li>
+</ul>
+<p>O catálogo predefinido é dividido por domínio (<code>bronze</code>, <code>silver</code>, <code>gold</code>, <code>modifiers</code>, <code>runtime</code>, <code>write_engine</code>) para que novos padrões não se acumulem em um arquivo central. Os termos nativos do Databricks, como Auto Loader, permanecem aceitáveis ​​em nomes de predefinições/modelos do adaptador, mas as cargas úteis do contrato usam nomes de origem principal canônicos, como <code>incremental_files</code>. O adaptador converte essa semântica para o comportamento de tempo de execução do Databricks.</p>
+<p>Esses ajudantes não fazem parte do <code>contractforge_core</code>. Eles são exemplos e padrões do adaptador Databricks. Os contratos principais permanecem semânticos; o catálogo de adaptadores mostra como essas semânticas são comumente usadas no Databricks.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="control-dashboard">Control Dashboard<a href="#control-dashboard" class="hash-link" aria-label="Link direto para Control Dashboard" title="Link direto para Control Dashboard" translate="no">​</a></h2>
+<p>O adaptador porta o centro de comandos de operações de linha de base do adaptador Databricks como artefatos de propriedade do Databricks nas tabelas de evidências/controle.</p>
+<p>Implemented pieces:</p>
+<ul>
+<li class=""><code>dashboards.control_dashboard_queries()</code> retorna o catálogo de 22 consultas.</li>
+<li class=""><code>dashboards.render_control_dashboard_sql()</code> renderiza Databricks SQL sobre o catálogo/esquema de evidências selecionado.</li>
+<li class=""><code>dashboards.control_dashboard_blueprint()</code> agrupa as consultas em páginas de visão geral, confiabilidade, desempenho, qualidade, streaming e governança.</li>
+<li class=""><code>dashboards.render_control_dashboard_artifacts()</code> emits SQL plus a serializable blueprint.</li>
+</ul>
+<p>A renderização do painel é de propriedade do adaptador porque os nomes das tabelas, o dialeto SQL, os destinos de visualização e a implantação do Lakeview são específicos do Databricks.</p></div><footer class="theme-doc-footer docusaurus-mt-lg"><div class="row margin-top--sm theme-doc-footer-edit-meta-row"><div class="col noPrint_WFHX"><a href="https://github.com/marquesantero/contractforge/edit/main/site/docs/specs/databricks-adapter.md" target="_blank" rel="noopener noreferrer" class="theme-edit-this-page"><svg fill="currentColor" height="20" width="20" viewBox="0 0 40 40" class="iconEdit_Z9Sw" aria-hidden="true"><g><path d="m34.5 11.7l-3 3.1-6.3-6.3 3.1-3q0.5-0.5 1.2-0.5t1.1 0.5l3.9 3.9q0.5 0.4 0.5 1.1t-0.5 1.2z m-29.5 17.1l18.4-18.5 6.3 6.3-18.4 18.4h-6.3v-6.2z"></path></g></svg>Editar esta página</a></div><div class="col lastUpdated_JAkA"></div></div></footer></article><nav class="docusaurus-mt-lg pagination-nav" aria-label="Páginas de documento"></nav></div></div><div class="col col--3"><div class="tableOfContents_bqdL thin-scrollbar theme-doc-toc-desktop"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#propósito" class="table-of-contents__link toc-highlight">Propósito</a></li><li><a href="#domain-layout" class="table-of-contents__link toc-highlight">Domain Layout</a></li><li><a href="#limites" class="table-of-contents__link toc-highlight">Limites</a></li><li><a href="#environment-binding" class="table-of-contents__link toc-highlight">Environment Binding</a></li><li><a href="#naming-binding" class="table-of-contents__link toc-highlight">Naming Binding</a></li><li><a href="#escopo-atual" class="table-of-contents__link toc-highlight">Escopo Atual</a></li><li><a href="#escrever-métricas" class="table-of-contents__link toc-highlight">Escrever métricas</a></li><li><a href="#cost-signals" class="table-of-contents__link toc-highlight">Cost Signals</a></li><li><a href="#módulos-de-execução-futura" class="table-of-contents__link toc-highlight">Módulos de Execução Futura</a></li><li><a href="#padrão-de-preparação-vs-execução" class="table-of-contents__link toc-highlight">Padrão de Preparação vs Execução</a></li><li><a href="#harness-de-ingestão-de-tempo-de-execução" class="table-of-contents__link toc-highlight">harness de ingestão de tempo de execução</a></li><li><a href="#databricks-cli" class="table-of-contents__link toc-highlight">Databricks CLI</a></li><li><a href="#transform-interpretation" class="table-of-contents__link toc-highlight">Transform Interpretation</a></li><li><a href="#shape-interpretation" class="table-of-contents__link toc-highlight">Shape Interpretation</a></li><li><a href="#tradução-de-origem" class="table-of-contents__link toc-highlight">Tradução de origem</a></li><li><a href="#lakeflow-auto-cdc-artefatos" class="table-of-contents__link toc-highlight">Lakeflow AUTO CDC Artefatos</a></li><li><a href="#implementação-de-evidências" class="table-of-contents__link toc-highlight">Implementação de evidências</a></li><li><a href="#anotações-e-governança" class="table-of-contents__link toc-highlight">Anotações e governança</a></li><li><a href="#operational-error-handling" class="table-of-contents__link toc-highlight">Operational Error Handling</a></li><li><a href="#operational-state" class="table-of-contents__link toc-highlight">Operational State</a></li><li><a href="#watermarks" class="table-of-contents__link toc-highlight">Watermarks</a></li><li><a href="#lineage" class="table-of-contents__link toc-highlight">Lineage</a></li><li><a href="#diagnostics" class="table-of-contents__link toc-highlight">Diagnostics</a></li><li><a href="#qualidade" class="table-of-contents__link toc-highlight">Qualidade</a></li><li><a href="#política-de-esquema" class="table-of-contents__link toc-highlight">Política de esquema</a></li><li><a href="#maintenance" class="table-of-contents__link toc-highlight">Maintenance</a></li><li><a href="#databricks-asset-bundles" class="table-of-contents__link toc-highlight">Databricks Asset Bundles</a></li><li><a href="#modelos-e-predefinições" class="table-of-contents__link toc-highlight">Modelos e predefinições</a></li><li><a href="#control-dashboard" class="table-of-contents__link toc-highlight">Control Dashboard</a></li></ul></div></div></div></div></main></div></div></div><footer class="theme-layout-footer footer footer--dark"><div class="container container-fluid"><div class="row footer__links"><div class="theme-layout-footer-column col footer__col"><div class="footer__title">Documentação</div><ul class="footer__items clean-list"><li class="footer__item"><a class="footer__link-item" href="/contractforge/pt-BR/docs/start/quickstart/">Início rápido</a></li><li class="footer__item"><a class="footer__link-item" href="/contractforge/pt-BR/docs/contracts/overview/">Contratos</a></li><li class="footer__item"><a class="footer__link-item" href="/contractforge/pt-BR/docs/connectors/overview/">Conectores</a></li><li class="footer__item"><a class="footer__link-item" href="/contractforge/pt-BR/docs/operations/overview/">Operações</a></li></ul></div><div class="theme-layout-footer-column col footer__col"><div class="footer__title">Projeto</div><ul class="footer__items clean-list"><li class="footer__item"><a href="https://github.com/marquesantero/contractforge" target="_blank" rel="noopener noreferrer" class="footer__link-item">GitHub<svg width="13.5" height="13.5" aria-label="(abre em nova aba)" class="iconExternalLink_nPIU"><use href="#theme-svg-external-link"></use></svg></a></li><li class="footer__item"><a href="https://github.com/marquesantero/contractforge/issues" target="_blank" rel="noopener noreferrer" class="footer__link-item">Issues<svg width="13.5" height="13.5" aria-label="(abre em nova aba)" class="iconExternalLink_nPIU"><use href="#theme-svg-external-link"></use></svg></a></li><li class="footer__item"><a href="https://github.com/marquesantero/contractforge/releases" target="_blank" rel="noopener noreferrer" class="footer__link-item">Versões<svg width="13.5" height="13.5" aria-label="(abre em nova aba)" class="iconExternalLink_nPIU"><use href="#theme-svg-external-link"></use></svg></a></li></ul></div></div><div class="footer__bottom text--center"><div class="footer__copyright">Copyright © 2026 ContractForge contributors. Documentação publicada com Docusaurus.</div></div></div></footer></div>
+</body>
+</html>

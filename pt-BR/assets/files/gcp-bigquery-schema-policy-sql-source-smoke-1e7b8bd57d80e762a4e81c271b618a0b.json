@@ -1,0 +1,103 @@
+{
+  "kind": "contractforge_gcp_bigquery_schema_policy_sql_source_smoke",
+  "schema_version": "1.0.0",
+  "adapter": "contractforge-gcp",
+  "subtarget": "gcp_bigquery",
+  "maturity_gate": "GCP-BQ-07G",
+  "status": "PASS",
+  "executed_at": "2026-06-16",
+  "project": "midyear-system-499521-p3",
+  "location": "us-east1",
+  "contract": {
+    "source": "inline_sql",
+    "target": "midyear-system-499521-p3.contractforge_gcp_schema_policy_smoke.schema_policy_sql_source_target",
+    "mode": "append",
+    "schema_policy": "permissive"
+  },
+  "command": "python -m contractforge_gcp.cli smoke .tmp/gcp_schema_policy_sql_source_contract.yaml --environment .tmp/gcp_schema_policy_smoke_environment.yaml --execute --runtime bq --enforce-schema-policy --report .tmp/gcp-schema-policy-sql-source-smoke.json",
+  "operations": [
+    {
+      "name": "prepare_evidence",
+      "status": "SUCCEEDED"
+    },
+    {
+      "name": "schema_policy",
+      "status": "SUCCEEDED",
+      "source_inspection": "zero-row SQL schema probe in evidence dataset",
+      "probe_cleanup": "VALIDATED",
+      "commands": [
+        "ALTER TABLE `midyear-system-499521-p3.contractforge_gcp_schema_policy_smoke.schema_policy_sql_source_target` ADD COLUMN `status` STRING"
+      ],
+      "schema_changes": {
+        "added_columns": [
+          {
+            "column": "status",
+            "source_type": "STRING",
+            "target_type": null,
+            "change_type": "ADD_COLUMN",
+            "applied": true
+          }
+        ]
+      }
+    },
+    {
+      "name": "persist_schema_evidence",
+      "status": "SUCCEEDED"
+    },
+    {
+      "name": "write_target",
+      "status": "SUCCEEDED",
+      "inserted_rows": 2
+    },
+    {
+      "name": "persist_run_evidence",
+      "status": "SUCCEEDED"
+    },
+    {
+      "name": "persist_lineage_evidence",
+      "status": "SUCCEEDED"
+    }
+  ],
+  "readback": {
+    "target_columns": [
+      {
+        "column_name": "order_id",
+        "data_type": "STRING",
+        "is_nullable": "YES",
+        "ordinal_position": 1
+      },
+      {
+        "column_name": "status",
+        "data_type": "STRING",
+        "is_nullable": "YES",
+        "ordinal_position": 2
+      }
+    ],
+    "target_row_count": 2,
+    "target_status_not_null": 2,
+    "schema_evidence": {
+      "schema_policy": "permissive",
+      "status": "SUCCEEDED",
+      "added_columns": [
+        "status"
+      ],
+      "removed_columns": [],
+      "added_column": "status",
+      "added_applied": true,
+      "error_message": null
+    },
+    "schema_probe_tables_remaining": []
+  },
+  "decision": {
+    "sql_source_schema_policy_e2e": "VALIDATED",
+    "schema_probe_cleanup": "VALIDATED",
+    "schema_evidence_readback": "VALIDATED",
+    "write_after_schema_sync": "VALIDATED",
+    "full_schema_policy_promotion": "PENDING"
+  },
+  "notes": [
+    "This smoke validates opt-in schema-policy runtime enforcement for a BigQuery SQL source, not only table/view sources.",
+    "The runtime creates a zero-row schema probe table in the evidence dataset, inspects it through INFORMATION_SCHEMA.COLUMNS, drops it, applies the nullable target column and then executes the contract write.",
+    "Automatic BigQuery type widening or mutation is review-required outside the stable runtime path and recorded in docs/reports/gcp-schema-policy-type-mutation-decision.json."
+  ]
+}
