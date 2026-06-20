@@ -1,7 +1,7 @@
 # Platform Parity Tests
 
 These scenarios validate how easily a ContractForge contract moves between
-Databricks, AWS, Snowflake and Fabric.
+Databricks, AWS, Snowflake, Fabric and GCP.
 
 The rule is strict:
 
@@ -17,13 +17,15 @@ The rule is strict:
 The executable scenario definitions live in
 `tools/platform_parity/contracts.py`.
 
-| Scenario | Intent | Databricks | AWS | Snowflake | Fabric |
-|---|---|---|---|---|---|
-| `orders_append_quality` | JSON append with casts, standardization, annotations and quality/quarantine. | `SUPPORTED` | `SUPPORTED` | `SUPPORTED` | `SUPPORTED_WITH_WARNINGS` |
-| `orders_overwrite_shape` | JSON overwrite with parse/explode/select shape and expression quality. | `SUPPORTED` | `SUPPORTED_WITH_WARNINGS` | `REVIEW_REQUIRED` | `SUPPORTED_WITH_WARNINGS` |
-| `customers_upsert` | current-state upsert with deterministic deduplicate and merge-key guards. | `SUPPORTED` | `SUPPORTED` | `SUPPORTED` | `SUPPORTED_WITH_WARNINGS` |
-| `customers_hash_diff` | hash-diff upsert update minimization. | `SUPPORTED` | `SUPPORTED_WITH_WARNINGS` | `SUPPORTED_WITH_WARNINGS` | `SUPPORTED_WITH_WARNINGS` |
-| `governance_review_boundary` | Same row-filter and column-mask intent. | `SUPPORTED` | `REVIEW_REQUIRED` | `SUPPORTED` | `REVIEW_REQUIRED` |
+| Scenario | Intent | Databricks | AWS | Snowflake | Fabric | GCP |
+|---|---|---|---|---|---|---|
+| `orders_append_quality` | JSON append with casts, standardization, annotations and quality/quarantine. | `SUPPORTED` | `SUPPORTED` | `SUPPORTED` | `SUPPORTED_WITH_WARNINGS` | `SUPPORTED_WITH_WARNINGS` |
+| `orders_overwrite_shape` | JSON overwrite with parse/explode/select shape and expression quality. | `SUPPORTED` | `SUPPORTED_WITH_WARNINGS` | `REVIEW_REQUIRED` | `SUPPORTED_WITH_WARNINGS` | `UNSUPPORTED` |
+| `customers_upsert` | current-state upsert with deterministic deduplicate and merge-key guards. | `SUPPORTED` | `SUPPORTED` | `SUPPORTED` | `SUPPORTED_WITH_WARNINGS` | `SUPPORTED_WITH_WARNINGS` |
+| `customers_hash_diff` | hash-diff upsert update minimization. | `SUPPORTED` | `SUPPORTED_WITH_WARNINGS` | `SUPPORTED_WITH_WARNINGS` | `SUPPORTED_WITH_WARNINGS` | `REVIEW_REQUIRED` |
+| `customers_historical` | Historical SCD2 with effective dating, delete expression and late-arriving reject semantics. | `SUPPORTED` | `REVIEW_REQUIRED` | `REVIEW_REQUIRED` | `SUPPORTED_WITH_WARNINGS` | `REVIEW_REQUIRED` |
+| `customers_snapshot_soft_delete` | Complete-source snapshot reconciliation with soft-delete semantics. | `SUPPORTED` | `REVIEW_REQUIRED` | `REVIEW_REQUIRED` | `SUPPORTED_WITH_WARNINGS` | `REVIEW_REQUIRED` |
+| `governance_review_boundary` | Same row-filter and column-mask intent. | `SUPPORTED` | `REVIEW_REQUIRED` | `SUPPORTED` | `REVIEW_REQUIRED` | `REVIEW_REQUIRED` |
 
 ## Local validation
 
@@ -55,11 +57,12 @@ Upload each generated scenario directory to the source path shown by
 - AWS: `s3://contractforge-parity-us-east-1/data/<dataset>/`;
 - Snowflake: `@"CONTRACTFORGE_TEST_DB"."PUBLIC"."CF_PARITY_DATA"/<dataset>/`.
 - Fabric: `Files/contractforge/parity/<dataset>/`.
+- GCP: `gs://contractforge-parity-us/data/<dataset>/`.
 
 ## Real execution validation
 
 The same scenario contracts should be used for real Databricks, AWS,
-Snowflake and, where validated, Fabric smoke runs. Do not hand-edit the
+Snowflake, Fabric and GCP smoke runs. Do not hand-edit the
 ingestion semantics per platform.
 
 Allowed runtime differences:
@@ -69,10 +72,13 @@ Allowed runtime differences:
 - Snowflake staged-file source path, for example
   `@"CONTRACTFORGE_TEST_DB"."PUBLIC"."CF_PARITY_DATA"/...`;
 - Fabric OneLake Files path, for example `Files/contractforge/parity/...`;
+- GCP Cloud Storage source path, for example
+  `gs://contractforge-parity-us/data/...`;
 - Databricks environment evidence catalog/schema;
 - AWS environment evidence database and Glue job deployment defaults;
 - Snowflake environment warehouse/schema/stage bindings;
 - Fabric environment tenant/workspace/lakehouse/warehouse bindings;
+- GCP environment project, location, dataset and evidence dataset bindings;
 - AWS `extensions.aws.iceberg.warehouse`;
 - Snowflake `extensions.snowflake.explain_enabled`.
 
@@ -87,6 +93,11 @@ Acceptance criteria for a real run:
   equivalence is validated for a concrete consumer engine.
 - Snowflake shape-heavy nested JSON remains review-required until SQL/Snowpark
   shape parity is validated against Spark/Glue behavior.
+- GCP shape-heavy nested JSON remains unsupported in the central parity harness
+  until an equivalent BigQuery/Dataflow/Dataproc shaping path is promoted.
+- GCP advanced write modes remain review-required in default planning even
+  though hash-diff production parity is accepted and historical/snapshot review
+  evidence exists.
 
 ## USGS GeoJSON Cross-Adapter E2E
 

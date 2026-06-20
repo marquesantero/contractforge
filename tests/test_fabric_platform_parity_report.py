@@ -15,7 +15,7 @@ def test_fabric_platform_parity_report_matches_shared_generator() -> None:
 
     assert manifest["kind"] == "contractforge_fabric_platform_parity"
     assert manifest["status"] == "PASS_WITH_REVIEW_BOUNDARIES"
-    assert manifest["platforms"] == ["databricks", "aws", "snowflake", "fabric"]
+    assert manifest["platforms"] == ["databricks", "aws", "snowflake", "fabric", "gcp"]
     assert manifest["scenario_count"] == report["scenario_count"]
     assert manifest["portable_signature_equal_all"] is True
 
@@ -25,6 +25,7 @@ def test_fabric_platform_parity_report_matches_shared_generator() -> None:
             "aws_status": item["aws_status"],
             "snowflake_status": item["snowflake_status"],
             "fabric_status": item["fabric_status"],
+            "gcp_status": item["gcp_status"],
             "portable_signature_equal": item["portable_signature_equal"],
         }
         for item in report["results"]
@@ -35,6 +36,7 @@ def test_fabric_platform_parity_report_matches_shared_generator() -> None:
             "aws_status": item["aws_status"],
             "snowflake_status": item["snowflake_status"],
             "fabric_status": item["fabric_status"],
+            "gcp_status": item["gcp_status"],
             "portable_signature_equal": item["portable_signature_equal"],
         }
         for item in manifest["results"]
