@@ -1,0 +1,19 @@
+source:
+  type: http_file
+  format: parquet
+  request:
+    url: http://127.0.0.1:8765/orders.parquet
+  limits:
+    timeout_seconds: 30
+    retry_attempts: 3
+    retry_backoff_seconds: 1
+    max_bytes: 1048576
+target:
+  catalog: midyear-system-499521-p3
+  schema: contractforge_gcp_smoke
+  table: cf_http_file_parquet_orders
+mode: overwrite
+quality_rules:
+  not_null:
+    - order_id
+

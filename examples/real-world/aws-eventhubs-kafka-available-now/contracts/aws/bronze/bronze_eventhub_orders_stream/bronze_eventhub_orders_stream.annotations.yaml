@@ -1,0 +1,14 @@
+table:
+  description: Bronze orders captured from Azure Event Hubs through its Kafka-compatible endpoint.
+  tags:
+    source_system: azure_eventhubs
+    connector: kafka_available_now
+    validation: aws_streaming
+
+columns:
+  event_id:
+    description: Source event identifier.
+  order_id:
+    description: Business order identifier.
+  kafka_offset:
+    description: Kafka-compatible Event Hubs offset observed by Spark.

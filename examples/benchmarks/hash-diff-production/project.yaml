@@ -1,0 +1,55 @@
+name: hash_diff_production_benchmark
+description: >
+  Shared AWS/Snowflake/GCP hash-diff upsert production-certification fixture.
+  The same logical columns and hash semantics are used on all platforms.
+
+source_system:
+  name: benchmark_customers
+  type: table_or_file
+  logical_schema:
+    customer_id: integer
+    segment: string
+    status: string
+    balance: decimal
+    updated_at: timestamp
+    payload_hash_noise: string
+
+environments:
+  aws: environments/aws.environment.yaml
+  gcp: environments/gcp.environment.yaml
+  snowflake: environments/snowflake.environment.yaml
+
+schedule:
+  cron: "0 6 * * *"
+  timezone: UTC
+  enabled: false
+  max_concurrent_runs: 1
+  queue: true
+
+execution_order:
+  - name: customers_hashdiff
+    layer: silver
+    description: Hash-diff upsert customer benchmark target.
+    contracts:
+      aws: contracts/aws/customers_hashdiff.ingestion.yaml
+      gcp: contracts/gcp/customers_hashdiff.ingestion.yaml
+      snowflake: contracts/snowflake/customers_hashdiff.ingestion.yaml
+
+validation:
+  maturity_gates:
+    aws: AWS-HASHDIFF-PROD
+    gcp: GCP-BQ-12C4
+    snowflake: SNOWFLAKE-HASHDIFF-PROD
+  required_cases:
+    - initial_load
+    - no_change_replay
+    - changed_row_wave
+    - concurrent_or_overlap_guard
+    - duplicate_key_failure
+    - null_key_failure
+  datasets:
+    checked_in_rows: 4
+    production_sizes:
+      small: 10000
+      medium: 1000000
+      large: 10000000

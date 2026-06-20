@@ -1,0 +1,30 @@
+source:
+  type: sql
+  system: s3_order_files_curated
+  query: |
+    SELECT
+      order_status,
+      COUNT(DISTINCT customer_id) AS customers,
+      SUM(order_count) AS orders,
+      SUM(gross_amount) AS gross_amount
+    FROM {{ table_ref:silver.s_orders_daily }}
+    GROUP BY order_status
+
+target:
+  catalog: contractforge
+  schema: cf_s3_file_e2e_gold
+  table: g_revenue_by_status
+
+layer: gold
+mode: overwrite
+schema_policy: additive_only
+
+quality_rules:
+  not_null: [order_status]
+  accepted_values:
+    order_status: [paid, cancelled, refunded]
+
+extensions:
+  aws:
+    iceberg:
+      warehouse: s3://contractforge-aws-smoke-449112696824-us-east-1/warehouse/s3-file-e2e/

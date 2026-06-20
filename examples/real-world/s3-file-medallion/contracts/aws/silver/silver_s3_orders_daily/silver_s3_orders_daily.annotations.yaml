@@ -1,0 +1,11 @@
+table:
+  description: Daily order metrics derived from bronze S3 order files.
+  tags:
+    domain: commerce
+    layer: silver
+columns:
+  order_date:
+    description: Order activity date.
+  gross_amount:
+    description: Total order amount for the grouping.
+

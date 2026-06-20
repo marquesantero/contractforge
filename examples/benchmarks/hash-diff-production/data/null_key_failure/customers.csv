@@ -1,0 +1,3 @@
+customer_id,segment,status,balance,updated_at,payload_hash_noise
+,retail,active,100.00,2026-06-09T00:00:00Z,null-key
+2,retail,active,250.00,2026-06-09T00:00:00Z,b

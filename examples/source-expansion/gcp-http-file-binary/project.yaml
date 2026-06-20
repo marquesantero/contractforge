@@ -1,0 +1,17 @@
+name: gcp-http-file-binary
+environments:
+  gcp: environments/gcp.environment.yaml
+execution_order:
+  - name: http_file_avro_orders
+    layer: bronze
+    contracts:
+      gcp: contracts/01_http_file_avro.ingestion.yaml
+  - name: http_file_orc_orders
+    layer: bronze
+    contracts:
+      gcp: contracts/02_http_file_orc.ingestion.yaml
+  - name: http_file_parquet_orders
+    layer: bronze
+    contracts:
+      gcp: contracts/03_http_file_parquet.ingestion.yaml
+

@@ -1,0 +1,51 @@
+name: fabric_iceberg_table_shortcut_source_smoke
+description: Fabric source-expansion smoke for Amazon S3 Iceberg table shortcut reads.
+default_environment: fabric
+
+environments:
+  fabric: environments/fabric.environment.yaml
+
+fabric_setup:
+  shortcuts:
+    - path: Tables
+      name: cf_fabric_iceberg_orders
+      conflict_policy: CreateOrOverwrite
+      target:
+        amazonS3:
+          location: https://contractforge-aws-smoke-449112696824-us-east-1.s3.us-east-1.amazonaws.com
+          subpath: /source-expansion/fabric-iceberg-shortcut/iceberg_orders
+          connectionId: "{{ parameter:fabric.connections.amazon_s3_shortcut_connection_id }}"
+
+execution_order:
+  - name: iceberg_table_shortcut_orders
+    layer: bronze
+    expected_result: succeeded
+    depends_on: []
+    contracts:
+      fabric: contracts/01_iceberg_table_shortcut_orders.ingestion.yaml
+  - name: iceberg_table_shortcut_evidence_probe
+    layer: bronze
+    expected_result: succeeded
+    depends_on: [iceberg_table_shortcut_orders]
+    contracts:
+      fabric: contracts/02_iceberg_table_shortcut_evidence_probe.ingestion.yaml
+
+source_expansion:
+  source_family: iceberg_table_shortcut
+  shortcut_kind: external_amazon_s3_iceberg_table
+  authentication: fabric_connection_basic_iam_user
+  source_format: iceberg
+  expected_success_steps: 2
+  expected_probe_checks: 6
+  stable_final_scope: stable_f11_iceberg_table_shortcut_evidence
+  fixture:
+    generator: pyiceberg_local_sql_catalog
+    rows: 3
+    s3_prefix: s3://contractforge-aws-smoke-449112696824-us-east-1/source-expansion/fabric-iceberg-shortcut/iceberg_orders/
+  shortcut:
+    path: Tables
+    name: cf_fabric_iceberg_orders
+    read_table: cf_fabric_iceberg_orders
+    target_type: AmazonS3
+    target_location: https://contractforge-aws-smoke-449112696824-us-east-1.s3.us-east-1.amazonaws.com
+    target_subpath: /source-expansion/fabric-iceberg-shortcut/iceberg_orders

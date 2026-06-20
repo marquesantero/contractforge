@@ -1,0 +1,26 @@
+source:
+  type: http_json
+  request:
+    url: https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_day.geojson
+    method: GET
+    headers:
+      Accept: application/geo+json, application/json
+      User-Agent: ContractForge Fabric HTTP source smoke
+  options:
+    multiLine: "true"
+  limits:
+    timeout_seconds: 60
+    retry_attempts: 3
+    retry_backoff_seconds: 2
+    max_bytes: 10485760
+target:
+  catalog: workspace
+  schema: cf_fabric_source_expansion
+  table: http_json_usgs_geojson
+layer: bronze
+mode: overwrite
+schema_policy: permissive
+quality_rules:
+  required_columns: [type, metadata, features]
+  not_null: [type, metadata]
+  min_rows: 1

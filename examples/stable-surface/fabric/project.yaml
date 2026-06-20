@@ -1,0 +1,129 @@
+name: fabric_stable_surface_smoke
+description: Fabric stable-surface smoke suite for write modes, failure paths and evidence checks.
+default_environment: fabric
+
+environments:
+  fabric: environments/fabric.environment.yaml
+
+execution_order:
+  - name: append_orders
+    layer: bronze
+    expected_result: succeeded
+    depends_on: []
+    contracts:
+      fabric: contracts/01_append_orders.ingestion.yaml
+  - name: overwrite_orders
+    layer: bronze
+    expected_result: succeeded
+    depends_on: []
+    contracts:
+      fabric: contracts/02_overwrite_orders.ingestion.yaml
+  - name: upsert_customers_seed
+    layer: silver
+    expected_result: succeeded
+    depends_on: []
+    contracts:
+      fabric: contracts/03_upsert_customers_seed.ingestion.yaml
+  - name: upsert_customers_change
+    layer: silver
+    expected_result: succeeded
+    depends_on: [upsert_customers_seed]
+    contracts:
+      fabric: contracts/04_upsert_customers_change.ingestion.yaml
+  - name: hash_diff_customers_seed
+    layer: silver
+    expected_result: succeeded
+    depends_on: []
+    contracts:
+      fabric: contracts/05_hash_diff_customers_seed.ingestion.yaml
+  - name: hash_diff_customers_noop
+    layer: silver
+    expected_result: succeeded
+    depends_on: [hash_diff_customers_seed]
+    contracts:
+      fabric: contracts/06_hash_diff_customers_noop.ingestion.yaml
+  - name: hash_diff_customers_change
+    layer: silver
+    expected_result: succeeded
+    depends_on: [hash_diff_customers_noop]
+    contracts:
+      fabric: contracts/07_hash_diff_customers_change.ingestion.yaml
+  - name: historical_customers_seed
+    layer: silver
+    expected_result: succeeded
+    depends_on: []
+    contracts:
+      fabric: contracts/08_historical_customers_seed.ingestion.yaml
+  - name: historical_customers_change
+    layer: silver
+    expected_result: succeeded
+    depends_on: [historical_customers_seed]
+    contracts:
+      fabric: contracts/09_historical_customers_change.ingestion.yaml
+  - name: snapshot_customers_seed
+    layer: silver
+    expected_result: succeeded
+    depends_on: []
+    contracts:
+      fabric: contracts/10_snapshot_customers_seed.ingestion.yaml
+  - name: snapshot_customers_delete
+    layer: silver
+    expected_result: succeeded
+    depends_on: [snapshot_customers_seed]
+    contracts:
+      fabric: contracts/11_snapshot_customers_delete.ingestion.yaml
+  - name: schema_guard_seed
+    layer: silver
+    expected_result: succeeded
+    depends_on: []
+    contracts:
+      fabric: contracts/12_schema_guard_seed.ingestion.yaml
+  - name: quality_abort_failure
+    layer: silver
+    expected_result: succeeded
+    depends_on: []
+    contracts:
+      fabric: contracts/13_quality_abort_failure.ingestion.yaml
+  - name: strict_schema_failure
+    layer: silver
+    expected_result: succeeded
+    depends_on: [schema_guard_seed]
+    contracts:
+      fabric: contracts/14_strict_schema_failure.ingestion.yaml
+  - name: governance_review_evidence
+    layer: gold
+    expected_result: succeeded
+    depends_on: []
+    contracts:
+      fabric: contracts/15_governance_review_evidence.ingestion.yaml
+  - name: evidence_probe
+    layer: gold
+    expected_result: succeeded
+    depends_on:
+      - append_orders
+      - overwrite_orders
+      - upsert_customers_change
+      - hash_diff_customers_change
+      - historical_customers_change
+      - snapshot_customers_delete
+      - governance_review_evidence
+      - quality_abort_failure
+      - strict_schema_failure
+    contracts:
+      fabric: contracts/16_evidence_probe.ingestion.yaml
+
+stable_surface:
+  target_scope:
+    - append
+    - overwrite
+    - upsert
+    - hash_diff_upsert
+    - historical
+    - snapshot_reconcile_soft_delete
+    - quality_abort
+    - strict_schema_failure
+    - governance_review_evidence
+    - evidence_probe
+  expected_success_steps: 14
+  expected_job_failed_steps: 0
+  expected_evidence_failed_steps: 2

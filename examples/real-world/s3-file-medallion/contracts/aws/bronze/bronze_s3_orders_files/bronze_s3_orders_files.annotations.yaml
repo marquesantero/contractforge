@@ -1,0 +1,16 @@
+table:
+  description: Bronze orders ingested from S3 CSV files with Glue bookmarks.
+  tags:
+    domain: commerce
+    source: s3
+    source_format: csv
+columns:
+  order_id:
+    description: Source order identifier.
+  customer_id:
+    description: Source customer identifier.
+  order_status:
+    description: Normalized order status.
+  amount:
+    description: Order amount in source currency.
+

@@ -1,0 +1,322 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      validation:
+        description: "Validation tier to run"
+        required: true
+        default: auto
+        type: choice
+        options:
+          - auto
+          - smoke
+          - docs
+          - aws
+          - databricks
+          - snowflake
+          - fabric
+          - gcp
+          - ai
+          - package
+          - full
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
+jobs:
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v8.1.0
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+
+      - name: Install test environment
+        run: |
+          uv sync --extra dev
+          uv pip install -e adapters/databricks -e adapters/aws -e adapters/snowflake -e adapters/fabric -e adapters/gcp -e ai
+
+      - name: Select validation scope
+        id: scope
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          requested="${{ github.event.inputs.validation || 'auto' }}"
+          scope="$requested"
+
+          if [[ "${{ github.event_name }}" == "push" && "${{ github.ref }}" == "refs/heads/main" ]]; then
+            scope="full"
+          fi
+
+          if [[ "$scope" == "auto" ]]; then
+            if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+              git fetch origin "${{ github.base_ref }}" --depth=1
+              changed="$(git diff --name-only "origin/${{ github.base_ref }}...HEAD")"
+            else
+              changed="$(git diff --name-only HEAD~1 HEAD || true)"
+            fi
+
+            if [[ -z "$changed" ]]; then
+              scope="full"
+            elif echo "$changed" | grep -Ev '^(docs/|README\.md|site/|\.claude/)' >/dev/null; then
+              if echo "$changed" | grep -Ev '^(adapters/aws/|tests/test_aws|tests/test_adapter_source_support\.py|tests/test_adapter_extension_docs\.py|tests/test_publication_packaging\.py|tests/test_package_version\.py|docs/(adapters/aws\.md|specs/(aws-|extensions-aws)|adrs/ADR-007-aws)|README\.md)$' >/dev/null; then
+                if echo "$changed" | grep -Ev '^(adapters/databricks/|tests/test_databricks|tests/test_adapter_source_support\.py|tests/test_adapter_extension_docs\.py|tests/test_publication_packaging\.py|tests/test_package_version\.py|docs/(databricks\.md|specs/(databricks-|extensions-databricks)|adrs/ADR-002-databricks)|README\.md)$' >/dev/null; then
+                  if echo "$changed" | grep -Ev '^(adapters/snowflake/|tests/test_snowflake|tests/test_adapter_extension_docs\.py|tests/test_publication_packaging\.py|tests/test_package_version\.py|docs/(specs/(snowflake-|extensions-snowflake)|adapters/snowflake\.md)|README\.md)$' >/dev/null; then
+                    if echo "$changed" | grep -Ev '^(pyproject\.toml|uv\.lock|adapters/(aws|databricks|snowflake)/pyproject\.toml|tests/test_publication_packaging\.py|tests/test_package_version\.py|docs/specs/publication-packaging\.md)$' >/dev/null; then
+                      scope="full"
+                    else
+                      scope="package"
+                    fi
+                  else
+                    scope="snowflake"
+                  fi
+                else
+                  scope="databricks"
+                fi
+              else
+                scope="aws"
+              fi
+            elif echo "$changed" | grep -Ev '^\.claude/' >/dev/null; then
+              scope="docs"
+            else
+              scope="smoke"
+            fi
+          fi
+
+          case "$scope" in
+            smoke)
+              pytest_targets="tests/test_core_boundaries.py tests/test_core_security.py tests/test_publication_packaging.py tests/test_package_version.py tests/test_documentation_map.py tests/test_aws_architecture.py tests/test_databricks_architecture.py"
+              build_core="false"
+              build_databricks="false"
+              build_aws="false"
+              build_snowflake="false"
+              build_fabric="false"
+              build_gcp="false"
+              build_ai="false"
+              ;;
+            docs)
+              pytest_targets="tests/test_documentation_map.py tests/test_adapter_authoring_docs.py tests/test_control_table_parity_docs.py tests/test_databricks_contractforge_parity_docs.py tests/test_aws_capability_parity_docs.py tests/test_adapter_extension_docs.py"
+              build_core="false"
+              build_databricks="false"
+              build_aws="false"
+              build_snowflake="false"
+              build_fabric="false"
+              build_gcp="false"
+              build_ai="false"
+              ;;
+            aws)
+              pytest_targets="tests/test_aws_adapter.py tests/test_aws_architecture.py tests/test_aws_capability_parity_docs.py tests/test_aws_deduplicate.py tests/test_aws_dqdl.py tests/test_aws_evidence_apply.py tests/test_aws_http_file.py tests/test_aws_http_safety.py tests/test_aws_incremental_bookmarks.py tests/test_aws_lake_formation.py tests/test_aws_quality_runtime.py tests/test_aws_rds_iam.py tests/test_aws_rest_api.py tests/test_aws_secret_rendering.py tests/test_aws_shape_arrays.py tests/test_aws_shape_columns.py tests/test_aws_shape_flatten.py tests/test_aws_source_coverage.py tests/test_aws_streaming.py tests/test_aws_streams_sharing.py tests/test_adapter_source_support.py tests/test_adapter_extension_docs.py tests/test_publication_packaging.py tests/test_package_version.py"
+              build_core="false"
+              build_databricks="false"
+              build_aws="true"
+              build_snowflake="false"
+              build_fabric="false"
+              build_gcp="false"
+              build_ai="false"
+              ;;
+            databricks)
+              pytest_targets="tests/test_databricks_access_audit_sql.py tests/test_databricks_adapter.py tests/test_databricks_annotations_sql.py tests/test_databricks_architecture.py tests/test_databricks_asset_bundle.py tests/test_databricks_autoloader_source.py tests/test_databricks_bounded_stream_sources.py tests/test_databricks_capabilities.py tests/test_databricks_cli.py tests/test_databricks_contractforge_parity_docs.py tests/test_databricks_control_dashboard.py tests/test_databricks_control_table_schema_parity.py tests/test_databricks_cost.py tests/test_databricks_delta_basic_execution.py tests/test_databricks_delta_share_source.py tests/test_databricks_diagnostics.py tests/test_databricks_environment.py tests/test_databricks_error_normalization.py tests/test_databricks_evidence_ddl.py tests/test_databricks_evidence_sql.py tests/test_databricks_execution_windows.py tests/test_databricks_file_sources.py tests/test_databricks_governance_application.py tests/test_databricks_governance_log.py tests/test_databricks_governance_sql.py tests/test_databricks_governance_validation.py tests/test_databricks_hash_diff_execution.py tests/test_databricks_http_file_source.py tests/test_databricks_http_safety.py tests/test_databricks_jdbc_source.py tests/test_databricks_lakeflow_rendering.py tests/test_databricks_lakeflow.py tests/test_databricks_lineage.py tests/test_databricks_maintenance_sql.py tests/test_databricks_merge_validation.py tests/test_databricks_naming.py tests/test_databricks_native_passthrough_source.py tests/test_databricks_operations_application.py tests/test_databricks_operations_sql.py tests/test_databricks_ops_log.py tests/test_databricks_parity_catalog.py tests/test_databricks_partitioning.py tests/test_databricks_preparation.py tests/test_databricks_presets.py tests/test_databricks_public_api.py tests/test_databricks_pyspark_preparation_static.py tests/test_databricks_pyspark_shape.py tests/test_databricks_pyspark_transform.py tests/test_databricks_quality_evaluation.py tests/test_databricks_quality_registry.py tests/test_databricks_quality_results.py tests/test_databricks_quality_sql.py tests/test_databricks_rds_iam_runtime.py tests/test_databricks_replace_partitions_execution.py tests/test_databricks_rest_api_source.py tests/test_databricks_retry.py tests/test_databricks_runtime_available_now.py tests/test_databricks_runtime_bundles.py tests/test_databricks_runtime_http_file.py tests/test_databricks_runtime_orchestrator.py tests/test_databricks_runtime_rest_api.py tests/test_databricks_runtime_sources.py tests/test_databricks_runtime_spark.py tests/test_databricks_runtime_streaming.py tests/test_databricks_scd2_execution.py tests/test_databricks_schema_diff.py tests/test_databricks_schema_policy.py tests/test_databricks_secret_resolver.py tests/test_databricks_shape_sql.py tests/test_databricks_snapshot_execution.py tests/test_databricks_source_artifacts.py tests/test_databricks_source_interpretation.py tests/test_databricks_source_metadata.py tests/test_databricks_sql_merge_execution.py tests/test_databricks_sql_runtime_utils.py tests/test_databricks_state_sql.py tests/test_databricks_table_setup.py tests/test_databricks_templates.py tests/test_databricks_transform_sql.py tests/test_databricks_watermark_sql.py tests/test_databricks_write_metrics.py tests/test_databricks_write_mode_registry.py tests/test_databricks_write_strategy.py tests/test_adapter_source_support.py tests/test_adapter_extension_docs.py tests/test_publication_packaging.py tests/test_package_version.py"
+              build_core="false"
+              build_databricks="true"
+              build_aws="false"
+              build_snowflake="false"
+              build_fabric="false"
+              build_gcp="false"
+              build_ai="false"
+              ;;
+            snowflake)
+              pytest_targets="tests/test_snowflake_adapter.py tests/test_publication_packaging.py tests/test_package_version.py"
+              build_core="false"
+              build_databricks="false"
+              build_aws="false"
+              build_snowflake="true"
+              build_fabric="false"
+              build_gcp="false"
+              build_ai="false"
+              ;;
+            fabric)
+              pytest_targets="tests/test_fabric_adapter.py tests/test_fabric_architecture.py tests/test_fabric_auth.py tests/test_fabric_cli_runtime.py tests/test_fabric_quality.py tests/test_fabric_shape.py tests/test_fabric_transform.py tests/test_fabric_stable_surface_smoke.py tests/test_fabric_platform_parity_report.py tests/test_fabric_maturity_docs.py tests/test_publication_packaging.py tests/test_package_version.py"
+              build_core="false"
+              build_databricks="false"
+              build_aws="false"
+              build_snowflake="false"
+              build_fabric="true"
+              build_gcp="false"
+              build_ai="false"
+              ;;
+            gcp)
+              pytest_targets="tests/test_gcp_adapter.py tests/test_gcp_smoke.py tests/test_gcp_capability_parity_docs.py tests/test_gcp_cost.py tests/test_gcp_lineage.py tests/test_publication_packaging.py tests/test_package_version.py"
+              build_core="false"
+              build_databricks="false"
+              build_aws="false"
+              build_snowflake="false"
+              build_fabric="false"
+              build_gcp="true"
+              build_ai="false"
+              ;;
+            ai)
+              pytest_targets="ai/tests/test_architecture_boundaries.py tests/test_publication_packaging.py tests/test_package_version.py"
+              build_core="false"
+              build_databricks="false"
+              build_aws="false"
+              build_snowflake="false"
+              build_fabric="false"
+              build_gcp="false"
+              build_ai="true"
+              ;;
+            package)
+              pytest_targets="tests/test_publication_packaging.py tests/test_package_version.py"
+              build_core="true"
+              build_databricks="true"
+              build_aws="true"
+              build_snowflake="true"
+              build_fabric="true"
+              build_gcp="true"
+              build_ai="true"
+              ;;
+            full)
+              pytest_targets=""
+              build_core="true"
+              build_databricks="true"
+              build_aws="true"
+              build_snowflake="true"
+              build_fabric="true"
+              build_gcp="true"
+              build_ai="true"
+              ;;
+            *)
+              echo "Unknown validation scope: $scope" >&2
+              exit 1
+              ;;
+          esac
+
+          echo "scope=$scope" >> "$GITHUB_OUTPUT"
+          echo "pytest_targets=$pytest_targets" >> "$GITHUB_OUTPUT"
+          echo "build_core=$build_core" >> "$GITHUB_OUTPUT"
+          echo "build_databricks=$build_databricks" >> "$GITHUB_OUTPUT"
+          echo "build_aws=$build_aws" >> "$GITHUB_OUTPUT"
+          echo "build_snowflake=$build_snowflake" >> "$GITHUB_OUTPUT"
+          echo "build_fabric=$build_fabric" >> "$GITHUB_OUTPUT"
+          echo "build_gcp=$build_gcp" >> "$GITHUB_OUTPUT"
+          echo "build_ai=$build_ai" >> "$GITHUB_OUTPUT"
+          echo "Selected validation scope: $scope"
+
+      - name: Run tests
+        run: uv run pytest ${{ steps.scope.outputs.pytest_targets }}
+
+      - name: Build core wheel
+        if: steps.scope.outputs.build_core == 'true'
+        run: uv build --wheel
+
+      - name: Build Databricks adapter wheel
+        if: steps.scope.outputs.build_databricks == 'true'
+        working-directory: adapters/databricks
+        run: uv build --wheel
+
+      - name: Build AWS adapter wheel
+        if: steps.scope.outputs.build_aws == 'true'
+        working-directory: adapters/aws
+        run: uv build --wheel
+
+      - name: Build Snowflake adapter wheel
+        if: steps.scope.outputs.build_snowflake == 'true'
+        working-directory: adapters/snowflake
+        run: uv build --wheel
+
+      - name: Build Fabric adapter wheel
+        if: steps.scope.outputs.build_fabric == 'true'
+        working-directory: adapters/fabric
+        run: uv build --wheel
+
+      - name: Build GCP adapter wheel
+        if: steps.scope.outputs.build_gcp == 'true'
+        working-directory: adapters/gcp
+        run: uv build --wheel
+
+      - name: Build AI package wheel
+        if: steps.scope.outputs.build_ai == 'true'
+        working-directory: ai
+        run: uv build --wheel
+
+  install-matrix:
+    name: Install smoke (${{ matrix.os }}, py${{ matrix.python-version }})
+    runs-on: ${{ matrix.os }}
+    if: github.event_name == 'push' || github.event.inputs.validation == 'package' || github.event.inputs.validation == 'full'
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        python-version: ["3.10", "3.11", "3.12"]
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Build all wheels
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install --upgrade build
+          mkdir -p wheelhouse
+          python -m build --wheel --outdir wheelhouse
+          (cd adapters/databricks && python -m build --wheel --outdir ../../wheelhouse)
+          (cd adapters/aws && python -m build --wheel --outdir ../../wheelhouse)
+          (cd adapters/snowflake && python -m build --wheel --outdir ../../wheelhouse)
+          (cd adapters/fabric && python -m build --wheel --outdir ../../wheelhouse)
+          (cd adapters/gcp && python -m build --wheel --outdir ../../wheelhouse)
+          (cd ai && python -m build --wheel --outdir ../wheelhouse)
+
+      - name: Install wheels in clean environment
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m venv .install-smoke
+          if [[ -f .install-smoke/bin/activate ]]; then
+            source .install-smoke/bin/activate
+          else
+            source .install-smoke/Scripts/activate
+          fi
+          python -m pip install --upgrade pip
+          python -m pip install \
+            wheelhouse/contractforge_core-*.whl \
+            wheelhouse/contractforge_databricks-*.whl \
+            wheelhouse/contractforge_aws-*.whl \
+            wheelhouse/contractforge_snowflake-*.whl \
+            wheelhouse/contractforge_fabric-*.whl \
+            wheelhouse/contractforge_gcp-*.whl \
+            wheelhouse/contractforge_ai-*.whl
+          python -c "import contractforge_core, contractforge_databricks, contractforge_aws, contractforge_snowflake, contractforge_fabric, contractforge_gcp, contractforge_ai"
+          contractforge --help
+          contractforge-databricks --help
+          contractforge-aws --help
+          contractforge-snowflake --help
+          contractforge-fabric --help
+          contractforge-gcp --help
+          contractforge-ai --help

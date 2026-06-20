@@ -1,0 +1,52 @@
+source:
+  type: sql
+  system: supabase_inventory_curated
+  name: latest_product_movements
+  query: |
+    SELECT
+      movement_uid,
+      product_id,
+      movement_seq,
+      movement_type,
+      quantity,
+      unit_cost,
+      movement_value,
+      movement_date,
+      event_ts,
+      updated_at,
+      ROW_NUMBER() OVER (
+        PARTITION BY product_id
+        ORDER BY event_ts DESC, updated_at DESC
+      ) AS product_recent_movement_rank
+    FROM {{ table_ref:bronze.b_product_movements_jdbc }}
+  read:
+    source_complete: true
+
+target:
+  catalog: workspace
+  schema: cf_supabase_jdbc_e2e_v2_silver
+  table: s_movements_current
+
+layer: silver
+mode: overwrite
+schema_policy: additive_only
+
+transform:
+  derive:
+    is_latest_for_product: product_recent_movement_rank = 1
+    curated_at_utc: CURRENT_TIMESTAMP()
+
+quality_rules:
+  not_null: [movement_uid, product_id, movement_type, event_ts]
+  unique_key: [movement_uid]
+  expressions:
+    - name: positive_rank
+      expression: product_recent_movement_rank >= 1
+      severity: abort
+      message: Window rank must be positive.
+
+extensions:
+  databricks:
+    delta_properties:
+      delta.enableChangeDataFeed: "true"
+    cluster_columns: [movement_date, movement_type]

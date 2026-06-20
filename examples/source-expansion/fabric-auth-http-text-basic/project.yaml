@@ -1,0 +1,27 @@
+name: fabric_authenticated_http_text_basic_source_smoke
+description: Fabric source-expansion smoke for endpoint-enforced Basic auth on bounded HTTP text reads.
+default_environment: fabric
+
+environments:
+  fabric: environments/fabric.environment.yaml
+
+execution_order:
+  - name: authenticated_http_text_basic
+    layer: bronze
+    expected_result: succeeded
+    depends_on: []
+    contracts:
+      fabric: contracts/01_authenticated_http_text_basic.ingestion.yaml
+  - name: authenticated_http_text_basic_evidence_probe
+    layer: bronze
+    expected_result: succeeded
+    depends_on: [authenticated_http_text_basic]
+    contracts:
+      fabric: contracts/02_authenticated_http_text_basic_evidence_probe.ingestion.yaml
+
+source_expansion:
+  source_family: http_text
+  authentication: endpoint_enforced_basic_key_vault_placeholder
+  expected_success_steps: 2
+  expected_probe_checks: 6
+  stable_final_scope: stable_f11_endpoint_enforced_http_text_basic_evidence

@@ -1,0 +1,30 @@
+name: fabric_confluent_kafka_available_now_source_smoke
+description: Fabric source-expansion smoke for checkpointed Confluent Cloud Kafka available-now reads.
+default_environment: fabric
+
+environments:
+  fabric: environments/fabric.environment.yaml
+
+execution_order:
+  - name: confluent_kafka_available_now_orders
+    layer: bronze
+    expected_result: succeeded
+    depends_on: []
+    contracts:
+      fabric: contracts/01_confluent_kafka_available_now_orders.ingestion.yaml
+  - name: confluent_kafka_available_now_evidence_probe
+    layer: bronze
+    expected_result: succeeded
+    depends_on: [confluent_kafka_available_now_orders]
+    contracts:
+      fabric: contracts/02_confluent_kafka_available_now_evidence_probe.ingestion.yaml
+
+source_expansion:
+  source_family: confluent_kafka_available_now
+  authentication: sasl_plain_key_vault_placeholder
+  trigger: available_now
+  checkpoint_location: Files/checkpoints/contractforge/fabric-confluent-kafka-available-now/orders-20260612
+  expected_success_steps: 2
+  expected_probe_checks: 6
+  stable_final_scope: stable_f11_available_now_stream_evidence
+

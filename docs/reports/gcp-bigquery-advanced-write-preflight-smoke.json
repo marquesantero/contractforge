@@ -1,0 +1,95 @@
+{
+  "kind": "contractforge_gcp_bigquery_advanced_write_preflight_smoke",
+  "schema_version": "1.0.0",
+  "adapter": "contractforge-gcp",
+  "subtarget": "gcp_bigquery",
+  "maturity_gate": "GCP-BQ-12C1",
+  "status": "PASS_WITH_REVIEW_BOUNDARY",
+  "executed_at": "2026-06-16",
+  "project_id": "midyear-system-499521-p3",
+  "location": "us-east1",
+  "datasets": {
+    "target": "contractforge_gcp_advanced_write_smoke",
+    "evidence": "contractforge_gcp_advanced_write_ops"
+  },
+  "scope": {
+    "validated": [
+      "hash_diff_upsert changed-row replay",
+      "hash_diff_upsert no-change replay after changed-row replay",
+      "hash_diff_upsert null merge-key preflight failure before MERGE",
+      "hash_diff_upsert duplicate merge-key preflight failure before MERGE",
+      "failed run and lineage evidence for preflight failures"
+    ],
+    "still_open": [
+      "historical delete-expression and late-arriving reject parity",
+      "snapshot broader complete-source variants",
+      "advanced write concurrent writer behavior",
+      "production-sized cross-adapter parity contracts"
+    ]
+  },
+  "contracts": [
+    {
+      "name": "hashdiff_changed_wave",
+      "mode": "hash_diff_upsert",
+      "source": "contractforge_gcp_advanced_write_smoke.hashdiff_source",
+      "target": "contractforge_gcp_advanced_write_smoke.hashdiff_target",
+      "first_run": {
+        "status": "SUCCEEDED",
+        "planning_status": "REVIEW_REQUIRED",
+        "statement_type": "MERGE",
+        "job_id": "cf_gcp_smoke_query_02e9fa4a51c146f5bc00",
+        "inserted_rows": 0,
+        "updated_rows": 1,
+        "deleted_rows": 0
+      },
+      "replay": {
+        "status": "SUCCEEDED",
+        "planning_status": "REVIEW_REQUIRED",
+        "statement_type": "MERGE",
+        "job_id": "cf_gcp_smoke_query_08eba47129a8490782a6",
+        "inserted_rows": 0,
+        "updated_rows": 0,
+        "deleted_rows": 0
+      },
+      "readback": {
+        "total_rows": 2,
+        "changed_rows_matching_source": 1
+      }
+    },
+    {
+      "name": "hashdiff_null_merge_key",
+      "mode": "hash_diff_upsert",
+      "source": "contractforge_gcp_advanced_write_smoke.hashdiff_null_source",
+      "target": "contractforge_gcp_advanced_write_smoke.hashdiff_negative_target",
+      "result": {
+        "status": "FAILED",
+        "planning_status": "REVIEW_REQUIRED",
+        "job_id": "cf_gcp_smoke_query_f3203076725a47ad9013",
+        "error_marker": "CONTRACTFORGE_NULL_MERGE_KEY"
+      }
+    },
+    {
+      "name": "hashdiff_duplicate_merge_key",
+      "mode": "hash_diff_upsert",
+      "source": "contractforge_gcp_advanced_write_smoke.hashdiff_duplicate_source",
+      "target": "contractforge_gcp_advanced_write_smoke.hashdiff_negative_target",
+      "result": {
+        "status": "FAILED",
+        "planning_status": "REVIEW_REQUIRED",
+        "job_id": "cf_gcp_smoke_query_5d96e6199ef04c41b677",
+        "error_marker": "CONTRACTFORGE_DUPLICATE_MERGE_KEYS"
+      }
+    }
+  ],
+  "target_readback": {
+    "hashdiff_target": {
+      "total_rows": 2,
+      "changed_rows_matching_source": 1
+    },
+    "hashdiff_negative_target": {
+      "total_rows": 1,
+      "seed_rows_preserved": 1
+    }
+  },
+  "decision": "GCP-BQ-12C1 closes hash_diff_upsert changed-row replay plus null/duplicate merge-key preflight failure evidence. GCP-BQ-12C now accepts hash_diff_upsert cross-adapter production parity using GCP, AWS, Snowflake and Fabric evidence. Historical and snapshot production parity remains tracked separately."
+}

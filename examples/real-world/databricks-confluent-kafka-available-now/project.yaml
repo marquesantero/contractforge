@@ -1,0 +1,11 @@
+name: databricks_confluent_kafka_available_now
+description: Databricks available-now Kafka ingestion from Confluent Cloud through ContractForge contracts.
+source_connector: kafka_available_now
+adapters:
+  databricks:
+    workspace_root: /Workspace/Shared/contractforge-examples/Databricks_Kafka_Available_Now
+    bundle_root: /Workspace/Shared/contractforge-examples/Databricks_Kafka_Available_Now/files
+    core_wheel_path: /Workspace/Shared/contractforge-examples/libs/contractforge_core-0.1.0-py3-none-any.whl
+    databricks_wheel_path: /Workspace/Shared/contractforge-examples/libs/contractforge_databricks-0.1.0-py3-none-any.whl
+    evidence_catalog: workspace
+    evidence_schema: cf_databricks_kafka_contract_ops

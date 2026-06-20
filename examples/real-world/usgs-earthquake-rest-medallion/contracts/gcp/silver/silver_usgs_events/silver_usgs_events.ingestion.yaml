@@ -1,0 +1,138 @@
+source:
+  type: sql
+  system: usgs
+  name: usgs_earthquake_events
+  query: |
+    WITH parsed AS (
+      SELECT
+        raw_response,
+        response_page_number,
+        PARSE_JSON(raw_response) AS payload
+      FROM `midyear-system-499521-p3.contractforge_gcp_usgs_rest_bronze.b_usgs_earthquake_geojson`
+    ),
+    flattened AS (
+      SELECT
+        raw_response,
+        response_page_number,
+        payload,
+        feature
+      FROM parsed,
+      UNNEST(JSON_QUERY_ARRAY(payload, '$.features')) AS feature
+    ),
+    shaped AS (
+      SELECT
+        SAFE_CAST(JSON_VALUE(payload, '$.metadata.generated') AS INT64) AS feed_generated_epoch_ms,
+        JSON_VALUE(payload, '$.metadata.title') AS feed_title,
+        SAFE_CAST(JSON_VALUE(payload, '$.metadata.count') AS INT64) AS feed_event_count,
+        JSON_VALUE(payload, '$.metadata.api') AS feed_api_version,
+        JSON_QUERY(payload, '$.bbox') AS feed_bbox,
+        JSON_VALUE(feature, '$.id') AS earthquake_id,
+        JSON_VALUE(feature, '$.type') AS geojson_feature_type,
+        JSON_VALUE(feature, '$.properties.title') AS event_title,
+        JSON_VALUE(feature, '$.properties.place') AS place,
+        SAFE_CAST(JSON_VALUE(feature, '$.properties.mag') AS FLOAT64) AS magnitude,
+        LOWER(NULLIF(TRIM(JSON_VALUE(feature, '$.properties.magType')), '')) AS magnitude_type,
+        SAFE_CAST(JSON_VALUE(feature, '$.properties.time') AS INT64) AS event_epoch_ms,
+        SAFE_CAST(JSON_VALUE(feature, '$.properties.updated') AS INT64) AS updated_epoch_ms,
+        LOWER(NULLIF(TRIM(JSON_VALUE(feature, '$.properties.status')), '')) AS event_status,
+        LOWER(NULLIF(TRIM(JSON_VALUE(feature, '$.properties.type')), '')) AS event_type,
+        LOWER(NULLIF(TRIM(JSON_VALUE(feature, '$.properties.alert')), '')) AS alert_level,
+        SAFE_CAST(JSON_VALUE(feature, '$.properties.tsunami') AS INT64) AS tsunami_flag,
+        SAFE_CAST(JSON_VALUE(feature, '$.properties.sig') AS INT64) AS significance,
+        LOWER(TRIM(JSON_VALUE(feature, '$.properties.net'))) AS network,
+        JSON_VALUE(feature, '$.properties.code') AS network_event_code,
+        JSON_VALUE(feature, '$.properties.url') AS event_url,
+        JSON_VALUE(feature, '$.properties.detail') AS detail_url,
+        SAFE_CAST(JSON_VALUE(feature, '$.properties.felt') AS INT64) AS felt_reports,
+        SAFE_CAST(JSON_VALUE(feature, '$.properties.cdi') AS FLOAT64) AS community_intensity,
+        SAFE_CAST(JSON_VALUE(feature, '$.properties.mmi') AS FLOAT64) AS instrumental_intensity,
+        JSON_VALUE(feature, '$.geometry.type') AS geometry_type,
+        JSON_QUERY(feature, '$.geometry.coordinates') AS coordinates,
+        SAFE_CAST(JSON_VALUE(feature, '$.geometry.coordinates[0]') AS FLOAT64) AS longitude,
+        SAFE_CAST(JSON_VALUE(feature, '$.geometry.coordinates[1]') AS FLOAT64) AS latitude,
+        SAFE_CAST(JSON_VALUE(feature, '$.geometry.coordinates[2]') AS FLOAT64) AS depth_km
+      FROM flattened
+    )
+    SELECT
+      feed_generated_epoch_ms,
+      feed_title,
+      feed_event_count,
+      feed_api_version,
+      feed_bbox,
+      earthquake_id,
+      geojson_feature_type,
+      event_title,
+      place,
+      magnitude,
+      magnitude_type,
+      event_epoch_ms,
+      updated_epoch_ms,
+      event_status,
+      event_type,
+      alert_level,
+      tsunami_flag,
+      significance,
+      network,
+      network_event_code,
+      event_url,
+      detail_url,
+      felt_reports,
+      community_intensity,
+      instrumental_intensity,
+      geometry_type,
+      coordinates,
+      longitude,
+      latitude,
+      depth_km,
+      TIMESTAMP_MILLIS(event_epoch_ms) AS event_time,
+      TIMESTAMP_MILLIS(updated_epoch_ms) AS updated_at,
+      TIMESTAMP_MILLIS(feed_generated_epoch_ms) AS feed_generated_at,
+      DATE(TIMESTAMP_MILLIS(event_epoch_ms)) AS event_date,
+      CASE
+        WHEN magnitude IS NULL THEN 'unknown'
+        WHEN magnitude < 3 THEN 'minor'
+        WHEN magnitude < 5 THEN 'light'
+        WHEN magnitude < 7 THEN 'strong'
+        ELSE 'major'
+      END AS magnitude_band,
+      tsunami_flag = 1 AS is_tsunami_related,
+      CURRENT_TIMESTAMP() AS normalized_at_utc
+    FROM shaped
+    WHERE earthquake_id IS NOT NULL
+    QUALIFY ROW_NUMBER() OVER (
+      PARTITION BY earthquake_id
+      ORDER BY updated_at DESC NULLS LAST,
+               feed_generated_at DESC NULLS LAST
+    ) = 1
+  read:
+    source_complete: true
+
+target:
+  catalog: midyear-system-499521-p3
+  schema: contractforge_gcp_usgs_rest_silver
+  table: s_usgs_earthquake_events
+
+layer: silver
+mode: overwrite
+schema_policy: additive_only
+
+quality_rules:
+  not_null: [earthquake_id, event_time, latitude, longitude]
+  unique_key: [earthquake_id]
+  expressions:
+    - name: valid_geojson_point
+      expression: geometry_type = 'Point'
+      severity: warn
+      message: USGS summary feeds should expose point geometries.
+    - name: valid_coordinates
+      expression: latitude BETWEEN -90 AND 90 AND longitude BETWEEN -180 AND 180
+      severity: abort
+      message: Coordinates must be valid WGS84 latitude/longitude.
+    - name: reasonable_depth
+      expression: depth_km IS NULL OR depth_km BETWEEN -20 AND 800
+      severity: warn
+      message: Earthquake depth is outside the expected operational range.
+    - name: non_negative_magnitude
+      expression: magnitude IS NULL OR magnitude >= 0
+      severity: warn
+      message: Magnitude should not be negative for normal earthquake events.

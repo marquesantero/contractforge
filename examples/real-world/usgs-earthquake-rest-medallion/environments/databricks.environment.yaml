@@ -1,0 +1,10 @@
+name: usgs_rest_databricks
+adapter: databricks
+runtime:
+  runtime_type: serverless
+evidence:
+  catalog: workspace
+  schema: cf_usgs_rest_ops
+parameters:
+  databricks:
+    runtime: serverless

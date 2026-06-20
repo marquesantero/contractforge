@@ -1,0 +1,24 @@
+source:
+  type: http_file
+  format: json
+  request:
+    url: https://jsonplaceholder.typicode.com/todos/1
+  read:
+    columns:
+      - name: userId
+        type: INT64
+      - name: id
+        type: INT64
+      - name: title
+        type: STRING
+      - name: completed
+        type: BOOL
+target:
+  catalog: midyear-system-499521-p3
+  schema: contractforge_gcp_smoke
+  table: cf_http_file_json_todo
+mode: overwrite
+quality_rules:
+  not_null:
+    - id
+    - title

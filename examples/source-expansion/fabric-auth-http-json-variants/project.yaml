@@ -1,0 +1,33 @@
+name: fabric_authenticated_http_json_variants_source_smoke
+description: Fabric source-expansion smoke for bearer-token and API-key bounded HTTP JSON reads.
+default_environment: fabric
+
+environments:
+  fabric: environments/fabric.environment.yaml
+
+execution_order:
+  - name: authenticated_http_json_bearer
+    layer: bronze
+    expected_result: succeeded
+    depends_on: []
+    contracts:
+      fabric: contracts/01_authenticated_http_json_bearer.ingestion.yaml
+  - name: authenticated_http_json_api_key
+    layer: bronze
+    expected_result: succeeded
+    depends_on: [authenticated_http_json_bearer]
+    contracts:
+      fabric: contracts/02_authenticated_http_json_api_key.ingestion.yaml
+  - name: authenticated_http_json_variants_evidence_probe
+    layer: bronze
+    expected_result: succeeded
+    depends_on: [authenticated_http_json_bearer, authenticated_http_json_api_key]
+    contracts:
+      fabric: contracts/03_authenticated_http_json_variants_evidence_probe.ingestion.yaml
+
+source_expansion:
+  source_family: http_json
+  authentication: bearer_and_api_key_vault_placeholders
+  expected_success_steps: 3
+  expected_probe_checks: 8
+  stable_final_scope: stable_f11_authenticated_http_json_variants_evidence

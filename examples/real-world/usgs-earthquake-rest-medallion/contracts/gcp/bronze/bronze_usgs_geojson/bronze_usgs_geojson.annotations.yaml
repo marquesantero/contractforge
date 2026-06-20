@@ -1,0 +1,11 @@
+table:
+  description: Raw USGS Earthquake GeoJSON feed response.
+  tags:
+    domain: geospatial
+    provider: usgs
+    source_format: geojson
+columns:
+  raw_response:
+    description: Raw GeoJSON FeatureCollection response body.
+  response_page_number:
+    description: REST connector page number.

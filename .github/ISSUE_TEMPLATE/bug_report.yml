@@ -1,0 +1,48 @@
+name: Bug report
+description: Report a reproducible ContractForge defect.
+title: "[Bug]: "
+labels: ["bug", "triage"]
+body:
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: What failed, and what did you expect?
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Core
+        - Databricks adapter
+        - AWS adapter
+        - Snowflake adapter
+        - Fabric adapter
+        - GCP adapter
+        - ContractForge AI
+        - Documentation/site
+        - Packaging/release
+    validations:
+      required: true
+  - type: input
+    id: versions
+    attributes:
+      label: Versions
+      placeholder: "contractforge-core 0.1.0, Python 3.11"
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Reproduction
+      description: Minimal contract, command and redacted output.
+      render: shell
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence
+      description: Add logs, explain output or rendered artifacts. Redact secrets.

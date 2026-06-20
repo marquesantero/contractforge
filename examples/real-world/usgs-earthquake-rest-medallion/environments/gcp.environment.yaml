@@ -1,0 +1,12 @@
+name: usgs_rest_gcp
+adapter: gcp
+runtime:
+  kind: bigquery_smoke
+evidence:
+  dataset: contractforge_gcp_usgs_rest_ops
+parameters:
+  gcp:
+    project_id: midyear-system-499521-p3
+    location: US
+    dataset: contractforge_gcp_usgs_rest_bronze
+    staging_bucket: gs://contractforge-gcp-smoke-midyear-system-499521-p3

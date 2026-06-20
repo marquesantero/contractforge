@@ -1,0 +1,7 @@
+parameters:
+  gcp:
+    project_id: midyear-system-499521-p3
+    location: us-east1
+    dataset: contractforge_gcp_hashdiff_prod
+evidence:
+  dataset: contractforge_gcp_hashdiff_prod_ops

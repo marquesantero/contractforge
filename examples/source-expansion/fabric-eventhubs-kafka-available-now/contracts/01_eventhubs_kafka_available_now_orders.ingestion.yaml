@@ -1,0 +1,50 @@
+source:
+  type: kafka_available_now
+  system: azure_eventhubs
+  bootstrap_servers: cfstreameh0601135444.servicebus.windows.net:9093
+  topic: cf-orders
+  starting_offsets: earliest
+  checkpoint_location: Files/checkpoints/contractforge/fabric-eventhubs-kafka-available-now/orders-20260613
+  options:
+    kafka.security.protocol: SASL_SSL
+    kafka.sasl.mechanism: PLAIN
+    kafka.sasl.jaas.config: "{{ secret:fabric/fabric-eventhubs-kafka-jaas-config }}"
+    failOnDataLoss: "false"
+target:
+  catalog: workspace
+  schema: cf_fabric_source_expansion
+  table: eventhubs_kafka_available_now_orders
+layer: bronze
+mode: overwrite
+schema_policy: permissive
+transform:
+  shape:
+    parse_json:
+      - column: value
+        alias: payload
+        schema: "STRUCT<event_id: STRING, order_id: STRING, customer_id: STRING, amount: DOUBLE, status: STRING, event_ts: STRING, batch_id: STRING>"
+        cast_input: STRING
+    columns:
+      payload.event_id: {alias: event_id, cast: STRING}
+      payload.order_id: {alias: order_id, cast: STRING}
+      payload.customer_id: {alias: customer_id, cast: STRING}
+      payload.amount: {alias: amount, cast: DOUBLE}
+      payload.status: {alias: status, cast: STRING}
+      payload.event_ts: {alias: event_ts_raw, cast: STRING}
+      payload.batch_id: {alias: batch_id, cast: STRING}
+      topic: {alias: kafka_topic, cast: STRING}
+      partition: {alias: kafka_partition, cast: INT}
+      offset: {alias: kafka_offset, cast: BIGINT}
+      timestamp: {alias: kafka_timestamp}
+  standardize:
+    status: {trim: true, lower: true}
+  derive:
+    event_ts: CAST(event_ts_raw AS TIMESTAMP)
+    ingested_at_utc: CURRENT_TIMESTAMP()
+quality_rules:
+  required_columns: [event_id, order_id, customer_id, amount, status, event_ts, batch_id, kafka_topic, kafka_partition, kafka_offset]
+  not_null: [event_id, order_id, batch_id]
+  accepted_values:
+    status: [new, priority]
+  min_rows: 3
+

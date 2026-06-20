@@ -1,0 +1,21 @@
+source:
+  type: sqlserver
+  url: jdbc:sqlserver://cffabricf11sql65687.database.windows.net:1433;database=contractforge_f11;encrypt=true;trustServerCertificate=false;hostNameInCertificate=*.database.windows.net;loginTimeout=30
+  table: dbo.cf_fabric_jdbc_orders
+  auth:
+    type: basic
+    username: cfadmin
+    password: "{{ secret:fabric/sqlserver-admin-password }}"
+  read:
+    fetchsize: 100
+target:
+  catalog: workspace
+  schema: cf_fabric_source_expansion
+  table: sqlserver_jdbc_orders
+layer: bronze
+mode: overwrite
+schema_policy: permissive
+quality_rules:
+  required_columns: [order_id, customer_name, amount]
+  not_null: [order_id, customer_name, amount]
+  min_rows: 2

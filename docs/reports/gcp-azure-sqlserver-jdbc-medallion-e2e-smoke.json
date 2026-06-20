@@ -1,0 +1,54 @@
+{
+  "adapter": "contractforge-gcp",
+  "status": "SUCCEEDED",
+  "source_family": "jdbc_sqlserver",
+  "provider": "azure_sql_database",
+  "runtime": "dataflow_jdbc_to_bigquery_then_bigquery_sql",
+  "validated_at": "2026-06-17",
+  "project": "examples/source-expansion/gcp-azure-sqlserver-jdbc-medallion/project.yaml",
+  "environment": "examples/source-expansion/gcp-azure-sqlserver-jdbc-medallion/environments/gcp.environment.yaml",
+  "contracts": [
+    "examples/source-expansion/gcp-azure-sqlserver-jdbc-medallion/contracts/01_bronze_azure_sql_orders.ingestion.yaml",
+    "examples/source-expansion/gcp-azure-sqlserver-jdbc-medallion/contracts/02_silver_azure_sql_orders_current.ingestion.yaml",
+    "examples/source-expansion/gcp-azure-sqlserver-jdbc-medallion/contracts/03_gold_azure_sql_customer_summary.ingestion.yaml"
+  ],
+  "source_promotion": {
+    "plan_report": "docs/reports/gcp-azure-sqlserver-jdbc-source-promotion-plan.json",
+    "launch_report": "docs/reports/gcp-azure-sqlserver-jdbc-source-promotion-launch.json",
+    "dataflow_job_id": "2026-06-17_10_17_18-8209945441164426353",
+    "dataflow_job_name": "cf-gcp-azure-sqlserver-jdbc-orders-20260617f",
+    "dataflow_region": "us-central1",
+    "dataflow_final_state": "JOB_STATE_DONE",
+    "template": "Jdbc_to_BigQuery_Flex",
+    "network_path": {
+      "gcp_subnetwork": "regions/us-central1/subnetworks/default",
+      "disable_public_ips": true,
+      "cloud_nat_egress_ip": "35.222.88.213",
+      "azure_sql_firewall_rule": "AllowGcpDataflowNatUsCentral1"
+    }
+  },
+  "readback": {
+    "bronze_rows": 2,
+    "silver_rows": 2,
+    "gold_rows": 2,
+    "bronze_table": "midyear-system-499521-p3.contractforge_gcp_azure_sql_bronze.b_azure_sql_orders",
+    "silver_table": "midyear-system-499521-p3.contractforge_gcp_azure_sql_silver.s_azure_sql_orders_current",
+    "gold_table": "midyear-system-499521-p3.contractforge_gcp_azure_sql_gold.g_azure_sql_customer_summary"
+  },
+  "downstream_smokes": {
+    "silver": "docs/reports/gcp-azure-sqlserver-jdbc-silver-smoke.json",
+    "gold": "docs/reports/gcp-azure-sqlserver-jdbc-gold-smoke.json"
+  },
+  "features_validated": [
+    "JDBC source promotion from Azure SQL Server through the Google-provided Dataflow JDBC to BigQuery template.",
+    "Secret Manager username and password references without secret values in contracts or reports.",
+    "Private Dataflow workers with Cloud NAT static egress and narrow Azure SQL firewall allow-listing.",
+    "BigQuery bronze-to-silver-to-gold execution from contracts.",
+    "Schema policy probe, write execution, lineage evidence and quality evidence for silver and gold.",
+    "Required columns, not-null, unique-key, accepted-values and expression quality checks."
+  ],
+  "notes": [
+    "Earlier failed launches exposed and fixed two real issues: Dataflow JDBC expects a BigQuery schema object with fields, and Secret Manager values must not include CRLF.",
+    "us-east1 and parts of us-central1 hit temporary Dataflow worker stockout; the successful run used us-central1-f with e2-standard-2."
+  ]
+}

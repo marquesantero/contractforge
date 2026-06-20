@@ -1,0 +1,45 @@
+source:
+  type: incremental_files
+  system: benchmark_customers_s3
+  path: s3://contractforge-aws-smoke-449112696824-us-east-1/data/hashdiff-production/customers/
+  format: csv
+  options:
+    header: true
+    inferSchema: true
+
+target:
+  catalog: contractforge
+  schema: cf_hashdiff_prod_silver
+  table: s_customers_hashdiff
+
+layer: silver
+mode: hash_diff_upsert
+schema_policy: additive_only
+merge_keys: [customer_id]
+hash_keys: [segment, status, balance, updated_at, payload_hash_noise]
+hash_exclude_columns: []
+on_quality_fail: fail
+
+transform:
+  cast:
+    customer_id: BIGINT
+    balance: DECIMAL(18,2)
+  standardize:
+    segment: {trim: true, upper: true}
+    status: {trim: true, lower: true}
+  derive:
+    benchmark_loaded_at_utc: CURRENT_TIMESTAMP()
+
+quality_rules:
+  not_null: [customer_id, segment, status, balance, updated_at]
+  unique_key: [customer_id]
+  expressions:
+    - name: non_negative_balance
+      expression: balance >= 0
+      severity: abort
+      message: Customer balance must be non-negative.
+
+extensions:
+  aws:
+    iceberg:
+      warehouse: s3://contractforge-aws-smoke-449112696824-us-east-1/warehouse/hashdiff-production/

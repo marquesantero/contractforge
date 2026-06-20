@@ -1,0 +1,52 @@
+name: fabric_s3_compatible_shortcut_source_smoke
+description: Fabric source-expansion smoke for S3-compatible shortcut-backed CSV reads.
+default_environment: fabric
+
+environments:
+  fabric: environments/fabric.environment.yaml
+
+fabric_setup:
+  shortcuts:
+    - path: Files/source-expansion/s3-compatible-shortcuts
+      name: s3_compatible_orders
+      conflict_policy: CreateOrOverwrite
+      target:
+        s3Compatible:
+          location: https://s3.us-east-1.amazonaws.com
+          bucket: contractforge-aws-smoke-449112696824-us-east-1
+          subpath: /source-expansion/fabric-s3-compatible-shortcut
+          connectionId: "{{ parameter:fabric.connections.s3_compatible_shortcut_connection_id }}"
+
+execution_order:
+  - name: s3_compatible_shortcut_orders
+    layer: bronze
+    expected_result: succeeded
+    depends_on: []
+    contracts:
+      fabric: contracts/01_s3_compatible_shortcut_orders.ingestion.yaml
+  - name: s3_compatible_shortcut_evidence_probe
+    layer: bronze
+    expected_result: succeeded
+    depends_on: [s3_compatible_shortcut_orders]
+    contracts:
+      fabric: contracts/02_s3_compatible_shortcut_evidence_probe.ingestion.yaml
+
+source_expansion:
+  source_family: s3_compatible_shortcut
+  shortcut_kind: external_s3_compatible
+  authentication: fabric_connection_basic_iam_user
+  source_format: csv
+  expected_success_steps: 2
+  expected_probe_checks: 6
+  stable_final_scope: stable_f11_s3_compatible_shortcut_evidence
+  fixture:
+    rows: 3
+    s3_prefix: s3://contractforge-aws-smoke-449112696824-us-east-1/source-expansion/fabric-s3-compatible-shortcut/
+  shortcut:
+    path: Files/source-expansion/s3-compatible-shortcuts
+    name: s3_compatible_orders
+    read_path: Files/source-expansion/s3-compatible-shortcuts/s3_compatible_orders/orders.csv
+    target_type: S3Compatible
+    target_location: https://s3.us-east-1.amazonaws.com
+    target_bucket: contractforge-aws-smoke-449112696824-us-east-1
+    target_subpath: /source-expansion/fabric-s3-compatible-shortcut

@@ -1,0 +1,27 @@
+name: fabric_sqlserver_jdbc_source_smoke
+description: Fabric source-expansion smoke for SQL Server JDBC reads.
+default_environment: fabric
+
+environments:
+  fabric: environments/fabric.environment.yaml
+
+execution_order:
+  - name: sqlserver_jdbc_orders
+    layer: bronze
+    expected_result: succeeded
+    depends_on: []
+    contracts:
+      fabric: contracts/01_sqlserver_jdbc_orders.ingestion.yaml
+  - name: sqlserver_jdbc_evidence_probe
+    layer: bronze
+    expected_result: succeeded
+    depends_on: [sqlserver_jdbc_orders]
+    contracts:
+      fabric: contracts/02_sqlserver_jdbc_evidence_probe.ingestion.yaml
+
+source_expansion:
+  source_family: jdbc_sqlserver
+  authentication: basic_key_vault_placeholder
+  expected_success_steps: 2
+  expected_probe_checks: 6
+  stable_final_scope: stable_f11_jdbc_sqlserver_evidence

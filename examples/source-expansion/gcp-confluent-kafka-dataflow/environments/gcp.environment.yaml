@@ -1,0 +1,8 @@
+parameters:
+  gcp:
+    project_id: midyear-system-499521-p3
+    location: us-central1
+    dataset: contractforge_gcp_streaming_smoke_usc
+    staging_bucket: contractforge-gcp-smoke-midyear-system-499521-p3
+evidence:
+  dataset: contractforge_gcp_smoke_ops

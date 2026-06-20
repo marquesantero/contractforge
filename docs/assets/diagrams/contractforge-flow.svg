@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="980" height="170" viewBox="0 0 980 170" role="img" aria-labelledby="title desc">
+  <title id="title">ContractForge architecture flow</title>
+  <desc id="desc">Contract flows through semantic core, capability matcher, platform adapter and native artifacts plus evidence.</desc>
+  <defs>
+    <style>
+      .box { fill: #f8fafc; stroke: #2563eb; stroke-width: 2; rx: 12; }
+      .adapter { fill: #fff7ed; stroke: #ea580c; stroke-width: 2; rx: 12; }
+      .text { fill: #0f172a; font-family: Inter, Segoe UI, Arial, sans-serif; font-size: 16px; font-weight: 600; }
+      .sub { fill: #475569; font-family: Inter, Segoe UI, Arial, sans-serif; font-size: 12px; }
+      .arrow { stroke: #64748b; stroke-width: 2.5; fill: none; marker-end: url(#arrowhead); }
+    </style>
+    <marker id="arrowhead" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto">
+      <path d="M0,0 L10,4 L0,8 Z" fill="#64748b"/>
+    </marker>
+  </defs>
+
+  <rect x="20" y="38" width="150" height="86" class="box"/>
+  <text x="95" y="73" text-anchor="middle" class="text">Contract</text>
+  <text x="95" y="95" text-anchor="middle" class="sub">ingestion, access,</text>
+  <text x="95" y="112" text-anchor="middle" class="sub">ops, annotations</text>
+
+  <path d="M178 81 H228" class="arrow"/>
+
+  <rect x="238" y="38" width="150" height="86" class="box"/>
+  <text x="313" y="73" text-anchor="middle" class="text">Semantic Core</text>
+  <text x="313" y="95" text-anchor="middle" class="sub">portable intent</text>
+  <text x="313" y="112" text-anchor="middle" class="sub">and validation</text>
+
+  <path d="M396 81 H446" class="arrow"/>
+
+  <rect x="456" y="38" width="150" height="86" class="box"/>
+  <text x="531" y="73" text-anchor="middle" class="text">Capabilities</text>
+  <text x="531" y="95" text-anchor="middle" class="sub">supported, review,</text>
+  <text x="531" y="112" text-anchor="middle" class="sub">or unsupported</text>
+
+  <path d="M614 81 H664" class="arrow"/>
+
+  <rect x="674" y="38" width="130" height="86" class="adapter"/>
+  <text x="739" y="73" text-anchor="middle" class="text">Adapter</text>
+  <text x="739" y="95" text-anchor="middle" class="sub">Databricks today</text>
+  <text x="739" y="112" text-anchor="middle" class="sub">more platforms next</text>
+
+  <path d="M812 81 H862" class="arrow"/>
+
+  <rect x="872" y="38" width="88" height="86" class="box"/>
+  <text x="916" y="69" text-anchor="middle" class="text">Native</text>
+  <text x="916" y="91" text-anchor="middle" class="text">Artifacts</text>
+  <text x="916" y="112" text-anchor="middle" class="sub">+ evidence</text>
+</svg>

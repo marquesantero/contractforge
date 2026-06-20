@@ -1,0 +1,135 @@
+"""Platform-neutral semantic core for contract-first ingestion."""
+
+from importlib.metadata import PackageNotFoundError, version as _pkg_version
+
+try:
+    __version__ = _pkg_version("contractforge-core")
+except PackageNotFoundError:  # pragma: no cover - editable installs without metadata
+    __version__ = "0.0.0+unknown"
+
+from contractforge_core.capabilities import CapabilityEvidence, NativeCapability, PlatformCapabilities, capability
+from contractforge_core.connectors import (
+    diagnose_source_connectors,
+    list_source_connector_details,
+    source_connector_details,
+)
+from contractforge_core.contracts import (
+    AccessContractModel,
+    AccessGrantContractModel,
+    AnnotationsContractModel,
+    ColumnAnnotationsContractModel,
+    ColumnMaskContractModel,
+    ContractBundle,
+    ConnectorSourceContract,
+    DeduplicateContractModel,
+    DeprecatedContractModel,
+    ExecutionCatchupContractModel,
+    ExecutionContractModel,
+    ExecutionWindowContractModel,
+    GenericSourceContract,
+    OperationsContractModel,
+    PiiContractModel,
+    QualityExpressionContractModel,
+    QualityRulesContractModel,
+    RowFilterContractModel,
+    ShapeArrayContractModel,
+    ShapeColumnContractModel,
+    ShapeContractModel,
+    ShapeFlattenContractModel,
+    ShapeJsonContractModel,
+    ShapeZipArraysContractModel,
+    StandardizeColumnContractModel,
+    TableAnnotationsContractModel,
+    TransformContractModel,
+    contract_model_schemas,
+    load_contract_bundle,
+    semantic_contract_from_mapping,
+    target_full_table_name,
+    target_schema_name,
+    validate_plan_shape,
+    yaml_schema,
+)
+from contractforge_core.errors import ContractForgeExecutionError, raise_for_failure_result
+from contractforge_core.execution import ExecutionWindow
+from contractforge_core.naming import DerivedNames, NamingConfig, derive_names, normalize_identifier, normalize_slug
+from contractforge_core.planner.result import PlanningResult, PlanningStatus
+from contractforge_core.portability import classify_write_mode
+from contractforge_core.project import (
+    ProjectScheduleIntent,
+    StandardCron,
+    adapter_scheduling,
+    parse_standard_cron,
+    project_schedule_intent,
+    quartz_cron_expression,
+)
+from contractforge_core.security import redact_secrets, redact_text, redact_value
+from contractforge_core.semantic.models import SemanticContract
+from contractforge_core.watermark import decode_watermark_value, encode_watermark_values, extract_watermark_field_value
+
+__all__ = [
+    "AccessContractModel",
+    "AccessGrantContractModel",
+    "AnnotationsContractModel",
+    "PlatformCapabilities",
+    "PlanningResult",
+    "PlanningStatus",
+    "ProjectScheduleIntent",
+    "StandardCron",
+    "SemanticContract",
+    "ContractForgeExecutionError",
+    "ContractBundle",
+    "CapabilityEvidence",
+    "ColumnAnnotationsContractModel",
+    "ColumnMaskContractModel",
+    "ConnectorSourceContract",
+    "DerivedNames",
+    "DeduplicateContractModel",
+    "DeprecatedContractModel",
+    "ExecutionCatchupContractModel",
+    "ExecutionContractModel",
+    "ExecutionWindow",
+    "ExecutionWindowContractModel",
+    "GenericSourceContract",
+    "NamingConfig",
+    "NativeCapability",
+    "OperationsContractModel",
+    "PiiContractModel",
+    "QualityExpressionContractModel",
+    "QualityRulesContractModel",
+    "RowFilterContractModel",
+    "ShapeArrayContractModel",
+    "ShapeColumnContractModel",
+    "ShapeContractModel",
+    "ShapeFlattenContractModel",
+    "ShapeJsonContractModel",
+    "ShapeZipArraysContractModel",
+    "StandardizeColumnContractModel",
+    "TableAnnotationsContractModel",
+    "TransformContractModel",
+    "capability",
+    "adapter_scheduling",
+    "classify_write_mode",
+    "contract_model_schemas",
+    "diagnose_source_connectors",
+    "derive_names",
+    "list_source_connector_details",
+    "load_contract_bundle",
+    "normalize_identifier",
+    "normalize_slug",
+    "project_schedule_intent",
+    "parse_standard_cron",
+    "quartz_cron_expression",
+    "redact_text",
+    "redact_secrets",
+    "redact_value",
+    "decode_watermark_value",
+    "encode_watermark_values",
+    "extract_watermark_field_value",
+    "raise_for_failure_result",
+    "semantic_contract_from_mapping",
+    "source_connector_details",
+    "target_full_table_name",
+    "target_schema_name",
+    "validate_plan_shape",
+    "yaml_schema",
+]

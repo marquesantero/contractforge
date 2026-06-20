@@ -1,0 +1,115 @@
+bundle:
+  name: contractforge_supabase_jdbc_medallion
+
+workspace:
+  root_path: /Workspace/Shared/contractforge-examples/Supabase_JDBC_Medallion
+
+variables:
+  core_wheel_path:
+    default: /Workspace/Shared/contractforge-examples/libs/contractforge_core-0.1.0-py3-none-any.whl
+  databricks_wheel_path:
+    default: /Workspace/Shared/contractforge-examples/libs/contractforge_databricks-0.1.0-py3-none-any.whl
+  bundle_root:
+    default: /Workspace/Shared/contractforge-examples/Supabase_JDBC_Medallion/files
+  evidence_catalog:
+    default: workspace
+  evidence_schema:
+    default: cf_supabase_jdbc_e2e_v2_ops
+
+resources:
+  jobs:
+    supabase_jdbc_medallion:
+      name: contractforge_supabase_jdbc_medallion
+      environments:
+        - environment_key: contractforge_runtime
+          spec:
+            environment_version: "2"
+            dependencies:
+              - ${var.core_wheel_path}
+              - ${var.databricks_wheel_path}
+              - PyYAML>=6
+      tasks:
+        - task_key: verify_supabase_source
+          environment_key: contractforge_runtime
+          notebook_task:
+            notebook_path: ./notebooks/verify_supabase_source.py
+            base_parameters:
+              source_schema: cf_supabase_newcore_demo
+              expected_products: "100000"
+              expected_movements: "1000500"
+
+        - task_key: bronze_products
+          environment_key: contractforge_runtime
+          depends_on:
+            - task_key: verify_supabase_source
+          notebook_task:
+            notebook_path: ./notebooks/run_contractforge.py
+            base_parameters:
+              bundle_root: ${var.bundle_root}
+              contract: contracts/databricks/bronze/bronze_supabase_products/bronze_supabase_products.ingestion.yaml
+              evidence_catalog: ${var.evidence_catalog}
+              evidence_schema: ${var.evidence_schema}
+
+        - task_key: bronze_movements
+          environment_key: contractforge_runtime
+          depends_on:
+            - task_key: bronze_products
+          notebook_task:
+            notebook_path: ./notebooks/run_contractforge.py
+            base_parameters:
+              bundle_root: ${var.bundle_root}
+              contract: contracts/databricks/bronze/bronze_supabase_movements/bronze_supabase_movements.ingestion.yaml
+              evidence_catalog: ${var.evidence_catalog}
+              evidence_schema: ${var.evidence_schema}
+
+        - task_key: silver_product_tags
+          environment_key: contractforge_runtime
+          depends_on:
+            - task_key: bronze_movements
+          notebook_task:
+            notebook_path: ./notebooks/run_contractforge.py
+            base_parameters:
+              bundle_root: ${var.bundle_root}
+              contract: contracts/databricks/silver/silver_supabase_product_tags/silver_supabase_product_tags.ingestion.yaml
+              evidence_catalog: ${var.evidence_catalog}
+              evidence_schema: ${var.evidence_schema}
+
+        - task_key: silver_movements_current
+          environment_key: contractforge_runtime
+          depends_on:
+            - task_key: silver_product_tags
+          notebook_task:
+            notebook_path: ./notebooks/run_contractforge.py
+            base_parameters:
+              bundle_root: ${var.bundle_root}
+              contract: contracts/databricks/silver/silver_supabase_movements_current/silver_supabase_movements_current.ingestion.yaml
+              evidence_catalog: ${var.evidence_catalog}
+              evidence_schema: ${var.evidence_schema}
+
+        - task_key: gold_brand_inventory
+          environment_key: contractforge_runtime
+          depends_on:
+            - task_key: silver_movements_current
+          notebook_task:
+            notebook_path: ./notebooks/run_contractforge.py
+            base_parameters:
+              bundle_root: ${var.bundle_root}
+              contract: contracts/databricks/gold/gold_supabase_brand_inventory/gold_supabase_brand_inventory.ingestion.yaml
+              evidence_catalog: ${var.evidence_catalog}
+              evidence_schema: ${var.evidence_schema}
+
+        - task_key: validate_results
+          environment_key: contractforge_runtime
+          depends_on:
+            - task_key: gold_brand_inventory
+          notebook_task:
+            notebook_path: ./notebooks/validate_results.py
+            base_parameters:
+              evidence_catalog: ${var.evidence_catalog}
+              evidence_schema: ${var.evidence_schema}
+              target_catalog: workspace
+              project_prefix: cf_supabase_jdbc_e2e_v2
+
+targets:
+  dev:
+    default: true

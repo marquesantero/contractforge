@@ -1,0 +1,13 @@
+table:
+  description: Earthquake counts and magnitude metrics by magnitude band and event type.
+  tags:
+    domain: geospatial
+    provider: usgs
+    layer: gold
+columns:
+  magnitude_band:
+    description: Derived magnitude category.
+  event_type:
+    description: Normalized USGS event type.
+  event_count:
+    description: Number of events in the band/type group.

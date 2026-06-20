@@ -1,0 +1,52 @@
+{
+  "kind": "contractforge_gcp_http_file_materialization_local_smoke",
+  "schema_version": "1.0.0",
+  "maturity_gate": "GCP-BQ-20",
+  "status": "PASS_LOCAL",
+  "validated_at": "2026-06-17",
+  "adapter": "contractforge-gcp",
+  "subtarget": "gcp_bigquery",
+  "source_family": "http_file",
+  "validated_surface": [
+    "source.type=http_file with format=avro is classified as renderable with warnings",
+    "source.type=http_file with format=json is classified as renderable with warnings",
+    "source.type=http_file with format=csv is classified as renderable with warnings",
+    "source.type=http_file with format=orc is classified as renderable with warnings",
+    "source.type=http_file with format=parquet is classified as renderable with warnings",
+    "source.type=http_file with format=text is classified as renderable with warnings",
+    "source.type=http_file without supported format remains review-required",
+    "inline authenticated http_file remains review-required",
+    "Secret Manager placeholder-backed authenticated http_file follows the shared credential boundary",
+    "render_gcp_contract emits BigQuery source_materialization plans for declared tabular formats",
+    "text format maps lines to a declared string column before local NDJSON load",
+    "avro, orc and parquet formats pass fetched bytes directly to BigQuery local load jobs"
+  ],
+  "contract_semantics": {
+    "supported_formats": [
+      "avro",
+      "csv",
+      "json",
+      "jsonl",
+      "ndjson",
+      "orc",
+      "parquet",
+      "text"
+    ],
+    "text_parser": "line_oriented_text",
+    "unsupported_without_format": true
+  },
+  "validation_commands": [
+    "uv run pytest tests/test_gcp_smoke.py tests/test_gcp_adapter.py tests/test_adapter_source_support.py tests/test_gcp_capability_parity_docs.py -q",
+    "uv run pytest -q"
+  ],
+  "promotion_boundary": {
+    "stable_runtime_claim": "adapter_runtime_path_only",
+    "real_account_bigquery_e2e": false,
+    "required_before_promotion": [
+      "Run real GCP BigQuery smokes for http_file avro/csv/json/orc/parquet/text contracts.",
+      "Read back target rows and run/lineage/quality evidence from BigQuery.",
+      "Keep undeclared or unsupported HTTP files review-required until a parser contract exists."
+    ]
+  },
+  "no_workaround_code_used": true
+}

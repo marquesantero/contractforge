@@ -1,0 +1,5 @@
+event_id,account_id,event_ts,event_type,amount,updated_at
+1005,acct-005,2026-06-01T01:00:00Z,purchase,61.00,2026-06-01T01:02:00Z
+1006,acct-006,2026-06-01T01:05:00Z,purchase,33.40,2026-06-01T01:06:00Z
+1007,acct-007,2026-06-01T01:10:00Z,refund,12.00,2026-06-01T01:11:00Z
+1008,acct-008,2026-06-01T01:15:00Z,purchase,-5.00,2026-06-01T01:16:00Z

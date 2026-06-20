@@ -1,0 +1,13 @@
+source:
+  type: http_file
+  format: csv
+  request:
+    url: https://raw.githubusercontent.com/cs109/2014_data/master/countries.csv
+  options:
+    skip_leading_rows: 1
+    autodetect: true
+target:
+  catalog: midyear-system-499521-p3
+  schema: contractforge_gcp_smoke
+  table: cf_http_file_csv_countries
+mode: overwrite

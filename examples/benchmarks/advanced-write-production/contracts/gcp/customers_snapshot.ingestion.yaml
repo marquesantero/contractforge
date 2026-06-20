@@ -1,0 +1,31 @@
+source:
+  type: table
+  table: contractforge_gcp_advanced_prod.customers_snapshot_source
+  read:
+    source_complete: true
+    columns:
+      - customer_id
+      - segment
+      - status
+      - balance
+      - updated_at
+
+target:
+  catalog: midyear-system-499521-p3
+  schema: contractforge_gcp_advanced_prod
+  table: customers_snapshot_target
+
+layer: silver
+mode: snapshot_reconcile_soft_delete
+schema_policy: additive_only
+merge_keys: [customer_id]
+on_quality_fail: fail
+
+quality_rules:
+  not_null: [customer_id, segment, status, balance, updated_at]
+  unique_key: [customer_id]
+  expressions:
+    - name: non_negative_balance
+      expression: balance >= 0
+      severity: abort
+      message: Customer balance must be non-negative.

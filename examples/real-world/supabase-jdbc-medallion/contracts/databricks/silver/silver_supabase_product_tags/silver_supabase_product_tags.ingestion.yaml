@@ -1,0 +1,79 @@
+source:
+  type: table
+  system: supabase_inventory_demo
+  ref: bronze.b_products_jdbc
+  read:
+    source_complete: true
+
+target:
+  catalog: workspace
+  schema: cf_supabase_jdbc_e2e_v2_silver
+  table: s_product_tags
+
+layer: silver
+mode: overwrite
+schema_policy: additive_only
+
+schemas:
+  product_attributes: |
+    STRUCT<color: STRING, size: STRING, fragile: BOOLEAN, supplier_tier: STRING>
+  product_tags: |
+    ARRAY<STRING>
+
+transform:
+  shape:
+    parse_json:
+      - column: attributes_json
+        alias: attributes
+        schema_ref: product_attributes
+        cast_input: STRING
+      - column: tags_json
+        alias: product_tags
+        schema_ref: product_tags
+        cast_input: STRING
+    arrays:
+      - path: product_tags
+        mode: explode_outer
+        alias: product_tag
+    columns:
+      product_id: {alias: product_id, cast: BIGINT}
+      sku: {alias: sku, cast: STRING}
+      name: {alias: product_name, cast: STRING}
+      brand: {alias: brand, cast: STRING}
+      price_amount: {alias: price_amount, cast: DOUBLE}
+      price_band: {alias: price_band, cast: STRING}
+      attributes.color: {alias: color, cast: STRING}
+      attributes.size: {alias: size, cast: STRING}
+      attributes.fragile: {alias: fragile, cast: BOOLEAN}
+      attributes.supplier_tier: {alias: supplier_tier, cast: STRING}
+      product_tag: {alias: product_tag, cast: STRING}
+      updated_at: {alias: updated_at}
+  standardize:
+    brand: {trim: true, upper: true, normalize_whitespace: true}
+    product_tag: {trim: true, lower: true, empty_as_null: true}
+    supplier_tier: {trim: true, lower: true, empty_as_null: true}
+  derive:
+    product_tag_uid: concat_ws('|', CAST(product_id AS STRING), product_tag)
+    curated_at_utc: CURRENT_TIMESTAMP()
+  deduplicate:
+    keys: [product_tag_uid]
+    order_by:
+      - {column: updated_at, direction: desc, nulls: last}
+
+quality_rules:
+  not_null: [product_id, sku, brand, price_band, product_tag_uid]
+  unique_key: [product_tag_uid]
+  accepted_values:
+    price_band: [budget, mid, premium, luxury]
+    supplier_tier: [standard, preferred, strategic]
+  expressions:
+    - name: tag_present
+      expression: product_tag IS NOT NULL
+      severity: quarantine
+      message: Exploded product tags must not be null.
+
+extensions:
+  databricks:
+    delta_properties:
+      delta.enableChangeDataFeed: "true"
+    cluster_columns: [brand, price_band]

@@ -1,0 +1,33 @@
+source:
+  type: rest_api
+  request:
+    url: https://postman-echo.com/headers
+    method: GET
+    headers:
+      Accept: application/json
+      User-Agent: ContractForge GCP REST API-key source smoke
+  auth:
+    type: api_key
+    header: X-Api-Key
+    value: "{{ secret:gcp/rest-api-key }}"
+  response:
+    records_path: headers.x-api-key
+  limits:
+    timeout_seconds: 60
+    retry_attempts: 3
+    retry_backoff_seconds: 2
+    max_page_bytes: 1048576
+    max_total_bytes: 1048576
+    max_records: 10
+  read:
+    columns:
+      - name: value
+        type: STRING
+target:
+  catalog: midyear-system-499521-p3
+  schema: contractforge_gcp_smoke
+  table: cf_auth_rest_api_key
+mode: overwrite
+quality_rules:
+  not_null:
+    - value

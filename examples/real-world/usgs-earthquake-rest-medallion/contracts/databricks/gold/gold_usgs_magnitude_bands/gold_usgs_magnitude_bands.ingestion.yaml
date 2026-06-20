@@ -1,0 +1,41 @@
+source:
+  type: sql
+  system: usgs_curated
+  name: usgs_earthquake_magnitude_bands
+  query: |
+    SELECT
+      magnitude_band,
+      event_type,
+      COUNT(*) AS event_count,
+      MIN(magnitude) AS min_magnitude,
+      AVG(magnitude) AS avg_magnitude,
+      MAX(magnitude) AS max_magnitude,
+      MIN(event_time) AS first_event_time,
+      MAX(event_time) AS latest_event_time,
+      CURRENT_TIMESTAMP() AS computed_at_utc
+    FROM workspace.cf_usgs_rest_silver.s_usgs_earthquake_events
+    GROUP BY magnitude_band, event_type
+  read:
+    source_complete: true
+
+target:
+  catalog: workspace
+  schema: cf_usgs_rest_gold
+  table: g_usgs_earthquake_magnitude_bands
+
+layer: gold
+mode: overwrite
+schema_policy: additive_only
+
+quality_rules:
+  not_null: [magnitude_band]
+  expressions:
+    - name: positive_band_count
+      expression: event_count > 0
+      severity: abort
+      message: Magnitude-band summary rows must represent at least one event.
+
+extensions:
+  databricks:
+    delta_properties:
+      delta.enableChangeDataFeed: "true"

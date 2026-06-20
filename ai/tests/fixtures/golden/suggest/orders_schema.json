@@ -1,0 +1,13 @@
+{
+  "columns": [
+    {"name": "order_id", "type": "STRING", "nullable": false},
+    {"name": "customer_email", "type": "STRING", "nullable": true},
+    {
+      "name": "status",
+      "type": "STRING",
+      "nullable": false,
+      "profile": {"distinct_values": ["open", "closed", "cancelled"]}
+    },
+    {"name": "order_amount", "type": "DOUBLE", "nullable": true}
+  ]
+}

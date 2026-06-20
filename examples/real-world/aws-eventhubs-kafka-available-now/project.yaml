@@ -1,0 +1,44 @@
+name: aws_eventhubs_kafka_available_now
+description: Real AWS Glue available-now streaming validation against Azure Event Hubs Kafka endpoint.
+source_system: azure_eventhubs
+source_connector: kafka_available_now
+default_environment: aws
+
+environments:
+  aws: environments/aws.environment.yaml
+
+execution_order:
+  - name: bronze_eventhub_orders_stream
+    layer: bronze
+    depends_on: []
+    contracts:
+      aws: contracts/aws/bronze/bronze_eventhub_orders_stream/bronze_eventhub_orders_stream.ingestion.yaml
+
+portability:
+  invariant_contract_intent:
+    - source.type
+    - target.layer
+    - mode
+    - schema_policy
+    - transform.shape
+    - quality_rules
+    - operations
+  platform_bindings:
+    aws:
+      runtime: aws_glue_spark
+      table_format: iceberg
+      evidence_store: iceberg_control_tables
+      stream_source: azure_eventhubs_kafka_endpoint
+
+cleanup:
+  external_resources:
+    - resource: azure_resource_group
+      name: rg-contractforge-stream-test
+      purpose: Azure Event Hubs namespace used as Kafka-compatible stream source for AWS Glue validation.
+      command:
+        - az
+        - group
+        - delete
+        - --name
+        - rg-contractforge-stream-test
+        - --yes

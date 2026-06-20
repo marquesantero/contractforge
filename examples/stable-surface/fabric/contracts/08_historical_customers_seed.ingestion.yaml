@@ -1,0 +1,24 @@
+source:
+  type: sql
+  query: |
+    SELECT stack(
+      2,
+      1, 'alpha', timestamp('2026-01-01 00:00:00'),
+      2, 'beta', timestamp('2026-01-01 00:00:00')
+    ) AS (customer_id, customer_name, effective_ts)
+target:
+  catalog: workspace
+  schema: cf_fabric_stable
+  table: customers_history
+layer: silver
+mode: historical
+merge_keys: [customer_id]
+scd2_change_columns: [customer_name]
+scd2_effective_from_column: effective_ts
+scd2_sequence_by: effective_ts
+scd2_late_arriving_policy: reject
+quality_rules:
+  required_columns: [customer_id, customer_name, effective_ts]
+  not_null: [customer_id]
+  unique_key: [customer_id]
+  min_rows: 2

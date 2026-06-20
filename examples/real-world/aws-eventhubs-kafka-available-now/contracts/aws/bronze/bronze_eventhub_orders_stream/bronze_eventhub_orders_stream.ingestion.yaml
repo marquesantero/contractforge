@@ -1,0 +1,67 @@
+source:
+  type: kafka_available_now
+  system: azure_eventhubs
+  bootstrap_servers: cfstreameh0601135444.servicebus.windows.net:9093
+  topic: cf-orders
+  checkpoint_location: s3://contractforge-aws-smoke-449112696824-us-east-1/checkpoints/eventhubs-stream/orders-v1/
+  starting_offsets: earliest
+  limits:
+    max_offsets_per_trigger: 50
+  options:
+    kafka.security.protocol: SASL_SSL
+    kafka.sasl.mechanism: PLAIN
+    kafka.sasl.jaas.config: 'org.apache.kafka.common.security.plain.PlainLoginModule required username="$ConnectionString" password="{{ secret:contractforge-eventhubs/connection_string }}";'
+
+target:
+  catalog: contractforge
+  schema: cf_eventhubs_stream_bronze
+  table: b_eventhub_orders_stream
+
+layer: bronze
+mode: append
+schema_policy: additive_only
+
+schemas:
+  order_event: |
+    STRUCT<
+      event_id: STRING,
+      order_id: BIGINT,
+      customer_id: BIGINT,
+      amount: DOUBLE,
+      status: STRING,
+      event_ts: STRING
+    >
+
+transform:
+  shape:
+    parse_json:
+      - column: value
+        alias: payload
+        schema_ref: order_event
+        cast_input: STRING
+    columns:
+      payload.event_id: {alias: event_id, cast: STRING}
+      payload.order_id: {alias: order_id, cast: BIGINT}
+      payload.customer_id: {alias: customer_id, cast: BIGINT}
+      payload.amount: {alias: amount, cast: DOUBLE}
+      payload.status: {alias: status, cast: STRING}
+      payload.event_ts: {alias: event_ts_raw, cast: STRING}
+      topic: {alias: kafka_topic, cast: STRING}
+      partition: {alias: kafka_partition, cast: INT}
+      offset: {alias: kafka_offset, cast: BIGINT}
+      timestamp: {alias: kafka_timestamp}
+  standardize:
+    status: {trim: true, lower: true}
+  derive:
+    event_ts: CAST(event_ts_raw AS TIMESTAMP)
+    ingested_at_utc: CURRENT_TIMESTAMP()
+
+quality_rules:
+  not_null: [event_id, order_id, event_ts]
+  accepted_values:
+    status: [new, priority]
+
+extensions:
+  aws:
+    iceberg:
+      warehouse: s3://contractforge-aws-smoke-449112696824-us-east-1/warehouse/eventhubs-stream/

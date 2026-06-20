@@ -1,0 +1,14 @@
+table:
+  description: Bronze orders captured from Confluent Cloud Kafka through Databricks available-now streaming.
+  tags:
+    source_system: confluent_cloud
+    connector: kafka_available_now
+    validation: databricks_contract_runtime
+
+columns:
+  order_id:
+    description: Source order identifier.
+  batch_id:
+    description: Producer batch identifier used by live smoke validation.
+  kafka_offset:
+    description: Kafka offset observed by Spark Structured Streaming.

@@ -1,0 +1,21 @@
+source:
+  type: postgres
+  url: "{{ secret:fabric/fabric-postgres-jdbc-url }}"
+  table: contractforge_fabric_f11.orders
+  auth:
+    type: basic
+    username: "{{ secret:fabric/fabric-postgres-user }}"
+    password: "{{ secret:fabric/fabric-postgres-password }}"
+  read:
+    fetchsize: 100
+target:
+  catalog: workspace
+  schema: cf_fabric_source_expansion
+  table: postgres_jdbc_orders
+layer: bronze
+mode: overwrite
+schema_policy: permissive
+quality_rules:
+  required_columns: [order_id, customer_name, amount]
+  not_null: [order_id, customer_name, amount]
+  min_rows: 2

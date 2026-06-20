@@ -1,0 +1,22 @@
+source:
+  type: csv
+  path: Files/source-expansion/external-azure-blob-shortcuts/private_blob_orders/orders.csv
+  options:
+    header: true
+    inferSchema: true
+target:
+  catalog: workspace
+  schema: cf_fabric_source_expansion
+  table: external_azure_blob_shortcut_orders
+layer: bronze
+mode: overwrite
+schema_policy: permissive
+quality_rules:
+  required_columns: [order_id, customer_name, amount]
+  not_null: [order_id, customer_name, amount]
+  min_rows: 2
+  expressions:
+    - name: positive_amount
+      expression: amount > 0
+      severity: abort
+

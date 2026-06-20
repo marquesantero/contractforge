@@ -1,0 +1,57 @@
+name: advanced_write_production_benchmark
+description: >
+  GCP BigQuery production-sized review benchmark for historical and
+  snapshot_reconcile_soft_delete advanced write modes. The contracts remain
+  review-required until cross-adapter parity is promoted.
+
+source_system:
+  name: benchmark_customers
+  type: table
+  logical_schema:
+    customer_id: integer
+    segment: string
+    status: string
+    balance: decimal
+    updated_at: timestamp
+
+environments:
+  gcp: environments/gcp.environment.yaml
+
+schedule:
+  cron: "0 6 * * *"
+  timezone: UTC
+  enabled: false
+  max_concurrent_runs: 1
+  queue: true
+
+execution_order:
+  - name: customers_historical
+    layer: silver
+    description: Production-sized historical SCD2 benchmark target.
+    contracts:
+      gcp: contracts/gcp/customers_historical.ingestion.yaml
+  - name: customers_snapshot
+    layer: silver
+    description: Production-sized complete-source snapshot soft-delete benchmark target.
+    contracts:
+      gcp: contracts/gcp/customers_snapshot.ingestion.yaml
+
+validation:
+  maturity_gates:
+    gcp: GCP-BQ-12C5
+  required_cases:
+    - historical_initial_load
+    - historical_no_change_replay
+    - historical_changed_row_wave
+    - historical_delete_expression
+    - historical_late_arriving_reject
+    - snapshot_initial_load
+    - snapshot_no_change_replay
+    - snapshot_changed_and_tombstone_wave
+    - snapshot_tombstone_replay
+    - snapshot_reactivation_wave
+  datasets:
+    production_sizes:
+      small: 10000
+      medium: 1000000
+      large: 10000000

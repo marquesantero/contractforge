@@ -1,0 +1,1055 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ContractForge - Apresentação Técnica</title>
+  <style>
+    :root {
+      --ink: #07111f;
+      --navy: #0d2440;
+      --steel: #516277;
+      --paper: #f7f4ed;
+      --panel: #fffdf8;
+      --line: #d9d0c2;
+      --copper: #c06f31;
+      --amber: #f2b866;
+      --cyan: #3eb7c5;
+      --green: #4b9b69;
+      --red: #ba4b55;
+      --code: #0b1728;
+      --shadow: 0 24px 70px rgba(7, 17, 31, .18);
+      --radius: 20px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      background:
+        linear-gradient(90deg, rgba(7, 17, 31, .08) 1px, transparent 1px) 0 0 / 48px 48px,
+        linear-gradient(180deg, #f9f6ef 0%, #eee7dc 100%);
+      font-family: "Inter", "Segoe UI", Arial, sans-serif;
+      overflow: hidden;
+    }
+
+    .deck {
+      height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 34px;
+    }
+
+    .slide {
+      display: none;
+      width: min(1440px, calc(100vw - 68px));
+      aspect-ratio: 16 / 9;
+      max-height: calc(100vh - 68px);
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .slide.active {
+      display: grid;
+      grid-template-columns: 120px 1fr;
+      animation: enter .28s ease-out;
+    }
+
+    @keyframes enter {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .rail {
+      background: var(--ink);
+      color: var(--paper);
+      padding: 30px 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      position: relative;
+    }
+
+    .rail::after {
+      content: "";
+      position: absolute;
+      inset: 96px auto 96px 50%;
+      width: 2px;
+      background: linear-gradient(var(--cyan), var(--amber), var(--green));
+      transform: translateX(-50%);
+      opacity: .95;
+    }
+
+    .mark {
+      width: 54px;
+      height: 54px;
+      object-fit: contain;
+      position: relative;
+      z-index: 1;
+    }
+
+    .num {
+      writing-mode: vertical-rl;
+      transform: rotate(180deg);
+      letter-spacing: .16em;
+      font-family: "Cascadia Mono", "Consolas", monospace;
+      font-weight: 700;
+      font-size: .82rem;
+      color: #d9e8f5;
+      position: relative;
+      z-index: 1;
+    }
+
+    .kind {
+      writing-mode: vertical-rl;
+      transform: rotate(180deg);
+      font-size: .74rem;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: #9db2c6;
+      position: relative;
+      z-index: 1;
+    }
+
+    .content {
+      padding: clamp(42px, 4.4vw, 74px);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 24px;
+      min-width: 0;
+    }
+
+    .split {
+      display: grid;
+      grid-template-columns: 1.02fr .98fr;
+      gap: 34px;
+      align-items: center;
+    }
+
+    .split.wide-left { grid-template-columns: 1.2fr .8fr; }
+    .split.wide-right { grid-template-columns: .84fr 1.16fr; }
+
+    .eyebrow {
+      margin: 0 0 8px;
+      font-family: "Cascadia Mono", "Consolas", monospace;
+      color: var(--copper);
+      font-size: .82rem;
+      font-weight: 800;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+
+    h1, h2 {
+      margin: 0;
+      line-height: .98;
+      letter-spacing: -.045em;
+      color: var(--navy);
+    }
+
+    h1 {
+      font-size: clamp(3.6rem, 7.2vw, 7.2rem);
+      max-width: 980px;
+    }
+
+    h2 {
+      font-size: clamp(2.6rem, 4.7vw, 5.2rem);
+      max-width: 1050px;
+    }
+
+    h3 {
+      margin: 0;
+      font-size: 1.32rem;
+      color: var(--navy);
+      letter-spacing: -.02em;
+    }
+
+    p {
+      margin: 0;
+      color: var(--steel);
+      font-size: clamp(1.08rem, 1.4vw, 1.42rem);
+      line-height: 1.48;
+      max-width: 900px;
+    }
+
+    .lead {
+      color: #21364d;
+      font-size: clamp(1.24rem, 1.7vw, 1.72rem);
+      line-height: 1.42;
+      max-width: 1020px;
+    }
+
+    .thesis {
+      margin-top: 12px;
+      padding: 22px 26px;
+      border-left: 7px solid var(--copper);
+      background: #fbefe0;
+      border-radius: 16px;
+      color: #382615;
+      font-size: clamp(1.3rem, 2vw, 2.08rem);
+      line-height: 1.32;
+      max-width: 980px;
+    }
+
+    .logo-word {
+      display: flex;
+      align-items: center;
+      gap: 22px;
+      margin-bottom: 10px;
+    }
+
+    .logo-word img {
+      width: min(520px, 48vw);
+      height: auto;
+    }
+
+    .tag-row {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 8px;
+    }
+
+    .tag {
+      border: 1px solid #bed0df;
+      background: #edf5f8;
+      color: #18334c;
+      border-radius: 999px;
+      padding: 9px 13px;
+      font-size: .93rem;
+      font-weight: 800;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+
+    .cards.two { grid-template-columns: repeat(2, 1fr); }
+    .cards.five { grid-template-columns: repeat(5, 1fr); }
+
+    .card {
+      min-width: 0;
+      border: 1px solid var(--line);
+      background: #fffaf2;
+      border-radius: var(--radius);
+      padding: 20px;
+      box-shadow: 0 12px 34px rgba(7, 17, 31, .06);
+    }
+
+    .card.dark {
+      background: var(--ink);
+      color: var(--paper);
+      border-color: #152d48;
+    }
+
+    .card.dark h3,
+    .card.dark p { color: var(--paper); }
+
+    .card p {
+      font-size: 1.02rem;
+      line-height: 1.42;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+      color: var(--copper);
+      font-family: "Cascadia Mono", "Consolas", monospace;
+      font-size: .76rem;
+      font-weight: 900;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .status {
+      color: var(--green);
+      font-weight: 900;
+    }
+
+    .warning { color: var(--copper); font-weight: 900; }
+    .blocked { color: var(--red); font-weight: 900; }
+
+    .flow {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 10px;
+      align-items: stretch;
+    }
+
+    .flow .node {
+      padding: 18px 14px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: #fffaf2;
+      min-height: 114px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .node strong {
+      color: var(--navy);
+      font-size: 1.04rem;
+    }
+
+    .node span {
+      color: var(--steel);
+      font-size: .88rem;
+      line-height: 1.35;
+    }
+
+    ul {
+      margin: 0;
+      padding-left: 1.25rem;
+      color: var(--steel);
+      font-size: clamp(1.05rem, 1.35vw, 1.34rem);
+      line-height: 1.52;
+    }
+
+    li + li { margin-top: 8px; }
+
+    .code-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 18px;
+      min-width: 0;
+    }
+
+    .code-grid.three { grid-template-columns: repeat(3, 1fr); }
+
+    pre {
+      margin: 0;
+      max-height: 540px;
+      overflow: auto;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+      background: var(--code);
+      color: #f2f7fb;
+      border: 1px solid #172b45;
+      border-radius: 18px;
+      padding: 20px;
+      font-family: "Cascadia Mono", "Consolas", monospace;
+      font-size: clamp(.78rem, .95vw, 1rem);
+      line-height: 1.48;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.03);
+    }
+
+    code { font-family: "Cascadia Mono", "Consolas", monospace; }
+    .code-title {
+      margin-bottom: 8px;
+      color: var(--navy);
+      font-weight: 900;
+      letter-spacing: -.01em;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 1rem;
+      overflow: hidden;
+      border-radius: 16px;
+      border: 1px solid var(--line);
+    }
+
+    th, td {
+      text-align: left;
+      vertical-align: top;
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--line);
+      color: #1e3147;
+      line-height: 1.35;
+    }
+
+    th {
+      background: #efe6d9;
+      color: var(--navy);
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      font-size: .76rem;
+    }
+
+    tr:last-child td { border-bottom: 0; }
+
+    .metric-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+    }
+
+    .metric {
+      border-radius: 20px;
+      padding: 20px;
+      background: var(--ink);
+      color: var(--paper);
+      min-height: 136px;
+    }
+
+    .metric b {
+      display: block;
+      font-size: 2.5rem;
+      line-height: 1;
+      letter-spacing: -.05em;
+      color: var(--amber);
+      margin-bottom: 10px;
+    }
+
+    .metric span {
+      color: #c8d6e2;
+      line-height: 1.35;
+      display: block;
+    }
+
+    .comparison {
+      display: grid;
+      grid-template-columns: .8fr 1.2fr;
+      gap: 20px;
+      align-items: stretch;
+    }
+
+    .quote {
+      font-size: clamp(2.2rem, 4vw, 4.7rem);
+      line-height: 1.02;
+      letter-spacing: -.05em;
+      color: var(--navy);
+      max-width: 1080px;
+    }
+
+    .accent { color: var(--copper); }
+    .cyan { color: var(--cyan); }
+
+    .controls {
+      position: fixed;
+      left: 50%;
+      bottom: 18px;
+      transform: translateX(-50%);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: rgba(7, 17, 31, .9);
+      color: var(--paper);
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 999px;
+      padding: 9px 14px;
+      box-shadow: 0 12px 30px rgba(7, 17, 31, .26);
+      z-index: 10;
+      font-size: .92rem;
+    }
+
+    button {
+      border: 0;
+      color: var(--paper);
+      background: #1b3b5b;
+      border-radius: 999px;
+      padding: 8px 12px;
+      cursor: pointer;
+      font-weight: 800;
+    }
+
+    button:focus-visible {
+      outline: 3px solid var(--amber);
+      outline-offset: 2px;
+    }
+
+    .progress {
+      position: fixed;
+      left: 0;
+      bottom: 0;
+      height: 5px;
+      width: 100vw;
+      background: rgba(7, 17, 31, .14);
+      z-index: 11;
+    }
+
+    .bar {
+      height: 100%;
+      width: 0;
+      background: linear-gradient(90deg, var(--cyan), var(--amber), var(--green));
+      transition: width .25s ease;
+    }
+
+    .print-note {
+      position: fixed;
+      right: 18px;
+      bottom: 22px;
+      color: #526276;
+      font-size: .8rem;
+      z-index: 9;
+    }
+
+    @media (max-width: 920px) {
+      body { overflow: auto; }
+      .deck {
+        height: auto;
+        min-height: 100vh;
+        padding: 12px;
+      }
+      .slide,
+      .slide.active {
+        width: 100%;
+        max-height: none;
+        aspect-ratio: auto;
+        min-height: 100vh;
+        grid-template-columns: 62px 1fr;
+        border-radius: 18px;
+      }
+      .content { padding: 28px 20px; }
+      .split,
+      .split.wide-left,
+      .split.wide-right,
+      .comparison,
+      .code-grid,
+      .code-grid.three,
+      .cards,
+      .cards.two,
+      .cards.five,
+      .metric-row,
+      .flow {
+        grid-template-columns: 1fr;
+      }
+      .controls, .print-note { display: none; }
+      h1 { font-size: 3.2rem; }
+      h2 { font-size: 2.4rem; }
+    }
+
+    @media print {
+      body {
+        background: #fff;
+        overflow: visible;
+      }
+      .deck {
+        display: block;
+        height: auto;
+        padding: 0;
+      }
+      .slide,
+      .slide.active {
+        display: grid !important;
+        width: 100vw;
+        height: 100vh;
+        max-height: none;
+        border: 0;
+        border-radius: 0;
+        box-shadow: none;
+        page-break-after: always;
+      }
+      .controls, .progress, .print-note { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <main class="deck" aria-live="polite">
+    <section class="slide active" data-kind="Tese">
+      <aside class="rail"><img class="mark" src="../../site/static/img/contractforge-mark.png" alt="ContractForge" /><div class="num">01 / 24</div><div class="kind">Tese</div></aside>
+      <div class="content">
+        <div class="logo-word"><img src="../../site/static/img/contractforge-logo.png" alt="ContractForge" /></div>
+        <h1>Contratos portáveis para ingestão governada.</h1>
+        <p class="lead">Uma camada semântica para declarar intenção uma vez, executar nativamente em Databricks, AWS, Snowflake, Fabric e GCP, e registrar evidência sem esconder diferenças de plataforma.</p>
+        <div class="tag-row">
+          <span class="tag">contract-first</span>
+          <span class="tag">multi-runtime</span>
+          <span class="tag">evidence-driven</span>
+          <span class="tag">sem downgrade silencioso</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" data-kind="Filosofia">
+      <aside class="rail"><img class="mark" src="../../site/static/img/contractforge-mark.png" alt="" /><div class="num">02 / 24</div><div class="kind">Filosofia</div></aside>
+      <div class="content">
+        <p class="eyebrow">A tese do projeto</p>
+        <div class="quote">A intenção de ingestão deve ser <span class="accent">estável</span>. A execução deve ser <span class="cyan">nativa</span>.</div>
+        <p class="lead">O contrato descreve o que precisa acontecer. O adapter preserva essa intenção usando os recursos reais da plataforma.</p>
+      </div>
+    </section>
+
+    <section class="slide" data-kind="Problema">
+      <aside class="rail"><img class="mark" src="../../site/static/img/contractforge-mark.png" alt="" /><div class="num">03 / 24</div><div class="kind">Problema</div></aside>
+      <div class="content split wide-left">
+        <div>
+          <p class="eyebrow">Por que isso existe</p>
+          <h2>Cada plataforma ensina o time a escrever a mesma ingestão de novo.</h2>
+          <p class="lead">Delta, Glue, Iceberg, Snowpark, Lakehouse, BigQuery, Workflows, Dataflow. O runtime muda, mas a intenção de negócio costuma ser a mesma.</p>
+        </div>
+        <div class="cards two">
+          <div class="card"><span class="pill">Efeito</span><h3>Duplicação</h3><p>Contratos, jobs e validações divergem por plataforma.</p></div>
+          <div class="card"><span class="pill">Efeito</span><h3>Migração cara</h3><p>A lógica fica presa ao runtime original.</p></div>
+          <div class="card"><span class="pill">Efeito</span><h3>Governança frágil</h3><p>Qualidade e evidência viram pós-processamento.</p></div>
+          <div class="card"><span class="pill">Efeito</span><h3>Confiança baixa</h3><p>O usuário não sabe se houve downgrade semântico.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" data-kind="Separação">
+      <aside class="rail"><img class="mark" src="../../site/static/img/contractforge-mark.png" alt="" /><div class="num">04 / 24</div><div class="kind">Separação</div></aside>
+      <div class="content">
+        <p class="eyebrow">Como o ContractForge pensa</p>
+        <h2>Três camadas, três responsabilidades.</h2>
+        <div class="cards">
+          <div class="card dark"><span class="pill">01</span><h3>Semântica comum</h3><p>Fonte, destino, escrita, qualidade, transformação, acesso, operações e evidência.</p></div>
+          <div class="card"><span class="pill">02</span><h3>Binding nativo</h3><p>Catálogo, schema, bucket, warehouse, Lakehouse, role, policy e runtime.</p></div>
+          <div class="card"><span class="pill">03</span><h3>Diagnóstico honesto</h3><p>Suportado, suportado com avisos, requer revisão ou não suportado.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" data-kind="Arquitetura">
+      <aside class="rail"><img class="mark" src="../../site/static/img/contractforge-mark.png" alt="" /><div class="num">05 / 24</div><div class="kind">Arquitetura</div></aside>
+      <div class="content">
+        <p class="eyebrow">Fluxo mental</p>
+        <h2>Do contrato à evidência.</h2>
+        <div class="flow">
+          <div class="node"><strong>Contrato YAML</strong><span>Intenção revisável.</span></div>
+          <div class="node"><strong>Core</strong><span>Normalização e validação.</span></div>
+          <div class="node"><strong>Planner</strong><span>Capacidade e semântica.</span></div>
+          <div class="node"><strong>Adapter</strong><span>Artefatos nativos.</span></div>
+          <div class="node"><strong>Runtime</strong><span>Execução na plataforma.</span></div>
+          <div class="node"><strong>Evidência</strong><span>Auditoria, qualidade e lineage.</span></div>
+        </div>
+        <p>O core não precisa carregar Spark, boto3, Snowpark, Fabric API ou BigQuery client. Esse acoplamento pertence aos adapters.</p>
+      </div>
+    </section>
+
+    <section class="slide" data-kind="Contrato">
+      <aside class="rail"><img class="mark" src="../../site/static/img/contractforge-mark.png" alt="" /><div class="num">06 / 24</div><div class="kind">Contrato</div></aside>
+      <div class="content split">
+        <div>
+          <p class="eyebrow">Contrato como fonte da verdade</p>
+          <h2>O YAML declara a intenção, não o motor.</h2>
+          <p class="lead">Um contrato carrega leitura, destino, camada, modo, política de schema, transformação, qualidade e evidência esperada.</p>
+        </div>
+        <pre><code>source:
+  type: rest_api
+  request:
+    method: GET
+  response:
+    mode: raw
+
+target:
+  schema: cf_usgs_rest_bronze
+  table: b_usgs_earthquake_geojson
+
+layer: bronze
+mode: overwrite
+schema_policy: permissive</code></pre>
+      </div>
+    </section>
+
+    <section class="slide" data-kind="Contrato">
+      <aside class="rail"><img class="mark" src="../../site/static/img/contractforge-mark.png" alt="" /><div class="num">07 / 24</div><div class="kind">Contrato</div></aside>
+      <div class="content">
+        <p class="eyebrow">USGS GeoJSON</p>
+        <h2>O bloco de fonte é o mesmo para todos os adapters.</h2>
+        <pre><code>source:
+  type: rest_api
+  name: usgs_earthquake_2_5_day_geojson
+  system: usgs
+  request:
+    url: https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_day.geojson
+    method: GET
+    headers:
+      Accept: application/geo+json, application/json
+      User-Agent: ContractForge real ingestion test
+  response:
+    mode: raw
+    raw_column: raw_response
+  limits:
+    timeout_seconds: 60
+    retry_attempts: 3
+    max_records: 1</code></pre>
+      </div>
+    </section>
+
+    <section class="slide" data-kind="Portabilidade">
+      <aside class="rail"><img class="mark" src="../../site/static/img/contractforge-mark.png" alt="" /><div class="num">08 / 24</div><div class="kind">Portabilidade</div></aside>
+      <div class="content">
+        <p class="eyebrow">O que permanece igual</p>
+        <h2>A superfície reutilizável é maior que a diferença entre plataformas.</h2>
+        <table>
+          <thead><tr><th>Parte</th><th>Intenção compartilhada</th></tr></thead>
+          <tbody>
+            <tr><td>Fonte</td><td><code>source.type: rest_api</code>, mesma URL, mesmo método, mesmo raw response.</td></tr>
+            <tr><td>Escrita</td><td><code>layer: bronze</code>, <code>mode: overwrite</code>, <code>schema_policy: permissive</code>.</td></tr>
+            <tr><td>Qualidade</td><td><code>required_columns</code>, <code>not_null</code> e <code>unique_key</code>.</td></tr>
+            <tr><td>Medallion</td><td>Bronze raw, silver normalizado, gold agregado.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="slide" data-kind="Binding">
+      <aside class="rail"><img class="mark" src="../../site/static/img/contractforge-mark.png" alt="" /><div class="num">09 / 24</div><div class="kind">Binding</div></aside>
+      <div class="content">
+        <p class="eyebrow">O que muda</p>
+        <h2>O endereço físico muda. A intenção não.</h2>
+        <div class="code-grid">
+          <div>
+            <div class="code-title">Databricks</div>
+            <pre><code>target:
+  catalog: workspace
+  schema: cf_usgs_rest_bronze
+  table: b_usgs_earthquake_geojson
+extensions:
+  databricks:
+    delta_properties:
+      delta.enableChangeDataFeed: "true"</code></pre>
+          </div>
+          <div>
+            <div class="code-title">AWS</div>
+            <pre><code>target:
+  catalog: contractforge
+  schema: cf_usgs_rest_bronze
+  table: b_usgs_earthquake_geojson
+extensions:
+  aws:
+    iceberg:
+      warehouse: s3://.../warehouse/usgs-rest/</code></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" data-kind="Binding">
+      <aside class="rail"><img class="mark" src="../../site/static/img/contractforge-mark.png" alt="" /><div class="num">10 / 24</div><div class="kind">Binding</div></aside>
+      <div class="content">
+        <p class="eyebrow">Mais três runtimes, mesma intenção</p>
+        <div class="code-grid three">
+          <div>
+            <div class="code-title">Snowflake</div>
+            <pre><code>target:
+  catalog: CONTRACTFORGE_TEST_DB
+  schema: PUBLIC
+  table: CF_USGS_REST_BRONZE</code></pre>
+          </div>
+          <div>
+            <div class="code-title">Fabric</div>
+            <pre><code>target:
+  catalog: workspace
+  schema: cf_usgs_rest_bronze
+  table: b_usgs_earthquake_geojson</code></pre>
+          </div>
+          <div>
+            <div class="code-title">GCP BigQuery</div>
+            <pre><code>target:
+  catalog: midyear-system-499521-p3
+  schema: contractforge_gcp_usgs_rest_bronze
+  table: b_usgs_earthquake_geojson</code></pre>
+          </div>
+        </div>
+        <p>Essa é a fronteira correta: a semântica é portável, o runtime continua nativo.</p>
+      </div>
+    </section>
+
+    <section class="slide" data-kind="Projeto">
+      <aside class="rail"><img class="mark" src="../../site/static/img/contractforge-mark.png" alt="" /><div class="num">11 / 24</div><div class="kind">Projeto</div></aside>
+      <div class="content split wide-right">
+        <div>
+          <p class="eyebrow">Projeto, não arquivo solto</p>
+          <h2>A ordem bronze → silver → gold também é contrato.</h2>
+          <p class="lead">O `project.yaml` declara ambientes, dependências e quais arquivos representam a mesma etapa em cada adapter.</p>
+        </div>
+        <pre><code>execution_order:
+  - name: bronze_usgs_geojson
+    layer: bronze
+    depends_on: []
+    contracts:
+      databricks: contracts/databricks/bronze/...
+      aws: contracts/aws/bronze/...
+      snowflake: contracts/snowflake/bronze/...
+      fabric: contracts/fabric/bronze/...
+      gcp: contracts/gcp/bronze/...
+
+  - name: silver_usgs_events
+    depends_on: [bronze_usgs_geojson]
+
+  - name: gold_usgs_daily_summary
+    depends_on: [silver_usgs_events]</code></pre>
+      </div>
+    </section>
+
+    <section class="slide" data-kind="Medallion">
+      <aside class="rail"><img class="mark" src="../../site/static/img/contractforge-mark.png" alt="" /><div class="num">12 / 24</div><div class="kind">Medallion</div></aside>
+      <div class="content">
+        <p class="eyebrow">USGS end-to-end</p>
+        <h2>O exemplo real não para no bronze.</h2>
+        <div class="cards">
+          <div class="card"><span class="pill">Bronze</span><h3>Raw GeoJSON</h3><p>Resposta REST armazenada em `raw_response` com paginação e qualidade mínima.</p></div>
+          <div class="card"><span class="pill">Silver</span><h3>Eventos normalizados</h3><p>Explode, cast, padronização, deduplicação e campos derivados.</p></div>
+          <div class="card"><span class="pill">Gold</span><h3>Agregações</h3><p>Resumo diário e bandas de magnitude para consumo analítico.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" data-kind="Maturidade">
+      <aside class="rail"><img class="mark" src="../../site/static/img/contractforge-mark.png" alt="" /><div class="num">13 / 24</div><div class="kind">Maturidade</div></aside>
+      <div class="content">
+        <p class="eyebrow">O que já funciona</p>
+        <h2>Superfícies estáveis, com limites explícitos.</h2>
+        <table>
+          <thead><tr><th>Componente</th><th>Estado</th><th>Superfície</th></tr></thead>
+          <tbody>
+            <tr><td>Core</td><td class="status">Ativo</td><td>Modelo semântico, validação, planejamento e evidência.</td></tr>
+            <tr><td>Databricks</td><td class="status">Referência</td><td>Delta, Unity Catalog, Auto Loader, Lakeflow, Jobs e dashboards.</td></tr>
+            <tr><td>AWS</td><td class="status">Stable supported surface</td><td>Glue Spark, Iceberg, S3, Lake Formation e evidência.</td></tr>
+            <tr><td>Snowflake</td><td class="status">Stable supported surface</td><td>SQL warehouse, Snowpark procedure, tasks, qualidade e evidência.</td></tr>
+            <tr><td>Fabric</td><td class="status">Stable supported surface</td><td>Lakehouse, notebooks, source expansion, governança e evidência.</td></tr>
+            <tr><td>GCP</td><td class="status">Stable supported surface</td><td>BigQuery, GCS, BigLake, Dataplex, Workflows e evidência.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="slide" data-kind="Honestidade">
+      <aside class="rail"><img class="mark" src="../../site/static/img/contractforge-mark.png" alt="" /><div class="num">14 / 24</div><div class="kind">Honestidade</div></aside>
+      <div class="content split">
+        <div>
+          <p class="eyebrow">A parte mais importante</p>
+          <h2>Adapter não é tradutor cego.</h2>
+          <p class="lead">O adapter deve preservar semântica, avisar, pedir revisão ou bloquear. Nunca transformar historical em append, merge em append ou segurança em comentário.</p>
+        </div>
+        <div class="cards two">
+          <div class="card"><span class="pill">SUPPORTED</span><p>Executa preservando a intenção.</p></div>
+          <div class="card"><span class="pill">SUPPORTED_WITH_WARNINGS</span><p>Executa, mas há caveat não destrutivo.</p></div>
+          <div class="card"><span class="pill">REVIEW_REQUIRED</span><p>Precisa de decisão humana ou privilégio especial.</p></div>
+          <div class="card"><span class="pill">UNSUPPORTED</span><p>Não há equivalência segura.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" data-kind="JDBC">
+      <aside class="rail"><img class="mark" src="../../site/static/img/contractforge-mark.png" alt="" /><div class="num">15 / 24</div><div class="kind">JDBC</div></aside>
+      <div class="content split wide-right">
+        <div>
+          <p class="eyebrow">Além de REST</p>
+          <h2>JDBC com upsert, deduplicação, derive e quarentena.</h2>
+          <p>O contrato carrega lógica de ingestão real, não apenas metadados decorativos.</p>
+        </div>
+        <pre><code>source:
+  type: connection
+  connection_path: project://connections/supabase.yaml
+  table: cf_supabase_newcore_demo.product_movements
+
+layer: bronze
+mode: upsert
+schema_policy: additive_only
+merge_keys: [movement_uid]
+on_quality_fail: quarantine
+
+transform:
+  composite_keys:
+    movement_uid: [product_id, movement_seq]
+  derive:
+    movement_value: quantity * unit_cost
+    movement_date: to_date(event_ts)
+  deduplicate:
+    keys: [movement_uid]</code></pre>
+      </div>
+    </section>
+
+    <section class="slide" data-kind="Qualidade">
+      <aside class="rail"><img class="mark" src="../../site/static/img/contractforge-mark.png" alt="" /><div class="num">16 / 24</div><div class="kind">Qualidade</div></aside>
+      <div class="content split">
+        <div>
+          <p class="eyebrow">Qualidade não é pós-processamento</p>
+          <h2>As regras entram no plano, no runtime e na evidência.</h2>
+          <p class="lead">Cada adapter precisa decidir como materializar as regras sem perder a intenção original.</p>
+        </div>
+        <pre><code>quality_rules:
+  not_null:
+    - movement_uid
+    - product_id
+    - event_ts
+  unique_key:
+    - movement_uid
+  accepted_values:
+    movement_type:
+      - inbound
+      - outbound
+      - adjustment
+  expressions:
+    - name: non_zero_quantity
+      expression: quantity <> 0
+      severity: quarantine</code></pre>
+      </div>
+    </section>
+
+    <section class="slide" data-kind="Streaming">
+      <aside class="rail"><img class="mark" src="../../site/static/img/contractforge-mark.png" alt="" /><div class="num">17 / 24</div><div class="kind">Streaming</div></aside>
+      <div class="content split wide-right">
+        <div>
+          <p class="eyebrow">Streaming com fronteira clara</p>
+          <h2>Kafka existe, mas a equivalência é tratada por provider e runtime.</h2>
+          <p>AWS, Databricks, Fabric e GCP têm caminhos validados em superfícies específicas. Snowflake mantém Kafka/Snowpipe/Streams como decisão separada.</p>
+        </div>
+        <pre><code>source:
+  type: kafka_available_now
+  system: confluent_cloud
+  bootstrap_servers: pkc-619z3.us-east1.gcp.confluent.cloud:9092
+  topic: cf-databricks-orders
+  checkpoint_location: /Volumes/.../checkpoints/...
+  starting_offsets: earliest
+
+layer: bronze
+mode: append
+schema_policy: additive_only</code></pre>
+      </div>
+    </section>
+
+    <section class="slide" data-kind="Evidência">
+      <aside class="rail"><img class="mark" src="../../site/static/img/contractforge-mark.png" alt="" /><div class="num">18 / 24</div><div class="kind">Evidência</div></aside>
+      <div class="content">
+        <p class="eyebrow">Evidence as product surface</p>
+        <h2>A ingestão não termina na tabela.</h2>
+        <div class="metric-row">
+          <div class="metric"><b>run</b><span>status, tempos, linhas, runtime e operação.</span></div>
+          <div class="metric"><b>quality</b><span>regras avaliadas, falhas e quarentena.</span></div>
+          <div class="metric"><b>schema</b><span>política aplicada e mudanças observadas.</span></div>
+          <div class="metric"><b>lineage</b><span>origem, destino e evento compatível com auditoria.</span></div>
+        </div>
+        <p>Governança e custo entram quando a plataforma expõe sinais confiáveis.</p>
+      </div>
+    </section>
+
+    <section class="slide" data-kind="Validação">
+      <aside class="rail"><img class="mark" src="../../site/static/img/contractforge-mark.png" alt="" /><div class="num">19 / 24</div><div class="kind">Validação</div></aside>
+      <div class="content">
+        <p class="eyebrow">Sinais reais do repo</p>
+        <h2>O exemplo USGS roda como projeto em múltiplos adapters.</h2>
+        <div class="cards">
+          <div class="card"><span class="pill">Fabric</span><h3 class="status">SUCCEEDED</h3><p>Projeto REST bronze → silver → gold validado em Lakehouse notebooks.</p></div>
+          <div class="card"><span class="pill">GCP</span><h3 class="status">SUCCEEDED</h3><p>BigQuery executou carga, SQL, qualidade, evidência, lineage e governança planejada.</p></div>
+          <div class="card"><span class="pill">Contrato</span><h3>Sem workaround</h3><p>O relatório registra quando o teste usou contratos declarados, não código paralelo para passar.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" data-kind="AI">
+      <aside class="rail"><img class="mark" src="../../site/static/img/contractforge-mark.png" alt="" /><div class="num">20 / 24</div><div class="kind">AI</div></aside>
+      <div class="content split">
+        <div>
+          <p class="eyebrow">ContractForge AI</p>
+          <h2>A IA ajuda a interpretar intenção. Ela não bypassa o crivo.</h2>
+          <p class="lead">O provider pode explicar, enriquecer e sugerir. Quem decide validade é o fluxo determinístico: intent, core, planner e adapter.</p>
+        </div>
+        <div class="cards two">
+          <div class="card"><span class="pill">1</span><h3>Prompt</h3><p>Usuário descreve o projeto.</p></div>
+          <div class="card"><span class="pill">2</span><h3>Parâmetros</h3><p>A intenção vira entrada aceitável.</p></div>
+          <div class="card"><span class="pill">3</span><h3>Validação</h3><p>Core e adapters bloqueiam incoerências.</p></div>
+          <div class="card"><span class="pill">4</span><h3>Review</h3><p>Saída consolidada em `AI_REVIEW.html`.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" data-kind="Review">
+      <aside class="rail"><img class="mark" src="../../site/static/img/contractforge-mark.png" alt="" /><div class="num">21 / 24</div><div class="kind">Review</div></aside>
+      <div class="content">
+        <p class="eyebrow">O relatório oficial</p>
+        <h2>`AI_REVIEW.html` existe para aprovação técnica.</h2>
+        <div class="cards">
+          <div class="card"><span class="pill">Pedido</span><p>O que foi interpretado a partir do prompt.</p></div>
+          <div class="card"><span class="pill">Projeto</span><p>Arquivos gerados, contexto e contratos.</p></div>
+          <div class="card"><span class="pill">Decisões</span><p>Itens pendentes agrupados por ocorrência e escopo.</p></div>
+          <div class="card"><span class="pill">Validação</span><p>Checks determinísticos e status de readiness.</p></div>
+          <div class="card"><span class="pill">IA</span><p>Orientação advisory separada da decisão determinística.</p></div>
+          <div class="card"><span class="pill">Evidência</span><p>Arquivos, contexto, riscos e próximos passos.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" data-kind="Comparativo">
+      <aside class="rail"><img class="mark" src="../../site/static/img/contractforge-mark.png" alt="" /><div class="num">22 / 24</div><div class="kind">Comparativo</div></aside>
+      <div class="content">
+        <p class="eyebrow">Onde ele se posiciona</p>
+        <h2>Não é dbt, Airbyte ou catálogo. É outra camada.</h2>
+        <table>
+          <thead><tr><th>Ferramenta</th><th>Foco</th><th>Diferença</th></tr></thead>
+          <tbody>
+            <tr><td>dbt</td><td>Transformação depois que o dado chegou.</td><td>ContractForge governa chegada, escrita, qualidade e evidência.</td></tr>
+            <tr><td>Airbyte</td><td>Conectores e replicação.</td><td>ContractForge foca semântica portável e runtime nativo.</td></tr>
+            <tr><td>Fivetran</td><td>ELT gerenciado.</td><td>ContractForge preserva contrato e ambiente do cliente.</td></tr>
+            <tr><td>Catálogos</td><td>Metadados.</td><td>ContractForge leva metadados para o fluxo de execução governada.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="slide" data-kind="Adoção">
+      <aside class="rail"><img class="mark" src="../../site/static/img/contractforge-mark.png" alt="" /><div class="num">23 / 24</div><div class="kind">Adoção</div></aside>
+      <div class="content split">
+        <div>
+          <p class="eyebrow">Onde faz mais sentido</p>
+          <h2>O valor aparece quando portabilidade, governança e evidência importam.</h2>
+        </div>
+        <ul>
+          <li>Consultorias que entregam em stacks diferentes.</li>
+          <li>Times de plataforma que querem padronizar ingestão.</li>
+          <li>Empresas em migração entre clouds ou data platforms.</li>
+          <li>Data products com SLA, lineage, qualidade e governança.</li>
+          <li>Projetos em que "funcionou" não basta; é preciso provar como funcionou.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="slide" data-kind="Fechamento">
+      <aside class="rail"><img class="mark" src="../../site/static/img/contractforge-mark.png" alt="" /><div class="num">24 / 24</div><div class="kind">Fechamento</div></aside>
+      <div class="content">
+        <p class="eyebrow">Mensagem final</p>
+        <h2>Defina a intenção. Preserve a semântica. Execute nativamente. Registre evidência.</h2>
+        <div class="thesis">E nunca esconda o que precisa de revisão.</div>
+        <p class="lead">Essa é a proposta do ContractForge: portabilidade honesta para ingestão governada.</p>
+      </div>
+    </section>
+  </main>
+
+  <div class="controls" aria-label="Controles da apresentação">
+    <button type="button" id="prev" aria-label="Slide anterior">Anterior</button>
+    <span id="counter">1 / 24</span>
+    <button type="button" id="next" aria-label="Próximo slide">Próximo</button>
+  </div>
+  <div class="print-note">Use ← → ou Espaço. Imprimir salva como PDF.</div>
+  <div class="progress" aria-hidden="true"><div class="bar" id="bar"></div></div>
+
+  <script>
+    const slides = Array.from(document.querySelectorAll(".slide"));
+    const counter = document.getElementById("counter");
+    const bar = document.getElementById("bar");
+    let index = Number(new URLSearchParams(location.search).get("slide") || location.hash.replace("#", "")) - 1;
+    if (!Number.isFinite(index) || index < 0 || index >= slides.length) index = 0;
+
+    function show(nextIndex) {
+      index = Math.max(0, Math.min(slides.length - 1, nextIndex));
+      slides.forEach((slide, position) => slide.classList.toggle("active", position === index));
+      counter.textContent = `${index + 1} / ${slides.length}`;
+      bar.style.width = `${((index + 1) / slides.length) * 100}%`;
+      history.replaceState(null, "", `#${index + 1}`);
+    }
+
+    document.getElementById("prev").addEventListener("click", () => show(index - 1));
+    document.getElementById("next").addEventListener("click", () => show(index + 1));
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "ArrowRight" || event.key === " " || event.key === "PageDown") {
+        event.preventDefault();
+        show(index + 1);
+      }
+      if (event.key === "ArrowLeft" || event.key === "PageUp") {
+        event.preventDefault();
+        show(index - 1);
+      }
+      if (event.key === "Home") show(0);
+      if (event.key === "End") show(slides.length - 1);
+    });
+
+    show(index);
+  </script>
+</body>
+</html>

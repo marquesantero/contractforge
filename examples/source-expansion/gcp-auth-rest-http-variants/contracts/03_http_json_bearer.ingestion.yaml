@@ -1,0 +1,29 @@
+source:
+  type: http_json
+  request:
+    url: https://postman-echo.com/headers
+    headers:
+      Accept: application/json
+      User-Agent: ContractForge GCP HTTP JSON bearer source smoke
+  auth:
+    type: bearer_token
+    token: "{{ secret:gcp/http-bearer-token }}"
+  response:
+    records_path: headers.authorization
+  limits:
+    timeout_seconds: 60
+    retry_attempts: 3
+    retry_backoff_seconds: 2
+    max_bytes: 1048576
+  read:
+    columns:
+      - name: value
+        type: STRING
+target:
+  catalog: midyear-system-499521-p3
+  schema: contractforge_gcp_smoke
+  table: cf_auth_http_json_bearer
+mode: overwrite
+quality_rules:
+  not_null:
+    - value

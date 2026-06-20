@@ -1,0 +1,33 @@
+name: gcp_azure_sqlserver_jdbc_medallion
+description: GCP source-expansion smoke for Azure SQL Server JDBC through Dataflow, then BigQuery bronze-to-gold contracts.
+default_environment: gcp
+
+environments:
+  gcp: environments/gcp.environment.yaml
+
+execution_order:
+  - name: bronze_azure_sql_orders
+    layer: bronze
+    expected_result: succeeded
+    depends_on: []
+    contracts:
+      gcp: contracts/01_bronze_azure_sql_orders.ingestion.yaml
+  - name: silver_azure_sql_orders_current
+    layer: silver
+    expected_result: succeeded
+    depends_on: [bronze_azure_sql_orders]
+    contracts:
+      gcp: contracts/02_silver_azure_sql_orders_current.ingestion.yaml
+  - name: gold_azure_sql_customer_summary
+    layer: gold
+    expected_result: succeeded
+    depends_on: [silver_azure_sql_orders_current]
+    contracts:
+      gcp: contracts/03_gold_azure_sql_customer_summary.ingestion.yaml
+
+source_expansion:
+  source_family: jdbc_sqlserver
+  provider: azure_sql_database
+  runtime: dataflow_jdbc_to_bigquery
+  expected_success_steps: 3
+  stable_boundary: GCP-BQ-20F

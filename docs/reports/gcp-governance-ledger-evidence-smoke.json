@@ -1,0 +1,103 @@
+{
+  "kind": "contractforge_gcp_governance_ledger_evidence_smoke",
+  "schema_version": "1.0.0",
+  "adapter": "contractforge-gcp",
+  "subtarget": "gcp_bigquery",
+  "maturity_gate": "GCP-BQ-17B1",
+  "status": "PASS_WITH_REVIEW_BOUNDARY",
+  "executed_at": "2026-06-17",
+  "project": "midyear-system-499521-p3",
+  "location": "us-east1",
+  "dataset": "contractforge_gcp_smoke",
+  "evidence_dataset": "contractforge_gcp_smoke_ops",
+  "contract": {
+    "name": "governance_ledger_smoke",
+    "source": "midyear-system-499521-p3.contractforge_gcp_smoke.workflow_bronze_orders",
+    "target": "midyear-system-499521-p3.contractforge_gcp_smoke.governance_ledger_smoke",
+    "mode": "overwrite",
+    "declared_governance": [
+      "row_filter",
+      "table_description",
+      "tags"
+    ]
+  },
+  "execution": {
+    "status": "SUCCEEDED",
+    "planning_status": "REVIEW_REQUIRED",
+    "run_id": "cf_gcp_smoke_query_d46ce40dbf0b49f7b8cc",
+    "operations": [
+      {
+        "name": "prepare_evidence",
+        "job_id": "cf_gcp_smoke_query_99005176407443c0a96f",
+        "state": "DONE"
+      },
+      {
+        "name": "write_target",
+        "job_id": "cf_gcp_smoke_query_d46ce40dbf0b49f7b8cc",
+        "state": "DONE"
+      },
+      {
+        "name": "persist_run_evidence",
+        "job_id": "cf_gcp_smoke_query_a82a894365e54ab6a66a",
+        "state": "DONE"
+      },
+      {
+        "name": "persist_lineage_evidence",
+        "job_id": "cf_gcp_smoke_query_ccecab25829d4280a489",
+        "state": "DONE"
+      },
+      {
+        "name": "persist_governance_evidence",
+        "job_id": "cf_gcp_smoke_query_9920eb515c984f31b065",
+        "state": "DONE"
+      }
+    ]
+  },
+  "readback": {
+    "table": "midyear-system-499521-p3.contractforge_gcp_smoke_ops.contractforge_governance_evidence",
+    "row_count": 3,
+    "surfaces": [
+      "bigquery_description",
+      "bigquery_row_access_policy",
+      "knowledge_catalog_or_dataplex_aspect"
+    ],
+    "rows": [
+      {
+        "governance_surface": "bigquery_description",
+        "operation": "apply",
+        "subject": "table",
+        "status": "PLANNED"
+      },
+      {
+        "governance_surface": "bigquery_row_access_policy",
+        "operation": "apply_or_validate",
+        "subject": "paid_only_review",
+        "status": "PLANNED_REVIEW_REQUIRED"
+      },
+      {
+        "governance_surface": "knowledge_catalog_or_dataplex_aspect",
+        "operation": "review",
+        "subject": "table",
+        "status": "REVIEW_REQUIRED"
+      }
+    ],
+    "raw_email_hits": 0,
+    "redacted_email_hits": 1
+  },
+  "validated_surfaces": [
+    "contract-declared governance intent is converted to BigQuery evidence rows during smoke execution",
+    "governance evidence is persisted after the target write without workaround SQL",
+    "row access policy, BigQuery description and Knowledge Catalog/Dataplex aspect intent produce separate evidence rows",
+    "principal values are redacted before SQL execution and readback"
+  ],
+  "review_boundaries": [
+    "This validates governance evidence write/readback for declared governance intent in the GCP smoke runtime.",
+    "It does not validate tag-based masking, policy-tag-backed masking, automatic repair/delete or overwrite-retention behavior.",
+    "The Knowledge Catalog/Dataplex aspect row records review intent only; explicit native aspect execution is validated separately by docs/reports/gcp-dataplex-lineage-aspects-smoke.json."
+  ],
+  "commands": [
+    "PYTHONPATH=.;src;adapters/gcp/src uv run python <inline governed smoke contract>",
+    "bq --project_id=midyear-system-499521-p3 --location=us-east1 --format=json query --use_legacy_sql=false <governance evidence readback SQL>"
+  ],
+  "no_workaround_code_used": true
+}

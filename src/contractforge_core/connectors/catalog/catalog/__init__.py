@@ -1,0 +1,29 @@
+"""Facade for catalog source helpers."""
+
+from contractforge_core.connectors.catalog.catalog.source import (
+    CATALOG_SOURCE_TYPES,
+    catalog_source_query,
+    catalog_source_table_or_path,
+    is_catalog_source,
+)
+from contractforge_core.connectors.catalog.catalog.table_refs import (
+    LogicalTableReference,
+    TableRefResolver,
+    has_table_reference_placeholders,
+    parse_logical_table_reference,
+    render_table_reference_placeholders,
+    source_logical_table_reference,
+)
+
+__all__ = [
+    "CATALOG_SOURCE_TYPES",
+    "LogicalTableReference",
+    "TableRefResolver",
+    "catalog_source_query",
+    "catalog_source_table_or_path",
+    "has_table_reference_placeholders",
+    "is_catalog_source",
+    "parse_logical_table_reference",
+    "render_table_reference_placeholders",
+    "source_logical_table_reference",
+]

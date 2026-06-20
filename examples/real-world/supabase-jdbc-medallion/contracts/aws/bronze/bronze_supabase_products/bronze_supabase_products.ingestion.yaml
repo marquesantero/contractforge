@@ -1,0 +1,45 @@
+source:
+  type: connection
+  connection_path: project://connections/supabase.yaml
+  table: cf_supabase_newcore_demo.products
+  read:
+    partition_column: product_id
+    lower_bound: 1
+    upper_bound: 100000
+    num_partitions: 8
+    fetchsize: 10000
+
+target:
+  catalog: contractforge
+  schema: cf_supabase_jdbc_e2e_v2_bronze
+  table: b_products_jdbc
+
+layer: bronze
+mode: hash_diff_upsert
+schema_policy: additive_only
+merge_keys: [product_id]
+hash_keys: [sku, name, brand, price_amount, tags_json, attributes_json]
+hash_exclude_columns: [updated_at]
+on_quality_fail: quarantine
+
+transform:
+  cast:
+    product_id: BIGINT
+    price_amount: DOUBLE
+  standardize:
+    sku: {trim: true, upper: true}
+    brand: {trim: true, upper: true, normalize_whitespace: true}
+  derive:
+    price_band: CASE WHEN price_amount < 10 THEN 'budget' WHEN price_amount < 50 THEN 'mid' WHEN price_amount < 150 THEN 'premium' ELSE 'luxury' END
+    source_loaded_at_utc: CURRENT_TIMESTAMP()
+
+quality_rules:
+  not_null: [product_id, sku, brand, price_amount]
+  unique_key: [product_id]
+  accepted_values:
+    price_band: [budget, mid, premium, luxury]
+  expressions:
+    - name: non_negative_price
+      expression: price_amount >= 0
+      severity: quarantine
+      message: Product prices must not be negative.

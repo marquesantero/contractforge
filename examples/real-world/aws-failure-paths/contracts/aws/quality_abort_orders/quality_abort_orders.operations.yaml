@@ -1,0 +1,12 @@
+criticality: high
+expected_frequency: ad_hoc
+freshness_sla_minutes: 60
+alert_on_failure: true
+alert_on_quality_fail: true
+runbook_url: https://example.com/runbooks/contractforge/aws-failure-paths
+ownership:
+  business_owner: platform-quality
+  technical_owner: data-engineering
+tags:
+  project: aws-failure-paths
+  expected_result: failed

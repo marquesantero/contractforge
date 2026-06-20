@@ -1,0 +1,19 @@
+source:
+  type: text
+  path: Files/source-expansion/lakehouse-text/orders.txt
+target:
+  catalog: workspace
+  schema: cf_fabric_source_expansion
+  table: lakehouse_text_orders
+layer: bronze
+mode: overwrite
+schema_policy: permissive
+quality_rules:
+  required_columns: [value]
+  not_null: [value]
+  min_rows: 2
+  expressions:
+    - name: expected_text_prefix
+      expression: value LIKE 'order-%'
+      severity: abort
+

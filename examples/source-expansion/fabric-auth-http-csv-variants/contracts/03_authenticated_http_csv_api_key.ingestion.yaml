@@ -1,0 +1,30 @@
+source:
+  type: http_csv
+  request:
+    url: https://httpbingo.org/base64/b3JkZXJfaWQsYW1vdW50CjEsMTAKMiwyMAo=
+    method: GET
+    headers:
+      Accept: text/csv
+      User-Agent: ContractForge Fabric API key HTTP CSV source smoke
+  auth:
+    type: api_key
+    header: ContractForgeApiKey
+    value: "{{ secret:fabric/rest-api-key }}"
+  options:
+    header: "true"
+  limits:
+    timeout_seconds: 60
+    retry_attempts: 3
+    retry_backoff_seconds: 2
+    max_bytes: 1048576
+target:
+  catalog: workspace
+  schema: cf_fabric_source_expansion
+  table: auth_http_csv_api_key
+layer: bronze
+mode: overwrite
+schema_policy: permissive
+quality_rules:
+  required_columns: [order_id, amount]
+  not_null: [order_id, amount]
+  min_rows: 2

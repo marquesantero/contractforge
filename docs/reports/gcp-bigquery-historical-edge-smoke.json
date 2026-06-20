@@ -1,0 +1,114 @@
+{
+  "kind": "contractforge_gcp_bigquery_historical_edge_smoke",
+  "schema_version": "1.0.0",
+  "adapter": "contractforge-gcp",
+  "subtarget": "gcp_bigquery",
+  "maturity_gate": "GCP-BQ-12C2",
+  "status": "PASS_WITH_REVIEW_BOUNDARY",
+  "executed_at": "2026-06-17",
+  "project_id": "midyear-system-499521-p3",
+  "location": "us-east1",
+  "datasets": {
+    "target": "contractforge_gcp_advanced_write_smoke",
+    "evidence": "contractforge_gcp_advanced_write_ops"
+  },
+  "scope": {
+    "validated": [
+      "historical SCD2 delete-expression expiration without replacement current-row insert",
+      "historical SCD2 late-arriving reject preflight failure before mutation",
+      "failed run and lineage evidence for late-arriving reject failure",
+      "target readback proving the negative late-arriving run did not mutate current rows"
+    ],
+    "still_open": [
+      "historical late-arriving apply/ignore production variants",
+      "advanced write concurrent writer behavior",
+      "production-sized cross-adapter parity contracts"
+    ]
+  },
+  "contracts": [
+    {
+      "name": "historical_delete_expression",
+      "mode": "historical",
+      "source": "contractforge_gcp_advanced_write_smoke.historical_delete_source",
+      "target": "contractforge_gcp_advanced_write_smoke.historical_edge_target",
+      "contract_fields": {
+        "merge_keys": [
+          "order_id"
+        ],
+        "scd2_change_columns": [
+          "amount",
+          "status"
+        ],
+        "scd2_effective_from_column": "updated_at",
+        "scd2_sequence_by": "updated_at",
+        "scd2_late_arriving_policy": "reject",
+        "scd2_apply_as_deletes": "status = 'DELETE'"
+      },
+      "result": {
+        "status": "SUCCEEDED",
+        "planning_status": "REVIEW_REQUIRED",
+        "write_job_id": "cf_gcp_smoke_query_f5c5eb95aa154a1da1fd",
+        "statement_type": "INSERT",
+        "inserted_rows": 0,
+        "run_evidence_job_id": "cf_gcp_smoke_query_a89b8295b6884d7c920f",
+        "lineage_evidence_job_id": "cf_gcp_smoke_query_cdfadb0d2595401bb8cf"
+      }
+    },
+    {
+      "name": "historical_late_arriving_reject",
+      "mode": "historical",
+      "source": "contractforge_gcp_advanced_write_smoke.historical_late_source",
+      "target": "contractforge_gcp_advanced_write_smoke.historical_edge_target",
+      "contract_fields": {
+        "merge_keys": [
+          "order_id"
+        ],
+        "scd2_change_columns": [
+          "amount",
+          "status"
+        ],
+        "scd2_effective_from_column": "updated_at",
+        "scd2_sequence_by": "updated_at",
+        "scd2_late_arriving_policy": "reject"
+      },
+      "result": {
+        "status": "FAILED",
+        "planning_status": "REVIEW_REQUIRED",
+        "write_job_id": "cf_gcp_smoke_query_031b98becec54f6da4c8",
+        "error_marker": "CONTRACTFORGE_LATE_ARRIVING_HISTORICAL",
+        "run_evidence_job_id": "cf_gcp_smoke_query_8035a09a5df64b019e68",
+        "lineage_evidence_job_id": "cf_gcp_smoke_query_ca290ec4fc1f4ee7ac83"
+      }
+    }
+  ],
+  "target_readback": {
+    "historical_edge_target": {
+      "rows": [
+        {
+          "order_id": "A",
+          "status": "new",
+          "updated_at": "2026-01-02 00:00:00",
+          "valid_from": "2026-01-02 00:00:00",
+          "valid_to": "2026-01-02 23:59:59",
+          "is_current": false,
+          "changed_columns": [
+            "DELETE"
+          ]
+        },
+        {
+          "order_id": "B",
+          "status": "paid",
+          "updated_at": "2026-01-02 00:00:00",
+          "valid_from": "2026-01-02 00:00:00",
+          "valid_to": "9999-12-31 23:59:59",
+          "is_current": true,
+          "changed_columns": [
+            "amount",
+            "status"
+          ]
+        }
+      ]
+    }
+  },
+  "decision": "GCP-BQ-12C2 closes compact historical delete-expression and late-arriving reject evidence for opt-in BigQuery review-required execution. GCP-BQ-12C3 later closes compact snapshot complete-source reactivation and tombstone variants. Hash_diff_upsert production parity is accepted by GCP-BQ-12C; historical and snapshot production parity remains future work."
+}

@@ -1,0 +1,62 @@
+{
+  "kind": "contractforge_gcp_workflows_cleanup_command_smoke",
+  "schema_version": "1.0.0",
+  "adapter": "contractforge-gcp",
+  "subtarget": "gcp_bigquery",
+  "maturity_gate": "GCP-BQ-15C8",
+  "status": "PASS",
+  "executed_at": "2026-06-16T20:06:38Z",
+  "project_id": "midyear-system-499521-p3",
+  "workflow": {
+    "name": "cf-gcp-workflows-smoke-runner",
+    "location": "us-central1",
+    "deploy_revision_id": "000001-0a7"
+  },
+  "validated": {
+    "adapter_owned_cleanup_flag": true,
+    "generated_execution_plan_cleanup_command": true,
+    "workflow_delete_command_executed": true,
+    "missing_workflow_cleanup_is_idempotent": true,
+    "cli_output_redacts_active_account_email": true,
+    "target_table_cleanup": false,
+    "evidence_table_cleanup": false,
+    "full_rerun_cleanup_certification": false
+  },
+  "commands": {
+    "cleanup": [
+      "gcloud",
+      "workflows",
+      "delete",
+      "cf-gcp-workflows-smoke-runner",
+      "--project=midyear-system-499521-p3",
+      "--location=us-central1",
+      "--quiet"
+    ]
+  },
+  "results": {
+    "first_cleanup": {
+      "status": "SUCCEEDED",
+      "raw_summary": "Deleted workflow [cf-gcp-workflows-smoke-runner]."
+    },
+    "second_cleanup": {
+      "status": "SKIPPED",
+      "reason": "workflow_not_found",
+      "raw_contains_redacted_email": true
+    }
+  },
+  "review_boundary": {
+    "certified_now": [
+      "contractforge-gcp deploy-project exposes --cleanup-orchestration",
+      "the generated execution-plan artifact documents the gcloud workflows delete command",
+      "the runtime deletes the generated workflow resource",
+      "a repeated cleanup against a missing workflow returns SKIPPED instead of failing",
+      "gcloud account emails are redacted before cleanup output is returned"
+    ],
+    "superseded_by_certified_runner_smoke": "docs/reports/gcp-workflows-certified-runner-smoke.json",
+    "remaining_before_runner_promotion": []
+  },
+  "sources": [
+    "https://docs.cloud.google.com/sdk/gcloud/reference/workflows",
+    "https://docs.cloud.google.com/sdk/gcloud/reference"
+  ]
+}

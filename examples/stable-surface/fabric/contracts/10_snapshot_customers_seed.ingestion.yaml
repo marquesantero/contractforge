@@ -1,0 +1,22 @@
+source:
+  type: sql
+  query: |
+    SELECT stack(
+      2,
+      1, 'alpha',
+      2, 'beta'
+    ) AS (customer_id, customer_name)
+  read:
+    source_complete: true
+target:
+  catalog: workspace
+  schema: cf_fabric_stable
+  table: customers_snapshot
+layer: silver
+mode: snapshot_reconcile_soft_delete
+merge_keys: [customer_id]
+quality_rules:
+  required_columns: [customer_id, customer_name]
+  not_null: [customer_id]
+  unique_key: [customer_id]
+  min_rows: 2

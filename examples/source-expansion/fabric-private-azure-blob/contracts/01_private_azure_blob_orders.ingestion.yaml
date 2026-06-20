@@ -1,0 +1,22 @@
+source:
+  type: azure_blob
+  format: csv
+  path: https://cffabpriv65687.blob.core.windows.net/cf-fabric-private/object-storage/orders.csv
+  options:
+    header: true
+    inferSchema: true
+target:
+  catalog: workspace
+  schema: cf_fabric_source_expansion
+  table: private_azure_blob_orders
+layer: bronze
+mode: overwrite
+schema_policy: permissive
+quality_rules:
+  required_columns: [order_id, customer_name, amount]
+  not_null: [order_id, customer_name, amount]
+  min_rows: 2
+extensions:
+  fabric:
+    source_runtime_path: wasbs://cf-fabric-private@cffabpriv65687.blob.core.windows.net/object-storage/orders.csv
+    storage_account_key_secret: "{{ secret:fabric/private-blob-storage-key }}"

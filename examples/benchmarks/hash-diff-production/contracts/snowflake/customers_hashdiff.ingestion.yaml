@@ -1,0 +1,35 @@
+source:
+  type: table
+  table: CONTRACTFORGE_TEST_DB.PUBLIC.CF_HASHDIFF_PROD_SOURCE
+
+target:
+  catalog: CONTRACTFORGE_TEST_DB
+  schema: PUBLIC
+  table: CF_HASHDIFF_PROD_TARGET
+
+layer: silver
+mode: hash_diff_upsert
+schema_policy: additive_only
+merge_keys: [customer_id]
+hash_keys: [segment, status, balance, updated_at, payload_hash_noise]
+hash_exclude_columns: []
+on_quality_fail: fail
+
+transform:
+  cast:
+    customer_id: NUMBER
+    balance: NUMBER(18,2)
+  standardize:
+    segment: {trim: true, upper: true}
+    status: {trim: true, lower: true}
+  derive:
+    benchmark_loaded_at_utc: CURRENT_TIMESTAMP()
+
+quality_rules:
+  not_null: [customer_id, segment, status, balance, updated_at]
+  unique_key: [customer_id]
+  expressions:
+    - name: non_negative_balance
+      expression: balance >= 0
+      severity: abort
+      message: Customer balance must be non-negative.

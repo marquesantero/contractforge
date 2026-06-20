@@ -1,0 +1,46 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "contractforge-aws"
+version = "0.2.0"
+description = "AWS adapter for ContractForge Core."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "ContractForge contributors" }]
+keywords = ["contractforge", "aws", "glue", "iceberg", "data-contracts", "ingestion"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Database",
+    "Topic :: Software Development :: Libraries",
+]
+dependencies = ["contractforge-core>=0.2,<0.3"]
+
+[project.urls]
+Homepage = "https://github.com/marquesantero/contractforge/tree/main/adapters/aws"
+Documentation = "https://marquesantero.github.io/contractforge/docs/adapters/aws"
+Repository = "https://github.com/marquesantero/contractforge"
+Issues = "https://github.com/marquesantero/contractforge/issues"
+Changelog = "https://github.com/marquesantero/contractforge/blob/main/adapters/aws/CHANGELOG.md"
+
+[project.optional-dependencies]
+dev = ["pytest>=8"]
+runtime = ["boto3>=1.34", "botocore[crt]>=1.34"]
+
+[project.scripts]
+contractforge-aws = "contractforge_aws.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/contractforge_aws"]
+
+[tool.hatch.build.targets.sdist]
+include = ["/src/contractforge_aws", "/README.md", "/CHANGELOG.md", "/pyproject.toml"]

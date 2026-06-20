@@ -1,0 +1,18 @@
+source:
+  type: sql
+  query: |
+    SELECT stack(
+      1,
+      1, 'alpha', 'unexpected'
+    ) AS (customer_id, customer_name, extra_column)
+target:
+  catalog: workspace
+  schema: cf_fabric_stable
+  table: schema_guard
+layer: silver
+mode: append
+schema_policy: strict
+quality_rules:
+  required_columns: [customer_id, customer_name, extra_column]
+  not_null: [customer_id]
+  min_rows: 1

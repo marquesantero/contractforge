@@ -1,0 +1,20 @@
+{
+  "adapter": "contractforge-fabric",
+  "api_surface": "Fabric deploymentPipelines list/stages APIs",
+  "kind": "contractforge_fabric_deployment_pipeline_read_probe",
+  "known_limitations": [
+    "No accessible Fabric deployment pipeline was available to live-certify stage promotion."
+  ],
+  "pipeline_count": 0,
+  "pipeline_ids": [],
+  "pipelines_accessible": true,
+  "promotion_executed": false,
+  "spark_jobs_started": 0,
+  "stage_probe_executed": false,
+  "status": "SUCCEEDED_READ_ONLY",
+  "validated_at_utc": "2026-06-14T14:37:12Z",
+  "workspace": {
+    "id": "061fd0c8-c248-4628-a332-6adf16623533",
+    "name": "Manager"
+  }
+}

@@ -1,0 +1,15 @@
+source:
+  type: connector
+  connector: postgres
+  system: supabase_inventory_demo
+  name: supabase_postgres_shared_connection
+  url: "{{ secret:contractforge-secrets/supabase-jdbc-url }}"
+  auth:
+    type: basic
+    username: "{{ secret:contractforge-secrets/supabase-user }}"
+    password: "{{ secret:contractforge-secrets/supabase-password }}"
+  options:
+    driver: org.postgresql.Driver
+    fetchsize: "10000"
+  read:
+    source_complete: true

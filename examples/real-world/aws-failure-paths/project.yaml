@@ -1,0 +1,34 @@
+name: aws_failure_paths
+description: >
+  Real AWS failure-path project used to validate failed run evidence, error
+  evidence and redaction with contract-only Glue jobs.
+
+source_system:
+  name: s3_failure_fixtures
+  type: object_storage
+  provider: s3
+  seed_prefix: s3://contractforge-aws-smoke-449112696824-us-east-1/data/aws-failure-paths/orders/
+
+environments:
+  aws: environments/aws.environment.yaml
+
+execution_order:
+  - name: quality_abort_orders
+    layer: bronze
+    description: Valid CSV source with intentionally impossible abort quality rule.
+    expected_result: failed
+    contracts:
+      aws: contracts/aws/quality_abort_orders/quality_abort_orders.ingestion.yaml
+  - name: missing_s3_source
+    layer: bronze
+    description: Missing S3 path to validate source failure evidence.
+    expected_result: failed
+    contracts:
+      aws: contracts/aws/missing_s3_source/missing_s3_source.ingestion.yaml
+
+validation:
+  aws:
+    artifact_bucket: contractforge-aws-smoke-449112696824-us-east-1
+    evidence_database: contractforge_cf_aws_failure_paths_ops
+    expected_terminal_state: FAILED
+

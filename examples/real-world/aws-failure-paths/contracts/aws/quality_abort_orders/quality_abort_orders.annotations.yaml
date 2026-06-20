@@ -1,0 +1,12 @@
+table:
+  description: Intentional abort-quality failure fixture for AWS evidence validation.
+  tags:
+    domain: testing
+    purpose: failure-path
+    source: s3
+columns:
+  order_id:
+    description: Source order identifier.
+  amount:
+    description: Order amount used by the intentional abort rule.
+

@@ -1,0 +1,13 @@
+table:
+  description: Magnitude-band summary derived from normalized USGS events.
+  tags:
+    domain: geospatial
+    provider: usgs
+    layer: gold
+columns:
+  magnitude_band:
+    description: Derived magnitude classification.
+  event_type:
+    description: Normalized USGS event type.
+  event_count:
+    description: Number of events in the band/type group.

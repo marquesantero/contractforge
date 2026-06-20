@@ -1,0 +1,36 @@
+name: Adapter gap
+description: Report a portability or maturity gap for a platform adapter.
+title: "[Adapter gap]: "
+labels: ["adapter-gap", "triage"]
+body:
+  - type: dropdown
+    id: adapter
+    attributes:
+      label: Adapter
+      options:
+        - Databricks
+        - AWS
+        - Snowflake
+        - Fabric
+        - GCP
+    validations:
+      required: true
+  - type: textarea
+    id: contract
+    attributes:
+      label: Contract behavior
+      description: What ContractForge behavior should be preserved?
+    validations:
+      required: true
+  - type: textarea
+    id: observed
+    attributes:
+      label: Observed result
+      description: Include planner status, rendered artifacts or runtime evidence.
+    validations:
+      required: true
+  - type: textarea
+    id: parity
+    attributes:
+      label: Cross-adapter reference
+      description: Does the same contract work in another adapter?

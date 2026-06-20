@@ -1,0 +1,29 @@
+source:
+  type: http_text
+  request:
+    url: https://httpbingo.org/base64/Q29udHJhY3RGb3JnZSBGYWJyaWMgcHVibGljIEhUVFAgdGV4dCBzbW9rZQo=
+    method: GET
+    headers:
+      Accept: text/plain
+      User-Agent: ContractForge Fabric HTTP text source smoke
+  limits:
+    timeout_seconds: 60
+    retry_attempts: 3
+    retry_backoff_seconds: 2
+    max_bytes: 1048576
+target:
+  catalog: workspace
+  schema: cf_fabric_source_expansion
+  table: http_text_payload
+layer: bronze
+mode: overwrite
+schema_policy: permissive
+quality_rules:
+  required_columns: [value]
+  not_null: [value]
+  min_rows: 1
+  expressions:
+    - name: expected_text_payload
+      expression: value LIKE '%ContractForge Fabric public HTTP text smoke%'
+      severity: abort
+

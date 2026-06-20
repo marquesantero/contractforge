@@ -1,0 +1,27 @@
+name: fabric_azure_blob_source_expansion
+description: Fabric source-expansion smoke for Azure Blob object-storage reads.
+default_environment: fabric
+
+environments:
+  fabric: environments/fabric.environment.yaml
+
+execution_order:
+  - name: azure_blob_orders
+    layer: bronze
+    expected_result: succeeded
+    depends_on: []
+    contracts:
+      fabric: contracts/01_azure_blob_orders.ingestion.yaml
+  - name: azure_blob_evidence_probe
+    layer: bronze
+    expected_result: succeeded
+    depends_on: [azure_blob_orders]
+    contracts:
+      fabric: contracts/02_azure_blob_evidence_probe.ingestion.yaml
+
+source_expansion:
+  source_family: azure_blob
+  authentication: public_blob
+  expected_success_steps: 2
+  expected_probe_checks: 6
+  stable_final_scope: stable_f11_evidence

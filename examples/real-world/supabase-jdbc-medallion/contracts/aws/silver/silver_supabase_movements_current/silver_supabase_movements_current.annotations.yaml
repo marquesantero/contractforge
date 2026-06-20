@@ -1,0 +1,12 @@
+policy: warn
+table:
+  description: Current curated movement rows with per-product window ranking.
+  tags:
+    domain: inventory
+    source: supabase
+    layer: silver
+columns:
+  product_recent_movement_rank:
+    description: ROW_NUMBER rank by product ordered by source movement time.
+  is_latest_for_product:
+    description: True for the most recent movement event for each product.

@@ -1,0 +1,48 @@
+source:
+  type: sql
+  query: |
+    WITH checks AS (
+      SELECT 'bearer_target_rows' AS check_name, COUNT(*) AS observed_count, 1 AS minimum_count
+      FROM cf_fabric_source_expansion.auth_rest_bearer
+      UNION ALL
+      SELECT 'bearer_header_present' AS check_name, COUNT(*) AS observed_count, 1 AS minimum_count
+      FROM cf_fabric_source_expansion.auth_rest_bearer
+      WHERE authorization LIKE 'Bearer %'
+      UNION ALL
+      SELECT 'api_key_target_rows' AS check_name, COUNT(*) AS observed_count, 1 AS minimum_count
+      FROM cf_fabric_source_expansion.auth_rest_api_key
+      UNION ALL
+      SELECT 'api_key_header_present' AS check_name, COUNT(*) AS observed_count, 1 AS minimum_count
+      FROM cf_fabric_source_expansion.auth_rest_api_key
+      WHERE contractforgeapikey IS NOT NULL
+      UNION ALL
+      SELECT 'run_rows' AS check_name, COUNT(*) AS observed_count, 2 AS minimum_count
+      FROM contractforge.ctrl_ingestion_runs
+      WHERE target_table IN ('cf_fabric_source_expansion.auth_rest_bearer', 'cf_fabric_source_expansion.auth_rest_api_key')
+        AND status = 'SUCCESS'
+      UNION ALL
+      SELECT 'quality_rows' AS check_name, COUNT(*) AS observed_count, 2 AS minimum_count
+      FROM contractforge.ctrl_ingestion_quality
+      WHERE target_table IN ('cf_fabric_source_expansion.auth_rest_bearer', 'cf_fabric_source_expansion.auth_rest_api_key')
+      UNION ALL
+      SELECT 'schema_rows' AS check_name, COUNT(*) AS observed_count, 2 AS minimum_count
+      FROM contractforge.ctrl_ingestion_schema_changes
+      WHERE target_table IN ('cf_fabric_source_expansion.auth_rest_bearer', 'cf_fabric_source_expansion.auth_rest_api_key')
+      UNION ALL
+      SELECT 'source_metadata_rows' AS check_name, COUNT(*) AS observed_count, 2 AS minimum_count
+      FROM contractforge.ctrl_ingestion_metadata
+      WHERE target_table IN ('cf_fabric_source_expansion.auth_rest_bearer', 'cf_fabric_source_expansion.auth_rest_api_key')
+    )
+    SELECT check_name, observed_count, minimum_count
+    FROM checks
+    WHERE observed_count >= minimum_count
+target:
+  catalog: workspace
+  schema: cf_fabric_source_expansion
+  table: auth_rest_variants_evidence_probe
+layer: bronze
+mode: overwrite
+quality_rules:
+  required_columns: [check_name, observed_count, minimum_count]
+  not_null: [check_name]
+  min_rows: 8

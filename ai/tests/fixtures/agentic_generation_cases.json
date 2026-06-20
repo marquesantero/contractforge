@@ -1,0 +1,138 @@
+{
+  "vague_request_requires_schema": {
+    "prompt": "Create an orders medallion project with scd1_hash_diff.",
+    "expected": {
+      "status": "NEEDS_DECISIONS",
+      "layers": [],
+      "policy_action": "block",
+      "required_artifacts": ["AI_REVIEW.html"],
+      "decision_paths": ["schema_path"]
+    }
+  },
+  "bilingual_bronze_to_gold": {
+    "prompt": "Crie um projeto medallion de bronze até gold usando main.raw.orders_sample. Gold final columns: order_id, customer_id, amount.",
+    "schema": {
+      "columns": [
+        {"name": "order_id", "type": "STRING"},
+        {"name": "customer_id", "type": "STRING"},
+        {"name": "amount", "type": "DOUBLE"}
+      ]
+    },
+    "expected": {
+      "status": "NEEDS_DECISIONS",
+      "layers": ["bronze", "silver", "gold"],
+      "policy_action": "review_required",
+      "required_artifacts": [
+        "contracts/bronze/b_orders.ingestion.yaml",
+        "contracts/silver/s_orders.ingestion.yaml",
+        "contracts/gold/g_orders.ingestion.yaml",
+        "AI_REVIEW.html"
+      ],
+      "shape_columns": {
+        "order_id": "order_id",
+        "customer_id": "customer_id",
+        "amount": "amount"
+      },
+      "decision_paths": ["contracts/silver/*.ingestion.yaml.merge_keys"]
+    }
+  },
+  "partial_project_preserves_bronze": {
+    "prompt": "Complete the existing orders project to gold. Gold final columns: order_id, amount.",
+    "project": {
+      "files": {
+        "contracts/bronze/b_orders.ingestion.yaml": {
+          "source": {"connector": "files", "path": "/landing/orders"},
+          "target": {"catalog": "main", "schema": "bronze", "table": "b_orders"},
+          "layer": "bronze",
+          "mode": "scd0_append"
+        }
+      }
+    },
+    "schema": {
+      "columns": [
+        {"name": "order_id", "type": "STRING"},
+        {"name": "amount", "type": "DOUBLE"}
+      ]
+    },
+    "expected": {
+      "status": "NEEDS_DECISIONS",
+      "layers": ["silver", "gold"],
+      "policy_action": "review_required",
+      "required_artifacts": [
+        "contracts/silver/s_orders.ingestion.yaml",
+        "contracts/gold/g_orders.ingestion.yaml",
+        "AI_REVIEW.html"
+      ],
+      "forbidden_artifacts": ["contracts/bronze/b_orders.ingestion.yaml"],
+      "shape_columns": {
+        "order_id": "order_id",
+        "amount": "amount"
+      }
+    }
+  },
+  "nested_json_sample_flattening": {
+    "prompt": "Create gold from main.silver.s_orders. Final columns: order_id, order_total, customer_id.",
+    "schema": {
+      "order": {"id": "O-1", "total": 42.5},
+      "customer": {"id": "C-1"}
+    },
+    "expected": {
+      "status": "NEEDS_DECISIONS",
+      "layers": ["gold"],
+      "policy_action": "review_required",
+      "shape_columns": {
+        "order_id": "order.id",
+        "order_total": "order.total",
+        "customer_id": "customer.id"
+      }
+    }
+  },
+  "array_sample_requires_review": {
+    "prompt": "Create gold from main.silver.s_orders. Final columns: order_id, items_sku, items_quantity.",
+    "schema": {
+      "order_id": "O-1",
+      "items": [{"sku": "SKU-1", "quantity": 2}]
+    },
+    "expected": {
+      "status": "NEEDS_DECISIONS",
+      "layers": ["gold"],
+      "policy_action": "review_required",
+      "shape_columns": {
+        "order_id": "order_id"
+      },
+      "decision_paths": [
+        "transform.shape.columns.items_sku",
+        "transform.shape.columns.items_quantity"
+      ]
+    }
+  },
+  "target_schema_safe_cast": {
+    "prompt": "Create gold from main.silver.s_orders. Final columns: quantity.",
+    "schema": {
+      "source_columns": [{"name": "quantity", "type": "INT"}],
+      "target_columns": [{"name": "quantity", "type": "DOUBLE"}]
+    },
+    "expected": {
+      "status": "NEEDS_DECISIONS",
+      "layers": ["gold"],
+      "shape_columns": {
+        "quantity": "CAST(quantity AS DOUBLE)"
+      }
+    }
+  },
+  "ambiguous_rename_requires_review": {
+    "prompt": "Create gold from main.silver.s_orders. Final columns: customerid.",
+    "schema": {
+      "columns": [
+        {"name": "customerId", "type": "STRING"},
+        {"name": "customer_id", "type": "STRING"}
+      ]
+    },
+    "expected": {
+      "status": "NEEDS_DECISIONS",
+      "layers": ["gold"],
+      "shape_columns": {},
+      "decision_paths": ["transform.shape.columns.customerid"]
+    }
+  }
+}

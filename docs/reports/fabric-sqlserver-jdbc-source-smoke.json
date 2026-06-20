@@ -1,0 +1,96 @@
+{
+  "kind": "contractforge_fabric_source_expansion_evidence",
+  "adapter": "contractforge-fabric",
+  "source_family": "jdbc_sqlserver",
+  "authentication": "basic_key_vault_placeholder",
+  "status": "SUCCEEDED",
+  "validated_at": "2026-06-12T00:06:29Z",
+  "project": "examples/source-expansion/fabric-sqlserver-jdbc/project.yaml",
+  "environment": "examples/source-expansion/fabric-sqlserver-jdbc/environments/fabric.environment.yaml",
+  "workspace": {
+    "workspace_id": "061fd0c8-c248-4628-a332-6adf16623533",
+    "workspace_name": "Manager",
+    "capacity_id": "2139f1ea-2676-46bf-ab4f-ab248c768056",
+    "capacity_region": "Brazil South",
+    "lakehouse_id": "07067d3f-d5e2-48c1-b526-634620e57d4b",
+    "lakehouse_name": "contractforge_lh"
+  },
+  "source_infrastructure": {
+    "provider": "azure_sql_database",
+    "resource_group": "rg-contractforge-stream-test",
+    "server": "cffabricf11sql65687.database.windows.net",
+    "database": "contractforge_f11",
+    "sku": "Basic",
+    "table": "dbo.cf_fabric_jdbc_orders",
+    "seed_rows": 2,
+    "firewall": {
+      "allow_azure_services": true,
+      "local_seed_rule_removed": true
+    }
+  },
+  "command": "uv run python -m contractforge_fabric.cli smoke-project examples/source-expansion/fabric-sqlserver-jdbc/project.yaml --environment-key fabric --max-attempts 35 --retry-after-seconds 30",
+  "contract_source": {
+    "contract_only": true,
+    "workaround_code_used": false,
+    "source_connector": "sqlserver",
+    "auth_mode": "basic",
+    "secret_reference": "{{ secret:fabric/sqlserver-admin-password }}",
+    "key_vault": "https://cffabricf11kv.vault.azure.net/",
+    "secret_value_recorded": false
+  },
+  "coverage": {
+    "source_family": "jdbc_sqlserver",
+    "authentication": "basic_key_vault_placeholder",
+    "target_table": "cf_fabric_source_expansion.sqlserver_jdbc_orders",
+    "probe_table": "cf_fabric_source_expansion.sqlserver_jdbc_evidence_probe",
+    "probe_checks": [
+      "target_rows",
+      "target_amount_rows",
+      "run_rows",
+      "quality_rows",
+      "schema_rows",
+      "source_metadata_rows"
+    ],
+    "evidence_tables": [
+      "contractforge.ctrl_ingestion_runs",
+      "contractforge.ctrl_ingestion_quality",
+      "contractforge.ctrl_ingestion_schema_changes",
+      "contractforge.ctrl_ingestion_metadata"
+    ]
+  },
+  "result_summary": {
+    "submitted_steps": 2,
+    "succeeded_steps": 2,
+    "failed_steps": 0,
+    "fabric_job_status_completed": 2,
+    "evidence_probe_checks": 6
+  },
+  "steps": [
+    {
+      "name": "sqlserver_jdbc_orders",
+      "contract": "contracts/01_sqlserver_jdbc_orders.ingestion.yaml",
+      "notebook": "cf_workspace_cf_fabric_source_expansion_sqlserver_jdbc_orders",
+      "item_id": "2884e839-7327-48e7-909b-9bb75e34a069",
+      "job_instance_id": "ed251555-16a7-4d52-84b9-bdaa1bf26cd9",
+      "start_time_utc": "2026-06-11T23:58:31.8759544",
+      "end_time_utc": "2026-06-12T00:02:12.1234555",
+      "status": "SUCCEEDED"
+    },
+    {
+      "name": "sqlserver_jdbc_evidence_probe",
+      "contract": "contracts/02_sqlserver_jdbc_evidence_probe.ingestion.yaml",
+      "notebook": "cf_workspace_cf_fabric_source_expansion_sqlserver_jdbc_evidence_probe",
+      "item_id": "915edda8-5a47-4a6e-833c-c7abacab181a",
+      "job_instance_id": "1d1a36d8-467d-4362-b6f7-77da37f3cd1f",
+      "start_time_utc": "2026-06-12T00:02:48.3183994",
+      "end_time_utc": "2026-06-12T00:06:29.8803912",
+      "status": "SUCCEEDED"
+    }
+  ],
+  "notes": [
+    "The generated notebook read Azure SQL through Spark JDBC with the Microsoft SQL Server JDBC driver.",
+    "The generated notebook resolved the JDBC password through Fabric notebookutils and Azure Key Vault.",
+    "The rendered notebook and evidence report do not contain the secret value.",
+    "This evidence is part of the stable F11 source surface; out-of-scope source families are excluded by docs/reports/fabric-source-expansion-stable-scope-decision.json."
+  ]
+}

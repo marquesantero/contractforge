@@ -1,0 +1,32 @@
+source:
+  type: http_json
+  request:
+    url: https://postman-echo.com/get
+    method: GET
+    headers:
+      Accept: application/json
+      User-Agent: ContractForge Fabric bearer HTTP JSON source smoke
+  auth:
+    type: bearer_token
+    token: "{{ secret:fabric/rest-bearer-token }}"
+  options:
+    multiLine: "true"
+  limits:
+    timeout_seconds: 60
+    retry_attempts: 3
+    retry_backoff_seconds: 2
+    max_bytes: 1048576
+target:
+  catalog: workspace
+  schema: cf_fabric_source_expansion
+  table: auth_http_json_bearer
+layer: bronze
+mode: overwrite
+schema_policy: permissive
+quality_rules:
+  required_columns: [headers]
+  min_rows: 1
+  expressions:
+    - name: bearer_header_present
+      expression: headers.authorization LIKE 'Bearer %'
+      severity: abort

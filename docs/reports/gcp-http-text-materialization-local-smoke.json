@@ -1,0 +1,40 @@
+{
+  "kind": "contractforge_gcp_http_text_materialization_local_smoke",
+  "schema_version": "1.0.0",
+  "maturity_gate": "GCP-BQ-20",
+  "status": "PASS_LOCAL",
+  "validated_at": "2026-06-17",
+  "adapter": "contractforge-gcp",
+  "subtarget": "gcp_bigquery",
+  "source_family": "http_text",
+  "validated_surface": [
+    "source.type=http_text classified as renderable with warnings for bounded no-auth reads",
+    "Secret Manager placeholder-backed authenticated http_text classified as renderable with warnings",
+    "inline authenticated http_text remains review-required",
+    "render_gcp_contract emits a BigQuery source_materialization plan",
+    "smoke runtime calls the shared core read_http_file_payload reader",
+    "text payload lines are written as local newline-delimited JSON",
+    "BigQuery local load job receives declared schema_fields",
+    "run and lineage evidence use the same materialize_source evidence path as REST/HTTP JSON"
+  ],
+  "contract_semantics": {
+    "source_type": "http_text",
+    "parser": "line_oriented_text",
+    "default_column": "value",
+    "declared_column_source": "source.read.columns[0].name or source.response.raw_column"
+  },
+  "validation_commands": [
+    "uv run pytest tests/test_gcp_smoke.py tests/test_gcp_adapter.py tests/test_adapter_source_support.py tests/test_gcp_capability_parity_docs.py -q",
+    "uv run pytest -q"
+  ],
+  "promotion_boundary": {
+    "stable_runtime_claim": "adapter_runtime_path_only",
+    "real_account_bigquery_e2e": false,
+    "required_before_promotion": [
+      "Run a real GCP BigQuery smoke against a public bounded text endpoint.",
+      "Read back target rows and evidence rows from BigQuery.",
+      "Add a negative malformed/empty payload decision if richer text parsing is introduced."
+    ]
+  },
+  "no_workaround_code_used": true
+}

@@ -1,0 +1,42 @@
+{
+  "kind": "contractforge_gcp_governance_ledger_reconciliation_plan",
+  "schema_version": "1.0.0",
+  "adapter": "contractforge-gcp",
+  "subtarget": "gcp_bigquery",
+  "maturity_gate": "GCP-BQ-17B2",
+  "status": "PASS",
+  "decided_at": "2026-06-17",
+  "scope": {
+    "included": [
+      "deterministic non-mutating reconciliation artifact",
+      "expected governance state derived from the governance ledger plan",
+      "BigQuery INFORMATION_SCHEMA readback query templates",
+      "BigQuery rowAccessPolicies.list, dataPolicies.list and tables.getIamPolicy readback metadata",
+      "principal redaction in generated reconciliation artifacts",
+      "standard reconciliation states for in_sync, missing_intent, unmanaged_actual, mismatch, retained_on_overwrite and requires_review"
+    ],
+    "excluded": [
+      "automatic policy repair",
+      "automatic grant repair",
+      "governance-object deletion",
+      "overwrite-retention certification",
+      "restricted-principal enforcement loop"
+    ]
+  },
+  "decision": {
+    "planner_behavior": "Rendered GCP bundles with governance intent include a non-mutating governance_reconciliation artifact alongside the governance_ledger artifact. The artifact defines expected state, native readback surfaces and comparison states. The CLI command can execute readback and comparison, but does not apply or repair governance.",
+    "promotion_boundary": "This closes reconciliation artifact planning and the non-mutating command surface. Auto-repair, governance-object deletion, overwrite-retention and restricted-principal enforcement loops remain separate review gates."
+  },
+  "validated_by": [
+    "tests/test_gcp_adapter.py::test_gcp_render_contract_emits_governance_ledger_plan_for_access_and_annotations",
+    "uv run pytest tests/test_gcp_adapter.py tests/test_gcp_capability_parity_docs.py -q"
+  ],
+  "sources": [
+    "https://docs.cloud.google.com/bigquery/docs/tables",
+    "https://docs.cloud.google.com/bigquery/docs/information-schema-column-field-paths",
+    "https://docs.cloud.google.com/bigquery/docs/row-level-security-intro",
+    "https://docs.cloud.google.com/bigquery/docs/column-level-security-intro",
+    "https://docs.cloud.google.com/bigquery/docs/access-control"
+  ],
+  "no_workaround_code_used": true
+}

@@ -1,0 +1,96 @@
+source:
+  type: sql
+  system: usgs
+  name: usgs_earthquake_events
+  query: |
+    WITH parsed AS (
+      SELECT
+        raw_response,
+        response_page_number,
+        TRY_PARSE_JSON(raw_response) AS payload
+      FROM CONTRACTFORGE_TEST_DB.PUBLIC.CF_USGS_REST_BRONZE
+    )
+    SELECT
+      payload:metadata:generated::NUMBER AS feed_generated_epoch_ms,
+      payload:metadata:title::STRING AS feed_title,
+      payload:metadata:count::NUMBER AS feed_event_count,
+      payload:metadata:api::STRING AS feed_api_version,
+      payload:bbox AS feed_bbox,
+      feature.value:id::STRING AS earthquake_id,
+      feature.value:type::STRING AS geojson_feature_type,
+      feature.value:properties:title::STRING AS event_title,
+      feature.value:properties:place::STRING AS place,
+      feature.value:properties:mag::FLOAT AS magnitude,
+      LOWER(NULLIF(TRIM(feature.value:properties:magType::STRING), '')) AS magnitude_type,
+      feature.value:properties:time::NUMBER AS event_epoch_ms,
+      feature.value:properties:updated::NUMBER AS updated_epoch_ms,
+      LOWER(NULLIF(TRIM(feature.value:properties:status::STRING), '')) AS event_status,
+      LOWER(NULLIF(TRIM(feature.value:properties:type::STRING), '')) AS event_type,
+      LOWER(NULLIF(TRIM(feature.value:properties:alert::STRING), '')) AS alert_level,
+      feature.value:properties:tsunami::NUMBER AS tsunami_flag,
+      feature.value:properties:sig::NUMBER AS significance,
+      LOWER(TRIM(feature.value:properties:net::STRING)) AS network,
+      feature.value:properties:code::STRING AS network_event_code,
+      feature.value:properties:url::STRING AS event_url,
+      feature.value:properties:detail::STRING AS detail_url,
+      feature.value:properties:felt::NUMBER AS felt_reports,
+      feature.value:properties:cdi::FLOAT AS community_intensity,
+      feature.value:properties:mmi::FLOAT AS instrumental_intensity,
+      feature.value:geometry:type::STRING AS geometry_type,
+      feature.value:geometry:coordinates AS coordinates,
+      feature.value:geometry:coordinates[0]::FLOAT AS longitude,
+      feature.value:geometry:coordinates[1]::FLOAT AS latitude,
+      feature.value:geometry:coordinates[2]::FLOAT AS depth_km,
+      TO_TIMESTAMP_NTZ(feature.value:properties:time::NUMBER / 1000) AS event_time,
+      TO_TIMESTAMP_NTZ(feature.value:properties:updated::NUMBER / 1000) AS updated_at,
+      TO_TIMESTAMP_NTZ(payload:metadata:generated::NUMBER / 1000) AS feed_generated_at,
+      TO_DATE(TO_TIMESTAMP_NTZ(feature.value:properties:time::NUMBER / 1000)) AS event_date,
+      CASE
+        WHEN feature.value:properties:mag::FLOAT IS NULL THEN 'unknown'
+        WHEN feature.value:properties:mag::FLOAT < 3 THEN 'minor'
+        WHEN feature.value:properties:mag::FLOAT < 5 THEN 'light'
+        WHEN feature.value:properties:mag::FLOAT < 7 THEN 'strong'
+        ELSE 'major'
+      END AS magnitude_band,
+      feature.value:properties:tsunami::NUMBER = 1 AS is_tsunami_related,
+      CURRENT_TIMESTAMP() AS normalized_at_utc
+    FROM parsed,
+    LATERAL FLATTEN(input => payload:features) AS feature
+    WHERE feature.value:id::STRING IS NOT NULL
+    QUALIFY ROW_NUMBER() OVER (
+      PARTITION BY feature.value:id::STRING
+      ORDER BY feature.value:properties:updated::NUMBER DESC NULLS LAST,
+               payload:metadata:generated::NUMBER DESC NULLS LAST
+    ) = 1
+  read:
+    source_complete: true
+
+target:
+  catalog: CONTRACTFORGE_TEST_DB
+  schema: PUBLIC
+  table: CF_USGS_REST_SILVER
+
+layer: silver
+mode: overwrite
+schema_policy: additive_only
+
+quality_rules:
+  not_null: [earthquake_id, event_time, latitude, longitude]
+  unique_key: [earthquake_id]
+  expressions:
+    - name: valid_geojson_point
+      expression: geometry_type = 'Point'
+      severity: warn
+      message: USGS summary feeds should expose point geometries.
+    - name: valid_coordinates
+      expression: latitude BETWEEN -90 AND 90 AND longitude BETWEEN -180 AND 180
+      severity: abort
+      message: Coordinates must be valid WGS84 latitude/longitude.
+    - name: reasonable_depth
+      expression: depth_km IS NULL OR depth_km BETWEEN -20 AND 800
+      severity: warn
+      message: Earthquake depth is outside the expected operational range.
+    - name: non_negative_magnitude
+      expression: magnitude IS NULL OR magnitude >= 0
+      severity: warn
+      message: Magnitude should not be negative for normal earthquake events.

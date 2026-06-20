@@ -1,0 +1,16 @@
+{
+  "run": {
+    "run_id": "run-network-001",
+    "status": "FAILED",
+    "target_table": "main.bronze.b_orders",
+    "mode": "scd0_append",
+    "source_connector": "http_file",
+    "runtime_type": "serverless",
+    "error_message": "urllib.error.URLError: <urlopen error [Errno -3] Temporary failure in name resolution>"
+  },
+  "errors": [
+    {
+      "stack_trace": "Temporary failure in name resolution while resolving public data source host"
+    }
+  ]
+}

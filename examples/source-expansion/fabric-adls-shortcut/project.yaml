@@ -1,0 +1,47 @@
+name: fabric_adls_shortcut_source_smoke
+description: Fabric source-expansion smoke for external ADLS Gen2 shortcut-backed CSV reads.
+default_environment: fabric
+
+environments:
+  fabric: environments/fabric.environment.yaml
+
+fabric_setup:
+  shortcuts:
+    - path: Files/source-expansion/adls-shortcuts
+      name: adls_orders
+      conflict_policy: CreateOrOverwrite
+      target:
+        adlsGen2:
+          location: https://cffabadls06131815.dfs.core.windows.net
+          subpath: /cf-fabric-adls/source-expansion
+          connectionId: "{{ parameter:fabric.connections.adls_shortcut_connection_id }}"
+
+execution_order:
+  - name: adls_shortcut_orders
+    layer: bronze
+    expected_result: succeeded
+    depends_on: []
+    contracts:
+      fabric: contracts/01_adls_shortcut_orders.ingestion.yaml
+  - name: adls_shortcut_evidence_probe
+    layer: bronze
+    expected_result: succeeded
+    depends_on: [adls_shortcut_orders]
+    contracts:
+      fabric: contracts/02_adls_shortcut_evidence_probe.ingestion.yaml
+
+source_expansion:
+  source_family: adls_shortcut
+  shortcut_kind: external_adls_gen2
+  authentication: fabric_connection_key
+  source_format: csv
+  expected_success_steps: 2
+  expected_probe_checks: 6
+  stable_final_scope: stable_f11_adls_shortcut_evidence
+  shortcut:
+    path: Files/source-expansion/adls-shortcuts
+    name: adls_orders
+    read_path: Files/source-expansion/adls-shortcuts/adls_orders/orders.csv
+    target_type: AdlsGen2
+    target_location: https://cffabadls06131815.dfs.core.windows.net
+    target_subpath: /cf-fabric-adls/source-expansion

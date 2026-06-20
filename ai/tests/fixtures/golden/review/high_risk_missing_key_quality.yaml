@@ -1,0 +1,22 @@
+source:
+  type: connector
+  connector: files
+  format: csv
+  path: /landing/orders
+  read:
+    schema: "order_id STRING, status STRING, amount DOUBLE"
+target:
+  catalog: main
+  schema: silver
+  table: s_orders
+layer: silver
+mode: scd1_hash_diff
+merge_keys: [order_id]
+quality_rules:
+  not_null: [status]
+annotations:
+  table:
+    description: Silver orders.
+operations:
+  technical_owner: data-engineering
+  criticality: high

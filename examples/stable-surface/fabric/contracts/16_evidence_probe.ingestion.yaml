@@ -1,0 +1,65 @@
+source:
+  type: sql
+  query: |
+    WITH checks AS (
+      SELECT 'successful_runs' AS check_name, COUNT(*) AS observed_count, 13 AS minimum_count
+      FROM contractforge.ctrl_ingestion_runs
+      WHERE target_table LIKE 'cf_fabric_stable.%' AND status = 'SUCCESS'
+      UNION ALL
+      SELECT 'failed_runs' AS check_name, COUNT(*) AS observed_count, 2 AS minimum_count
+      FROM contractforge.ctrl_ingestion_runs
+      WHERE target_table LIKE 'cf_fabric_stable.%' AND status = 'FAILED'
+      UNION ALL
+      SELECT 'error_rows' AS check_name, COUNT(*) AS observed_count, 2 AS minimum_count
+      FROM contractforge.ctrl_ingestion_errors
+      WHERE target_table LIKE 'cf_fabric_stable.%' AND status = 'FAILED'
+      UNION ALL
+      SELECT 'quality_rows' AS check_name, COUNT(*) AS observed_count, 13 AS minimum_count
+      FROM contractforge.ctrl_ingestion_quality
+      WHERE target_table LIKE 'cf_fabric_stable.%'
+      UNION ALL
+      SELECT 'schema_rows' AS check_name, COUNT(*) AS observed_count, 13 AS minimum_count
+      FROM contractforge.ctrl_ingestion_schema_changes
+      WHERE target_table LIKE 'cf_fabric_stable.%'
+      UNION ALL
+      SELECT 'source_metadata_rows' AS check_name, COUNT(*) AS observed_count, 13 AS minimum_count
+      FROM contractforge.ctrl_ingestion_metadata
+      WHERE target_table LIKE 'cf_fabric_stable.%'
+      UNION ALL
+      SELECT 'lineage_rows' AS check_name, COUNT(*) AS observed_count, 13 AS minimum_count
+      FROM contractforge.ctrl_ingestion_lineage
+      WHERE target_table LIKE 'cf_fabric_stable.%'
+      UNION ALL
+      SELECT 'explain_rows' AS check_name, COUNT(*) AS observed_count, 13 AS minimum_count
+      FROM contractforge.ctrl_ingestion_explain
+      WHERE target_table LIKE 'cf_fabric_stable.%'
+      UNION ALL
+      SELECT 'state_rows' AS check_name, COUNT(*) AS observed_count, 9 AS minimum_count
+      FROM contractforge.ctrl_ingestion_state
+      WHERE target_table LIKE 'cf_fabric_stable.%'
+      UNION ALL
+      SELECT 'operations_rows' AS check_name, COUNT(*) AS observed_count, 1 AS minimum_count
+      FROM contractforge.ctrl_ingestion_operations
+      WHERE target_table = 'cf_fabric_stable.governance_review'
+      UNION ALL
+      SELECT 'annotation_rows' AS check_name, COUNT(*) AS observed_count, 1 AS minimum_count
+      FROM contractforge.ctrl_ingestion_annotations
+      WHERE target_table = 'cf_fabric_stable.governance_review'
+      UNION ALL
+      SELECT 'access_rows' AS check_name, COUNT(*) AS observed_count, 1 AS minimum_count
+      FROM contractforge.ctrl_ingestion_access
+      WHERE target_table = 'cf_fabric_stable.governance_review'
+    )
+    SELECT check_name, observed_count, minimum_count
+    FROM checks
+    WHERE observed_count >= minimum_count
+target:
+  catalog: workspace
+  schema: cf_fabric_stable
+  table: evidence_probe
+layer: gold
+mode: overwrite
+quality_rules:
+  required_columns: [check_name, observed_count, minimum_count]
+  not_null: [check_name]
+  min_rows: 12

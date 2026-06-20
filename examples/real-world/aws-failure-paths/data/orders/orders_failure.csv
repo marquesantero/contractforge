@@ -1,0 +1,5 @@
+order_id,customer_id,order_ts,order_status,amount,updated_at
+1,C-100,2026-06-01T10:00:00Z,paid,125.50,2026-06-01T10:05:00Z
+2,C-200,2026-06-01T10:15:00Z,paid,250.75,2026-06-01T10:20:00Z
+3,C-300,2026-06-01T10:30:00Z,cancelled,0.00,2026-06-01T10:35:00Z
+

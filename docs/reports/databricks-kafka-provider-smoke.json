@@ -1,0 +1,113 @@
+{
+  "kind": "contractforge_databricks_kafka_contract_provider_smoke",
+  "schema_version": "1.0.0",
+  "adapter": "contractforge-databricks",
+  "subtarget": "databricks_serverless_delta",
+  "maturity_gate": "DATABRICKS-KAFKA-CONTRACT-RUNTIME",
+  "status": "PASS",
+  "executed_at": "2026-06-10",
+  "databricks_profile": "dbc-424b2872-08c9",
+  "workspace_user": "marco@marques.inf.br",
+  "validation_scope": {
+    "contract_only": true,
+    "runner": "contractforge_databricks.runtime.bundles.ingest_databricks_bundle",
+    "ad_hoc_read_stream_smoke": "SUPERSEDED_BY_CONTRACT_RUNTIME_VALIDATION",
+    "contract_bundle": "examples/real-world/databricks-confluent-kafka-available-now",
+    "contract_path": "contracts/databricks/bronze/bronze_confluent_orders_stream/bronze_confluent_orders_stream.ingestion.yaml",
+    "workspace_notebook": "/Workspace/Shared/contractforge-examples/Databricks_Kafka_Available_Now/notebooks/run_contractforge"
+  },
+  "source": {
+    "provider": "confluent_cloud_kafka",
+    "environment_id": "env-36dw32",
+    "cluster_id": "lkc-dokqkxo",
+    "cluster_name": "cluster_0",
+    "bootstrap_servers": "pkc-619z3.us-east1.gcp.confluent.cloud:9092",
+    "topic": "cf-databricks-orders",
+    "seed_batch_id": "dbx-kafka-1781053436",
+    "seeded_messages": 3
+  },
+  "target": {
+    "catalog": "workspace",
+    "schema": "cf_databricks_kafka_contract",
+    "table": "bronze_orders",
+    "full_name": "workspace.cf_databricks_kafka_contract.bronze_orders",
+    "evidence_schema": "cf_databricks_kafka_contract_ops",
+    "evidence_streams_table": "workspace.cf_databricks_kafka_contract_ops.ctrl_ingestion_streams",
+    "checkpoint": "/Volumes/workspace/cf_databricks_kafka_smoke/kafka_smoke/checkpoints/cf-databricks-orders-contract-v2",
+    "checkpoint_storage": {
+      "type": "unity_catalog_managed_volume",
+      "full_name": "workspace.cf_databricks_kafka_smoke.kafka_smoke",
+      "volume_id": "1655eb2d-666e-465f-ad89-b68db7adc8b2"
+    }
+  },
+  "contract_runtime": {
+    "source_type": "kafka_available_now",
+    "trigger": "available_now",
+    "write_mode": "append",
+    "schema_policy": "additive_only",
+    "runtime_type": "serverless",
+    "deployment": "databricks_job_contract_runtime",
+    "dependencies": [
+      "/Workspace/Shared/contractforge-examples/libs/contractforge_core-0.1.0-py3-none-any.whl",
+      "/Workspace/Shared/contractforge-examples/libs/contractforge_databricks-0.1.0-py3-none-any.whl"
+    ]
+  },
+  "live_runs": [
+    {
+      "purpose": "first_available_now_contract_run",
+      "status": "SUCCESS",
+      "parent_run_id": 952702771763488,
+      "task_run_id": 1013124606167607,
+      "stream_run_id": "dbx-kafka-contract-20260610-2",
+      "rows_read": 3,
+      "rows_written": 3,
+      "rows_quarantined": 0,
+      "batches_processed": 1,
+      "target_rows_after_run": 3
+    },
+    {
+      "purpose": "no_input_checkpoint_contract_rerun",
+      "status": "SUCCESS",
+      "parent_run_id": 96254973450943,
+      "task_run_id": 686101624567345,
+      "stream_run_id": "dbx-kafka-contract-20260610-2-rerun",
+      "rows_read": 0,
+      "rows_written": 0,
+      "rows_quarantined": 0,
+      "batches_processed": 0,
+      "target_rows_after_run": 3
+    },
+    {
+      "purpose": "target_and_evidence_readback",
+      "status": "SUCCESS",
+      "parent_run_id": 669389405268414,
+      "task_run_id": 2063805555313,
+      "target_rows": 3,
+      "seed_batch_rows": 3,
+      "evidence_stream_rows_checked": 2
+    }
+  ],
+  "adapter_fixes_validated": [
+    "Databricks Kafka source resolution normalizes standard Kafka PlainLoginModule JAAS config to Databricks serverless shaded PlainLoginModule.",
+    "Available-now batch preparation carries source schema into table setup, allowing missing target Delta tables to be created before append."
+  ],
+  "resolved_blockers": [
+    "Confluent Cloud global API keys are not valid for Kafka data-plane SASL; validation uses a cluster-scoped API key stored in Databricks secrets.",
+    "Databricks serverless cannot write checkpoints to disabled public DBFS root paths; validation uses a Unity Catalog managed volume checkpoint.",
+    "Databricks serverless Kafka uses a shaded Kafka client; the adapter normalizes the contract JAAS config at runtime."
+  ],
+  "security_controls": [
+    "Kafka credentials are referenced through Databricks secret placeholders in the contract.",
+    "Secret values were not written to report output or notebook result output.",
+    "The committed contract uses secret references, not plaintext Confluent credentials."
+  ],
+  "required_cases": [
+    "provider_available_now_databricks_contract_run",
+    "checkpoint_progress_recorded",
+    "no_input_contract_rerun_records_zero_new_rows",
+    "offset_or_position_semantics_recorded",
+    "target_delta_rows_recorded",
+    "secret_values_not_logged"
+  ],
+  "open_items": []
+}

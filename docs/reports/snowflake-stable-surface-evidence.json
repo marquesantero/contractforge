@@ -1,0 +1,181 @@
+{
+  "kind": "contractforge_snowflake_stable_surface_evidence",
+  "schema_version": "1.0.0",
+  "adapter": "contractforge-snowflake",
+  "subtarget": "snowflake_sql_warehouse",
+  "classification": "STABLE_SUPPORTED_SURFACE",
+  "supported_surface_ready": true,
+  "stable_final": true,
+  "evidence_date": "2026-06-09",
+  "stability_criteria": "docs/specs/snowflake-ga-criteria.md",
+  "stabilization_matrix": "docs/specs/snowflake-stabilization-matrix.md",
+  "waiver_registry": "docs/specs/snowflake-ga-waivers.md",
+  "summary": {
+    "decision": "The documented Snowflake SQL warehouse surface is stable-supported.",
+    "basis": "Real Snowflake validation completed through ContractForge commands and the hosted procedure/library-runner pattern, with Snowflake control-table evidence.",
+    "scope_limit": "Continuous ingestion, historical/snapshot soft delete and account-feature-dependent row access or masking policy certification are excluded from stable-final."
+  },
+  "verification_commands": [
+    {
+      "name": "local_full_suite",
+      "command": "uv run pytest -q",
+      "expected": "all tests pass"
+    },
+    {
+      "name": "snowflake_status_report",
+      "command": "uv run contractforge-snowflake stabilization-report",
+      "expected": "classification=STABLE_SUPPORTED_SURFACE, supported_surface_ready=true, stable_final=true"
+    },
+    {
+      "name": "strict_final_gate",
+      "command": "uv run contractforge-snowflake stabilization-report --strict-final",
+      "expected": "exit 0 while stable_final=true"
+    },
+    {
+      "name": "platform_parity_report",
+      "command": "uv run python -m tools.platform_parity.report",
+      "expected": "portable signatures equal for shared Databricks/AWS/Snowflake scenarios"
+    }
+  ],
+  "real_validation_projects": [
+    {
+      "name": "snowflake_smoke_minimal",
+      "status": "PASS",
+      "source_family": "generated_tables",
+      "validated_surfaces": [
+        "append",
+        "overwrite",
+        "quarantine",
+        "upsert",
+        "hash_diff",
+        "control evidence",
+        "cleanup"
+      ],
+      "required_result": "Five contracts complete with matching Snowflake control evidence."
+    },
+    {
+      "name": "snowflake_smoke_failure_paths",
+      "status": "PASS",
+      "source_family": "controlled_failures",
+      "validated_surfaces": [
+        "missing source",
+        "quality abort",
+        "strict schema failure",
+        "redacted error evidence"
+      ],
+      "required_result": "Failures write redacted evidence without exposing connection secrets."
+    },
+    {
+      "name": "snowflake_smoke_stage_publish",
+      "status": "PASS",
+      "source_family": "internal_stage",
+      "validated_surfaces": [
+        "stage publish",
+        "artifact reload",
+        "staged contract execution"
+      ],
+      "required_result": "Published bundle loads from @stage and executes through the connector-backed runner."
+    },
+    {
+      "name": "snowflake_smoke_procedure",
+      "status": "PASS",
+      "source_family": "hosted_procedure",
+      "validated_surfaces": [
+        "Snowpark procedure deployment",
+        "staged ZIP imports",
+        "hosted library runner"
+      ],
+      "required_result": "Hosted procedure deploys and runs one contract through the stable runner."
+    },
+    {
+      "name": "snowflake_smoke_task_graph",
+      "status": "PASS",
+      "source_family": "scheduled_project_graph",
+      "validated_surfaces": [
+        "CREATE TASK deployment",
+        "root task execution",
+        "dependent task execution",
+        "task history polling",
+        "cleanup"
+      ],
+      "required_result": "Live task graph deploys, root and dependent tasks reach SUCCEEDED, and bronze/silver counts match expected rows."
+    },
+    {
+      "name": "snowflake_usgs_rest_medallion",
+      "status": "PASS",
+      "source_family": "same_contract_parity",
+      "contracts": "examples/real-world/usgs-earthquake-rest-medallion",
+      "validated_surfaces": [
+        "hosted procedure library runner",
+        "bronze to gold medallion promotion",
+        "quality evidence",
+        "lineage evidence",
+        "same-result parity"
+      ],
+      "required_result": "Frozen USGS payload produces matching logical counts across Databricks, AWS and Snowflake."
+    },
+    {
+      "name": "snowflake_hashdiff_production_benchmark",
+      "status": "PASS",
+      "source_family": "hashdiff_production_benchmark",
+      "contracts": "examples/benchmarks/hash-diff-production",
+      "validated_surfaces": [
+        "hash_diff_upsert initial load",
+        "no-change replay",
+        "changed-row wave",
+        "concurrent-or-overlap guard",
+        "duplicate-key failure",
+        "null-key failure",
+        "query-history cost signals",
+        "control audit"
+      ],
+      "required_result": "Snowflake hash-diff benchmark passes all required cases with query ids and control evidence."
+    }
+  ],
+  "same_contract_e2e": {
+    "status": "PASS",
+    "platforms": [
+      "databricks",
+      "aws",
+      "snowflake"
+    ],
+    "evidence_source": "User-reported E2E execution of the same contracts with the same results on all three platforms.",
+    "machine_check": "tools.platform_parity.report keeps portable signatures equal and records allowed platform deltas.",
+    "required_follow_up": "Attach run ids, audit query outputs or CI artifact URLs when publishing a tagged release."
+  },
+  "accepted_review_boundaries": [
+    {
+      "code": "SNOWFLAKE_HASH_DIFF_PERFORMANCE_UNVALIDATED",
+      "area": "hash_diff_upsert",
+      "decision": "SUPPORTED_WITH_WARNINGS",
+      "reason": "The reference production benchmark is validated; individual hash-diff contracts still carry a benchmark-required warning until workload-specific evidence is attached."
+    },
+    {
+      "code": "SNOWFLAKE_ACCESS_POLICY_ACCOUNT_FEATURE_BLOCKED",
+      "area": "row access policies and masking policies",
+      "decision": "EXCLUDED_FROM_STABLE_FINAL",
+      "reason": "The connected account returns Unsupported feature 'ROW ACCESS POLICY'. Table grants, comments/tags and validate-only governance remain supported; row access and masking policy certification are excluded from the stable-final claim for this account."
+    },
+    {
+      "code": "SNOWFLAKE_CONTINUOUS_INGESTION_REVIEW",
+      "area": "Snowpipe, Streams and continuous ingestion",
+      "decision": "EXCLUDED_FROM_STABLE_FINAL",
+      "reason": "The stable surface covers table, SQL and staged-file batch sources. Snowpipe, Streams, Snowpipe Streaming and Kafka connector ingestion require a separate runtime/evidence mapping."
+    },
+    {
+      "code": "SNOWFLAKE_SCD2_REVIEW",
+      "area": "Historical and snapshot soft delete",
+      "decision": "EXCLUDED_FROM_STABLE_FINAL",
+      "reason": "Historical modes are explicitly outside the Snowflake stable-final claim until Databricks/Snowflake parity evidence is attached."
+    }
+  ],
+  "release_decision": {
+    "promote_package_classifier": "Development Status :: 4 - Beta",
+    "do_not_claim": [
+      "General Availability",
+      "row access policy or masking policy support on accounts where the policy features are unavailable",
+      "Snowpipe, Streams, Snowpipe Streaming or Kafka connector equivalence",
+      "Historical or snapshot soft-delete support"
+    ]
+  }
+}

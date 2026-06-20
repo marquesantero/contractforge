@@ -1,0 +1,13 @@
+table:
+  description: Daily earthquake activity summary derived from normalized USGS events.
+  tags:
+    domain: geospatial
+    provider: usgs
+    layer: gold
+columns:
+  event_date:
+    description: Date of earthquake activity.
+  earthquake_count:
+    description: Number of earthquake events observed on the date.
+  tsunami_related_count:
+    description: Count of events marked by USGS as tsunami-related.

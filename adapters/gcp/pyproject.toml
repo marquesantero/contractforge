@@ -1,0 +1,46 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "contractforge-gcp"
+version = "0.2.0"
+description = "Google Cloud BigQuery adapter package for ContractForge Core."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "ContractForge contributors" }]
+keywords = ["contractforge", "google-cloud", "gcp", "bigquery", "data-contracts", "ingestion"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Database",
+    "Topic :: Software Development :: Libraries",
+]
+dependencies = ["contractforge-core>=0.2,<0.3", "PyYAML>=6"]
+
+[project.optional-dependencies]
+dev = ["pytest>=8"]
+runtime = ["google-cloud-bigquery>=3"]
+
+[project.urls]
+Homepage = "https://github.com/marquesantero/contractforge/tree/main/adapters/gcp"
+Documentation = "https://marquesantero.github.io/contractforge/"
+Repository = "https://github.com/marquesantero/contractforge"
+Issues = "https://github.com/marquesantero/contractforge/issues"
+Changelog = "https://github.com/marquesantero/contractforge/blob/main/adapters/gcp/CHANGELOG.md"
+
+[project.scripts]
+contractforge-gcp = "contractforge_gcp.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/contractforge_gcp"]
+
+[tool.hatch.build.targets.sdist]
+include = ["/src/contractforge_gcp", "/README.md", "/CHANGELOG.md", "/pyproject.toml"]

@@ -1,0 +1,40 @@
+name: Feature request
+description: Propose a new capability or improvement.
+title: "[Feature]: "
+labels: ["enhancement", "triage"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What user or platform problem should this solve?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposal
+      description: Describe the desired behavior.
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Core semantics
+        - Databricks adapter
+        - AWS adapter
+        - Snowflake adapter
+        - Fabric adapter
+        - GCP adapter
+        - ContractForge AI
+        - Documentation/site
+        - Packaging/release
+    validations:
+      required: true
+  - type: textarea
+    id: compatibility
+    attributes:
+      label: Contract compatibility
+      description: Does this need new contract syntax or adapter-specific behavior?

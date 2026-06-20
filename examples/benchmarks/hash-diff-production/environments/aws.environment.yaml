@@ -1,0 +1,31 @@
+name: hash_diff_prod_aws
+adapter: aws
+runtime:
+  runtime: aws_glue_spark
+evidence:
+  database: contractforge_cf_hashdiff_prod_ops
+artifacts:
+  uri: s3://contractforge-aws-smoke-449112696824-us-east-1/contractforge-hashdiff-production/
+  layout: contractforge-v1
+  include_contract_bundle: true
+  include_normalized_contract: true
+  include_rendered_artifacts: true
+  include_manifest: true
+parameters:
+  aws:
+    region: us-east-1
+    iceberg:
+      warehouse: s3://contractforge-aws-smoke-449112696824-us-east-1/warehouse/hashdiff-production/
+    dependencies:
+      additional_python_modules: pydantic>=2.7,eval-type-backport,PyYAML>=6
+      extra_py_files:
+        - s3://contractforge-aws-smoke-449112696824-us-east-1/artifacts/contractforge/libs/contractforge_core-0.1.0-py3-none-any.whl
+        - s3://contractforge-aws-smoke-449112696824-us-east-1/artifacts/contractforge/libs/contractforge_aws-0.1.0-py3-none-any.whl
+    job_bookmarks:
+      enabled: true
+    glue_job:
+      role_arn: arn:aws:iam::449112696824:role/ContractForgeGlueSmokeRole
+      worker_type: G.1X
+      number_of_workers: 2
+      timeout_minutes: 30
+      max_retries: 0

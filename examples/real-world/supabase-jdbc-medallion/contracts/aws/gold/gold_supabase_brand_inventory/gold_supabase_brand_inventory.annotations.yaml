@@ -1,0 +1,12 @@
+policy: warn
+table:
+  description: Gold inventory mart aggregated by brand, price band and supplier tier.
+  tags:
+    domain: inventory
+    source: supabase
+    layer: gold
+columns:
+  product_count:
+    description: Distinct product count in the aggregate.
+  gross_movement_value:
+    description: Summed movement value across joined movement rows.

@@ -1,0 +1,160 @@
+{
+  "adapter": "contractforge-gcp",
+  "execute": false,
+  "kind": "contractforge.gcp.source_family_promotion_result.v1",
+  "operations": [],
+  "plan": {
+    "adapter": "contractforge-gcp",
+    "dataflow_jdbc": {
+      "evidence_required": [
+        "Dataflow job id, final state and region are captured for the ContractForge run id.",
+        "JDBC driver, query/table, partition options and target table are captured without credentials.",
+        "BigQuery output rows reconcile with downstream bronze-to-gold row-count and quality evidence.",
+        "Network, credential and schema failure paths persist failed evidence without leaking secrets."
+      ],
+      "job_name": "cf-gcp-azure-sqlserver-jdbc-orders-20260617f",
+      "kind": "contractforge.gcp.dataflow_jdbc_promotion_plan.v1",
+      "launch_command": [
+        "gcloud",
+        "dataflow",
+        "flex-template",
+        "run",
+        "{{ dataflow_job_name }}",
+        "--region",
+        "us-central1",
+        "--project",
+        "midyear-system-499521-p3",
+        "--template-file-gcs-location",
+        "gs://dataflow-templates-us-central1/latest/flex/Jdbc_to_BigQuery_Flex",
+        "--disable-public-ips",
+        "--network",
+        "default",
+        "--subnetwork",
+        "regions/us-central1/subnetworks/default",
+        "--staging-location",
+        "gs://contractforge-gcp-smoke-midyear-system-499521-p3/dataflow/staging/azure-sqlserver-jdbc/",
+        "--temp-location",
+        "gs://contractforge-gcp-smoke-midyear-system-499521-p3/dataflow/temp/azure-sqlserver-jdbc/",
+        "--worker-zone",
+        "us-central1-f",
+        "--worker-machine-type",
+        "e2-standard-2",
+        "--max-workers",
+        "1",
+        "--parameters",
+        "{{ rendered_parameter_csv }}"
+      ],
+      "launch_options": {
+        "disable_public_ips": true,
+        "max_workers": "1",
+        "network": "default",
+        "staging_location": "gs://contractforge-gcp-smoke-midyear-system-499521-p3/dataflow/staging/azure-sqlserver-jdbc/",
+        "subnetwork": "regions/us-central1/subnetworks/default",
+        "temp_location": "gs://contractforge-gcp-smoke-midyear-system-499521-p3/dataflow/temp/azure-sqlserver-jdbc/",
+        "worker_machine_type": "e2-standard-2",
+        "worker_zone": "us-central1-f"
+      },
+      "location": "us-central1",
+      "non_claims": [
+        "A Dataflow JDBC load alone is not full bronze-to-gold parity until downstream contracts run from the promoted table.",
+        "Manual local JDBC extraction or file export is not acceptable promotion evidence."
+      ],
+      "parameters": {
+        "bigQueryLoadingTemporaryDirectory": "gs://contractforge-gcp-smoke-midyear-system-499521-p3/dataflow/temp/azure-sqlserver-jdbc/bq-load/",
+        "bigQuerySchemaPath": "gs://contractforge-gcp-smoke-midyear-system-499521-p3/schemas/gcp-azure-sqlserver-jdbc/orders.schema.json",
+        "connectionURL": "jdbc:sqlserver://cffabricf11sql65687.database.windows.net:1433;database=contractforge_f11;encrypt=true;trustServerCertificate=false;hostNameInCertificate=*.database.windows.net;loginTimeout=30",
+        "createDisposition": "CREATE_IF_NEEDED",
+        "driverClassName": "com.microsoft.sqlserver.jdbc.SQLServerDriver",
+        "driverJars": "gs://contractforge-gcp-smoke-midyear-system-499521-p3/drivers/mssql-jdbc-12.10.1.jre11.jar",
+        "fetchSize": "100",
+        "outputTable": "midyear-system-499521-p3:contractforge_gcp_azure_sql_bronze.b_azure_sql_orders",
+        "password": "projects/midyear-system-499521-p3/secrets/contractforge-azure-sqlserver-password/versions/latest",
+        "query": "SELECT\n  CAST(order_id AS VARCHAR(64)) AS order_id,\n  CAST(customer_name AS VARCHAR(256)) AS customer_name,\n  CAST(amount AS FLOAT) AS amount\nFROM dbo.cf_fabric_jdbc_orders",
+        "username": "projects/midyear-system-499521-p3/secrets/contractforge-azure-sqlserver-user/versions/latest"
+      },
+      "project_id": "midyear-system-499521-p3",
+      "readback_commands": {
+        "count_output_table": [
+          "bq",
+          "--format=json",
+          "query",
+          "--use_legacy_sql=false",
+          "SELECT COUNT(*) AS row_count FROM `midyear-system-499521-p3.contractforge_gcp_azure_sql_bronze.b_azure_sql_orders`"
+        ],
+        "describe_job": [
+          "gcloud",
+          "dataflow",
+          "jobs",
+          "describe",
+          "{{ dataflow_job_id }}",
+          "--region",
+          "us-central1",
+          "--project",
+          "midyear-system-499521-p3",
+          "--format=json"
+        ]
+      },
+      "runtime": "Google-provided Dataflow JDBC to BigQuery batch template.",
+      "source_type": "sqlserver",
+      "status": "REVIEW_REQUIRED",
+      "temp_location": "gs://contractforge-gcp-smoke-midyear-system-499521-p3/dataflow/temp/azure-sqlserver-jdbc/",
+      "template": {
+        "documentation": "https://docs.cloud.google.com/dataflow/docs/guides/templates/provided/jdbc-to-bigquery",
+        "name": "Jdbc_to_BigQuery_Flex"
+      }
+    },
+    "execution": {
+      "command": "contractforge-gcp source-promotion <contract> --execute --readback",
+      "included": true,
+      "reason": "JDBC source promotion can launch the declared Dataflow JDBC-to-BigQuery batch template, then read back Dataflow job and BigQuery target metadata."
+    },
+    "graduation_gates": [
+      "Generated artifacts are derived only from contracts and GCP environment bindings.",
+      "Bronze-to-gold execution succeeds in GCP without one-off notebooks, scripts or manual staging.",
+      "Run, source metadata, schema, quality, lineage and error evidence are written for success and failure paths.",
+      "`sqlserver` is covered by a real GCP smoke or cross-adapter parity fixture."
+    ],
+    "kind": "contractforge.gcp.source_family_promotion_plan.v1",
+    "native_mapping": "Google Cloud staging/runtime design required",
+    "promotion_path": {
+      "blockers": [
+        "A local JDBC read or manual export/import is not GCP adapter promotion evidence.",
+        "The database must be reachable from the Dataflow worker subnet or the job is expected to fail."
+      ],
+      "candidate_runtime": "Dataflow JDBC to BigQuery batch template with adapter-owned readback.",
+      "evidence_required": [
+        "Generated Dataflow JDBC plan records driver, query/table, target table and temp directory.",
+        "Dataflow job id, final state and BigQuery output row count are read back.",
+        "Downstream bronze-to-gold contracts read the promoted BigQuery table without connector-specific rewrites.",
+        "Credential, network and schema failures persist failed-run evidence without leaking secrets."
+      ],
+      "required_bindings": [
+        "JDBC driver JAR staged in Google Cloud Storage or Secret Manager.",
+        "Connection URL and credentials resolved from Secret Manager or reviewed environment bindings.",
+        "BigQuery target table or schema-file binding before the Dataflow load starts.",
+        "Network path from Dataflow workers to the database endpoint."
+      ],
+      "stable_claim": "Review-required until bronze-to-gold execution, schema drift and evidence semantics pass in GCP."
+    },
+    "renderable": false,
+    "review_prerequisites": [
+      "JDBC reads should be handled through Dataflow, Dataproc or a reviewed BigQuery external connection design.",
+      "Choose and document the Google Cloud runtime owner before claiming execution support.",
+      "Validate credentials, network path, retry behavior, schema drift and evidence readback in a real GCP smoke."
+    ],
+    "runtime_path": "Reviewed BigQuery external connection, Dataflow or Dataproc extraction",
+    "source_type": "sqlserver",
+    "stable_boundary": {
+      "current_gate": "GCP-BQ-20F",
+      "decision": "DATAFLOW_JDBC_TEMPLATE_COMMAND_INCLUDED_FULL_SOURCE_PARITY_PENDING",
+      "future_gate": "GCP-BQ-20"
+    },
+    "status": "PLANNED_REVIEW_REQUIRED",
+    "subtarget": "gcp_bigquery"
+  },
+  "readback": false,
+  "reason": "Dry-run only. Pass --execute to launch the Dataflow JDBC-to-BigQuery template.",
+  "source_type": "sqlserver",
+  "status": "PLANNED_NOT_EXECUTED",
+  "subtarget": "gcp_bigquery"
+}

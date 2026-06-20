@@ -1,0 +1,17 @@
+{
+  "order_id": "o-001",
+  "customer": {
+    "id": "c-001",
+    "email": "customer@example.com"
+  },
+  "items": [
+    {
+      "sku": "sku-001",
+      "quantity": 2,
+      "price": 19.9
+    }
+  ],
+  "events": [
+    ["created", "paid"]
+  ]
+}

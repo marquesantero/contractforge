@@ -1,0 +1,100 @@
+{
+  "kind": "contractforge_gcp_bigquery_snapshot_variant_smoke",
+  "schema_version": "1.0.0",
+  "adapter": "contractforge-gcp",
+  "subtarget": "gcp_bigquery",
+  "maturity_gate": "GCP-BQ-12C3",
+  "status": "PASS_WITH_REVIEW_BOUNDARY",
+  "executed_at": "2026-06-17",
+  "project_id": "midyear-system-499521-p3",
+  "location": "us-east1",
+  "datasets": {
+    "target": "contractforge_gcp_advanced_write_smoke",
+    "evidence": "contractforge_gcp_advanced_write_ops"
+  },
+  "scope": {
+    "validated": [
+      "snapshot_reconcile_soft_delete requires complete-source declaration before execution",
+      "previously inactive target row is reactivated when the same source row returns with the same row hash",
+      "missing active target row is soft-deleted from a complete-source snapshot",
+      "no-change replay is idempotent after reactivation and tombstone",
+      "run and lineage evidence for first-run and replay MERGE jobs"
+    ],
+    "still_open": [
+      "advanced write concurrent writer behavior",
+      "production-sized cross-adapter parity contracts"
+    ]
+  },
+  "contracts": [
+    {
+      "name": "snapshot_incomplete_source_block",
+      "mode": "snapshot_reconcile_soft_delete",
+      "source": "contractforge_gcp_advanced_write_smoke.snapshot_reactivation_source",
+      "target": "contractforge_gcp_advanced_write_smoke.snapshot_reactivation_target",
+      "result": {
+        "status": "BLOCKED",
+        "planning_status": "UNSUPPORTED",
+        "blocker": "SNAPSHOT_SOURCE_COMPLETE_REQUIRED"
+      }
+    },
+    {
+      "name": "snapshot_reactivation_and_tombstone",
+      "mode": "snapshot_reconcile_soft_delete",
+      "source": "contractforge_gcp_advanced_write_smoke.snapshot_reactivation_source",
+      "target": "contractforge_gcp_advanced_write_smoke.snapshot_reactivation_target",
+      "contract_fields": {
+        "merge_keys": [
+          "order_id"
+        ],
+        "source.read.source_complete": true
+      },
+      "first_run": {
+        "status": "SUCCEEDED",
+        "planning_status": "REVIEW_REQUIRED",
+        "write_job_id": "cf_gcp_smoke_query_e591bd9f62774dd28d43",
+        "statement_type": "MERGE",
+        "inserted_rows": 0,
+        "updated_rows": 2,
+        "deleted_rows": 0,
+        "run_evidence_job_id": "cf_gcp_smoke_query_83bebb0781874729bb35",
+        "lineage_evidence_job_id": "cf_gcp_smoke_query_edb18f9888a44c76bdf4"
+      },
+      "replay": {
+        "status": "SUCCEEDED",
+        "planning_status": "REVIEW_REQUIRED",
+        "write_job_id": "cf_gcp_smoke_query_a121b187b6694b5b8118",
+        "statement_type": "MERGE",
+        "inserted_rows": 0,
+        "updated_rows": 0,
+        "deleted_rows": 0,
+        "run_evidence_job_id": "cf_gcp_smoke_query_db7389c4588b4f10ab26",
+        "lineage_evidence_job_id": "cf_gcp_smoke_query_8cbf7c26df2546f5ad45"
+      }
+    }
+  ],
+  "target_readback": {
+    "snapshot_reactivation_target": {
+      "rows": [
+        {
+          "order_id": "A",
+          "status": "new",
+          "is_active": true,
+          "deleted_at_is_null": true
+        },
+        {
+          "order_id": "B",
+          "status": "paid",
+          "is_active": true,
+          "deleted_at_is_null": true
+        },
+        {
+          "order_id": "C",
+          "status": "old",
+          "is_active": false,
+          "deleted_at_is_null": false
+        }
+      ]
+    }
+  },
+  "decision": "GCP-BQ-12C3 closes compact snapshot complete-source blocker, same-hash reactivation, missing-row tombstone and replay idempotency evidence for opt-in BigQuery review-required execution. Hash_diff_upsert production parity is accepted by GCP-BQ-12C; historical and snapshot production parity remains future work."
+}

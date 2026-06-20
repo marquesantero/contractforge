@@ -1,0 +1,117 @@
+name: usgs_earthquake_rest_medallion
+description: Real-world REST API medallion ingestion project for ContractForge adapter parity.
+source_system: usgs
+source_connector: rest_api
+default_environment: databricks
+
+environments:
+  databricks: environments/databricks.environment.yaml
+  aws: environments/aws.environment.yaml
+  snowflake: environments/snowflake.environment.yaml
+  fabric: environments/fabric.environment.yaml
+  gcp: environments/gcp.environment.yaml
+
+deployment:
+  databricks:
+    bundle_name: contractforge_usgs_earthquake_rest_medallion
+    job_key: usgs_earthquake_rest_medallion
+    job_name: contractforge_usgs_earthquake_rest_medallion
+    workspace_root_path: /Workspace/Shared/contractforge-examples/USGS_REST_Medallion
+    bundle_root: /Workspace/Shared/contractforge-examples/USGS_REST_Medallion/files
+    evidence_catalog: workspace
+    evidence_schema: cf_usgs_rest_ops
+    core_wheel_path: /Workspace/Shared/contractforge-examples/libs/contractforge_core-0.1.0-py3-none-any.whl
+    databricks_wheel_path: /Workspace/Shared/contractforge-examples/libs/contractforge_databricks-0.1.0-py3-none-any.whl
+  aws:
+    state_machine_name: contractforge_usgs_earthquake_rest_medallion
+  snowflake:
+    runner_procedure: CONTRACTFORGE_TEST_DB.PUBLIC.CF_USGS_REST_RUNNER
+  fabric:
+    runtime: notebook
+    workspace_name: Manager
+    lakehouse_name: contractforge_lh
+  gcp:
+    runtime: bigquery_smoke
+    project_id: midyear-system-499521-p3
+    location: US
+
+schedule:
+  cron: "0 6 * * *"
+  timezone: America/Sao_Paulo
+  enabled: false
+  adapters:
+    aws:
+      state: DISABLED
+
+execution_order:
+  - name: bronze_usgs_geojson
+    layer: bronze
+    depends_on: []
+    contracts:
+      databricks: contracts/databricks/bronze/bronze_usgs_geojson/bronze_usgs_geojson.ingestion.yaml
+      aws: contracts/aws/bronze/bronze_usgs_geojson/bronze_usgs_geojson.ingestion.yaml
+      snowflake: contracts/snowflake/bronze/bronze_usgs_geojson/bronze_usgs_geojson.ingestion.yaml
+      fabric: contracts/fabric/bronze/bronze_usgs_geojson/bronze_usgs_geojson.ingestion.yaml
+      gcp: contracts/gcp/bronze/bronze_usgs_geojson/bronze_usgs_geojson.ingestion.yaml
+  - name: silver_usgs_events
+    layer: silver
+    depends_on: [bronze_usgs_geojson]
+    contracts:
+      databricks: contracts/databricks/silver/silver_usgs_events/silver_usgs_events.ingestion.yaml
+      aws: contracts/aws/silver/silver_usgs_events/silver_usgs_events.ingestion.yaml
+      snowflake: contracts/snowflake/silver/silver_usgs_events/silver_usgs_events.ingestion.yaml
+      fabric: contracts/fabric/silver/silver_usgs_events/silver_usgs_events.ingestion.yaml
+      gcp: contracts/gcp/silver/silver_usgs_events/silver_usgs_events.ingestion.yaml
+  - name: gold_usgs_daily_summary
+    layer: gold
+    depends_on: [silver_usgs_events]
+    contracts:
+      databricks: contracts/databricks/gold/gold_usgs_daily_summary/gold_usgs_daily_summary.ingestion.yaml
+      aws: contracts/aws/gold/gold_usgs_daily_summary/gold_usgs_daily_summary.ingestion.yaml
+      snowflake: contracts/snowflake/gold/gold_usgs_daily_summary/gold_usgs_daily_summary.ingestion.yaml
+      fabric: contracts/fabric/gold/gold_usgs_daily_summary/gold_usgs_daily_summary.ingestion.yaml
+      gcp: contracts/gcp/gold/gold_usgs_daily_summary/gold_usgs_daily_summary.ingestion.yaml
+  - name: gold_usgs_magnitude_bands
+    layer: gold
+    depends_on: [silver_usgs_events]
+    contracts:
+      databricks: contracts/databricks/gold/gold_usgs_magnitude_bands/gold_usgs_magnitude_bands.ingestion.yaml
+      aws: contracts/aws/gold/gold_usgs_magnitude_bands/gold_usgs_magnitude_bands.ingestion.yaml
+      snowflake: contracts/snowflake/gold/gold_usgs_magnitude_bands/gold_usgs_magnitude_bands.ingestion.yaml
+      fabric: contracts/fabric/gold/gold_usgs_magnitude_bands/gold_usgs_magnitude_bands.ingestion.yaml
+      gcp: contracts/gcp/gold/gold_usgs_magnitude_bands/gold_usgs_magnitude_bands.ingestion.yaml
+
+portability:
+  invariant_contract_intent:
+    - source.type
+    - target.layer
+    - mode
+    - schema_policy
+    - transform.shape
+    - transform.standardize
+    - transform.derive
+    - transform.deduplicate
+    - quality_rules
+    - annotations
+    - operations
+  platform_bindings:
+    databricks:
+      table_format: delta
+      evidence_store: delta_control_tables
+      extensions_namespace: extensions.databricks
+    aws:
+      table_format: iceberg
+      evidence_store: iceberg_control_tables
+      extensions_namespace: extensions.aws
+    snowflake:
+      table_format: snowflake_table
+      evidence_store: snowflake_audit_tables
+      extensions_namespace: extensions.snowflake
+    fabric:
+      table_format: delta
+      evidence_store: fabric_lakehouse_delta_tables
+      extensions_namespace: extensions.fabric
+    gcp:
+      table_format: bigquery_table
+      evidence_store: bigquery_control_tables
+      extensions_namespace: extensions.gcp

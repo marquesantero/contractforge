@@ -1,0 +1,47 @@
+source:
+  type: sqlserver
+  system: azure_sql_database
+  url: jdbc:sqlserver://cffabricf11sql65687.database.windows.net:1433;database=contractforge_f11;encrypt=true;trustServerCertificate=false;hostNameInCertificate=*.database.windows.net;loginTimeout=30
+  query: |
+    SELECT
+      CAST(order_id AS VARCHAR(64)) AS order_id,
+      CAST(customer_name AS VARCHAR(256)) AS customer_name,
+      CAST(amount AS FLOAT) AS amount
+    FROM dbo.cf_fabric_jdbc_orders
+  driver_jars:
+    - gs://contractforge-gcp-smoke-midyear-system-499521-p3/drivers/mssql-jdbc-12.10.1.jre11.jar
+  auth:
+    type: basic
+    username_secret_id: projects/midyear-system-499521-p3/secrets/contractforge-azure-sqlserver-user/versions/latest
+    password_secret_id: projects/midyear-system-499521-p3/secrets/contractforge-azure-sqlserver-password/versions/latest
+  output:
+    table: midyear-system-499521-p3:contractforge_gcp_azure_sql_bronze.b_azure_sql_orders
+    create_disposition: CREATE_IF_NEEDED
+    schema_path: gs://contractforge-gcp-smoke-midyear-system-499521-p3/schemas/gcp-azure-sqlserver-jdbc/orders.schema.json
+  dataflow:
+    project_id: midyear-system-499521-p3
+    location: us-central1
+    temp_location: gs://contractforge-gcp-smoke-midyear-system-499521-p3/dataflow/temp/azure-sqlserver-jdbc/
+    staging_location: gs://contractforge-gcp-smoke-midyear-system-499521-p3/dataflow/staging/azure-sqlserver-jdbc/
+    network: default
+    subnetwork: regions/us-central1/subnetworks/default
+    disable_public_ips: true
+    job_name: cf-gcp-azure-sqlserver-jdbc-orders-20260617f
+    worker_zone: us-central1-f
+    worker_machine_type: e2-standard-2
+    max_workers: 1
+    fetch_size: 100
+
+target:
+  catalog: midyear-system-499521-p3
+  schema: contractforge_gcp_azure_sql_bronze
+  table: b_azure_sql_orders
+
+layer: bronze
+mode: overwrite
+schema_policy: permissive
+
+quality_rules:
+  required_columns: [order_id, customer_name, amount]
+  not_null: [order_id, customer_name, amount]
+  min_rows: 2

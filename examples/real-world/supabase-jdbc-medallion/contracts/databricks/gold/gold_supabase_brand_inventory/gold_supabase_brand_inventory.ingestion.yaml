@@ -1,0 +1,45 @@
+source:
+  type: sql
+  system: supabase_inventory_curated
+  name: brand_inventory_mart
+  query: |
+    SELECT
+      p.brand,
+      p.price_band,
+      p.supplier_tier,
+      COUNT(DISTINCT p.product_id) AS product_count,
+      COUNT(DISTINCT p.product_tag) AS distinct_tag_count,
+      SUM(CASE WHEN m.movement_type = 'inbound' THEN m.quantity ELSE 0 END) AS inbound_quantity,
+      SUM(CASE WHEN m.movement_type = 'outbound' THEN ABS(m.quantity) ELSE 0 END) AS outbound_quantity,
+      SUM(m.movement_value) AS gross_movement_value,
+      MAX(m.event_ts) AS latest_movement_at,
+      CURRENT_TIMESTAMP() AS computed_at_utc
+    FROM {{ table_ref:silver.s_product_tags }} p
+    LEFT JOIN {{ table_ref:silver.s_movements_current }} m
+      ON p.product_id = m.product_id
+    GROUP BY p.brand, p.price_band, p.supplier_tier
+  read:
+    source_complete: true
+
+target:
+  catalog: workspace
+  schema: cf_supabase_jdbc_e2e_v2_gold
+  table: g_brand_inventory
+
+layer: gold
+mode: overwrite
+schema_policy: additive_only
+
+quality_rules:
+  not_null: [brand, price_band, supplier_tier]
+  expressions:
+    - name: non_negative_product_count
+      expression: product_count >= 0
+      severity: abort
+      message: Product counts cannot be negative.
+
+extensions:
+  databricks:
+    delta_properties:
+      delta.enableChangeDataFeed: "true"
+    cluster_columns: [brand, price_band]

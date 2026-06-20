@@ -1,0 +1,170 @@
+{
+  "kind": "contractforge_gcp_confluent_kafka_dataflow_source_promotion_smoke",
+  "schema_version": "1.0.0",
+  "created": "2026-06-17",
+  "adapter": "contractforge-gcp",
+  "subtarget": "gcp_bigquery",
+  "source_type": "kafka_available_now",
+  "provider": "Confluent Cloud Kafka",
+  "status": "PASS_WITH_REVIEW_BOUNDARY",
+  "maturity_gate": "GCP-BQ-13A",
+  "stable_boundary": {
+    "current_gate": "GCP-BQ-13A",
+    "decision": "DATAFLOW_CONFLUENT_PROVIDER_PARITY_VALIDATED_BROADER_STREAMING_REVIEW_SCOPED"
+  },
+  "contract_fixture": "examples/source-expansion/gcp-confluent-kafka-dataflow/contracts/01_confluent_kafka_available_now_orders.ingestion.yaml",
+  "environment_fixture": "examples/source-expansion/gcp-confluent-kafka-dataflow/environments/gcp.environment.yaml",
+  "target_table": "midyear-system-499521-p3.contractforge_gcp_streaming_smoke_usc.confluent_orders",
+  "dlq_table": "midyear-system-499521-p3.contractforge_gcp_streaming_smoke_usc.confluent_orders_dlq",
+  "confluent_topic": "cf-fabric-orders",
+  "confluent_bootstrap": "pkc-619z3.us-east1.gcp.confluent.cloud:9092",
+  "secret_binding": {
+    "username": "projects/midyear-system-499521-p3/secrets/contractforge-confluent-kafka-api-key/versions/latest",
+    "password": "projects/midyear-system-499521-p3/secrets/contractforge-confluent-kafka-api-secret/versions/latest",
+    "values_logged": false
+  },
+  "validated": {
+    "dataflow_api_enabled": true,
+    "bigquery_target_created": true,
+    "bigquery_dlq_created": true,
+    "confluent_credentials_loaded_from_existing_successful_fabric_binding": true,
+    "adapter_owned_source_promotion_execute_path": true,
+    "adapter_owned_readback_path": true,
+    "google_provided_kafka_to_bigquery_flex_template": true,
+    "external_kafka_source_binding_uses_semicolon_format": true,
+    "streaming_pipeline_type_reached": true,
+    "worker_zone_binding_supported": true,
+    "row_ingestion_validated": true,
+    "dlq_reconciliation_validated": true,
+    "offset_checkpoint_no_input_validated": true,
+    "no_workaround_code_used": true
+  },
+  "runtime_parameters": {
+    "consumerGroupId": "contractforge-gcp-dataflow-confluent-orders-20260617h",
+    "checkpoint_location": "gs://contractforge-gcp-smoke-midyear-system-499521-p3/dataflow/checkpoints/confluent-orders-20260617h/",
+    "enableCommitOffsets": "true",
+    "kafkaReadOffset": "earliest",
+    "messageFormat": "JSON",
+    "worker_machine_type": "e2-standard-2",
+    "num_workers": 1,
+    "max_workers": 1,
+    "worker_zone_selected_by_dataflow": "us-central1-f"
+  },
+  "seed_batches": [
+    {
+      "batch_id": "gcp-bq-13a-1781722000",
+      "messages": 3,
+      "timing": "seeded before the first successful Dataflow job was running"
+    },
+    {
+      "batch_id": "gcp-bq-13a-live-1781723200",
+      "messages": 3,
+      "timing": "seeded while the first successful Dataflow job was running"
+    }
+  ],
+  "successful_runs": [
+    {
+      "purpose": "row ingestion",
+      "job_name": "cf-gcp-confluent-orders-20260617h",
+      "job_id": "2026-06-17_11_59_43-17505665225938902365",
+      "region": "us-central1",
+      "zone": "us-central1-f",
+      "job_type": "JOB_TYPE_STREAMING",
+      "final_state_after_cleanup": "JOB_STATE_CANCELLED",
+      "target_row_count_after_flush": 12,
+      "live_batch_rows": 3,
+      "dlq_rows": 0
+    },
+    {
+      "purpose": "no-input replay",
+      "job_name": "cf-gcp-confluent-orders-20260617h-rerun",
+      "job_id": "2026-06-17_12_04_40-13779211374187551398",
+      "region": "us-central1",
+      "job_type": "JOB_TYPE_STREAMING",
+      "same_consumer_group": true,
+      "same_checkpoint_location": true,
+      "target_row_count_before": 12,
+      "target_row_count_after_running_window": 12,
+      "live_batch_rows_after_running_window": 3,
+      "dlq_rows_after_running_window": 0,
+      "cost_metrics_after_running_window": {
+        "TotalVcpuTime": 60,
+        "CurrentVcpuCount": 2,
+        "TotalSeCuUsage": 0.0038888936572604718
+      },
+      "final_state_after_cleanup": "JOB_STATE_CANCELLED"
+    }
+  ],
+  "historical_attempts": [
+    {
+      "job_name": "cf-gcp-confluent-orders-20260617",
+      "job_id": "2026-06-17_08_24_21-8939537409602485584",
+      "result": "FAILED",
+      "reason": "Template launcher result file was not written before runtime IAM roles were granted to the default Dataflow worker service account."
+    },
+    {
+      "job_name": "cf-gcp-confluent-orders-20260617b",
+      "job_id": "2026-06-17_08_28_35-5800481295740352176",
+      "result": "CANCELLED",
+      "reason": "The launcher reached the Beam pipeline but logged that an unbounded Kafka source was being created in a batch pipeline."
+    },
+    {
+      "job_name": "cf-gcp-confluent-orders-20260617c",
+      "job_id": null,
+      "result": "FAILED_FAST",
+      "reason": "The Google-provided template rejects streaming as a template parameter, so ContractForge moved it to gcloud additional pipeline options."
+    },
+    {
+      "job_name": "cf-gcp-confluent-orders-20260617d",
+      "job_id": "2026-06-17_08_32_23-12841717234830698035",
+      "result": "CANCELLED",
+      "zone": "us-east1-c",
+      "job_type": "JOB_TYPE_STREAMING",
+      "reason": "ZONE_RESOURCE_POOL_EXHAUSTED before worker startup; target and DLQ counts stayed at 0."
+    },
+    {
+      "job_name": "cf-gcp-confluent-orders-20260617e",
+      "job_id": "2026-06-17_08_36_42-15848229162727672463",
+      "result": "CANCELLED",
+      "zone": "us-east1-b",
+      "job_type": "JOB_TYPE_STREAMING",
+      "reason": "ZONE_RESOURCE_POOL_EXHAUSTED before worker startup; target and DLQ counts stayed at 0."
+    },
+    {
+      "job_name": "cf-gcp-confluent-orders-20260617f",
+      "job_id": "2026-06-17_08_39_39-6841215848319385429",
+      "result": "CANCELLED",
+      "zone": "us-east1-d",
+      "job_type": "JOB_TYPE_STREAMING",
+      "reason": "ZONE_RESOURCE_POOL_EXHAUSTED before worker startup; target and DLQ counts stayed at 0."
+    },
+    {
+      "job_name": "cf-gcp-confluent-orders-20260617g",
+      "job_id": "2026-06-17_08_54_28-3689913692077664122",
+      "result": "CANCELLED",
+      "region": "us-central1",
+      "zone": "us-central1-a",
+      "job_type": "JOB_TYPE_STREAMING",
+      "reason": "ZONE_RESOURCE_POOL_EXHAUSTED before worker startup; target and DLQ counts stayed at 0."
+    }
+  ],
+  "provider_findings": [
+    "Leaving worker_zone unset allowed Dataflow to select us-central1-f and cleared the earlier ZONE_RESOURCE_POOL_EXHAUSTED blocker.",
+    "The Google-provided template authenticated to Confluent with SASL/PLAIN Secret Manager references and read JSON records into BigQuery.",
+    "The same consumer group and checkpoint location were reused for the no-input replay; the target count remained stable while the replay job was running."
+  ],
+  "cost_control": {
+    "jobs_cancelled_after_evidence_capture": true,
+    "first_job_final_state": "JOB_STATE_CANCELLED",
+    "replay_job_final_state": "JOB_STATE_CANCELLED"
+  },
+  "promotion_decision": {
+    "decision": "PROMOTE_GCP_BQ_13A",
+    "reason": "Row ingestion, zero-DLQ reconciliation and no-input replay evidence now exist for the Confluent/Dataflow provider path. Broader streaming families remain review-scoped under GCP-BQ-13."
+  },
+  "official_docs_checked": [
+    "https://docs.cloud.google.com/dataflow/docs/guides/templates/provided/kafka-to-bigquery",
+    "https://docs.cloud.google.com/dataflow/docs/guides/read-from-kafka",
+    "https://cloud.google.com/dataflow/docs/guides/common-errors#worker-pool-failure"
+  ]
+}

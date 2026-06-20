@@ -1,0 +1,43 @@
+source:
+  type: table
+  table: contractforge_gcp_hashdiff_prod.customers_hashdiff_source
+  read:
+    columns:
+      - customer_id
+      - segment
+      - status
+      - balance
+      - updated_at
+      - payload_hash_noise
+
+target:
+  catalog: midyear-system-499521-p3
+  schema: contractforge_gcp_hashdiff_prod
+  table: customers_hashdiff_target
+
+layer: silver
+mode: hash_diff_upsert
+schema_policy: additive_only
+merge_keys: [customer_id]
+hash_keys: [segment, status, balance, updated_at, payload_hash_noise]
+hash_exclude_columns: []
+on_quality_fail: fail
+
+transform:
+  cast:
+    customer_id: INT64
+    balance: NUMERIC
+  standardize:
+    segment: {trim: true, upper: true}
+    status: {trim: true, lower: true}
+  derive:
+    benchmark_loaded_at_utc: CURRENT_TIMESTAMP()
+
+quality_rules:
+  not_null: [customer_id, segment, status, balance, updated_at]
+  unique_key: [customer_id]
+  expressions:
+    - name: non_negative_balance
+      expression: balance >= 0
+      severity: abort
+      message: Customer balance must be non-negative.

@@ -1,0 +1,42 @@
+source:
+  type: kafka_available_now
+  system: confluent_cloud
+  bootstrap_servers: pkc-619z3.us-east1.gcp.confluent.cloud:9092
+  topic: cf-fabric-orders
+  starting_offsets: earliest
+  checkpoint_location: Files/checkpoints/contractforge/fabric-confluent-kafka-available-now/orders-20260612
+  options:
+    kafka.security.protocol: SASL_SSL
+    kafka.sasl.mechanism: PLAIN
+    kafka.sasl.jaas.config: "{{ secret:fabric/fabric-confluent-kafka-jaas-config }}"
+    failOnDataLoss: "false"
+target:
+  catalog: workspace
+  schema: cf_fabric_source_expansion
+  table: confluent_kafka_available_now_orders
+layer: bronze
+mode: overwrite
+schema_policy: permissive
+transform:
+  shape:
+    parse_json:
+      - column: value
+        alias: payload
+        schema: "STRUCT<order_id: STRING, customer_id: STRING, amount: DOUBLE, batch_id: STRING>"
+        cast_input: STRING
+    columns:
+      payload.order_id: {alias: order_id, cast: STRING}
+      payload.customer_id: {alias: customer_id, cast: STRING}
+      payload.amount: {alias: amount, cast: DOUBLE}
+      payload.batch_id: {alias: batch_id, cast: STRING}
+      topic: {alias: kafka_topic, cast: STRING}
+      partition: {alias: kafka_partition, cast: INT}
+      offset: {alias: kafka_offset, cast: BIGINT}
+      timestamp: {alias: kafka_timestamp}
+  derive:
+    ingested_at_utc: CURRENT_TIMESTAMP()
+quality_rules:
+  required_columns: [order_id, customer_id, amount, batch_id, kafka_topic, kafka_partition, kafka_offset]
+  not_null: [order_id, customer_id, batch_id]
+  min_rows: 3
+

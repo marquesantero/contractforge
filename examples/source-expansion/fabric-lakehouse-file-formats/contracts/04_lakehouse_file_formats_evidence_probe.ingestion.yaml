@@ -1,0 +1,67 @@
+source:
+  type: sql
+  query: |
+    WITH checks AS (
+      SELECT 'orc_target_rows' AS check_name, COUNT(*) AS observed_count, 2 AS minimum_count
+      FROM cf_fabric_source_expansion.lakehouse_orc_orders
+      UNION ALL
+      SELECT 'avro_target_rows' AS check_name, COUNT(*) AS observed_count, 2 AS minimum_count
+      FROM cf_fabric_source_expansion.lakehouse_avro_orders
+      UNION ALL
+      SELECT 'xml_target_rows' AS check_name, COUNT(*) AS observed_count, 2 AS minimum_count
+      FROM cf_fabric_source_expansion.lakehouse_xml_orders
+      UNION ALL
+      SELECT 'run_rows' AS check_name, COUNT(*) AS observed_count, 3 AS minimum_count
+      FROM contractforge.ctrl_ingestion_runs
+      WHERE target_table IN (
+        'cf_fabric_source_expansion.lakehouse_orc_orders',
+        'cf_fabric_source_expansion.lakehouse_avro_orders',
+        'cf_fabric_source_expansion.lakehouse_xml_orders'
+      ) AND status = 'SUCCESS'
+      UNION ALL
+      SELECT 'quality_rows' AS check_name, COUNT(*) AS observed_count, 3 AS minimum_count
+      FROM contractforge.ctrl_ingestion_quality
+      WHERE target_table IN (
+        'cf_fabric_source_expansion.lakehouse_orc_orders',
+        'cf_fabric_source_expansion.lakehouse_avro_orders',
+        'cf_fabric_source_expansion.lakehouse_xml_orders'
+      )
+      UNION ALL
+      SELECT 'schema_rows' AS check_name, COUNT(*) AS observed_count, 3 AS minimum_count
+      FROM contractforge.ctrl_ingestion_schema_changes
+      WHERE target_table IN (
+        'cf_fabric_source_expansion.lakehouse_orc_orders',
+        'cf_fabric_source_expansion.lakehouse_avro_orders',
+        'cf_fabric_source_expansion.lakehouse_xml_orders'
+      )
+      UNION ALL
+      SELECT 'source_metadata_rows' AS check_name, COUNT(*) AS observed_count, 3 AS minimum_count
+      FROM contractforge.ctrl_ingestion_metadata
+      WHERE target_table IN (
+        'cf_fabric_source_expansion.lakehouse_orc_orders',
+        'cf_fabric_source_expansion.lakehouse_avro_orders',
+        'cf_fabric_source_expansion.lakehouse_xml_orders'
+      )
+      UNION ALL
+      SELECT 'orc_amount_sum' AS check_name, CAST(SUM(amount) AS BIGINT) AS observed_count, 30 AS minimum_count
+      FROM cf_fabric_source_expansion.lakehouse_orc_orders
+      UNION ALL
+      SELECT 'avro_amount_sum' AS check_name, CAST(SUM(amount) AS BIGINT) AS observed_count, 30 AS minimum_count
+      FROM cf_fabric_source_expansion.lakehouse_avro_orders
+      UNION ALL
+      SELECT 'xml_amount_sum' AS check_name, CAST(SUM(amount) AS BIGINT) AS observed_count, 30 AS minimum_count
+      FROM cf_fabric_source_expansion.lakehouse_xml_orders
+    )
+    SELECT check_name, observed_count, minimum_count
+    FROM checks
+    WHERE observed_count >= minimum_count
+target:
+  catalog: workspace
+  schema: cf_fabric_source_expansion
+  table: lakehouse_file_formats_evidence_probe
+layer: bronze
+mode: overwrite
+quality_rules:
+  required_columns: [check_name, observed_count, minimum_count]
+  not_null: [check_name]
+  min_rows: 10

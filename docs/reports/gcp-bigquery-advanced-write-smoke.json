@@ -1,0 +1,153 @@
+{
+  "kind": "contractforge_gcp_bigquery_advanced_write_smoke",
+  "schema_version": "1.0.0",
+  "adapter": "contractforge-gcp",
+  "subtarget": "gcp_bigquery",
+  "maturity_gate": "GCP-BQ-12A",
+  "status": "PASS_WITH_REVIEW_BOUNDARY",
+  "executed_at": "2026-06-16",
+  "project_id": "midyear-system-499521-p3",
+  "location": "us-east1",
+  "datasets": {
+    "target": "contractforge_gcp_advanced_write_smoke",
+    "evidence": "contractforge_gcp_advanced_write_ops"
+  },
+  "scope": {
+    "validated": [
+      "opt-in review-required execution for hash_diff_upsert",
+      "opt-in review-required execution for historical",
+      "opt-in review-required execution for snapshot_reconcile_soft_delete",
+      "no-change replay idempotency for all three advanced write modes",
+      "run and lineage evidence writes for all successful smoke runs"
+    ],
+    "not_promoted_to_stable": [
+      "historical/snapshot negative cases",
+      "late-arriving historical changes",
+      "delete-expression parity for historical mode",
+      "cross-adapter shared-contract production parity",
+      "concurrent writer isolation",
+      "production-sized workload benchmarking"
+    ]
+  },
+  "contracts": [
+    {
+      "name": "hashdiff",
+      "mode": "hash_diff_upsert",
+      "source": "contractforge_gcp_advanced_write_smoke.hashdiff_source",
+      "target": "contractforge_gcp_advanced_write_smoke.hashdiff_target",
+      "merge_keys": [
+        "order_id"
+      ],
+      "hash_keys": [
+        "amount",
+        "status"
+      ],
+      "first_run": {
+        "status": "SUCCEEDED",
+        "planning_status": "REVIEW_REQUIRED",
+        "statement_type": "MERGE",
+        "job_id": "cf_gcp_smoke_query_69b6936ccd05417a9712",
+        "inserted_rows": 1,
+        "updated_rows": 1,
+        "deleted_rows": 0
+      },
+      "replay": {
+        "status": "SUCCEEDED",
+        "planning_status": "REVIEW_REQUIRED",
+        "statement_type": "MERGE",
+        "job_id": "cf_gcp_smoke_query_2ee071e03a974399947a",
+        "inserted_rows": 0,
+        "updated_rows": 0,
+        "deleted_rows": 0
+      },
+      "readback": {
+        "total_rows": 2
+      }
+    },
+    {
+      "name": "historical",
+      "mode": "historical",
+      "source": "contractforge_gcp_advanced_write_smoke.historical_source",
+      "target": "contractforge_gcp_advanced_write_smoke.historical_target",
+      "merge_keys": [
+        "order_id"
+      ],
+      "change_columns": [
+        "amount",
+        "status"
+      ],
+      "effective_from_column": "updated_at",
+      "first_run": {
+        "status": "SUCCEEDED",
+        "planning_status": "REVIEW_REQUIRED",
+        "statement_type": "INSERT",
+        "job_id": "cf_gcp_smoke_query_565a0984d79d4808b4f2",
+        "inserted_rows": 2
+      },
+      "replay": {
+        "status": "SUCCEEDED",
+        "planning_status": "REVIEW_REQUIRED",
+        "statement_type": "INSERT",
+        "job_id": "cf_gcp_smoke_query_5526aabd296f493286fa",
+        "inserted_rows": 0
+      },
+      "readback": {
+        "total_rows": 3,
+        "current_rows": 2,
+        "history_rows": 1
+      }
+    },
+    {
+      "name": "snapshot",
+      "mode": "snapshot_reconcile_soft_delete",
+      "source": "contractforge_gcp_advanced_write_smoke.snapshot_source",
+      "target": "contractforge_gcp_advanced_write_smoke.snapshot_target",
+      "merge_keys": [
+        "order_id"
+      ],
+      "source_complete": true,
+      "first_run": {
+        "status": "SUCCEEDED",
+        "planning_status": "REVIEW_REQUIRED",
+        "statement_type": "MERGE",
+        "job_id": "cf_gcp_smoke_query_8e0fb56cce824822a8fc",
+        "inserted_rows": 1,
+        "updated_rows": 2,
+        "deleted_rows": 0
+      },
+      "replay": {
+        "status": "SUCCEEDED",
+        "planning_status": "REVIEW_REQUIRED",
+        "statement_type": "MERGE",
+        "job_id": "cf_gcp_smoke_query_674b072106b94c03973d",
+        "inserted_rows": 0,
+        "updated_rows": 0,
+        "deleted_rows": 0
+      },
+      "readback": {
+        "total_rows": 3,
+        "active_rows": 2,
+        "inactive_rows": 1
+      }
+    }
+  ],
+  "follow_up_evidence": {
+    "gcp_bq_12c1": "docs/reports/gcp-bigquery-advanced-write-preflight-smoke.json",
+    "summary": "A later hash_diff_upsert smoke validated changed-row replay, no-change replay after change, null merge-key preflight failure and duplicate merge-key preflight failure."
+  },
+  "verification_commands": [
+    {
+      "name": "hashdiff_first_run",
+      "command": "PYTHONPATH=.;src;adapters/gcp/src uv run python -m contractforge_gcp.cli smoke .tmp/gcp-bq-12a/hashdiff.ingestion.yaml --environment .tmp/gcp-bq-12a/env.yaml --execute --runtime bq --allow-review-required --report .tmp/gcp-bq-12a/hashdiff-report.json"
+    },
+    {
+      "name": "historical_first_run",
+      "command": "PYTHONPATH=.;src;adapters/gcp/src uv run python -m contractforge_gcp.cli smoke .tmp/gcp-bq-12a/historical.ingestion.yaml --environment .tmp/gcp-bq-12a/env.yaml --execute --runtime bq --allow-review-required --report .tmp/gcp-bq-12a/historical-report.json"
+    },
+    {
+      "name": "snapshot_first_run",
+      "command": "PYTHONPATH=.;src;adapters/gcp/src uv run python -m contractforge_gcp.cli smoke .tmp/gcp-bq-12a/snapshot.ingestion.yaml --environment .tmp/gcp-bq-12a/env.yaml --execute --runtime bq --allow-review-required --report .tmp/gcp-bq-12a/snapshot-report.json"
+    }
+  ],
+  "decision": "GCP-BQ-12A is closed for compact opt-in BigQuery replay/idempotency evidence. GCP-BQ-12C1 later closed hash_diff_upsert changed-row and source-key preflight evidence, GCP-BQ-12C2 closed compact historical delete-expression and late-arriving reject evidence, and GCP-BQ-12C3 closed compact snapshot complete-source reactivation/tombstone evidence. GCP-BQ-12C now accepts hash_diff_upsert cross-adapter production parity; historical and snapshot production parity remains future work."
+}

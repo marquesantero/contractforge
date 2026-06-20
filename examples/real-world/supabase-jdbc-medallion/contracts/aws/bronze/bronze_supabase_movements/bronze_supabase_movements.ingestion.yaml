@@ -1,0 +1,57 @@
+source:
+  type: connection
+  connection_path: project://connections/supabase.yaml
+  table: cf_supabase_newcore_demo.product_movements
+  read:
+    partition_column: id
+    lower_bound: 1
+    upper_bound: 1000500
+    num_partitions: 16
+    fetchsize: 20000
+
+target:
+  catalog: contractforge
+  schema: cf_supabase_jdbc_e2e_v2_bronze
+  table: b_product_movements_jdbc
+
+layer: bronze
+mode: upsert
+schema_policy: additive_only
+merge_keys: [movement_uid]
+on_quality_fail: quarantine
+
+transform:
+  composite_keys:
+    movement_uid: [product_id, movement_seq]
+  cast:
+    id: BIGINT
+    product_id: BIGINT
+    movement_seq: INT
+    quantity: INT
+    unit_cost: DOUBLE
+  standardize:
+    movement_type: {trim: true, lower: true, empty_as_null: true}
+  derive:
+    movement_value: quantity * unit_cost
+    movement_date: to_date(event_ts)
+    source_loaded_at_utc: CURRENT_TIMESTAMP()
+  deduplicate:
+    keys: [movement_uid]
+    order_by:
+      - {column: updated_at, direction: desc, nulls: last}
+      - {column: id, direction: desc, nulls: last}
+
+quality_rules:
+  not_null: [movement_uid, product_id, movement_seq, movement_type, event_ts]
+  unique_key: [movement_uid]
+  accepted_values:
+    movement_type: [inbound, outbound, adjustment]
+  expressions:
+    - name: non_zero_quantity
+      expression: quantity <> 0
+      severity: quarantine
+      message: Movement quantity must not be zero.
+    - name: non_negative_unit_cost
+      expression: unit_cost >= 0
+      severity: quarantine
+      message: Unit cost must not be negative.

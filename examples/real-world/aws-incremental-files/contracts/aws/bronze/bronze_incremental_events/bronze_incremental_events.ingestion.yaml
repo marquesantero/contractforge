@@ -1,0 +1,47 @@
+source:
+  type: incremental_files
+  system: s3_incremental_events
+  path: s3://contractforge-aws-smoke-449112696824-us-east-1/data/aws-incremental-files/events/
+  format: csv
+  options:
+    header: true
+    inferSchema: true
+
+target:
+  catalog: contractforge
+  schema: cf_incremental_files_bronze
+  table: b_events
+
+layer: bronze
+mode: hash_diff_upsert
+schema_policy: additive_only
+merge_keys: [event_id]
+hash_keys: [account_id, event_ts, event_type, amount, updated_at]
+hash_exclude_columns: []
+on_quality_fail: quarantine
+
+transform:
+  cast:
+    event_id: BIGINT
+    amount: DOUBLE
+  standardize:
+    account_id: {trim: true, upper: true}
+    event_type: {trim: true, lower: true}
+  derive:
+    source_loaded_at_utc: CURRENT_TIMESTAMP()
+
+quality_rules:
+  not_null: [event_id, account_id, event_ts, event_type]
+  unique_key: [event_id]
+  accepted_values:
+    event_type: [purchase, refund, adjustment]
+  expressions:
+    - name: non_negative_amount
+      expression: amount >= 0
+      severity: quarantine
+      message: Event amount must not be negative.
+
+extensions:
+  aws:
+    iceberg:
+      warehouse: s3://contractforge-aws-smoke-449112696824-us-east-1/warehouse/incremental-files/

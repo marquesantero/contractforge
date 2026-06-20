@@ -1,0 +1,70 @@
+source:
+  type: sql
+  query: |
+    SELECT stack(
+      2,
+      1001, 'north', 'alpha@example.com', 42.0,
+      1002, 'south', 'beta@example.com', 58.0
+    ) AS (customer_id, region, customer_email, score)
+target:
+  catalog: workspace
+  schema: cf_fabric_stable
+  table: governance_review
+layer: gold
+mode: overwrite
+quality_rules:
+  required_columns: [customer_id, region, customer_email, score]
+  not_null: [customer_id, region]
+  min_rows: 2
+operations:
+  ownership:
+    business_owner: analytics-governance
+    technical_owner: data-platform
+    support_group: fabric-platform
+  operations:
+    criticality: medium
+    expected_frequency: daily
+    freshness_sla_minutes: 240
+    alert_on_failure: true
+    alert_on_quality_fail: true
+    owners: [analytics-governance, data-platform]
+    groups: [fabric-platform]
+    tags:
+      domain: governance
+      maturity: stable_surface
+annotations:
+  table:
+    description: Governance review evidence table for Fabric stable-surface smoke.
+    aliases: [fabric_governance_review]
+    tags:
+      domain: governance
+      adapter: fabric
+  columns:
+    customer_email:
+      description: Email address used to validate annotation and access review evidence.
+      pii:
+        enabled: true
+        type: email
+        sensitivity: confidential
+      tags:
+        business_name: Customer email
+access:
+  access_policy:
+    mode: apply
+    on_drift: warn
+    revoke_unmanaged: false
+  grants:
+    - principal: fabric-analysts
+      privileges: [select]
+  row_filters:
+    - name: region_filter
+      function: security.fn_region_filter
+      columns: [region]
+      applies_to:
+        principals: [regional-analysts]
+  column_masks:
+    customer_email:
+      function: security.fn_mask_email
+      using_columns: [customer_email, region]
+      applies_to:
+        principals: [support-users]

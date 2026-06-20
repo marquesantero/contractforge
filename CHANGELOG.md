@@ -1,0 +1,37 @@
+# Changelog
+
+All notable changes to `contractforge-core` are documented in this file.
+
+The format follows Keep a Changelog, and this package follows semantic
+versioning as described in `docs/specs/api-stability.md`.
+
+## [0.2.0] - 2026-06-19
+
+### Added
+
+- Promoted the public package set for the current ContractForge maturity
+  baseline across core, Databricks, AWS, Snowflake, Fabric, GCP and AI.
+- Added the core-owned `ctrl_deployment_versions` deployment ledger schema,
+  stable deployment hashes and adapter-native ledger DDL/insert renderers for
+  Databricks, AWS, Snowflake, Fabric and GCP.
+- Added project and connection semantics used by the cross-platform test
+  projects, including reusable source defaults and environment-specific
+  bindings.
+- Added stable writer aliases for contract authoring: `append`, `overwrite`,
+  `upsert`, `hash_diff_upsert`, `historical` and
+  `snapshot_reconcile_soft_delete`.
+
+### Changed
+
+- Updated packaging and release metadata for the independent PyPI
+  distributions.
+- Kept adapter-specific behavior outside the core package while aligning the
+  core validation boundary with the current adapter surfaces.
+
+## [0.1.0] - 2026-06-08
+
+### Added
+
+- Initial public preview release of the platform-neutral ContractForge core.
+- Semantic contract models, project parsing, capability matching, planning,
+  source connector catalog, evidence models and the `contractforge` CLI.

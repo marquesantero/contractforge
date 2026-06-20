@@ -1,0 +1,6 @@
+{
+  "status": "WARN",
+  "risk": "high",
+  "summary": "WARN: 1 finding(s), including 0 critical and 1 high severity item(s).",
+  "finding_codes": ["write.keys.nullable"]
+}

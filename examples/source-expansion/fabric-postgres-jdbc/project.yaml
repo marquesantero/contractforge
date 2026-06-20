@@ -1,0 +1,27 @@
+name: fabric_postgres_jdbc_source_smoke
+description: Fabric source-expansion smoke for PostgreSQL JDBC reads.
+default_environment: fabric
+
+environments:
+  fabric: environments/fabric.environment.yaml
+
+execution_order:
+  - name: postgres_jdbc_orders
+    layer: bronze
+    expected_result: succeeded
+    depends_on: []
+    contracts:
+      fabric: contracts/01_postgres_jdbc_orders.ingestion.yaml
+  - name: postgres_jdbc_evidence_probe
+    layer: bronze
+    expected_result: succeeded
+    depends_on: [postgres_jdbc_orders]
+    contracts:
+      fabric: contracts/02_postgres_jdbc_evidence_probe.ingestion.yaml
+
+source_expansion:
+  source_family: jdbc_postgres
+  authentication: basic_key_vault_placeholders
+  expected_success_steps: 2
+  expected_probe_checks: 6
+  stable_final_scope: stable_f11_jdbc_postgres_evidence

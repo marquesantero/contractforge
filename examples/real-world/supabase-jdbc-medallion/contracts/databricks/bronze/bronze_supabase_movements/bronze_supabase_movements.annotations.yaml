@@ -1,0 +1,22 @@
+policy: warn
+table:
+  description: Inventory movement facts ingested from Supabase PostgreSQL.
+  tags:
+    domain: inventory
+    source: supabase
+    layer: bronze
+columns:
+  movement_uid:
+    description: Business movement key derived from product_id and movement_seq.
+  product_id:
+    description: Product surrogate key.
+  movement_type:
+    description: inbound, outbound or adjustment.
+  quantity:
+    description: Movement quantity.
+  unit_cost:
+    description: Unit cost captured with the movement event.
+  event_ts:
+    description: Source event timestamp.
+  updated_at:
+    description: Source update timestamp used for deduplication.

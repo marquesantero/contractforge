@@ -1,0 +1,37 @@
+source:
+  type: csv
+  system: s3_failure_fixtures
+  path: s3://contractforge-aws-smoke-449112696824-us-east-1/data/aws-failure-paths/orders/orders_failure.csv
+  format: csv
+  options:
+    header: true
+    inferSchema: true
+
+target:
+  catalog: contractforge
+  schema: cf_aws_failure_paths
+  table: b_quality_abort_orders
+
+layer: bronze
+mode: append
+schema_policy: additive_only
+on_quality_fail: fail
+
+transform:
+  cast:
+    order_id: BIGINT
+    amount: DOUBLE
+
+quality_rules:
+  not_null: [order_id, amount]
+  expressions:
+    - name: impossible_amount_threshold
+      expression: amount > 1000000
+      severity: abort
+      message: This fixture intentionally fails to validate abort evidence.
+
+extensions:
+  aws:
+    iceberg:
+      warehouse: s3://contractforge-aws-smoke-449112696824-us-east-1/warehouse/aws-failure-paths/
+

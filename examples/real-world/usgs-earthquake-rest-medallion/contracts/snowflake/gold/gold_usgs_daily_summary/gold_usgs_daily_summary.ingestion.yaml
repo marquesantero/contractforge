@@ -1,0 +1,37 @@
+source:
+  type: sql
+  system: usgs_curated
+  name: usgs_earthquake_daily_summary
+  query: |
+    SELECT
+      event_date,
+      COUNT(*) AS earthquake_count,
+      SUM(IFF(is_tsunami_related, 1, 0)) AS tsunami_related_count,
+      AVG(magnitude) AS avg_magnitude,
+      MAX(magnitude) AS max_magnitude,
+      AVG(depth_km) AS avg_depth_km,
+      COUNT(DISTINCT network) AS reporting_networks,
+      MAX(updated_at) AS last_event_update_at,
+      CURRENT_TIMESTAMP() AS computed_at_utc
+    FROM CONTRACTFORGE_TEST_DB.PUBLIC.CF_USGS_REST_SILVER
+    WHERE event_date IS NOT NULL
+    GROUP BY event_date
+  read:
+    source_complete: true
+
+target:
+  catalog: CONTRACTFORGE_TEST_DB
+  schema: PUBLIC
+  table: CF_USGS_REST_GOLD_DAILY
+
+layer: gold
+mode: overwrite
+schema_policy: additive_only
+
+quality_rules:
+  not_null: [event_date]
+  expressions:
+    - name: positive_daily_count
+      expression: earthquake_count > 0
+      severity: abort
+      message: Daily summary rows must represent at least one earthquake.

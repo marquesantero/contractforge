@@ -1,0 +1,53 @@
+source:
+  type: kafka_available_now
+  system: confluent_cloud
+  bootstrap_servers: pkc-619z3.us-east1.gcp.confluent.cloud:9092
+  topic: cf-databricks-orders
+  checkpoint_location: /Volumes/workspace/cf_databricks_kafka_smoke/kafka_smoke/checkpoints/cf-databricks-orders-contract-v2
+  starting_offsets: earliest
+  limits:
+    max_offsets_per_trigger: 50
+  options:
+    kafka.security.protocol: SASL_SSL
+    kafka.sasl.mechanism: PLAIN
+    kafka.sasl.jaas.config: 'org.apache.kafka.common.security.plain.PlainLoginModule required username="{{ secret:contractforge-secrets/confluent-kafka-api-key }}" password="{{ secret:contractforge-secrets/confluent-kafka-api-secret }}";'
+
+target:
+  catalog: workspace
+  schema: cf_databricks_kafka_contract
+  table: bronze_orders
+
+layer: bronze
+mode: append
+schema_policy: additive_only
+
+schemas:
+  order_event: |
+    STRUCT<
+      order_id: STRING,
+      customer_id: STRING,
+      amount: DOUBLE,
+      batch_id: STRING
+    >
+
+transform:
+  shape:
+    parse_json:
+      - column: value
+        alias: payload
+        schema_ref: order_event
+        cast_input: STRING
+    columns:
+      payload.order_id: {alias: order_id, cast: STRING}
+      payload.customer_id: {alias: customer_id, cast: STRING}
+      payload.amount: {alias: amount, cast: DOUBLE}
+      payload.batch_id: {alias: batch_id, cast: STRING}
+      topic: {alias: kafka_topic, cast: STRING}
+      partition: {alias: kafka_partition, cast: INT}
+      offset: {alias: kafka_offset, cast: BIGINT}
+      timestamp: {alias: kafka_timestamp}
+  derive:
+    ingested_at_utc: CURRENT_TIMESTAMP()
+
+quality_rules:
+  not_null: [order_id, customer_id, batch_id]

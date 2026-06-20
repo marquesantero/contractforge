@@ -1,0 +1,120 @@
+source:
+  type: table
+  system: usgs
+  table: cf_usgs_rest_bronze.b_usgs_earthquake_geojson
+  read:
+    source_complete: true
+
+target:
+  catalog: workspace
+  schema: cf_usgs_rest_silver
+  table: s_usgs_earthquake_events
+
+layer: silver
+mode: overwrite
+schema_policy: additive_only
+select_columns: [raw_response, response_page_number]
+
+schemas:
+  usgs_geojson_feed: |
+    STRUCT<
+      type: STRING,
+      metadata: STRUCT<generated: BIGINT, url: STRING, title: STRING, status: BIGINT, api: STRING, count: BIGINT>,
+      bbox: ARRAY<DOUBLE>,
+      features: ARRAY<STRUCT<
+        type: STRING,
+        id: STRING,
+        properties: STRUCT<
+          mag: DOUBLE, place: STRING, time: BIGINT, updated: BIGINT, tz: BIGINT, url: STRING,
+          detail: STRING, felt: BIGINT, cdi: DOUBLE, mmi: DOUBLE, alert: STRING, status: STRING,
+          tsunami: BIGINT, sig: BIGINT, net: STRING, code: STRING, ids: STRING, sources: STRING,
+          types: STRING, nst: BIGINT, dmin: DOUBLE, rms: DOUBLE, gap: DOUBLE, magType: STRING,
+          type: STRING, title: STRING
+        >,
+        geometry: STRUCT<type: STRING, coordinates: ARRAY<DOUBLE>>
+      >>
+    >
+
+transform:
+  shape:
+    parse_json:
+      - column: raw_response
+        alias: payload
+        schema_ref: usgs_geojson_feed
+    arrays:
+      - path: payload.features
+        mode: explode_outer
+        alias: feature
+    columns:
+      payload.metadata.generated: {alias: feed_generated_epoch_ms, cast: BIGINT}
+      payload.metadata.title: {alias: feed_title, cast: STRING}
+      payload.metadata.count: {alias: feed_event_count, cast: BIGINT}
+      payload.metadata.api: {alias: feed_api_version, cast: STRING}
+      payload.bbox: {alias: feed_bbox}
+      feature.id: {alias: earthquake_id, cast: STRING}
+      feature.type: {alias: geojson_feature_type, cast: STRING}
+      feature.properties.title: {alias: event_title, cast: STRING}
+      feature.properties.place: {alias: place, cast: STRING}
+      feature.properties.mag: {alias: magnitude, cast: DOUBLE}
+      feature.properties.magType: {alias: magnitude_type, cast: STRING}
+      feature.properties.time: {alias: event_epoch_ms, cast: BIGINT}
+      feature.properties.updated: {alias: updated_epoch_ms, cast: BIGINT}
+      feature.properties.status: {alias: event_status, cast: STRING}
+      feature.properties.type: {alias: event_type, cast: STRING}
+      feature.properties.alert: {alias: alert_level, cast: STRING}
+      feature.properties.tsunami: {alias: tsunami_flag, cast: INT}
+      feature.properties.sig: {alias: significance, cast: BIGINT}
+      feature.properties.net: {alias: network, cast: STRING}
+      feature.properties.code: {alias: network_event_code, cast: STRING}
+      feature.properties.url: {alias: event_url, cast: STRING}
+      feature.properties.detail: {alias: detail_url, cast: STRING}
+      feature.properties.felt: {alias: felt_reports, cast: BIGINT}
+      feature.properties.cdi: {alias: community_intensity, cast: DOUBLE}
+      feature.properties.mmi: {alias: instrumental_intensity, cast: DOUBLE}
+      feature.geometry.type: {alias: geometry_type, cast: STRING}
+      feature.geometry.coordinates: {alias: coordinates}
+      longitude: {alias: longitude, expression: "CAST(feature.geometry.coordinates[0] AS DOUBLE)"}
+      latitude: {alias: latitude, expression: "CAST(feature.geometry.coordinates[1] AS DOUBLE)"}
+      depth_km: {alias: depth_km, expression: "CAST(feature.geometry.coordinates[2] AS DOUBLE)"}
+  standardize:
+    event_status: {trim: true, lower: true, empty_as_null: true}
+    event_type: {trim: true, lower: true, empty_as_null: true}
+    magnitude_type: {trim: true, lower: true, empty_as_null: true}
+    alert_level: {trim: true, lower: true, empty_as_null: true}
+    network: {trim: true, lower: true}
+  derive:
+    event_time: CAST(from_unixtime(event_epoch_ms / 1000) AS TIMESTAMP)
+    updated_at: CAST(from_unixtime(updated_epoch_ms / 1000) AS TIMESTAMP)
+    feed_generated_at: CAST(from_unixtime(feed_generated_epoch_ms / 1000) AS TIMESTAMP)
+    event_date: to_date(CAST(from_unixtime(event_epoch_ms / 1000) AS TIMESTAMP))
+    magnitude_band: CASE WHEN magnitude IS NULL THEN 'unknown' WHEN magnitude < 3 THEN 'minor' WHEN magnitude < 5 THEN 'light' WHEN magnitude < 7 THEN 'strong' ELSE 'major' END
+    is_tsunami_related: tsunami_flag = 1
+    normalized_at_utc: CURRENT_TIMESTAMP()
+  deduplicate:
+    keys: [earthquake_id]
+    order_by:
+      - {column: updated_at, direction: desc, nulls: last}
+      - {column: feed_generated_at, direction: desc, nulls: last}
+
+filter_expression: earthquake_id IS NOT NULL
+
+quality_rules:
+  not_null: [earthquake_id, event_time, latitude, longitude]
+  unique_key: [earthquake_id]
+  expressions:
+    - name: valid_geojson_point
+      expression: geometry_type = 'Point'
+      severity: warn
+      message: USGS summary feeds should expose point geometries.
+    - name: valid_coordinates
+      expression: latitude BETWEEN -90 AND 90 AND longitude BETWEEN -180 AND 180
+      severity: abort
+      message: Coordinates must be valid WGS84 latitude/longitude.
+    - name: reasonable_depth
+      expression: depth_km IS NULL OR depth_km BETWEEN -20 AND 800
+      severity: warn
+      message: Earthquake depth is outside the expected operational range.
+    - name: non_negative_magnitude
+      expression: magnitude IS NULL OR magnitude >= 0
+      severity: warn
+      message: Magnitude should not be negative for normal earthquake events.

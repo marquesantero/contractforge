@@ -1,0 +1,16 @@
+{
+  "mode": "hash_diff_upsert",
+  "merge_keys": ["order_id"],
+  "target": {
+    "catalog": "main",
+    "schema": "silver",
+    "table": "s_orders"
+  },
+  "source": {
+    "connector": "files",
+    "path": "/landing/orders",
+    "schema": "order_id STRING, customer_email STRING, status STRING, order_amount DOUBLE"
+  },
+  "quality_not_null": ["order_id", "status"],
+  "validation_status": "WARN"
+}

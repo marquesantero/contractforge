@@ -1,0 +1,22 @@
+source:
+  type: sql
+  query: |
+    SELECT stack(
+      2,
+      1, 'alpha', 15.0,
+      2, 'beta', 25.0
+    ) AS (order_id, order_name, amount)
+target:
+  catalog: workspace
+  schema: cf_fabric_stable
+  table: orders_overwrite
+layer: bronze
+mode: overwrite
+quality_rules:
+  required_columns: [order_id, order_name, amount]
+  not_null: [order_id]
+  min_rows: 2
+  expressions:
+    - name: positive_amount
+      expression: amount > 0
+      severity: abort

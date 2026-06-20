@@ -1,0 +1,58 @@
+source:
+  type: kafka_available_now
+  system: confluent_cloud
+  bootstrap_servers: pkc-619z3.us-east1.gcp.confluent.cloud:9092
+  topic: cf-fabric-orders
+  consumer_group_id: contractforge-gcp-dataflow-confluent-orders-20260617h
+  checkpoint_location: gs://contractforge-gcp-smoke-midyear-system-499521-p3/dataflow/checkpoints/confluent-orders-20260617h/
+  starting_offsets: earliest
+  message_format: JSON
+  auth:
+    mode: SASL_PLAIN
+    username_secret_id: projects/midyear-system-499521-p3/secrets/contractforge-confluent-kafka-api-key/versions/latest
+    password_secret_id: projects/midyear-system-499521-p3/secrets/contractforge-confluent-kafka-api-secret/versions/latest
+  output:
+    table: midyear-system-499521-p3:contractforge_gcp_streaming_smoke_usc.confluent_orders
+    deadletter_table: midyear-system-499521-p3:contractforge_gcp_streaming_smoke_usc.confluent_orders_dlq
+  dataflow:
+    project_id: midyear-system-499521-p3
+    location: us-central1
+    temp_location: gs://contractforge-gcp-smoke-midyear-system-499521-p3/dataflow/temp/
+    job_name: cf-gcp-confluent-orders-20260617h-rerun
+    worker_machine_type: e2-standard-2
+    num_workers: 1
+    max_workers: 1
+
+target:
+  catalog: midyear-system-499521-p3
+  schema: contractforge_gcp_streaming_smoke_usc
+  table: confluent_orders
+
+layer: bronze
+mode: append
+schema_policy: additive_only
+
+schemas:
+  order_event: |
+    STRUCT<
+      order_id: STRING,
+      customer_id: STRING,
+      amount: DOUBLE,
+      batch_id: STRING
+    >
+
+transform:
+  shape:
+    parse_json:
+      - column: value
+        alias: payload
+        schema_ref: order_event
+        cast_input: STRING
+    columns:
+      payload.order_id: {alias: order_id, cast: STRING}
+      payload.customer_id: {alias: customer_id, cast: STRING}
+      payload.amount: {alias: amount, cast: DOUBLE}
+      payload.batch_id: {alias: batch_id, cast: STRING}
+
+quality_rules:
+  not_null: [order_id, customer_id, batch_id]

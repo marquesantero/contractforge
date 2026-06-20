@@ -1,0 +1,15 @@
+{
+  "select_aliases": [
+    "order_id",
+    "customer_id",
+    "customer_email",
+    "items_sku",
+    "items_quantity",
+    "items_price",
+    "events"
+  ],
+  "flatten_paths": ["customer", "items[]"],
+  "explode_paths": ["items", "events", "events[]"],
+  "warning_fragments": ["Array explosions can multiply row counts", "Nested arrays were found"],
+  "decision_count": 3
+}

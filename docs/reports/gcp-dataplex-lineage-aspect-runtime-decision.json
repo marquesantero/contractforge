@@ -1,0 +1,39 @@
+{
+  "kind": "contractforge_gcp_dataplex_lineage_aspect_runtime_decision",
+  "schema_version": "1.0.0",
+  "adapter": "contractforge-gcp",
+  "subtarget": "gcp_bigquery",
+  "maturity_gate": "GCP-BQ-16B3",
+  "status": "PASS",
+  "decided_at": "2026-06-17",
+  "decision": "Keep native Dataplex lineage and aspect mutation as an explicit adapter command surface. Do not emit native Dataplex lineage/aspect mutations automatically during every contract smoke or apply run.",
+  "included_surface": [
+    "deterministic Dataplex Data Lineage publication/readback planning artifacts",
+    "deterministic Dataplex AspectType/apply/readback planning artifacts",
+    "adapter-owned dataplex-lineage-aspects non-mutating report path",
+    "adapter-owned dataplex-lineage-aspects --execute --readback path",
+    "BigQuery control-table OpenLineage evidence during normal smoke/apply execution"
+  ],
+  "excluded_surface": [
+    "automatic native Dataplex Data Lineage publication during every contract run",
+    "automatic Dataplex aspect mutation during every contract run",
+    "implicit Dataplex AspectType creation/update as a side effect of unrelated write/load commands"
+  ],
+  "rationale": [
+    "Native Dataplex lineage/aspect execution mutates platform metadata and therefore needs explicit operator intent, IAM and quota ownership.",
+    "Keeping native publication explicit preserves deterministic contract execution, bounded retries and idempotency expectations for ordinary smoke/apply paths.",
+    "The validated neutral OpenLineage control-table evidence remains the automatic, low-risk lineage evidence surface for normal executions.",
+    "The explicit command can still be scheduled or orchestrated by a platform team when native Dataplex publication is required."
+  ],
+  "evidence": [
+    "docs/reports/gcp-dataplex-lineage-dq-scope-decision.json",
+    "docs/reports/gcp-dataplex-lineage-aspects-smoke.json",
+    "docs/reports/gcp-stable-surface-evidence.json"
+  ],
+  "context7_sources": [
+    "https://docs.cloud.google.com/dataplex/docs/reference/rest/v1/projects.locations/modifyEntry",
+    "https://docs.cloud.google.com/dataplex/docs/reference/rest/v1/projects.locations.aspectTypes",
+    "https://docs.cloud.google.com/dataplex/docs/reference/rest",
+    "https://cloud.google.com/data-catalog/docs/reference/data-lineage/rest"
+  ]
+}

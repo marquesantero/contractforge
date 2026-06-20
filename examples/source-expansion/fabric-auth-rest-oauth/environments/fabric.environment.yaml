@@ -1,0 +1,18 @@
+name: fabric_authenticated_rest_oauth_source_expansion
+parameters:
+  fabric:
+    tenant_id: 3fb3492c-48be-4ac6-ae3a-fec6a63cf4d1
+    tenant_domain: ticomcafe.com.br
+    workspace_id: 061fd0c8-c248-4628-a332-6adf16623533
+    workspace_name: Manager
+    lakehouse_id: 07067d3f-d5e2-48c1-b526-634620e57d4b
+    lakehouse_name: contractforge_lh
+evidence:
+  lakehouse: contractforge_lh
+  schema: contractforge
+runtime:
+  kind: notebook
+secrets:
+  vault_url: https://cffabricf11kv.vault.azure.net/
+  scopes:
+    fabric: https://cffabricf11kv.vault.azure.net/

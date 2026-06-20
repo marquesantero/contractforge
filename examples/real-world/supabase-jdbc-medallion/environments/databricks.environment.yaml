@@ -1,0 +1,13 @@
+name: supabase_jdbc_databricks
+adapter: databricks
+runtime:
+  runtime_type: serverless
+deployment:
+  artifact: databricks_asset_bundle
+  target: dev
+evidence:
+  catalog: workspace
+  schema: cf_supabase_jdbc_e2e_v2_ops
+parameters:
+  databricks:
+    runtime: serverless

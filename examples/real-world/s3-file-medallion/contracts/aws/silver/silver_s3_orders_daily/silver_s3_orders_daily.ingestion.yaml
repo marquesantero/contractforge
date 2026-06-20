@@ -1,0 +1,35 @@
+source:
+  type: sql
+  system: s3_order_files_curated
+  query: |
+    SELECT
+      CAST(order_ts AS DATE) AS order_date,
+      customer_id,
+      order_status,
+      COUNT(*) AS order_count,
+      SUM(amount) AS gross_amount,
+      MAX(updated_at) AS last_source_update_utc
+    FROM {{ table_ref:bronze.b_orders_files }}
+    GROUP BY CAST(order_ts AS DATE), customer_id, order_status
+
+target:
+  catalog: contractforge
+  schema: cf_s3_file_e2e_silver
+  table: s_orders_daily
+
+layer: silver
+mode: overwrite
+schema_policy: additive_only
+
+quality_rules:
+  not_null: [order_date, customer_id, order_status]
+  expressions:
+    - name: non_negative_daily_amount
+      expression: gross_amount >= 0
+      severity: warn
+      message: Daily gross amount should be non-negative after quarantine.
+
+extensions:
+  aws:
+    iceberg:
+      warehouse: s3://contractforge-aws-smoke-449112696824-us-east-1/warehouse/s3-file-e2e/

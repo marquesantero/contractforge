@@ -1,0 +1,35 @@
+source:
+  type: sql
+  system: azure_sql_database
+  name: azure_sql_orders_current
+  query: |
+    SELECT
+      CAST(order_id AS STRING) AS order_id,
+      TRIM(CAST(customer_name AS STRING)) AS customer_name,
+      CAST(amount AS FLOAT64) AS amount,
+      CASE
+        WHEN CAST(amount AS FLOAT64) >= 100 THEN 'high'
+        WHEN CAST(amount AS FLOAT64) >= 25 THEN 'medium'
+        ELSE 'low'
+      END AS amount_band,
+      CURRENT_TIMESTAMP() AS normalized_at_utc
+    FROM `midyear-system-499521-p3.contractforge_gcp_azure_sql_bronze.b_azure_sql_orders`
+  read:
+    source_complete: true
+
+target:
+  catalog: midyear-system-499521-p3
+  schema: contractforge_gcp_azure_sql_silver
+  table: s_azure_sql_orders_current
+
+layer: silver
+mode: overwrite
+schema_policy: additive_only
+
+quality_rules:
+  required_columns: [order_id, customer_name, amount, amount_band]
+  not_null: [order_id, customer_name, amount]
+  unique_key: [order_id]
+  accepted_values:
+    amount_band: [low, medium, high]
+  min_rows: 2

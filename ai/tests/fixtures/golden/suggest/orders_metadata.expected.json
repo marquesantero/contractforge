@@ -1,0 +1,9 @@
+{
+  "quality_not_null": ["order_id", "status"],
+  "accepted_values": {
+    "status": ["open", "closed", "cancelled"]
+  },
+  "expression_names": ["order_amount_non_negative"],
+  "pii_columns": ["customer_email"],
+  "tagged_columns": ["order_id", "status"]
+}

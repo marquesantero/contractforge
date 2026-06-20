@@ -1,0 +1,263 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*-core"
+      - "v*-databricks"
+      - "v*-aws"
+      - "v*-snowflake"
+      - "v*-fabric"
+      - "v*-gcp"
+      - "v*-ai"
+  workflow_dispatch:
+    inputs:
+      package:
+        description: "Package to build and publish"
+        required: true
+        type: choice
+        options:
+          - core
+          - databricks
+          - aws
+          - snowflake
+          - fabric
+          - gcp
+          - ai
+      target:
+        description: "Package index"
+        required: true
+        default: testpypi
+        type: choice
+        options:
+          - testpypi
+          - pypi
+      auth:
+        description: "Publishing auth mode"
+        required: true
+        default: trusted-publishing
+        type: choice
+        options:
+          - trusted-publishing
+          - api-token
+      github_release:
+        description: "Attach built distributions to a GitHub Release"
+        required: true
+        default: false
+        type: boolean
+      release_tag:
+        description: "GitHub Release tag for workflow_dispatch asset upload"
+        required: false
+        type: string
+
+concurrency:
+  group: release-${{ github.ref }}-${{ github.event.inputs.package || 'tag' }}
+  cancel-in-progress: false
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
+jobs:
+  build:
+    name: Build package
+    runs-on: ubuntu-latest
+
+    outputs:
+      package: ${{ steps.select.outputs.package }}
+      path: ${{ steps.select.outputs.path }}
+      target: ${{ steps.select.outputs.target }}
+      auth: ${{ steps.select.outputs.auth }}
+      github_release: ${{ steps.select.outputs.github_release }}
+      release_tag: ${{ steps.select.outputs.release_tag }}
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v8.1.0
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+
+      - name: Select package
+        id: select
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          package="${{ github.event.inputs.package || '' }}"
+          target="${{ github.event.inputs.target || 'pypi' }}"
+          auth="${{ github.event.inputs.auth || 'trusted-publishing' }}"
+          github_release="${{ github.event.inputs.github_release || 'false' }}"
+          release_tag="${{ github.event.inputs.release_tag || github.ref_name }}"
+
+          if [[ -z "$package" ]]; then
+            ref="${GITHUB_REF_NAME}"
+            case "$ref" in
+              *-core) package="core" ;;
+              *-databricks) package="databricks" ;;
+              *-aws) package="aws" ;;
+              *-snowflake) package="snowflake" ;;
+              *-fabric) package="fabric" ;;
+              *-gcp) package="gcp" ;;
+              *-ai) package="ai" ;;
+              *)
+                echo "Cannot infer package from tag: $ref" >&2
+                exit 1
+                ;;
+            esac
+          fi
+
+          case "$package" in
+            core) path="." ;;
+            databricks) path="adapters/databricks" ;;
+            aws) path="adapters/aws" ;;
+            snowflake) path="adapters/snowflake" ;;
+            fabric) path="adapters/fabric" ;;
+            gcp) path="adapters/gcp" ;;
+            ai) path="ai" ;;
+            *)
+              echo "Unknown package: $package" >&2
+              exit 1
+              ;;
+          esac
+
+          echo "package=$package" >> "$GITHUB_OUTPUT"
+          echo "path=$path" >> "$GITHUB_OUTPUT"
+          echo "target=$target" >> "$GITHUB_OUTPUT"
+          echo "auth=$auth" >> "$GITHUB_OUTPUT"
+          echo "github_release=$github_release" >> "$GITHUB_OUTPUT"
+          echo "release_tag=$release_tag" >> "$GITHUB_OUTPUT"
+          echo "Selected package=$package path=$path target=$target auth=$auth github_release=$github_release release_tag=$release_tag"
+
+      - name: Install test environment
+        run: |
+          uv sync --extra dev
+          uv pip install -e adapters/databricks -e adapters/aws -e adapters/snowflake -e adapters/fabric -e adapters/gcp -e ai
+
+      - name: Run release gate tests
+        run: |
+          uv run pytest \
+            tests/test_publication_packaging.py \
+            tests/test_package_version.py \
+            tests/test_adapter_independence.py \
+            tests/test_core_platform_independence.py \
+            tests/test_aws_architecture.py \
+            ai/tests/test_architecture_boundaries.py
+
+      - name: Install build tooling
+        run: python -m pip install --upgrade build twine
+
+      - name: Build selected package
+        working-directory: ${{ steps.select.outputs.path }}
+        run: python -m build --wheel --sdist
+
+      - name: Check distributions
+        working-directory: ${{ steps.select.outputs.path }}
+        run: twine check dist/*
+
+      - name: Create ZIP aliases for wheel-only runtimes
+        working-directory: ${{ steps.select.outputs.path }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          for wheel in dist/*.whl; do
+            base="$(basename "$wheel" .whl)"
+            cp "$wheel" "dist/${base}.zip"
+          done
+
+      - name: Upload PyPI distributions
+        uses: actions/upload-artifact@v6
+        with:
+          name: ${{ steps.select.outputs.package }}-pypi-dist
+          path: |
+            ${{ steps.select.outputs.path }}/dist/*.whl
+            ${{ steps.select.outputs.path }}/dist/*.tar.gz
+          if-no-files-found: error
+
+      - name: Upload GitHub Release assets
+        uses: actions/upload-artifact@v6
+        with:
+          name: ${{ steps.select.outputs.package }}-release-assets
+          path: ${{ steps.select.outputs.path }}/dist/*
+          if-no-files-found: error
+
+  publish:
+    name: Publish package
+    needs: build
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      id-token: write
+
+    steps:
+      - name: Download distributions
+        uses: actions/download-artifact@v7
+        with:
+          name: ${{ needs.build.outputs.package }}-pypi-dist
+          path: dist
+
+      - name: Publish to PyPI with trusted publishing
+        if: needs.build.outputs.target == 'pypi' && needs.build.outputs.auth == 'trusted-publishing'
+        uses: pypa/gh-action-pypi-publish@release/v1
+
+      - name: Publish to TestPyPI with trusted publishing
+        if: needs.build.outputs.target == 'testpypi' && needs.build.outputs.auth == 'trusted-publishing'
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          repository-url: https://test.pypi.org/legacy/
+
+      - name: Publish to PyPI with API token
+        if: needs.build.outputs.target == 'pypi' && needs.build.outputs.auth == 'api-token'
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          password: ${{ secrets.PYPI_API_TOKEN }}
+
+      - name: Publish to TestPyPI with API token
+        if: needs.build.outputs.target == 'testpypi' && needs.build.outputs.auth == 'api-token'
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          repository-url: https://test.pypi.org/legacy/
+          password: ${{ secrets.TEST_PYPI_API_TOKEN }}
+
+  github-release-assets:
+    name: Attach GitHub Release assets
+    needs:
+      - build
+      - publish
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' || needs.build.outputs.github_release == 'true'
+    permissions:
+      contents: write
+
+    steps:
+      - name: Download distributions
+        uses: actions/download-artifact@v7
+        with:
+          name: ${{ needs.build.outputs.package }}-release-assets
+          path: dist
+
+      - name: Upload release assets
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ needs.build.outputs.release_tag }}
+          PACKAGE: ${{ needs.build.outputs.package }}
+        run: |
+          set -euo pipefail
+          if [[ -z "$RELEASE_TAG" ]]; then
+            echo "release_tag is required when attaching GitHub Release assets from workflow_dispatch" >&2
+            exit 1
+          fi
+          if ! gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
+            gh release create "$RELEASE_TAG" \
+              --title "ContractForge ${RELEASE_TAG}" \
+              --notes "ContractForge ${PACKAGE} distribution assets. PyPI remains the canonical Python package index; these files support runtimes that require wheel or ZIP artifacts."
+          fi
+          gh release upload "$RELEASE_TAG" dist/* --clobber

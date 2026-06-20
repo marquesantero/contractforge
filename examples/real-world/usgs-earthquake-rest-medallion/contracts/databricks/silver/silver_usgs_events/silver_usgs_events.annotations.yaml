@@ -1,0 +1,19 @@
+table:
+  description: Current normalized earthquake events parsed from the USGS GeoJSON feed.
+  tags:
+    domain: geospatial
+    provider: usgs
+    layer: silver
+columns:
+  earthquake_id:
+    description: Stable USGS earthquake event identifier.
+  event_time:
+    description: Event timestamp derived from USGS epoch milliseconds.
+  magnitude:
+    description: Event magnitude from USGS summary properties.
+  latitude:
+    description: Latitude extracted from GeoJSON coordinates.
+  longitude:
+    description: Longitude extracted from GeoJSON coordinates.
+  depth_km:
+    description: Event depth in kilometers extracted from GeoJSON coordinates.

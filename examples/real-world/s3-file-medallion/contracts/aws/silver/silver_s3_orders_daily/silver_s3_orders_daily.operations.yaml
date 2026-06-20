@@ -1,0 +1,13 @@
+criticality: medium
+expected_frequency: hourly
+freshness_sla_minutes: 90
+alert_on_failure: true
+alert_on_quality_fail: true
+runbook_url: https://example.com/runbooks/contractforge/s3-orders-daily
+ownership:
+  business_owner: commerce-ops
+  technical_owner: data-engineering
+tags:
+  project: s3-file-medallion
+  layer: silver
+

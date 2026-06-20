@@ -1,0 +1,32 @@
+source:
+  type: rest_api
+  request:
+    url: https://postman-echo.com/get
+    method: GET
+    headers:
+      Accept: application/json
+      User-Agent: ContractForge Fabric API key REST source smoke
+  auth:
+    type: api_key
+    header: ContractForgeApiKey
+    value: "{{ secret:fabric/rest-api-key }}"
+  response:
+    records_path: headers
+  limits:
+    timeout_seconds: 60
+    retry_attempts: 3
+    retry_backoff_seconds: 2
+    max_page_bytes: 1048576
+    max_total_bytes: 1048576
+    max_records: 10
+target:
+  catalog: workspace
+  schema: cf_fabric_source_expansion
+  table: auth_rest_api_key
+layer: bronze
+mode: overwrite
+schema_policy: permissive
+quality_rules:
+  required_columns: [contractforgeapikey]
+  not_null: [contractforgeapikey]
+  min_rows: 1

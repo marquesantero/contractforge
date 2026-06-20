@@ -1,0 +1,27 @@
+name: fabric_confluent_kafka_bounded_source_smoke
+description: Fabric source-expansion smoke for bounded Confluent Cloud Kafka reads.
+default_environment: fabric
+
+environments:
+  fabric: environments/fabric.environment.yaml
+
+execution_order:
+  - name: confluent_kafka_bounded_orders
+    layer: bronze
+    expected_result: succeeded
+    depends_on: []
+    contracts:
+      fabric: contracts/01_confluent_kafka_bounded_orders.ingestion.yaml
+  - name: confluent_kafka_bounded_evidence_probe
+    layer: bronze
+    expected_result: succeeded
+    depends_on: [confluent_kafka_bounded_orders]
+    contracts:
+      fabric: contracts/02_confluent_kafka_bounded_evidence_probe.ingestion.yaml
+
+source_expansion:
+  source_family: confluent_kafka_bounded
+  authentication: sasl_plain_key_vault_placeholder
+  expected_success_steps: 2
+  expected_probe_checks: 6
+  stable_final_scope: stable_f11_bounded_stream_evidence

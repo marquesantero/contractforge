@@ -1,0 +1,53 @@
+{
+  "kind": "contractforge_cross_adapter_production_run_scope_check",
+  "schema_version": "1.0.0",
+  "created": "2026-06-17",
+  "status": "DECIDED",
+  "decision": "AWS and Snowflake production-sized parity evidence currently supports hash_diff_upsert only. It does not close historical or snapshot_reconcile_soft_delete production parity.",
+  "adapters": [
+    {
+      "adapter": "contractforge-aws",
+      "evidence": "docs/reports/aws-hashdiff-production-benchmark.json",
+      "validated_modes": [
+        "hash_diff_upsert"
+      ],
+      "missing_modes": [
+        "historical",
+        "snapshot_reconcile_soft_delete"
+      ],
+      "notes": [
+        "AWS production evidence includes initial load, no-change replay, changed-row wave, overlap guard, duplicate-key failure and null-key failure for hash_diff_upsert.",
+        "AWS historical and snapshot modes remain outside the accepted production parity claim."
+      ]
+    },
+    {
+      "adapter": "contractforge-snowflake",
+      "evidence": "docs/reports/snowflake-hashdiff-production-benchmark.json",
+      "validated_modes": [
+        "hash_diff_upsert"
+      ],
+      "missing_modes": [
+        "historical",
+        "snapshot_reconcile_soft_delete"
+      ],
+      "notes": [
+        "Snowflake production evidence includes initial load, no-change replay, changed-row wave, overlap guard, duplicate-key failure and null-key failure for hash_diff_upsert.",
+        "Snowflake historical and snapshot modes remain outside the accepted production parity claim."
+      ]
+    },
+    {
+      "adapter": "contractforge-gcp",
+      "evidence": "docs/reports/gcp-bigquery-advanced-write-production-benchmark.json",
+      "validated_modes": [
+        "historical",
+        "snapshot_reconcile_soft_delete"
+      ],
+      "cross_adapter_decision": "Not sufficient to close GCP-BQ-12D until AWS and Snowflake have comparable production-sized historical/snapshot evidence or an explicit product decision accepts GCP-only coverage."
+    }
+  ],
+  "affected_gate": {
+    "id": "GCP-BQ-12D",
+    "status": "FUTURE",
+    "reason": "Cross-adapter historical and snapshot production parity is incomplete because the AWS and Snowflake production reports are hash_diff_upsert-only."
+  }
+}

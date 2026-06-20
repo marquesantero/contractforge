@@ -1,0 +1,7 @@
+{
+  "status": "EXPLAINED",
+  "primary_category": "network_or_egress",
+  "risk": "high",
+  "finding_codes": ["failure.network_or_egress", "failure.runtime_limitation"],
+  "recommended_action_count": 2
+}

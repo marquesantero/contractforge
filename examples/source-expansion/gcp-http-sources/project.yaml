@@ -1,0 +1,20 @@
+name: gcp-http-sources
+environments:
+  gcp: environments/gcp.environment.yaml
+execution_order:
+  - name: http_text_countries
+    layer: bronze
+    contracts:
+      gcp: contracts/01_http_text.ingestion.yaml
+  - name: http_file_text_countries
+    layer: bronze
+    contracts:
+      gcp: contracts/02_http_file_text.ingestion.yaml
+  - name: http_file_json_todo
+    layer: bronze
+    contracts:
+      gcp: contracts/03_http_file_json.ingestion.yaml
+  - name: http_file_csv_countries
+    layer: bronze
+    contracts:
+      gcp: contracts/04_http_file_csv.ingestion.yaml

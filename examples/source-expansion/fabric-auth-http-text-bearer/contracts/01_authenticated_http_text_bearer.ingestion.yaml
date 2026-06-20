@@ -1,0 +1,31 @@
+source:
+  type: http_text
+  request:
+    url: https://httpbin.org/bearer
+    method: GET
+    headers:
+      Accept: text/plain
+      User-Agent: ContractForge Fabric authenticated HTTP text bearer source smoke
+  auth:
+    type: bearer_token
+    token: "{{ secret:fabric/rest-bearer-token }}"
+  limits:
+    timeout_seconds: 60
+    retry_attempts: 3
+    retry_backoff_seconds: 2
+    max_bytes: 1048576
+target:
+  catalog: workspace
+  schema: cf_fabric_source_expansion
+  table: auth_http_text_bearer
+layer: bronze
+mode: overwrite
+schema_policy: permissive
+quality_rules:
+  required_columns: [value]
+  not_null: [value]
+  min_rows: 1
+  expressions:
+    - name: authenticated_payload
+      expression: 'value LIKE ''%"authenticated": true%'''
+      severity: abort

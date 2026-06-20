@@ -1,0 +1,34 @@
+source:
+  type: sql
+  system: azure_sql_database
+  name: azure_sql_customer_summary
+  query: |
+    SELECT
+      customer_name,
+      COUNT(*) AS order_count,
+      SUM(amount) AS total_amount,
+      AVG(amount) AS avg_amount,
+      MAX(amount_band) AS max_amount_band,
+      CURRENT_TIMESTAMP() AS computed_at_utc
+    FROM `midyear-system-499521-p3.contractforge_gcp_azure_sql_silver.s_azure_sql_orders_current`
+    GROUP BY customer_name
+  read:
+    source_complete: true
+
+target:
+  catalog: midyear-system-499521-p3
+  schema: contractforge_gcp_azure_sql_gold
+  table: g_azure_sql_customer_summary
+
+layer: gold
+mode: overwrite
+schema_policy: additive_only
+
+quality_rules:
+  required_columns: [customer_name, order_count, total_amount]
+  not_null: [customer_name]
+  expressions:
+    - name: positive_order_count
+      expression: order_count > 0
+      severity: abort
+      message: Gold customer summary must aggregate at least one order.

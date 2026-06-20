@@ -1,0 +1,21 @@
+source:
+  type: sql
+  query: |
+    SELECT stack(
+      1,
+      1, 'bad-order', -10.0
+    ) AS (order_id, order_name, amount)
+target:
+  catalog: workspace
+  schema: cf_fabric_stable
+  table: quality_abort
+layer: silver
+mode: overwrite
+quality_rules:
+  required_columns: [order_id, order_name, amount, contract_required_column]
+  not_null: [order_id]
+  min_rows: 1
+  expressions:
+    - name: positive_amount
+      expression: amount > 0
+      severity: abort

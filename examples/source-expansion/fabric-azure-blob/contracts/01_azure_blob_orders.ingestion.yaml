@@ -1,0 +1,21 @@
+source:
+  type: azure_blob
+  format: csv
+  path: https://cffabricf11obj65687.blob.core.windows.net/cf-fabric-f11/object-storage/orders.csv
+  options:
+    header: true
+    inferSchema: true
+target:
+  catalog: workspace
+  schema: cf_fabric_source_expansion
+  table: azure_blob_orders
+layer: bronze
+mode: overwrite
+schema_policy: permissive
+quality_rules:
+  required_columns: [order_id, customer_name, amount]
+  not_null: [order_id, customer_name, amount]
+  min_rows: 2
+extensions:
+  fabric:
+    source_runtime_path: wasbs://cf-fabric-f11@cffabricf11obj65687.blob.core.windows.net/object-storage/orders.csv

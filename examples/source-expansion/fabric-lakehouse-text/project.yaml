@@ -1,0 +1,29 @@
+name: fabric_lakehouse_text_source_smoke
+description: Fabric source-expansion smoke for bounded Lakehouse text file reads.
+default_environment: fabric
+
+environments:
+  fabric: environments/fabric.environment.yaml
+
+execution_order:
+  - name: lakehouse_text_orders
+    layer: bronze
+    expected_result: succeeded
+    depends_on: []
+    contracts:
+      fabric: contracts/01_lakehouse_text_orders.ingestion.yaml
+  - name: lakehouse_text_evidence_probe
+    layer: bronze
+    expected_result: succeeded
+    depends_on: [lakehouse_text_orders]
+    contracts:
+      fabric: contracts/02_lakehouse_text_evidence_probe.ingestion.yaml
+
+source_expansion:
+  source_family: lakehouse_text
+  authentication: fabric_lakehouse_files
+  expected_success_steps: 2
+  expected_probe_checks: 5
+  stable_final_scope: stable_f11_lakehouse_text_evidence
+  fixture_path: Files/source-expansion/lakehouse-text/orders.txt
+

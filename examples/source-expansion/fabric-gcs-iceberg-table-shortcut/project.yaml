@@ -1,0 +1,51 @@
+name: fabric_gcs_iceberg_table_shortcut_source_smoke
+description: Fabric source-expansion smoke for a GCS Iceberg table shortcut read.
+default_environment: fabric
+
+environments:
+  fabric: environments/fabric.environment.yaml
+
+fabric_setup:
+  shortcuts:
+    - path: Tables
+      name: cf_fabric_gcs_iceberg_orders
+      conflict_policy: CreateOrOverwrite
+      target:
+        googleCloudStorage:
+          location: https://contractforge-fabric-gcs-testebig-496714.storage.googleapis.com
+          subpath: /iceberg-shortcut/iceberg_orders
+          connectionId: "{{ parameter:fabric.connections.gcs_shortcut_connection_id }}"
+
+execution_order:
+  - name: gcs_iceberg_table_shortcut_orders
+    layer: bronze
+    expected_result: succeeded
+    depends_on: []
+    contracts:
+      fabric: contracts/01_gcs_iceberg_table_shortcut_orders.ingestion.yaml
+  - name: gcs_iceberg_table_shortcut_evidence_probe
+    layer: bronze
+    expected_result: succeeded
+    depends_on: [gcs_iceberg_table_shortcut_orders]
+    contracts:
+      fabric: contracts/02_gcs_iceberg_table_shortcut_evidence_probe.ingestion.yaml
+
+source_expansion:
+  source_family: iceberg_table_shortcut
+  shortcut_kind: external_google_cloud_storage_iceberg_table
+  authentication: fabric_connection_basic_hmac
+  source_format: iceberg
+  expected_success_steps: 2
+  expected_probe_checks: 6
+  stable_final_scope: stable_f11_gcs_iceberg_table_shortcut_evidence
+  fixture:
+    generator: reused_pyiceberg_fixture_from_s3_iceberg_smoke
+    rows: 3
+    gcs_prefix: gs://contractforge-fabric-gcs-testebig-496714/iceberg-shortcut/iceberg_orders/
+  shortcut:
+    path: Tables
+    name: cf_fabric_gcs_iceberg_orders
+    read_table: cf_fabric_gcs_iceberg_orders
+    target_type: GoogleCloudStorage
+    target_location: https://contractforge-fabric-gcs-testebig-496714.storage.googleapis.com
+    target_subpath: /iceberg-shortcut/iceberg_orders

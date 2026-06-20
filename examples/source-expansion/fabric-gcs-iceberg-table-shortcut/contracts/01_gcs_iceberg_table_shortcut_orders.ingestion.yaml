@@ -1,0 +1,18 @@
+source:
+  type: iceberg_table
+  table: cf_fabric_gcs_iceberg_orders
+target:
+  catalog: workspace
+  schema: cf_fabric_source_expansion
+  table: gcs_iceberg_table_shortcut_orders
+layer: bronze
+mode: overwrite
+schema_policy: permissive
+quality_rules:
+  required_columns: [order_id, customer_name, amount, batch_id]
+  not_null: [order_id, customer_name, amount, batch_id]
+  min_rows: 3
+  expressions:
+    - name: positive_amount
+      expression: amount > 0
+      severity: abort

@@ -1,0 +1,37 @@
+{
+  "kind": "contractforge_gcp_http_text_bigquery_smoke_blocker",
+  "schema_version": "1.0.0",
+  "maturity_gate": "GCP-BQ-20",
+  "status": "SUPERSEDED",
+  "blocked_at": "2026-06-17",
+  "superseded_at": "2026-06-17",
+  "superseded_by": "docs/reports/gcp-http-sources-bigquery-smoke.json",
+  "adapter": "contractforge-gcp",
+  "subtarget": "gcp_bigquery",
+  "target_surface": "real-account BigQuery http_text execution smoke",
+  "attempted_execution_path": [
+    "contractforge-gcp smoke <http_text contract> --environment <gcp environment> --execute --runtime bq",
+    "shared core read_http_file_payload",
+    "temporary local NDJSON materialization",
+    "BigQuery local load job",
+    "run, quality and lineage evidence"
+  ],
+  "blocker": {
+    "code": "GCLOUD_REAUTH_REQUIRED",
+    "message": "bq cannot refresh the active gcloud account token in non-interactive execution.",
+    "active_account": "marco@intentus.dev",
+    "project": "midyear-system-499521-p3",
+    "error_prefix": "There was a problem refreshing your current auth tokens: Reauthentication failed. cannot prompt during non-interactive execution."
+  },
+  "validated_before_block": [
+    "GCP http_text and generic http_file text materialization pass local adapter smoke tests.",
+    "The adapter renders BigQuery source_materialization plans with declared schema_fields.",
+    "The smoke runtime converts text lines to newline-delimited JSON before BigQuery load."
+  ],
+  "required_to_unblock": [
+    "Run gcloud auth login interactively for marco@intentus.dev or switch to a non-expired authenticated account.",
+    "Run the real BigQuery http_text smoke and read back target/evidence rows.",
+    "Replace this blocker with a PASS report if the contract-only execution succeeds."
+  ],
+  "no_workaround_code_used": true
+}

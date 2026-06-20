@@ -1,0 +1,28 @@
+name: fabric_http_text_source_smoke
+description: Fabric source-expansion smoke for public bounded HTTP text reads.
+default_environment: fabric
+
+environments:
+  fabric: environments/fabric.environment.yaml
+
+execution_order:
+  - name: http_text_payload
+    layer: bronze
+    expected_result: succeeded
+    depends_on: []
+    contracts:
+      fabric: contracts/01_http_text_payload.ingestion.yaml
+  - name: http_text_evidence_probe
+    layer: bronze
+    expected_result: succeeded
+    depends_on: [http_text_payload]
+    contracts:
+      fabric: contracts/02_http_text_evidence_probe.ingestion.yaml
+
+source_expansion:
+  source_family: http_text
+  authentication: none
+  expected_success_steps: 2
+  expected_probe_checks: 5
+  stable_final_scope: stable_f11_public_http_text_evidence
+

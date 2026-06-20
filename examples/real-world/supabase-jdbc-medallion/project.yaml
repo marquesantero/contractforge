@@ -1,0 +1,117 @@
+name: supabase_jdbc_medallion
+description: >
+  Real end-to-end Supabase/PostgreSQL medallion ingestion project used to
+  validate shared JDBC contracts on Databricks and AWS.
+
+source_system:
+  name: supabase_inventory_demo
+  type: postgresql
+  seed_schema: cf_supabase_newcore_demo
+  expected_seed_rows:
+    products: 100000
+    product_movements: 1000500
+
+environments:
+  databricks: environments/databricks.environment.yaml
+  aws: environments/aws.environment.yaml
+
+connections:
+  supabase_postgres: connections/supabase.yaml
+
+deployment:
+  databricks:
+    bundle_name: contractforge_supabase_jdbc_medallion
+    job_key: supabase_jdbc_medallion
+    job_name: contractforge_supabase_jdbc_medallion
+    workspace_root_path: /Workspace/Shared/contractforge-examples/Supabase_JDBC_Medallion
+    bundle_root: /Workspace/Shared/contractforge-examples/Supabase_JDBC_Medallion/files
+    evidence_catalog: workspace
+    evidence_schema: cf_supabase_jdbc_e2e_v2_ops
+    core_wheel_path: /Workspace/Shared/contractforge-examples/libs/contractforge_core-0.1.0-py3-none-any.whl
+    databricks_wheel_path: /Workspace/Shared/contractforge-examples/libs/contractforge_databricks-0.1.0-py3-none-any.whl
+  aws:
+    state_machine_name: contractforge_supabase_jdbc_medallion
+
+schedule:
+  cron: "0 6 * * *"
+  timezone: America/Sao_Paulo
+  enabled: false
+  max_concurrent_runs: 1
+  queue: true
+  adapters:
+    databricks:
+      pause_status: PAUSED
+      tasks:
+        bronze_supabase_products:
+          task_key: bronze_products
+        bronze_supabase_movements:
+          task_key: bronze_movements
+        silver_supabase_product_tags:
+          task_key: silver_product_tags
+        silver_supabase_movements_current:
+          task_key: silver_movements_current
+        gold_supabase_brand_inventory:
+          task_key: gold_brand_inventory
+      extra_tasks:
+        - name: verify_supabase_source
+          task_key: verify_supabase_source
+          notebook_path: ./notebooks/verify_supabase_source.py
+          base_parameters:
+            source_schema: cf_supabase_newcore_demo
+            expected_products: "100000"
+            expected_movements: "1000500"
+        - name: validate_results
+          task_key: validate_results
+          depends_on: [gold_supabase_brand_inventory]
+          notebook_path: ./notebooks/validate_results.py
+          base_parameters:
+            evidence_catalog: workspace
+            evidence_schema: cf_supabase_jdbc_e2e_v2_ops
+            target_catalog: workspace
+            project_prefix: cf_supabase_jdbc_e2e_v2
+    aws:
+      state: DISABLED
+execution_order:
+  - name: bronze_supabase_products
+    layer: bronze
+    description: Partitioned JDBC ingest of product master data.
+    depends_on: [verify_supabase_source]
+    contracts:
+      databricks: contracts/databricks/bronze/bronze_supabase_products/bronze_supabase_products.ingestion.yaml
+      aws: contracts/aws/bronze/bronze_supabase_products/bronze_supabase_products.ingestion.yaml
+  - name: bronze_supabase_movements
+    layer: bronze
+    description: Partitioned JDBC ingest of inventory movement facts.
+    depends_on: [bronze_supabase_products]
+    contracts:
+      databricks: contracts/databricks/bronze/bronze_supabase_movements/bronze_supabase_movements.ingestion.yaml
+      aws: contracts/aws/bronze/bronze_supabase_movements/bronze_supabase_movements.ingestion.yaml
+  - name: silver_supabase_product_tags
+    layer: silver
+    description: Parse JSON product attributes, standardize brands and explode tags.
+    depends_on: [bronze_supabase_movements]
+    contracts:
+      databricks: contracts/databricks/silver/silver_supabase_product_tags/silver_supabase_product_tags.ingestion.yaml
+      aws: contracts/aws/silver/silver_supabase_product_tags/silver_supabase_product_tags.ingestion.yaml
+  - name: silver_supabase_movements_current
+    layer: silver
+    description: SQL/window current movement view over the bronze movement table.
+    depends_on: [silver_supabase_product_tags]
+    contracts:
+      databricks: contracts/databricks/silver/silver_supabase_movements_current/silver_supabase_movements_current.ingestion.yaml
+      aws: contracts/aws/silver/silver_supabase_movements_current/silver_supabase_movements_current.ingestion.yaml
+  - name: gold_supabase_brand_inventory
+    layer: gold
+    description: Brand and price-band inventory mart joining silver products and movements.
+    depends_on: [silver_supabase_movements_current]
+    contracts:
+      databricks: contracts/databricks/gold/gold_supabase_brand_inventory/gold_supabase_brand_inventory.ingestion.yaml
+      aws: contracts/aws/gold/gold_supabase_brand_inventory/gold_supabase_brand_inventory.ingestion.yaml
+
+validation:
+  databricks:
+    bundle: databricks.yml
+    job_name: contractforge_supabase_jdbc_medallion
+  aws:
+    artifact_bucket_parameter: CONTRACTFORGE_AWS_ARTIFACT_BUCKET
+    glue_role_parameter: CONTRACTFORGE_AWS_GLUE_ROLE_ARN

@@ -1,0 +1,66 @@
+{
+  "project_planning_incomplete_hash_diff": {
+    "intent": "Create a silver ingestion from s3a://landing/orders into main.silver.orders using scd1_hash_diff.",
+    "schema_path": "schemas/orders.json",
+    "expected": {
+      "status": "NEEDS_DECISIONS",
+      "decision_path": "merge_keys",
+      "connector": "s3"
+    }
+  },
+  "control_table_incident": {
+    "evidence": {
+      "runs": [
+        {
+          "run_id": "1",
+          "status": "FAILED",
+          "target_table": "main.bronze.orders",
+          "source_connector": "s3",
+          "runtime_type": "serverless"
+        },
+        {
+          "run_id": "2",
+          "status": "FAILED",
+          "target_table": "main.bronze.orders",
+          "source_connector": "s3",
+          "runtime_type": "serverless"
+        }
+      ],
+      "errors": [
+        {
+          "run_id": "1",
+          "error_message": "Network egress timeout"
+        },
+        {
+          "run_id": "2",
+          "error_message": "Temporary DNS failure"
+        }
+      ]
+    },
+    "expected": {
+      "status": "FAIL",
+      "finding_codes": [
+        "observability.failure_rate.high",
+        "observability.failure.cluster.recurring",
+        "observability.error.network_recurring"
+      ]
+    }
+  },
+  "provider_output_invalid": {
+    "prompt": "project.plan.enrichment.v1",
+    "output": {
+      "kind": "project_plan"
+    },
+    "expected": {
+      "validation_status": "INVALID",
+      "critique_status": "INVALID"
+    }
+  },
+  "route_shape_intent": {
+    "intent": "Generate a transform shape for nested JSON arrays and structs.",
+    "expected": {
+      "task": "shape_suggestion",
+      "confidence_min": 0.6
+    }
+  }
+}

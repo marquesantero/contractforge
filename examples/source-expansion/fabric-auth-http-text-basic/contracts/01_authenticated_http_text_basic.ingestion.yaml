@@ -1,0 +1,32 @@
+source:
+  type: http_text
+  request:
+    url: https://postman-echo.com/basic-auth
+    method: GET
+    headers:
+      Accept: text/plain
+      User-Agent: ContractForge Fabric authenticated HTTP text source smoke
+  auth:
+    type: basic
+    username: postman
+    password: "{{ secret:fabric/postman-basic-password }}"
+  limits:
+    timeout_seconds: 60
+    retry_attempts: 3
+    retry_backoff_seconds: 2
+    max_bytes: 1048576
+target:
+  catalog: workspace
+  schema: cf_fabric_source_expansion
+  table: auth_http_text_basic
+layer: bronze
+mode: overwrite
+schema_policy: permissive
+quality_rules:
+  required_columns: [value]
+  not_null: [value]
+  min_rows: 1
+  expressions:
+    - name: authenticated_payload
+      expression: value LIKE '%"authenticated":true%'
+      severity: abort

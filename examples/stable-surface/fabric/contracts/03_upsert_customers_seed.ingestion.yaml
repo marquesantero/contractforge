@@ -1,0 +1,20 @@
+source:
+  type: sql
+  query: |
+    SELECT stack(
+      2,
+      1, 'alpha', 'active',
+      2, 'beta', 'active'
+    ) AS (customer_id, customer_name, customer_status)
+target:
+  catalog: workspace
+  schema: cf_fabric_stable
+  table: customers_current
+layer: silver
+mode: upsert
+merge_keys: [customer_id]
+quality_rules:
+  required_columns: [customer_id, customer_name, customer_status]
+  not_null: [customer_id]
+  unique_key: [customer_id]
+  min_rows: 2

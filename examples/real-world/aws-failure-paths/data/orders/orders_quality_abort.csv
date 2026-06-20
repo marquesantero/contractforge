@@ -1,0 +1,4 @@
+order_id,customer_id,order_ts,order_status,amount,updated_at
+9001,C901,2026-06-01T10:00:00Z,paid,10.00,2026-06-01T10:01:00Z
+9002,C902,2026-06-01T11:00:00Z,paid,20.00,2026-06-01T11:01:00Z
+

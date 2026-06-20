@@ -1,0 +1,11 @@
+table:
+  description: Gold revenue mart by order status.
+  tags:
+    domain: commerce
+    layer: gold
+columns:
+  order_status:
+    description: Normalized order status.
+  gross_amount:
+    description: Total amount by status.
+

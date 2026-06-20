@@ -1,0 +1,24 @@
+name: usgs_rest_snowflake
+adapter: snowflake
+evidence:
+  database: CONTRACTFORGE_TEST_DB
+  schema: PUBLIC
+  create_database: false
+  create_schema: false
+artifacts:
+  uri: '@"CONTRACTFORGE_TEST_DB"."PUBLIC"."CF_USGS_REST_ARTIFACTS"'
+  layout: contractforge-v1
+parameters:
+  snowflake:
+    warehouse: COMPUTE_WH
+    role: CONTRACTFORGE_INGEST_ROLE
+    runner_procedure: CONTRACTFORGE_TEST_DB.PUBLIC.CF_USGS_REST_RUNNER
+    runtime_create_database: false
+    runtime_create_schema: false
+    runtime_wheel_uri: '@"CONTRACTFORGE_TEST_DB"."PUBLIC"."CF_USGS_REST_ARTIFACTS"/libs/contractforge_snowflake-0.1.0-py3-none-any.zip'
+    task_database: CONTRACTFORGE_TEST_DB
+    task_schema: PUBLIC
+    task_create_database: false
+    task_create_schema: false
+    external_access_integrations:
+      - CF_USGS_REST_ACCESS

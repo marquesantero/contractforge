@@ -1,0 +1,21 @@
+source:
+  type: sql
+  query: |
+    SELECT stack(
+      2,
+      1, 'alpha-changed', 'a@example.com',
+      3, 'gamma', 'g@example.com'
+    ) AS (customer_id, customer_name, email)
+target:
+  catalog: workspace
+  schema: cf_fabric_stable
+  table: customers_hash
+layer: silver
+mode: hash_diff_upsert
+merge_keys: [customer_id]
+hash_keys: [customer_name, email]
+quality_rules:
+  required_columns: [customer_id, customer_name, email]
+  not_null: [customer_id]
+  unique_key: [customer_id]
+  min_rows: 2

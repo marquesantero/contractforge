@@ -1,0 +1,16 @@
+policy: warn
+table:
+  description: Curated product/tag rows parsed from Supabase JSON columns.
+  tags:
+    domain: inventory
+    source: supabase
+    layer: silver
+columns:
+  product_tag_uid:
+    description: Stable product/tag key.
+  product_tag:
+    description: Normalized product tag.
+  color:
+    description: Product color parsed from attributes JSON.
+  supplier_tier:
+    description: Supplier tier parsed from attributes JSON.

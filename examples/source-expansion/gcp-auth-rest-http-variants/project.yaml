@@ -1,0 +1,20 @@
+name: gcp-auth-rest-http-variants
+environments:
+  gcp: environments/gcp.environment.yaml
+execution_order:
+  - name: rest_bearer
+    layer: bronze
+    contracts:
+      gcp: contracts/01_rest_bearer.ingestion.yaml
+  - name: rest_api_key
+    layer: bronze
+    contracts:
+      gcp: contracts/02_rest_api_key.ingestion.yaml
+  - name: http_json_bearer
+    layer: bronze
+    contracts:
+      gcp: contracts/03_http_json_bearer.ingestion.yaml
+  - name: http_json_api_key
+    layer: bronze
+    contracts:
+      gcp: contracts/04_http_json_api_key.ingestion.yaml

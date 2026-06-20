@@ -1,0 +1,11 @@
+name: gcp_azure_sqlserver_jdbc_medallion
+
+parameters:
+  gcp:
+    project_id: midyear-system-499521-p3
+    location: US
+    dataset: contractforge_gcp_azure_sql_bronze
+    staging_bucket: contractforge-gcp-smoke-midyear-system-499521-p3
+
+evidence:
+  dataset: contractforge_gcp_azure_sql_ops

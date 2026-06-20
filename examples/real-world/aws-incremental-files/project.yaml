@@ -1,0 +1,28 @@
+name: aws_incremental_files
+description: >
+  Dedicated AWS incremental file ingestion project used to validate portable
+  incremental_files semantics, Glue job bookmarks and Iceberg evidence.
+
+source_system:
+  name: s3_incremental_events
+  type: object_storage
+  provider: s3
+  seed_prefix: s3://contractforge-aws-smoke-449112696824-us-east-1/data/aws-incremental-files/events/
+
+environments:
+  aws: environments/aws.environment.yaml
+
+execution_order:
+  - name: bronze_incremental_events
+    layer: bronze
+    description: Incremental CSV file ingest with Glue bookmarks and hash-diff merge.
+    contracts:
+      aws: contracts/aws/bronze/bronze_incremental_events/bronze_incremental_events.ingestion.yaml
+
+validation:
+  aws:
+    artifact_bucket: contractforge-aws-smoke-449112696824-us-east-1
+    evidence_database: contractforge_cf_incremental_files_ops
+    upload_waves:
+      - data/events/wave1/events_2026_06_01.csv
+      - data/events/wave2/events_2026_06_01_late.csv

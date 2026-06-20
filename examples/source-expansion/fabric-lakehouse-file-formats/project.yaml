@@ -1,0 +1,44 @@
+name: fabric_lakehouse_file_formats_source_smoke
+description: Fabric source-expansion smoke for bounded Lakehouse ORC, Avro and XML file reads.
+default_environment: fabric
+
+environments:
+  fabric: environments/fabric.environment.yaml
+
+execution_order:
+  - name: lakehouse_orc_orders
+    layer: bronze
+    expected_result: succeeded
+    depends_on: []
+    contracts:
+      fabric: contracts/01_lakehouse_orc_orders.ingestion.yaml
+  - name: lakehouse_avro_orders
+    layer: bronze
+    expected_result: succeeded
+    depends_on: [lakehouse_orc_orders]
+    contracts:
+      fabric: contracts/02_lakehouse_avro_orders.ingestion.yaml
+  - name: lakehouse_xml_orders
+    layer: bronze
+    expected_result: succeeded
+    depends_on: [lakehouse_avro_orders]
+    contracts:
+      fabric: contracts/03_lakehouse_xml_orders.ingestion.yaml
+  - name: lakehouse_file_formats_evidence_probe
+    layer: bronze
+    expected_result: succeeded
+    depends_on: [lakehouse_orc_orders, lakehouse_avro_orders, lakehouse_xml_orders]
+    contracts:
+      fabric: contracts/04_lakehouse_file_formats_evidence_probe.ingestion.yaml
+
+source_expansion:
+  source_family: lakehouse_file_formats
+  formats: [orc, avro, xml]
+  authentication: fabric_lakehouse_files
+  expected_success_steps: 4
+  expected_probe_checks: 10
+  stable_final_scope: stable_f11_lakehouse_file_formats_evidence
+  fixture_paths:
+    orc: Files/source-expansion/lakehouse-file-formats/orc_orders
+    avro: Files/source-expansion/lakehouse-file-formats/avro_orders
+    xml: Files/source-expansion/lakehouse-file-formats/xml_orders

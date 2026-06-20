@@ -1,0 +1,243 @@
+{
+  "kind": "contractforge_gcp_advanced_write_production_benchmark",
+  "schema_version": "1.0.0",
+  "adapter": "contractforge-gcp",
+  "subtarget": "gcp_bigquery",
+  "maturity_gate": "GCP-BQ-12C5",
+  "status": "PASS_WITH_REVIEW_BOUNDARY",
+  "runbook": "examples/benchmarks/advanced-write-production/README.md",
+  "created": "2026-06-17",
+  "validated": "2026-06-17",
+  "stable_final_blocker": true,
+  "review_boundary": "GCP BigQuery production-sized historical and snapshot execution passed through explicit review-required contract execution. Advanced write modes remain excluded from stable-final until cross-adapter parity is accepted.",
+  "project_id": "midyear-system-499521-p3",
+  "location": "us-east1",
+  "datasets": {
+    "target": "contractforge_gcp_advanced_prod",
+    "evidence": "contractforge_gcp_advanced_prod_ops"
+  },
+  "required_cases": [
+    "historical_initial_load",
+    "historical_no_change_replay",
+    "historical_changed_row_wave",
+    "historical_delete_expression",
+    "historical_late_arriving_reject",
+    "snapshot_initial_load",
+    "snapshot_no_change_replay",
+    "snapshot_changed_and_tombstone_wave",
+    "snapshot_tombstone_replay",
+    "snapshot_reactivation_wave"
+  ],
+  "required_metrics": [
+    "bigquery_job_id",
+    "statement_type",
+    "inserted_rows",
+    "updated_rows",
+    "deleted_rows",
+    "total_bytes_processed",
+    "total_slot_ms",
+    "target_row_counts",
+    "failed_run_evidence",
+    "cleanup_status"
+  ],
+  "command_pattern": [
+    "PYTHONPATH=src;adapters/gcp/src uv run python -m contractforge_gcp.cli smoke <advanced-write-contract.yaml> --environment <gcp.environment.yaml> --execute --allow-review-required --runtime bq --skip-quality --report <report.json>"
+  ],
+  "live_results": [
+    {
+      "case": "historical_initial_load",
+      "contract": "examples/benchmarks/advanced-write-production/contracts/gcp/customers_historical.ingestion.yaml",
+      "status": "SUCCESS",
+      "planning_status": "REVIEW_REQUIRED",
+      "bigquery_job_id": "cf_gcp_smoke_query_03cdb904bcbf42a59399",
+      "statement_type": "INSERT",
+      "inserted_rows": 10000,
+      "total_bytes_processed": 512856,
+      "total_slot_ms": 4169
+    },
+    {
+      "case": "historical_no_change_replay",
+      "contract": "examples/benchmarks/advanced-write-production/contracts/gcp/customers_historical.ingestion.yaml",
+      "status": "SUCCESS",
+      "planning_status": "REVIEW_REQUIRED",
+      "bigquery_job_id": "cf_gcp_smoke_query_bfeb97456120466eaa7d",
+      "statement_type": "INSERT",
+      "inserted_rows": 0,
+      "total_bytes_processed": 1342856,
+      "total_slot_ms": 3367
+    },
+    {
+      "case": "historical_changed_row_wave",
+      "contract": "examples/benchmarks/advanced-write-production/contracts/gcp/customers_historical.ingestion.yaml",
+      "status": "SUCCESS",
+      "planning_status": "REVIEW_REQUIRED",
+      "bigquery_job_id": "cf_gcp_smoke_query_847be633872b47498f81",
+      "statement_type": "INSERT",
+      "inserted_rows": 250,
+      "changed_row_rule": "MOD(customer_id, 40) = 0",
+      "target_after_case": {
+        "total_rows": 10250,
+        "current_rows": 10000,
+        "expired_rows": 250,
+        "distinct_keys": 10000
+      },
+      "total_bytes_processed": 1342786,
+      "total_slot_ms": 3527
+    },
+    {
+      "case": "historical_delete_expression",
+      "contract": "examples/benchmarks/advanced-write-production/contracts/gcp/customers_historical.ingestion.yaml",
+      "status": "SUCCESS",
+      "planning_status": "REVIEW_REQUIRED",
+      "bigquery_job_id": "cf_gcp_smoke_query_b23c01d0b519432489d0",
+      "statement_type": "INSERT",
+      "inserted_rows": 0,
+      "delete_row_rule": "MOD(customer_id, 100) = 0",
+      "target_after_case": {
+        "total_rows": 10250,
+        "current_rows": 9900,
+        "expired_rows": 350,
+        "delete_expired_rows": 100,
+        "distinct_keys": 10000
+      },
+      "total_bytes_processed": 1363522,
+      "total_slot_ms": 3390
+    },
+    {
+      "case": "historical_late_arriving_reject",
+      "contract": "examples/benchmarks/advanced-write-production/contracts/gcp/customers_historical.ingestion.yaml",
+      "status": "EXPECTED_FAILURE",
+      "planning_status": "REVIEW_REQUIRED",
+      "bigquery_job_id": "cf_gcp_smoke_query_a832f665eaab44069d8f",
+      "error_marker": "CONTRACTFORGE_LATE_ARRIVING_HISTORICAL",
+      "target_after_case": {
+        "total_rows": 10250,
+        "current_rows": 9900,
+        "expired_rows": 350
+      }
+    },
+    {
+      "case": "snapshot_initial_load",
+      "contract": "examples/benchmarks/advanced-write-production/contracts/gcp/customers_snapshot.ingestion.yaml",
+      "status": "SUCCESS",
+      "planning_status": "REVIEW_REQUIRED",
+      "bigquery_job_id": "cf_gcp_smoke_query_09f04f8163eb40f1b5e8",
+      "statement_type": "MERGE",
+      "inserted_rows": 10000,
+      "updated_rows": 0,
+      "deleted_rows": 0,
+      "total_bytes_processed": 512856,
+      "total_slot_ms": 3095
+    },
+    {
+      "case": "snapshot_no_change_replay",
+      "contract": "examples/benchmarks/advanced-write-production/contracts/gcp/customers_snapshot.ingestion.yaml",
+      "status": "SUCCESS",
+      "planning_status": "REVIEW_REQUIRED",
+      "bigquery_job_id": "cf_gcp_smoke_query_4eb3502550084bf0b7dc",
+      "statement_type": "MERGE",
+      "inserted_rows": 0,
+      "updated_rows": 0,
+      "deleted_rows": 0,
+      "total_bytes_processed": 1695712,
+      "total_slot_ms": 3402
+    },
+    {
+      "case": "snapshot_changed_and_tombstone_wave",
+      "contract": "examples/benchmarks/advanced-write-production/contracts/gcp/customers_snapshot.ingestion.yaml",
+      "status": "SUCCESS",
+      "planning_status": "REVIEW_REQUIRED",
+      "bigquery_job_id": "cf_gcp_smoke_query_f2e8a3898dab49ada561",
+      "statement_type": "MERGE",
+      "inserted_rows": 0,
+      "updated_rows": 10000,
+      "deleted_rows": 0,
+      "note": "updated_at is part of the declared source columns and snapshot hash input, so 9,900 present rows changed plus 100 omitted rows were soft-deleted.",
+      "target_after_case": {
+        "total_rows": 10000,
+        "active_rows": 9900,
+        "inactive_rows": 100,
+        "vip_active_rows": 198,
+        "distinct_keys": 10000
+      },
+      "total_bytes_processed": 1689934,
+      "total_slot_ms": 3952
+    },
+    {
+      "case": "snapshot_tombstone_replay",
+      "contract": "examples/benchmarks/advanced-write-production/contracts/gcp/customers_snapshot.ingestion.yaml",
+      "status": "SUCCESS",
+      "planning_status": "REVIEW_REQUIRED",
+      "bigquery_job_id": "cf_gcp_smoke_query_512cb7503e7646a6a948",
+      "statement_type": "MERGE",
+      "inserted_rows": 0,
+      "updated_rows": 0,
+      "deleted_rows": 0,
+      "total_bytes_processed": 1690084,
+      "total_slot_ms": 3480
+    },
+    {
+      "case": "snapshot_reactivation_wave",
+      "contract": "examples/benchmarks/advanced-write-production/contracts/gcp/customers_snapshot.ingestion.yaml",
+      "status": "SUCCESS",
+      "planning_status": "REVIEW_REQUIRED",
+      "bigquery_job_id": "cf_gcp_smoke_query_3a3101830c43472f8ef3",
+      "statement_type": "MERGE",
+      "inserted_rows": 0,
+      "updated_rows": 100,
+      "deleted_rows": 0,
+      "target_after_case": {
+        "total_rows": 10000,
+        "active_rows": 10000,
+        "inactive_rows": 0,
+        "distinct_keys": 10000
+      },
+      "total_bytes_processed": 1695206,
+      "total_slot_ms": 3082
+    }
+  ],
+  "evidence_readback": {
+    "run_evidence_by_status": {
+      "FAILED": 1,
+      "SUCCEEDED": 9
+    },
+    "final_targets": {
+      "historical": {
+        "total_rows": 10250,
+        "current_rows": 9900,
+        "expired_rows": 350,
+        "delete_expired_rows": 100,
+        "distinct_keys": 10000
+      },
+      "snapshot": {
+        "total_rows": 10000,
+        "active_rows": 10000,
+        "inactive_rows": 0,
+        "distinct_keys": 10000
+      }
+    }
+  },
+  "retained_artifacts": {
+    "historical_source_table": "midyear-system-499521-p3.contractforge_gcp_advanced_prod.customers_historical_source",
+    "historical_target_table": "midyear-system-499521-p3.contractforge_gcp_advanced_prod.customers_historical_target",
+    "snapshot_source_table": "midyear-system-499521-p3.contractforge_gcp_advanced_prod.customers_snapshot_source",
+    "snapshot_target_table": "midyear-system-499521-p3.contractforge_gcp_advanced_prod.customers_snapshot_target",
+    "evidence_dataset": "midyear-system-499521-p3.contractforge_gcp_advanced_prod_ops"
+  },
+  "cleanup_status": "RETAINED_FOR_AUDIT",
+  "benchmark_project": "examples/benchmarks/advanced-write-production/project.yaml",
+  "benchmark_contracts": [
+    "examples/benchmarks/advanced-write-production/contracts/gcp/customers_historical.ingestion.yaml",
+    "examples/benchmarks/advanced-write-production/contracts/gcp/customers_snapshot.ingestion.yaml"
+  ],
+  "open_items": [
+    "Run the same production contracts against Databricks or a shared cross-adapter benchmark before changing the stable-final advanced-write claim.",
+    "Remove or expire retained live benchmark artifacts after release audit evidence is archived."
+  ],
+  "sources": [
+    "https://docs.cloud.google.com/bigquery/docs/reference/standard-sql/data-manipulation-language",
+    "https://docs.cloud.google.com/bigquery/docs/reference/standard-sql/dml-syntax",
+    "https://docs.cloud.google.com/bigquery/docs/reference/standard-sql/hash_functions",
+    "https://docs.cloud.google.com/bigquery/docs/access-historical-data"
+  ]
+}

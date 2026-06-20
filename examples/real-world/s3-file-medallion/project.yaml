@@ -1,0 +1,38 @@
+name: s3_file_medallion
+description: >
+  Real AWS S3 file ingestion project used to validate file/object-storage
+  sources, incremental file tracking and Iceberg evidence without JDBC or REST.
+
+source_system:
+  name: s3_order_files
+  type: object_storage
+  provider: s3
+  seed_prefix: s3://contractforge-aws-smoke-449112696824-us-east-1/data/s3-file-medallion/orders/
+
+environments:
+  aws: environments/aws.environment.yaml
+
+execution_order:
+  - name: bronze_s3_orders_files
+    layer: bronze
+    description: Incremental CSV file ingest with Glue bookmarks and hash-diff merge.
+    contracts:
+      aws: contracts/aws/bronze/bronze_s3_orders_files/bronze_s3_orders_files.ingestion.yaml
+  - name: silver_s3_orders_daily
+    layer: silver
+    description: Daily order metrics from the bronze file ingestion table.
+    depends_on: [bronze_s3_orders_files]
+    contracts:
+      aws: contracts/aws/silver/silver_s3_orders_daily/silver_s3_orders_daily.ingestion.yaml
+  - name: gold_s3_revenue_by_status
+    layer: gold
+    description: Revenue mart by order status.
+    depends_on: [silver_s3_orders_daily]
+    contracts:
+      aws: contracts/aws/gold/gold_s3_revenue_by_status/gold_s3_revenue_by_status.ingestion.yaml
+
+validation:
+  aws:
+    artifact_bucket: contractforge-aws-smoke-449112696824-us-east-1
+    evidence_database: contractforge_cf_s3_file_e2e_ops
+

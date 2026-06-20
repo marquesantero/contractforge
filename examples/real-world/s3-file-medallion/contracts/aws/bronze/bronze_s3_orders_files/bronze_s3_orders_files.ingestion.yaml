@@ -1,0 +1,48 @@
+source:
+  type: incremental_files
+  system: s3_order_files
+  path: s3://contractforge-aws-smoke-449112696824-us-east-1/data/s3-file-medallion/orders/
+  format: csv
+  options:
+    header: true
+    inferSchema: true
+
+target:
+  catalog: contractforge
+  schema: cf_s3_file_e2e_bronze
+  table: b_orders_files
+
+layer: bronze
+mode: hash_diff_upsert
+schema_policy: additive_only
+merge_keys: [order_id]
+hash_keys: [customer_id, order_ts, order_status, amount, updated_at]
+hash_exclude_columns: []
+on_quality_fail: quarantine
+
+transform:
+  cast:
+    order_id: BIGINT
+    amount: DOUBLE
+  standardize:
+    customer_id: {trim: true, upper: true}
+    order_status: {trim: true, lower: true}
+  derive:
+    source_loaded_at_utc: CURRENT_TIMESTAMP()
+
+quality_rules:
+  not_null: [order_id, customer_id, order_ts, order_status]
+  unique_key: [order_id]
+  accepted_values:
+    order_status: [paid, cancelled, refunded]
+  expressions:
+    - name: non_negative_amount
+      expression: amount >= 0
+      severity: quarantine
+      message: Order amount must not be negative.
+
+extensions:
+  aws:
+    iceberg:
+      warehouse: s3://contractforge-aws-smoke-449112696824-us-east-1/warehouse/s3-file-e2e/
+

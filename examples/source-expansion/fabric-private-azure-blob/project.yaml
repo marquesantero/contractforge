@@ -1,0 +1,27 @@
+name: fabric_private_azure_blob_source_smoke
+description: Fabric source-expansion smoke for private Azure Blob CSV reads with Key Vault-backed storage key.
+default_environment: fabric
+
+environments:
+  fabric: environments/fabric.environment.yaml
+
+execution_order:
+  - name: private_azure_blob_orders
+    layer: bronze
+    expected_result: succeeded
+    depends_on: []
+    contracts:
+      fabric: contracts/01_private_azure_blob_orders.ingestion.yaml
+  - name: private_azure_blob_evidence_probe
+    layer: bronze
+    expected_result: succeeded
+    depends_on: [private_azure_blob_orders]
+    contracts:
+      fabric: contracts/02_private_azure_blob_evidence_probe.ingestion.yaml
+
+source_expansion:
+  source_family: azure_blob
+  authentication: private_blob_account_key_vault_placeholder
+  expected_success_steps: 2
+  expected_probe_checks: 6
+  stable_final_scope: stable_f11_private_azure_blob_evidence
