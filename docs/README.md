@@ -22,6 +22,7 @@ ContractForge is a multi-runtime contract-first ingestion platform. The core pac
 - [Platform parity tests](platform-parity-tests.md): shared Databricks/AWS/Snowflake/Fabric/GCP scenarios that validate contract portability boundaries.
 - [ContractForge AI](ai.md): AI-assisted generation, validation and review with deterministic core and adapter gates.
 - [Deployment versioning](deployment-versioning.md): core-owned deployment ledger schema, adapter-native persistence and stable hash semantics.
+- [Examples index](../examples/README.md): all runnable and reference projects grouped by category (real-world, source expansion, benchmarks, stable surface).
 - [USGS GeoJSON medallion example](../examples/real-world/usgs-earthquake-rest-medallion/README.md): real Databricks, AWS, Snowflake, Fabric and GCP adapter parity project using the shared GeoJSON medallion intent.
 - [S3 file medallion example](../examples/real-world/s3-file-medallion/README.md): AWS Glue/Iceberg file ingestion project using S3 CSV files, Glue bookmarks and control-table evidence.
 - [AWS failure-path example](../examples/real-world/aws-failure-paths/README.md): contract-only negative tests for failed run evidence, error evidence and redaction.
@@ -42,6 +43,8 @@ ContractForge is a multi-runtime contract-first ingestion platform. The core pac
 ## Architecture Contracts
 
 The files under [specs](specs/) are not casual notes. They define architecture contracts that code and adapters should preserve.
+
+New contributors should start with the curated [specs index](specs/README.md), which groups specs by audience (core contracts, authoring, reference and internal release planning).
 
 Important specs:
 

@@ -4,6 +4,33 @@ ContractForge is a contract-first ingestion platform with a strict package
 boundary between the semantic core and runtime adapters. Contributions should
 preserve that boundary.
 
+## Where To Start
+
+The repository is large, but you do not need to understand all of it to
+contribute. A good path for a first change:
+
+1. Read [docs/architecture.md](docs/architecture.md) for the core/adapter
+   boundary, then the "Start here" tier in
+   [docs/specs/README.md](docs/specs/README.md). You can ignore the internal
+   release-planning specs.
+2. Browse the [examples index](examples/README.md) to see real contracts in
+   action. [examples/source-expansion/](examples/source-expansion/) is a good
+   template when adding a new source.
+
+Approachable first contributions:
+
+- **Docs**: fix something unclear, or improve an example. This counts.
+- **A new source**: follow [docs/specs/source-portability.md](docs/specs/source-portability.md)
+  and model it on an existing connector under an adapter's `sources/` package.
+- **A quality rule or write-mode detail**: small, well-scoped, and covered by
+  focused tests.
+- **A platform parity scenario**: extend the shared scenarios that prove the
+  same contract behaves consistently across adapters.
+
+Issues labeled `good first issue` are scoped for newcomers. If none are open or
+nothing fits, open an issue describing what you would like to work on before
+writing code.
+
 ## Before Opening A Change
 
 1. Read [README.md](README.md), [docs/architecture.md](docs/architecture.md)
