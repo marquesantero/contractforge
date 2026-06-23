@@ -23,7 +23,7 @@ def load_mapping(path: Path | None) -> dict[str, Any]:
 
 
 def load_contract_input(path: Path) -> tuple[dict[str, Any], dict[str, Any] | None]:
-    if looks_like_split_contract(path):
+    if path.is_dir() or looks_like_split_contract(path) or has_project_context(path):
         bundle = load_contract_bundle(bundle_base(path))
         environment = bundle.environment if isinstance(bundle.environment, dict) else None
         return bundle.contract, environment
@@ -65,6 +65,11 @@ def yaml_dump(payload: dict[str, Any]) -> str:
 
 def looks_like_split_contract(path: Path) -> bool:
     return any(marker in path.name for marker in (".ingestion.", ".annotations.", ".operations.", ".access.", ".environment."))
+
+
+def has_project_context(path: Path) -> bool:
+    base = path if path.is_dir() else path.parent
+    return any((candidate / "project.yaml").exists() or (candidate / "project.yml").exists() for candidate in (base, *base.parents))
 
 
 def bundle_base(path: Path) -> Path:

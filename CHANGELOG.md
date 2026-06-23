@@ -20,6 +20,12 @@ versioning as described in `docs/specs/api-stability.md`.
   `project.yaml.defaults`, adapter overrides and deterministic
   quality/custom-transform inferences.
 
+### Changed
+
+- Aligned adapter project loaders so project-scoped simple YAML contracts can
+  use `project.yaml.defaults` consistently across AWS, Databricks, Snowflake,
+  Fabric and GCP.
+
 ## [0.2.0] - 2026-06-19
 
 ### Added

@@ -5,6 +5,14 @@ All notable changes to `contractforge-snowflake` are documented in this file.
 The format follows Keep a Changelog, and this package follows semantic
 versioning as described in `../../docs/specs/api-stability.md`.
 
+## [Unreleased]
+
+### Changed
+
+- Aligned project contract loading so simple YAML contracts under a
+  `project.yaml` tree use the core `project.yaml.defaults` resolver before
+  Snowflake planning, publishing or project task deployment.
+
 ## [0.2.0] - 2026-06-19
 
 ### Added
