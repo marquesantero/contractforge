@@ -2172,6 +2172,8 @@ def test_snowflake_deploy_project_dry_run_renders_task_graph_for_schedule_and_de
     assert "IMPORTS = ('@CONTRACTFORGE_ARTIFACTS/libs/contractforge_snowflake-0.1.0-py3-none-any.zip')" in procedure
     assert "HANDLER = 'contractforge_snowflake.runtime.snowpark_handler.run'" in procedure
     assert "SCHEDULE = 'USING CRON 0 6 * * * America/Sao_Paulo'" in task_graph
+    assert 'ALTER TASK IF EXISTS "CONTRACTFORGE"."CF_TASKS"."silver_customers" SUSPEND' in task_graph
+    assert 'CREATE OR REPLACE TASK "CONTRACTFORGE"."CF_TASKS"."bronze_customers"' in task_graph
     assert 'AFTER "CONTRACTFORGE"."CF_TASKS"."bronze_customers"' in task_graph
     assert 'CALL "CONTRACTFORGE"."CF_RUNTIME"."RUN_CONTRACTFORGE_CONTRACT"' in task_graph
     assert "@CONTRACTFORGE_ARTIFACTS/dev/runtime/ANALYTICS.BRONZE_CUSTOMERS.contract.json" in task_graph
@@ -2235,12 +2237,12 @@ def test_snowflake_deploy_project_applies_task_graph_when_scheduled(tmp_path) ->
     assert result.dry_run is False
     assert "deployment/snowflake_runtime_procedure.sql" in result.deployment_artifacts
     assert "deployment/snowflake_task_graph.sql" in result.deployment_artifacts
-    assert len(result.applied_deployment_commands) == 7
     assert any(command.startswith("CREATE OR REPLACE PROCEDURE") for command in result.applied_deployment_commands)
-    assert any(command.startswith("CREATE TASK IF NOT EXISTS") for command in result.applied_deployment_commands)
+    assert any(command.startswith("ALTER TASK IF EXISTS") for command in result.applied_deployment_commands)
+    assert any(command.startswith("CREATE OR REPLACE TASK") for command in result.applied_deployment_commands)
     assert any("SCHEDULE = 'USING CRON 0 6 * * * America/Sao_Paulo'" in command for command in result.applied_deployment_commands)
     assert any('AFTER "CONTRACTFORGE"."CF_TASKS"."bronze_customers"' in command for command in result.applied_deployment_commands)
-    assert len(connection.commands) == 21
+    assert len(connection.commands) == len(result.applied_deployment_commands) + 14
 
 
 def test_snowflake_deploy_project_accepts_connection_factory(tmp_path) -> None:
@@ -2335,7 +2337,10 @@ def test_snowflake_run_project_dry_run_executes_root_tasks(tmp_path) -> None:
     assert result.dry_run is True
     assert result.task_names == ("bronze_customers", "silver_customers")
     assert result.root_tasks == ("bronze_customers",)
-    assert result.commands == ('EXECUTE TASK "CONTRACTFORGE"."CF_TASKS"."bronze_customers"',)
+    assert result.commands == (
+        'ALTER TASK "CONTRACTFORGE"."CF_TASKS"."silver_customers" RESUME',
+        'EXECUTE TASK "CONTRACTFORGE"."CF_TASKS"."bronze_customers"',
+    )
 
 
 def test_snowflake_run_project_requires_task_graph(tmp_path) -> None:
@@ -2364,6 +2369,25 @@ def test_snowflake_wait_project_tasks_returns_terminal_history() -> None:
     assert result["status"] == "SUCCESS"
     assert [task["query_id"] for task in result["tasks"]] == ["01-bronze", "01-silver"]
     assert any("TASK_HISTORY" in command for command in connection.commands)
+
+
+def test_snowflake_wait_project_tasks_returns_failed_when_root_fails() -> None:
+    connection = _TaskHistorySnowflakeConnection(
+        [
+            ("bronze_customers", "FAILED", "01-bronze"),
+        ]
+    )
+
+    result = wait_snowflake_project_tasks(
+        connection=connection,
+        environment={"parameters": {"snowflake": {"task_database": "CONTRACTFORGE", "task_schema": "CF_TASKS"}}},
+        task_names=("bronze_customers", "silver_customers"),
+        poll_interval_seconds=0,
+        max_wait_seconds=1,
+    )
+
+    assert result["status"] == "FAILED"
+    assert result["tasks"] == ({"name": "bronze_customers", "state": "FAILED", "query_id": "01-bronze"},)
 
 
 def test_snowflake_wait_project_tasks_tracks_newest_history_per_poll(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -2484,7 +2508,10 @@ def test_snowflake_run_project_accepts_connection_factory(tmp_path) -> None:
     assert result.dry_run is False
     assert observed["options"] == {"account": "TEST_ACCOUNT", "role": "CONTRACTFORGE_ROLE"}
     assert connection.closed
-    assert connection.commands == ['EXECUTE TASK "CONTRACTFORGE"."CF_TASKS"."bronze_customers"']
+    assert connection.commands == [
+        'ALTER TASK "CONTRACTFORGE"."CF_TASKS"."silver_customers" RESUME',
+        'EXECUTE TASK "CONTRACTFORGE"."CF_TASKS"."bronze_customers"',
+    ]
 
 
 def test_snowflake_run_project_wait_ignores_stale_task_history(tmp_path) -> None:
@@ -2937,4 +2964,3 @@ def _snowflake_project_dependency_lines(include_dependencies: bool) -> list[str]
         "    depends_on:",
         "      - bronze_customers",
     ] if include_dependencies else []
-

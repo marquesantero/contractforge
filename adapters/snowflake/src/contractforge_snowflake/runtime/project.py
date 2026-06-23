@@ -22,8 +22,8 @@ from contractforge_snowflake.deployment.task_graph import (
     SnowflakeTaskGraphStep,
     artifact_uri,
     render_project_task_graph,
+    render_task_graph_run_sql,
     render_task_history_query,
-    render_task_lifecycle_sql,
 )
 from contractforge_snowflake.api import build_snowflake_publish_bundle, plan_snowflake_contract
 from contractforge_snowflake.polling import clamped_poll_interval
@@ -183,12 +183,15 @@ def run_snowflake_project(
         raise ValueError("Snowflake run-project requires a scheduled or dependency task graph")
     task_names = tuple(step.name for step in steps)
     root_tasks = tuple(step.name for step in steps if not step.depends_on)
+    dependent_tasks = tuple(step.name for step in steps if step.depends_on)
     if not root_tasks:
         raise ValueError("Snowflake run-project could not determine root tasks")
-    commands = tuple(
-        command
-        for root in root_tasks
-        for command in _split_sql_script(render_task_lifecycle_sql(environment=environment_payload, task_names=(root,), action="execute"))
+    commands = _split_sql_script(
+        render_task_graph_run_sql(
+            environment=environment_payload,
+            root_task_names=root_tasks,
+            dependent_task_names=dependent_tasks,
+        )
     )
     wait_payload = None
     if not dry_run:
@@ -253,6 +256,9 @@ def wait_snowflake_project_tasks(
         if all(task.lower() in latest and latest[task.lower()]["state"] in terminal_states for task in task_names):
             status = "SUCCESS" if all(item["state"] == "SUCCEEDED" for item in latest.values()) else "FAILED"
             return {"status": status, "tasks": tuple(latest[task.lower()] for task in task_names), "query": history_query}
+        failures = tuple(item for item in latest.values() if item["state"] in {"FAILED", "CANCELLED", "SKIPPED"})
+        if failures:
+            return {"status": "FAILED", "tasks": failures, "query": history_query}
         if time.monotonic() >= deadline:
             raise TimeoutError(f"Snowflake task graph did not finish within {max_wait_seconds} seconds")
         time.sleep(poll_interval)
