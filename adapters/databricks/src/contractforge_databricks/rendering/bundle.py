@@ -24,7 +24,11 @@ from contractforge_databricks.rendering.markdown import render_review_markdown
 from contractforge_databricks.rendering.names import artifact_prefix, bundle_name, job_name, task_key
 from contractforge_databricks.schema import plan_schema_policy
 from contractforge_databricks.shapes import render_shape_sql
-from contractforge_databricks.sources import render_source_artifacts, render_source_metadata_json
+from contractforge_databricks.sources import (
+    custom_transform_notebook_task,
+    render_source_artifacts,
+    render_source_metadata_json,
+)
 from contractforge_databricks.state import render_control_table_migrations_sql, render_create_state_tables_sql
 from contractforge_databricks.transforms import render_transform_sql
 from contractforge_databricks.write_modes import choose_write_strategy, render_write_mode_sql_notes
@@ -68,6 +72,11 @@ def render_databricks_artifacts(
         compatibility = evaluate_lakeflow_compatibility(contract)
         artifacts[f"{prefix}.lakeflow.md"] = render_lakeflow_review(compatibility)
     artifacts.update(render_source_artifacts(contract, environment=env))
+    pre_tasks = tuple(
+        task
+        for task in (custom_transform_notebook_task(contract, artifact_prefix=prefix),)
+        if task is not None
+    )
     artifacts[f"{prefix}.databricks.yml"] = render_databricks_asset_bundle(
         DatabricksJobSpec(
             bundle_name=bundle_name(contract),
@@ -75,6 +84,7 @@ def render_databricks_artifacts(
             task_key=task_key(contract),
             notebook_path=f"{env.workspace_path}/{prefix}/run",
             target=env.bundle_target,
+            pre_tasks=pre_tasks,
         )
     )
     return RenderedArtifacts(artifacts=artifacts)

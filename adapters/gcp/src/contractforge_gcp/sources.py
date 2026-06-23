@@ -19,6 +19,7 @@ _BIGQUERY_LOAD_FORMATS = frozenset({"avro", "csv", "json", "jsonl", "ndjson", "o
 _OBJECT_STORAGE_SOURCES = frozenset({"gcs", "blob", "object_storage"})
 _REVIEW_SOURCES = {
     "bigquery_jdbc": "BigQuery-to-BigQuery JDBC is not the stable path; use table/view/sql sources or a reviewed external connection design.",
+    "custom_transform": "Custom treatment boundaries need a reviewed BigQuery/Dataflow/Dataproc runtime binding before BigQuery runtime support.",
     "db2": "JDBC reads should be handled through Dataflow, Dataproc or a reviewed BigQuery external connection design.",
     "delta": "Path-based Delta files need a Dataproc/Spark, BigLake handoff or staged copy design before BigQuery runtime support.",
     "delta_share": "BigQuery needs a governed handoff, BigLake/external table design or a staged copy before runtime support.",

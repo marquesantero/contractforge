@@ -17,6 +17,7 @@ ContractForge Core treats sources as contract intent. Adapters translate that in
 | Available-now streams | `kafka_available_now`, `eventhubs_available_now` | Checkpointed readStream catch-up with `availableNow`; not continuous streaming. |
 | Lakehouse sharing | `delta_share` | Portable consumer intent where adapters support Delta Sharing or equivalent sharing clients. |
 | REST API | `rest_api` | Generic bounded JSON API reads; specialized SaaS APIs should use native passthrough. |
+| Custom treatment | `custom_transform` | Declared custom transformation boundary with named inputs; adapters bind native execution such as notebooks or jobs. |
 | Native passthrough | `native_passthrough` | ContractForge records intent, adapter renders native connector/service artifacts. |
 
 ## Adapter-Specific Source Names
@@ -54,6 +55,37 @@ Examples:
 - Fabric adapter may render Dataflow Gen2 artifacts.
 
 The core records intent and portability diagnostics; the adapter owns native execution.
+
+## Custom Treatment Boundary
+
+Use `custom_transform` when a declarative transform cannot express the required treatment but the result must still stay under ContractForge validation, write-mode and evidence controls.
+
+The contract declares the named inputs and expected output. Adapter-specific runtime details, such as a Databricks notebook path, live under the adapter extension.
+
+```yaml
+source:
+  type: custom_transform
+  intent: custom_treatment
+  inputs:
+    - alias: orders
+      table_ref:
+        layer: silver
+        table: orders
+    - alias: customers
+      table: main.silver.customers
+transform:
+  custom:
+    name: customer_feature_engineering
+    output: customer_features
+    expected_columns: [customer_id, order_count, lifetime_value]
+extensions:
+  databricks:
+    custom_transform:
+      notebook_path: /Workspace/ContractForge/customer_features/treatment
+      task_key: prepare_customer_features
+```
+
+The notebook or job is a native adapter binding. It must not bypass schema, quality, access, write-mode or evidence semantics. Adapters should record review artifacts and require explicit runtime support before marking this source stable.
 
 ## Reusable Connection YAML
 
@@ -158,6 +190,7 @@ a platform-specific source table only after documenting the portability tradeoff
 | `incremental_files` | `path`, `format` | runtime identity or storage-specific credentials | Databricks maps to Auto Loader; other adapters may use bookmarks, file listings, pipelines or review. |
 | `http_file`, `http_csv`, `http_json`, `http_text` | `request.url` | none, bearer token, API key, basic | Bounded file fetch. Limits include timeout, retries, bytes and records. |
 | `rest_api` | `request.url` | none, basic, bearer token, API key, OAuth client credentials | Generic bounded JSON API reads with pagination/retry limits. The shared core client validates request and OAuth token URLs, rejects unsafe schemes/private hosts by default and refuses HTTP redirects. Use native passthrough for vendor-specific APIs. |
+| `custom_transform` | `inputs` | adapter-owned | Declares a custom treatment boundary with named source inputs. Native runtime binding belongs in adapter extensions. |
 | `jdbc`, `postgres`, `mysql`, `mariadb`, `sqlserver`, `oracle`, `redshift`, `db2`, `snowflake_jdbc`, `bigquery_jdbc` | `url` plus `table`, `query`, `options.dbtable` or `options.query` | none, basic, connector-specific modes | Partitioned reads require all partition fields together. Oracle JDBC driver must be supplied by the user/runtime. |
 | `kafka_bounded` | `bootstrap_servers`, `topic` or `topics` or `assign` | adapter/runtime specific | Bounded replay using starting/ending offsets or timestamps. |
 | `eventhubs_bounded` | `connection_string` or Event Hubs options | adapter/runtime specific | Bounded replay using starting/ending positions. |
@@ -194,6 +227,7 @@ Databricks executes this through Structured Streaming `availableNow`, writes a p
 - Prefer `incremental_files` for recurring file arrivals.
 - Prefer `http_file` for bounded public or authenticated files.
 - Prefer JDBC for relational batch ingestion with clear predicates/partitioning.
+- Prefer `custom_transform` when business treatment needs reviewed custom code while the contract still owns inputs, output validation, write mode and evidence.
 - Treat SaaS/ERP/marketing connectors as native passthrough or adapter-owned connectors.
 - Do not hide continuous streaming semantics behind a batch connector.
 

@@ -10,6 +10,11 @@ from contractforge_databricks.environment import DatabricksEnvironment
 from contractforge_databricks.rendering.names import artifact_prefix
 from contractforge_databricks.sources.autoloader import render_autoloader_python
 from contractforge_databricks.sources.bounded_streams import is_bounded_stream_source, render_bounded_stream_python
+from contractforge_databricks.sources.custom_transform import (
+    is_custom_transform_source,
+    render_custom_transform_review_markdown,
+    render_custom_transform_review_plan,
+)
 from contractforge_databricks.sources.delta_share import is_delta_share_source, render_delta_share_python
 from contractforge_databricks.sources.files import (
     is_catalog_source,
@@ -58,6 +63,9 @@ def render_source_artifacts(
         artifacts[f"{prefix}.native_passthrough.json"] = render_native_passthrough_plan(source)
     if is_rest_api_connector(source):
         artifacts[f"{prefix}.source_rest_api_review.json"] = render_rest_api_review_plan(source)
+    if is_custom_transform_source(source):
+        artifacts[f"{prefix}.custom_transform_review.json"] = render_custom_transform_review_plan(runtime_contract)
+        artifacts[f"{prefix}.custom_transform_review.md"] = render_custom_transform_review_markdown(runtime_contract)
     return artifacts
 
 

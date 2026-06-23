@@ -133,6 +133,7 @@ VALID_SOURCE_CONNECTORS = {
     "bigquery_jdbc",
     "blob",
     "csv",
+    "custom_transform",
     "db2",
     "delta",
     "delta_share",

@@ -8,6 +8,12 @@ from contractforge_databricks.sources.bounded_streams import (
     render_eventhubs_bounded_python,
     render_kafka_bounded_python,
 )
+from contractforge_databricks.sources.custom_transform import (
+    custom_transform_notebook_task,
+    is_custom_transform_source,
+    render_custom_transform_review_markdown,
+    render_custom_transform_review_plan,
+)
 from contractforge_databricks.sources.delta_share import (
     delta_share_options,
     is_delta_share_source,
@@ -38,6 +44,7 @@ __all__ = [
     "is_delta_share_source",
     "is_file_source",
     "is_http_file_source",
+    "is_custom_transform_source",
     "is_incremental_file_source",
     "is_rest_api_connector",
     "interpret_incremental_files_source",
@@ -60,8 +67,11 @@ __all__ = [
     "render_kafka_bounded_python",
     "render_native_passthrough_plan",
     "render_rest_api_review_plan",
+    "render_custom_transform_review_markdown",
+    "render_custom_transform_review_plan",
     "render_source_artifacts",
     "render_source_metadata_json",
     "source_metadata_from_contract",
     "databricks_source_support",
+    "custom_transform_notebook_task",
 ]

@@ -29,6 +29,7 @@ These source types are maintained as core-level portable intent:
 | Bounded streams | `kafka_bounded`, `eventhubs_bounded` |
 | Available-now streams | `kafka_available_now`, `eventhubs_available_now` |
 | Lakehouse sharing | `delta_share` |
+| Custom treatment | `custom_transform` |
 | Connection reference | `connection` |
 
 `oracle` is portable JDBC intent, but adapters must document that the user provides the Oracle JDBC driver. The project must not redistribute `ojdbc`.
@@ -100,6 +101,45 @@ source:
 ```
 
 An adapter may map this to Auto Loader, Glue bookmarks, object listing plus evidence state, a pipeline-native incremental pattern, or `REVIEW_REQUIRED`. It must not silently convert the contract into a weaker bounded batch read.
+
+## Custom Treatment Boundary
+
+`custom_transform` is a portable boundary for complex treatment logic that cannot be expressed with declarative `shape`, `cast`, `derive`, `standardize` or `deduplicate` fields.
+
+It is not a platform-specific notebook source. The core requires named inputs and validates the downstream contract normally. The adapter decides whether it can bind the treatment to a native artifact such as a Databricks notebook task, AWS Glue job, Fabric notebook, Snowflake procedure or GCP Dataflow/Dataproc job.
+
+Canonical portable fields:
+
+- `source.type: custom_transform`
+- `source.intent: custom_treatment`
+- `source.inputs[*].alias`
+- each input declares one of `ref`, `table`, `table_ref`, `path` or `query`
+- `transform.custom.name`
+- `transform.custom.output`
+- `transform.custom.expected_columns`
+- `transform.custom.parameters`
+
+Example:
+
+```yaml
+source:
+  type: custom_transform
+  intent: custom_treatment
+  inputs:
+    - alias: orders
+      table_ref:
+        layer: silver
+        table: orders
+    - alias: customers
+      table: main.silver.customers
+transform:
+  custom:
+    name: customer_feature_engineering
+    output: customer_features
+    expected_columns: [customer_id, order_count, lifetime_value]
+```
+
+Adapter-specific execution fields must stay in `extensions.<adapter>`. The custom treatment must not bypass schema policy, quality rules, access controls, write-mode semantics or deployment evidence.
 
 ## Incremental Files
 

@@ -28,6 +28,8 @@ def validate_source_semantics(data: dict[str, Any]) -> None:
         _validate_http_file(data, connector)
     elif connector == "rest_api":
         _validate_rest_api(data)
+    elif connector == "custom_transform":
+        _validate_custom_transform(data)
     elif connector == "incremental_files":
         _validate_incremental_files(data)
     elif connector in CATALOG_TYPES:
@@ -138,6 +140,32 @@ def _validate_incremental_files(data: dict[str, Any]) -> None:
     fmt = str(data.get("format") or "").strip().lower()
     if fmt not in VALID_FILE_FORMATS:
         raise ValueError(f"source.format={fmt!r} is not supported")
+
+
+def _validate_custom_transform(data: dict[str, Any]) -> None:
+    inputs = data.get("inputs")
+    if not isinstance(inputs, list) or not inputs:
+        raise ValueError("source.inputs is required for connector=custom_transform")
+    aliases: set[str] = set()
+    for index, item in enumerate(inputs):
+        if not isinstance(item, dict):
+            raise ValueError(f"source.inputs[{index}] must be an object")
+        alias = str(item.get("alias") or "").strip()
+        if not alias:
+            raise ValueError(f"source.inputs[{index}].alias is required")
+        if alias in aliases:
+            raise ValueError(f"source.inputs alias {alias!r} is duplicated")
+        aliases.add(alias)
+        if not (
+            _value(item, "ref")
+            or _value(item, "table")
+            or _value(item, "table_ref")
+            or _value(item, "path")
+            or _value(item, "query")
+        ):
+            raise ValueError(
+                f"source.inputs[{index}] must declare one of ref, table, table_ref, path or query"
+            )
 
 
 def _validate_limit_values(data: dict[str, Any]) -> None:

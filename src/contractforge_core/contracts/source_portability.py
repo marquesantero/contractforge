@@ -45,6 +45,7 @@ PORTABLE_SOURCE_TYPES = {
     "blob",
     "object_storage",
     "connection",
+    "custom_transform",
     "incremental_files",
     "http_file",
     "http_csv",
