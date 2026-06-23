@@ -25,6 +25,8 @@ def handle_contract_command(args: Any) -> int | None:
         return validate_contracts(args.paths, indent=args.indent)
     if args.command == "validate-bundle":
         return validate_bundles(args.paths, indent=args.indent)
+    if args.command == "resolve-bundle":
+        return resolve_bundles(args.paths, indent=args.indent)
     if args.command == "validate-project":
         return validate_project(args.paths, indent=args.indent)
     if args.command == "schema":
@@ -60,6 +62,27 @@ def validate_bundles(paths: list[Path], *, indent: int) -> int:
                     "status": "SUCCESS",
                     "target": bundle.semantic.target.name,
                     "mode": public_write_mode(bundle.semantic.write.mode),
+                    "split_files": dict(bundle.metadata.get("paths", {})),
+                }
+            )
+        except Exception as exc:
+            items.append({"path": str(path), "kind": "bundle", "status": "FAILED", "error": str(exc)})
+    return _report(items, indent)
+
+
+def resolve_bundles(paths: list[Path], *, indent: int) -> int:
+    items = []
+    for path in paths:
+        try:
+            bundle = _load_bundle(path)
+            _validate_source_if_mapping(bundle.contract.get("source"))
+            items.append(
+                {
+                    "path": str(path),
+                    "kind": "bundle",
+                    "status": "SUCCESS",
+                    "contract": bundle.contract,
+                    "defaults": bundle.metadata.get("defaults", {"decisions": []}),
                     "split_files": dict(bundle.metadata.get("paths", {})),
                 }
             )

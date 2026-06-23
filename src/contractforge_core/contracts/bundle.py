@@ -8,6 +8,7 @@ from dataclasses import dataclass, field
 from pathlib import Path, PureWindowsPath
 from typing import Any
 
+from contractforge_core.contracts.defaults import resolve_contract_defaults
 from contractforge_core.contracts.environment import validate_environment_contract
 from contractforge_core.contracts.normalize import semantic_contract_from_mapping
 from contractforge_core.semantic.models import SemanticContract
@@ -72,12 +73,22 @@ def load_contract_bundle(path: str | Path) -> ContractBundle:
     warnings = contract_metadata_warnings(metadata)
     if warnings:
         metadata["warnings"] = {"items": warnings}
-    return compose_contract_sections(
+    bundle = compose_contract_sections(
         ingestion=ingestion,
         annotations=sections["annotations"],
         operations=sections["operations"],
         access=sections["access"],
         environment=sections["environment"],
+        metadata=metadata,
+    )
+    project = _project_mapping(ingestion_path.parent)
+    resolved = resolve_contract_defaults(bundle.contract, project=project)
+    if resolved.decisions:
+        metadata["defaults"] = {"decisions": resolved.decisions_json()}
+    return ContractBundle(
+        semantic=semantic_contract_from_mapping(resolved.contract),
+        contract=resolved.contract,
+        environment=bundle.environment,
         metadata=metadata,
     )
 
@@ -158,6 +169,17 @@ def _find_project_root(base_dir: Path) -> Path | None:
         if (candidate / "project.yaml").exists() or (candidate / "project.yml").exists():
             return candidate
     return None
+
+
+def _project_mapping(base_dir: Path) -> dict[str, Any] | None:
+    root = _find_project_root(base_dir)
+    if root is None:
+        return None
+    project_path = root / "project.yaml"
+    if not project_path.exists():
+        project_path = root / "project.yml"
+    payload = _load_mapping(project_path)
+    return payload if isinstance(payload, dict) else None
 
 
 def _connection_source_payload(payload: dict[str, Any], path: Path) -> dict[str, Any]:

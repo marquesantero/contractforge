@@ -7,6 +7,7 @@ from contractforge_core.contracts.bundle import (
     contract_metadata_warnings,
     load_contract_bundle,
 )
+from contractforge_core.contracts.defaults import ContractDefaultDecision, ResolvedContract, resolve_contract_defaults
 from contractforge_core.contracts.environment import EnvironmentContractModel, validate_environment_contract
 from contractforge_core.contracts.execution import (
     ExecutionCatchupContractModel,
@@ -73,6 +74,7 @@ __all__ = [
     "AnnotationsContractModel",
     "ConnectorSourceContract",
     "ContractBundle",
+    "ContractDefaultDecision",
     "ColumnAnnotationsContractModel",
     "ColumnMaskContractModel",
     "DeduplicateContractModel",
@@ -88,6 +90,7 @@ __all__ = [
     "PiiContractModel",
     "QualityExpressionContractModel",
     "QualityRulesContractModel",
+    "ResolvedContract",
     "RowFilterContractModel",
     "SemanticContractInputModel",
     "ShapeContractModel",
@@ -110,6 +113,7 @@ __all__ = [
     "compose_contract_sections",
     "contract_metadata_warnings",
     "load_contract_bundle",
+    "resolve_contract_defaults",
     "semantic_contract_from_mapping",
     "target_full_table_name",
     "target_schema_name",

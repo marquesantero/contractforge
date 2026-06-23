@@ -64,6 +64,48 @@ def test_core_cli_validate_project_discovers_split_bundle(tmp_path, capsys) -> N
     assert payload["items"][0]["target"] == "orders"
 
 
+def test_core_cli_resolve_bundle_prints_contract_defaults(tmp_path, capsys) -> None:
+    (tmp_path / "project.yaml").write_text(
+        """
+name: demo
+defaults:
+  catalog: main
+  schemas:
+    silver: curated
+  operations:
+    technical_owner: data-platform
+    expected_frequency: daily
+""".lstrip(),
+        encoding="utf-8",
+    )
+    bundle_dir = tmp_path / "contracts" / "silver" / "orders"
+    bundle_dir.mkdir(parents=True)
+    contract = bundle_dir / "orders.ingestion.yaml"
+    contract.write_text(
+        """
+source:
+  type: table
+  table: main.raw.orders
+target:
+  table: orders
+layer: silver
+mode: upsert
+merge_keys: [order_id]
+""".lstrip(),
+        encoding="utf-8",
+    )
+
+    assert main(["resolve-bundle", str(contract), "--indent", "0"]) == 0
+
+    payload = json.loads(capsys.readouterr().out)
+    item = payload["items"][0]
+    assert item["status"] == "SUCCESS"
+    assert item["contract"]["target"] == {"table": "orders", "catalog": "main", "schema": "curated"}
+    assert item["contract"]["operations"]["ownership"]["technical_owner"] == "data-platform"
+    assert item["contract"]["quality_rules"]["unique_key"] == ["order_id"]
+    assert any(decision["path"] == "target.schema" for decision in item["defaults"]["decisions"])
+
+
 def test_core_cli_validate_project_ignores_project_connections_and_generated_metadata(tmp_path, capsys) -> None:
     project = tmp_path / "project.yaml"
     connection = tmp_path / "connections" / "supabase.yaml"

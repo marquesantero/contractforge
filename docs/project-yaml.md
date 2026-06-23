@@ -40,6 +40,23 @@ environments:
 connections:
   usgs_geojson: connections/usgs.yaml
 
+defaults:
+  catalog: workspace
+  schemas:
+    bronze: cf_bronze
+    silver: cf_silver
+    gold: cf_gold
+    tmp: cf_tmp
+  schema_policy: additive_only
+  operations:
+    technical_owner: data-platform
+    criticality: medium
+    expected_frequency: daily
+  annotations:
+    table:
+      tags:
+        domain: seismology
+
 deployment:
   databricks:
     bundle_name: contractforge_usgs_geojson_medallion
@@ -103,6 +120,7 @@ validation:
 | `source_system` | no | core | Project-level source context for documentation and test data. Dataset-level source semantics still belong in ingestion contracts. |
 | `environments` | yes for deploy | core | Maps environment keys to `*.environment.yaml` files. |
 | `connections` | no | core | Named reusable connection YAMLs for humans and project organization. Ingestion contracts still use `source.connection_path`. |
+| `defaults` | no | core | Deterministic project defaults applied to split bundles before semantic validation. Existing contract values always win. |
 | `deployment` | no | adapters | Adapter deployment metadata. Keep only platform deployment settings here. |
 | `schedule` | no | core plus adapters | Core-owned schedule intent plus adapter-specific scheduler overrides. |
 | `execution_order` | yes for projects | core | Ordered contract steps and dependencies. |
@@ -201,6 +219,80 @@ Security rules:
 - keep secrets as secret references;
 - do not put table-specific semantics in the connection file;
 - use connection files for endpoint, auth, driver and common read defaults.
+
+## Contract Defaults
+
+Use `defaults` to remove repeated project-level values from individual
+contracts while keeping execution deterministic:
+
+```yaml
+defaults:
+  catalog: workspace
+  schemas:
+    bronze: cf_bronze
+    silver: cf_silver
+    gold: cf_gold
+    tmp: cf_tmp
+  schema_policy: additive_only
+  operations:
+    technical_owner: data-platform
+    criticality: medium
+    expected_frequency: daily
+  annotations:
+    table:
+      tags:
+        domain: commerce
+```
+
+Then an ingestion contract can stay focused on dataset intent:
+
+```yaml
+source:
+  type: table
+  ref: bronze.orders
+
+target:
+  table: orders_current
+
+layer: silver
+mode: upsert
+merge_keys: [order_id]
+```
+
+When the split bundle is loaded, the core resolves a complete contract:
+
+```yaml
+target:
+  table: orders_current
+  catalog: workspace
+  schema: cf_silver
+schema_policy: additive_only
+quality_rules:
+  unique_key: [order_id]
+  not_null: [order_id]
+operations:
+  ownership:
+    technical_owner: data-platform
+  criticality: medium
+  expected_frequency: daily
+annotations:
+  table:
+    tags:
+      domain: commerce
+```
+
+Only safe values are inferred. `source`, `target.table`, secrets, access rules
+and identity keys are never guessed. Existing contract fields always override
+project defaults.
+
+Inspect the effective contract before deploying:
+
+```bash
+contractforge resolve-bundle contracts/silver/orders/orders.ingestion.yaml
+```
+
+The output includes `defaults.decisions[]`, a ledger with the field path, value,
+source and reason for every value added by the resolver.
 
 ## Deployment
 

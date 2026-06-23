@@ -4,7 +4,12 @@ import json
 
 import pytest
 
-from contractforge_core.contracts import compose_contract_sections, contract_metadata_warnings, load_contract_bundle
+from contractforge_core.contracts import (
+    compose_contract_sections,
+    contract_metadata_warnings,
+    load_contract_bundle,
+    resolve_contract_defaults,
+)
 
 
 def test_compose_split_contract_sections_into_semantic_bundle() -> None:
@@ -334,6 +339,112 @@ owners: [data-platform]
     assert bundle.semantic.operations is not None
     assert bundle.semantic.operations.metadata["ownership"]["business_owner"] == "sales"
     assert bundle.semantic.operations.metadata["criticality"] == "high"
+
+
+def test_load_contract_bundle_applies_project_defaults_with_decision_ledger(tmp_path) -> None:
+    (tmp_path / "project.yaml").write_text(
+        """
+name: demo
+defaults:
+  catalog: workspace
+  schemas:
+    bronze: cf_bronze
+    silver: cf_silver
+    gold: cf_gold
+    tmp: cf_tmp
+  schema_policy: additive_only
+  operations:
+    technical_owner: data-platform
+    criticality: medium
+    expected_frequency: daily
+  annotations:
+    table:
+      tags:
+        domain: commerce
+""".lstrip(),
+        encoding="utf-8",
+    )
+    contract_dir = tmp_path / "contracts" / "silver" / "orders"
+    contract_dir.mkdir(parents=True)
+    base = contract_dir / "orders"
+    (contract_dir / "orders.ingestion.yaml").write_text(
+        """
+source:
+  type: table
+  table: workspace.cf_bronze.orders
+target:
+  table: orders
+layer: silver
+mode: upsert
+merge_keys: [order_id]
+""".lstrip(),
+        encoding="utf-8",
+    )
+
+    bundle = load_contract_bundle(base)
+
+    assert bundle.contract["target"] == {"table": "orders", "catalog": "workspace", "schema": "cf_silver"}
+    assert bundle.contract["schema_policy"] == "additive_only"
+    assert bundle.contract["operations"]["ownership"]["technical_owner"] == "data-platform"
+    assert bundle.contract["annotations"]["table"]["tags"]["domain"] == "commerce"
+    assert bundle.contract["quality_rules"]["unique_key"] == ["order_id"]
+    assert bundle.contract["quality_rules"]["not_null"] == ["order_id"]
+    decisions = bundle.metadata["defaults"]["decisions"]
+    assert {decision["path"] for decision in decisions} >= {
+        "target.catalog",
+        "target.schema",
+        "schema_policy",
+        "operations.ownership",
+        "annotations.table",
+        "quality_rules.unique_key",
+        "quality_rules.not_null",
+    }
+    assert bundle.semantic.target.namespace == "workspace.cf_silver"
+    assert bundle.semantic.write.schema_policy == "additive_only"
+
+
+def test_contract_defaults_do_not_override_explicit_values() -> None:
+    resolved = resolve_contract_defaults(
+        {
+            "source": {"type": "table", "table": "main.raw.orders"},
+            "target": {"catalog": "main", "schema": "custom_silver", "table": "orders"},
+            "layer": "silver",
+            "schema_policy": "strict",
+            "operations": {"criticality": "high"},
+            "annotations": {"table": {"tags": {"domain": "explicit"}}},
+        },
+        project={
+            "defaults": {
+                "catalog": "workspace",
+                "schemas": {"silver": "cf_silver"},
+                "schema_policy": "additive_only",
+                "operations": {"criticality": "medium", "expected_frequency": "daily"},
+                "annotations": {"table": {"tags": {"domain": "default", "system": "erp"}}},
+            }
+        },
+    )
+
+    assert resolved.contract["target"]["catalog"] == "main"
+    assert resolved.contract["target"]["schema"] == "custom_silver"
+    assert resolved.contract["schema_policy"] == "strict"
+    assert resolved.contract["operations"]["criticality"] == "high"
+    assert resolved.contract["operations"]["expected_frequency"] == "daily"
+    assert resolved.contract["annotations"]["table"]["tags"] == {"domain": "explicit", "system": "erp"}
+    assert "target.catalog" not in {decision.path for decision in resolved.decisions}
+
+
+def test_contract_defaults_can_infer_custom_transform_output_table() -> None:
+    resolved = resolve_contract_defaults(
+        {
+            "source": {"type": "custom_transform", "inputs": [{"alias": "orders", "table": "main.silver.orders"}]},
+            "target": {"table": "customer_features"},
+            "layer": "gold",
+        },
+        project={"defaults": {"catalog": "main", "schemas": {"gold": "gold", "tmp": "tmp"}}},
+    )
+
+    assert resolved.contract["transform"]["custom"]["output"] == "main.tmp.customer_features__custom_output"
+    assert any(decision.path == "transform.custom.output" for decision in resolved.decisions)
 
 
 def test_contract_metadata_warnings_detect_version_drift() -> None:
