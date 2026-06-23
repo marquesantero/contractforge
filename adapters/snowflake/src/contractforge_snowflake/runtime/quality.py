@@ -96,19 +96,20 @@ class _QualityOutcome:
 
 def _required_columns(context: _QualityContext, session: Any) -> _QualityOutcome:
     columns = _source_columns(session, context.source_sql)
-    missing = tuple(column for column in context.rule.columns if column not in columns)
+    available = {_normalized_column_key(column) for column in columns}
+    missing = tuple(column for column in context.rule.columns if _normalized_column_key(column) not in available)
     return _QualityOutcome(failed_count=len(missing), status="FAILED" if missing else "PASSED", observed_value=",".join(missing))
 
 
 def _not_null(context: _QualityContext, session: Any) -> _QualityOutcome:
-    column = _single_column(context.rule)
+    column = _source_column_identifier(context, session, _single_column(context.rule))
     condition = f"{quote_identifier(column)} IS NULL"
     failed = _count(session, context.source_sql, condition)
     return _QualityOutcome(failed_count=failed, status=_status(failed), observed_value=failed, row_level_condition=condition)
 
 
 def _accepted_values(context: _QualityContext, session: Any) -> _QualityOutcome:
-    column = _single_column(context.rule)
+    column = _source_column_identifier(context, session, _single_column(context.rule))
     values = context.rule.value if isinstance(context.rule.value, (list, tuple, set)) else (context.rule.value,)
     literals = ", ".join(_sql_literal(value) for value in values)
     condition = f"{quote_identifier(column)} IS NOT NULL AND {quote_identifier(column)} NOT IN ({literals})"
@@ -137,7 +138,7 @@ def _row_count_minimum(context: _QualityContext, session: Any) -> _QualityOutcom
 
 
 def _unique_key(context: _QualityContext, session: Any) -> _QualityOutcome:
-    columns = ", ".join(quote_identifier(column) for column in context.rule.columns)
+    columns = ", ".join(quote_identifier(_source_column_identifier(context, session, column)) for column in context.rule.columns)
     sql = (
         "SELECT COUNT(*) FROM (\n"
         f"  SELECT {columns}, COUNT(*) AS _CF_COUNT\n"
@@ -151,7 +152,7 @@ def _unique_key(context: _QualityContext, session: Any) -> _QualityOutcome:
 
 
 def _max_null_ratio(context: _QualityContext, session: Any) -> _QualityOutcome:
-    column = _single_column(context.rule)
+    column = _source_column_identifier(context, session, _single_column(context.rule))
     threshold = float(context.rule.value or 0)
     sql = (
         f"SELECT COALESCE(AVG(IFF({quote_identifier(column)} IS NULL, 1, 0)), 0)\n"
@@ -180,6 +181,22 @@ def _scalar(session: Any, sql: str) -> object | None:
 
 def _source_columns(session: Any, source_sql: str) -> tuple[str, ...]:
     return source_columns_for(session, source_sql)
+
+
+def _source_column_identifier(context: _QualityContext, session: Any, column: str) -> str:
+    columns = _source_columns(session, context.source_sql)
+    exact = tuple(candidate for candidate in columns if candidate == column)
+    if exact:
+        return exact[0]
+    normalized = _normalized_column_key(column)
+    matches = tuple(candidate for candidate in columns if _normalized_column_key(candidate) == normalized)
+    if len(matches) == 1:
+        return matches[0]
+    return column
+
+
+def _normalized_column_key(column: str) -> str:
+    return str(column).strip('"').upper()
 
 
 def _filtered_source(source_sql: str, failed_condition: str) -> str:

@@ -1,4 +1,5 @@
 import json
+from typing import Any
 
 import pytest
 
@@ -372,6 +373,52 @@ def test_snowflake_runtime_materializes_rest_api_source(tmp_path, monkeypatch: p
     assert any('CREATE OR REPLACE TEMPORARY TABLE "CF_REST_ANALYTICS_BRONZE_USGS_RAW_run_rest_1"' in command for command in session.commands)
     assert any('INSERT INTO "CF_REST_ANALYTICS_BRONZE_USGS_RAW_run_rest_1"' in command and '{"ok": true}' in command for command in session.commands)
     assert any('SELECT * FROM "CF_REST_ANALYTICS_BRONZE_USGS_RAW_run_rest_1"' in command for command in session.commands)
+
+
+def test_snowflake_runtime_resolves_rest_api_secret_placeholders(tmp_path, monkeypatch: pytest.MonkeyPatch) -> None:
+    from contractforge_snowflake.sources import rest_api as rest_source
+
+    observed: dict[str, Any] = {}
+
+    def fake_secret_resolver(value: Any) -> Any:
+        from contractforge_snowflake.security.secrets import resolve_snowflake_secret_placeholders
+
+        return resolve_snowflake_secret_placeholders(value, secret_getter=lambda alias: f"resolved-{alias}")
+
+    def fake_read(source: dict[str, Any]) -> list[dict[str, Any]]:
+        observed.update(source)
+        return [{"raw_response": '{"ok": true}', "response_page_number": 1}]
+
+    monkeypatch.setattr(rest_source, "resolve_snowflake_secret_placeholders", fake_secret_resolver)
+    monkeypatch.setattr(rest_source, "read_rest_api_records", fake_read)
+    contract_path = tmp_path / "contract.json"
+    contract_path.write_text(
+        json.dumps(
+            {
+                "source": {
+                    "type": "rest_api",
+                    "request": {"method": "GET", "url": "https://api.themoviedb.org/3/discover/movie"},
+                    "auth": {"type": "bearer_token", "token": "{{ secret:snowflake/tmdb_api_token }}"},
+                    "response": {"mode": "raw", "raw_column": "raw_response"},
+                },
+                "target": {"catalog": "ANALYTICS", "schema": "BRONZE", "table": "TMDB_RAW"},
+                "mode": "scd0_overwrite",
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    result = run_snowflake_contract(contract_uri=str(contract_path), session=_ExecutingSession(), run_id="run-rest-secret")
+
+    assert result["status"] == "SUCCESS"
+    assert observed["auth"]["token"] == "resolved-tmdb_api_token"
+
+
+def test_snowflake_secret_placeholder_resolver_requires_snowflake_scope() -> None:
+    from contractforge_snowflake.security.secrets import resolve_snowflake_secret_placeholders
+
+    with pytest.raises(ValueError, match="secret:snowflake/alias"):
+        resolve_snowflake_secret_placeholders("{{ secret:orders/token }}", secret_getter=lambda _alias: "x")
 
 
 class _ExecutingSession:

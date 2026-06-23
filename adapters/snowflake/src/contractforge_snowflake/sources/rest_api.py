@@ -9,6 +9,7 @@ from typing import Any
 from contractforge_core.connectors.api.rest import read_rest_api_records
 from contractforge_core.semantic import SemanticContract
 from contractforge_snowflake.naming import quote_identifier
+from contractforge_snowflake.security import resolve_snowflake_secret_placeholders
 from contractforge_snowflake.sources.models import SnowflakeSourcePlan
 from contractforge_snowflake.sql import sql_string
 
@@ -23,7 +24,7 @@ def materialize_rest_api_source(
 ) -> SnowflakeSourcePlan:
     """Fetch a bounded REST source and materialize it as a temporary table."""
 
-    source = contract.source.raw or {}
+    source = resolve_snowflake_secret_placeholders(contract.source.raw or {})
     records = read_rest_api_records(source)
     columns = _columns(records, source=source)
     table_name = quote_identifier(_temporary_table_name(contract, run_id=run_id))
