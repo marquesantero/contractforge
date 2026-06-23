@@ -42,6 +42,7 @@ def render_project_task_graph(
         return None
     settings = _settings(environment or {})
     schedule = project_schedule_intent(project)
+    task_names = tuple(step.name for step in steps)
     statement_blocks = [
         _render_task(
             step,
@@ -50,6 +51,7 @@ def render_project_task_graph(
         )
         for step in steps
     ]
+    statement_blocks = [*_suspend_existing_tasks(settings, task_names), *statement_blocks]
     return "\n\n".join(_header(settings) + statement_blocks) + "\n"
 
 
@@ -93,7 +95,7 @@ def _header(settings: _TaskGraphSettings) -> list[str]:
 
 def _render_task(step: SnowflakeTaskGraphStep, *, settings: _TaskGraphSettings, schedule_clause: str | None) -> str:
     clauses = [
-        f"CREATE TASK IF NOT EXISTS {_task_name(settings, step.name)}",
+        f"CREATE OR REPLACE TASK {_task_name(settings, step.name)}",
         *_warehouse_clause(settings),
         *_dependency_clause(settings, step.depends_on),
         *([schedule_clause] if schedule_clause else []),
@@ -104,6 +106,13 @@ def _render_task(step: SnowflakeTaskGraphStep, *, settings: _TaskGraphSettings, 
         "  );",
     ]
     return "\n".join(clauses)
+
+
+def _suspend_existing_tasks(settings: _TaskGraphSettings, task_names: Sequence[str]) -> list[str]:
+    return [
+        f"ALTER TASK IF EXISTS {_task_name(settings, task_name)} SUSPEND;"
+        for task_name in reversed(tuple(task_names))
+    ]
 
 
 def _warehouse_clause(settings: _TaskGraphSettings) -> list[str]:
@@ -153,6 +162,26 @@ def render_task_lifecycle_sql(
     commands = tuple(_task_lifecycle_command(settings, task_name, normalized_action) for task_name in task_names)
     if not commands:
         raise ValueError("Snowflake task lifecycle requires at least one task name")
+    return ";\n".join(commands) + ";\n"
+
+
+def render_task_graph_run_sql(
+    *,
+    environment: Mapping[str, Any] | None,
+    root_task_names: Sequence[str],
+    dependent_task_names: Sequence[str] = (),
+) -> str:
+    """Render Snowflake's documented task-graph enable/resume/execute lifecycle."""
+
+    settings = _settings(environment or {})
+    commands: list[str] = []
+    for dependent in dependent_task_names:
+        commands.append(f"ALTER TASK {_task_name(settings, dependent)} RESUME")
+    for root in root_task_names:
+        task = _task_name(settings, root)
+        commands.append(f"EXECUTE TASK {task}")
+    if not commands:
+        raise ValueError("Snowflake task graph run requires at least one root task name")
     return ";\n".join(commands) + ";\n"
 
 
