@@ -20,13 +20,10 @@ source:
     max_records: 1
 
 target:
-  catalog: gcp-project-redacted
-  schema: contractforge_gcp_usgs_rest_bronze
   table: b_usgs_earthquake_geojson
 
 layer: bronze
 mode: overwrite
-schema_policy: permissive
 
 quality_rules:
   required_columns: [raw_response, response_page_number]

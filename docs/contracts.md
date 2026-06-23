@@ -64,6 +64,12 @@ contractforge resolve-bundle contracts/silver/orders/orders.ingestion.yaml
 Defaults reduce YAML volume but do not guess the source, target table, secrets,
 access rules or merge keys.
 
+For cross-platform projects, catalog and schema usually live under
+`project.yaml.defaults.adapters.<adapter>`. A contract under
+`contracts/aws/...` receives AWS defaults; the equivalent contract under
+`contracts/databricks/...` receives Databricks defaults. The resolved contract
+is what adapters plan and execute.
+
 The write mode is semantic. It does not prescribe Delta MERGE, Iceberg MERGE, Snowflake MERGE or Fabric pipeline behavior. The adapter decides whether equivalent behavior is available.
 
 The ingestion contract may also inherit common connection settings from a reusable YAML file without losing the ability to declare a complete inline source:

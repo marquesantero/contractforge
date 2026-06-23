@@ -11,6 +11,43 @@ environments:
   fabric: environments/fabric.environment.yaml
   gcp: environments/gcp.environment.yaml
 
+defaults:
+  schema_policy:
+    bronze: permissive
+    silver: additive_only
+    gold: additive_only
+  adapters:
+    databricks:
+      catalog: workspace
+      schemas:
+        bronze: cf_usgs_rest_bronze
+        silver: cf_usgs_rest_silver
+        gold: cf_usgs_rest_gold
+    aws:
+      catalog: contractforge
+      schemas:
+        bronze: cf_usgs_rest_bronze
+        silver: cf_usgs_rest_silver
+        gold: cf_usgs_rest_gold
+    snowflake:
+      catalog: CONTRACTFORGE_TEST_DB
+      schemas:
+        bronze: PUBLIC
+        silver: PUBLIC
+        gold: PUBLIC
+    fabric:
+      catalog: workspace
+      schemas:
+        bronze: cf_usgs_rest_bronze
+        silver: cf_usgs_rest_silver
+        gold: cf_usgs_rest_gold
+    gcp:
+      catalog: gcp-project-redacted
+      schemas:
+        bronze: contractforge_gcp_usgs_rest_bronze
+        silver: contractforge_gcp_usgs_rest_silver
+        gold: contractforge_gcp_usgs_rest_gold
+
 deployment:
   databricks:
     bundle_name: contractforge_usgs_earthquake_rest_medallion

@@ -65,9 +65,26 @@ environments/
 
 Each dataset folder is a split ContractForge bundle:
 
-- `*.ingestion.yaml` declares source, target, write mode, shape and quality.
+- `*.ingestion.yaml` declares source, target table, write mode, shape and quality.
 - `*.annotations.yaml` declares table/column metadata.
 - `*.operations.yaml` declares operational ownership and runbook metadata.
+
+`project.yaml.defaults` keeps repeated platform bindings out of every
+ingestion contract. The compact contract declares only the target table:
+
+```yaml
+target:
+  table: b_usgs_earthquake_geojson
+```
+
+The core resolves catalog, schema and default schema policy from the project
+before adapter planning. Inspect the effective contract and default decision
+ledger with:
+
+```bash
+contractforge resolve-bundle \
+  examples/real-world/usgs-earthquake-rest-medallion/contracts/databricks/bronze/bronze_usgs_geojson/bronze_usgs_geojson.ingestion.yaml
+```
 
 The reusable contract builder in `tools/rest_medallion/usgs.py` mirrors these
 YAML files and is used by automated tests, but the real project source of truth

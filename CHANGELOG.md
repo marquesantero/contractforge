@@ -14,6 +14,8 @@ versioning as described in `docs/specs/api-stability.md`.
   `contractforge resolve-bundle` inspection command.
 - Added safe inference from `merge_keys` to `quality_rules.unique_key` and
   missing `not_null` checks for identity-based write modes.
+- Added adapter-specific project defaults for cross-platform contract trees and
+  layer-aware defaults such as `schema_policy`.
 
 ## [0.2.0] - 2026-06-19
 
