@@ -37,6 +37,7 @@ def resolve_contract_defaults(
     *,
     project: Mapping[str, Any] | None = None,
     defaults: Mapping[str, Any] | None = None,
+    adapter: str | None = None,
 ) -> ResolvedContract:
     """Apply explicit project/default values and safe inference to a contract.
 
@@ -46,7 +47,7 @@ def resolve_contract_defaults(
 
     resolved = deepcopy(dict(contract))
     decisions: list[ContractDefaultDecision] = []
-    default_values = _default_values(project=project, defaults=defaults)
+    default_values = _default_values(project=project, defaults=defaults, adapter=adapter)
     _apply_target_defaults(resolved, default_values, decisions)
     _apply_contract_defaults(resolved, default_values, decisions)
     _apply_operations_defaults(resolved, default_values, decisions)
@@ -56,13 +57,32 @@ def resolve_contract_defaults(
     return ResolvedContract(contract=resolved, decisions=tuple(decisions))
 
 
-def _default_values(*, project: Mapping[str, Any] | None, defaults: Mapping[str, Any] | None) -> dict[str, Any]:
+def _default_values(
+    *,
+    project: Mapping[str, Any] | None,
+    defaults: Mapping[str, Any] | None,
+    adapter: str | None,
+) -> dict[str, Any]:
     values: dict[str, Any] = {}
     if isinstance(project, Mapping) and isinstance(project.get("defaults"), Mapping):
-        values = _deep_merge(values, dict(project["defaults"]))
+        project_defaults = dict(project["defaults"])
+        adapter_defaults = _adapter_defaults(project_defaults, adapter)
+        project_defaults.pop("adapters", None)
+        values = _deep_merge(values, project_defaults)
+        values = _deep_merge(values, adapter_defaults)
     if isinstance(defaults, Mapping):
         values = _deep_merge(values, dict(defaults))
     return values
+
+
+def _adapter_defaults(defaults: Mapping[str, Any], adapter: str | None) -> dict[str, Any]:
+    if not adapter:
+        return {}
+    adapters = defaults.get("adapters")
+    if not isinstance(adapters, Mapping):
+        return {}
+    value = adapters.get(adapter)
+    return dict(value) if isinstance(value, Mapping) else {}
 
 
 def _apply_target_defaults(
@@ -89,8 +109,9 @@ def _apply_contract_defaults(
     decisions: list[ContractDefaultDecision],
 ) -> None:
     for key in ("mode", "schema_policy", "on_quality_fail"):
-        if _missing(contract.get(key)) and defaults.get(key):
-            _set(contract, key, defaults[key], decisions, key, f"project.defaults.{key}")
+        value = _layer_default(contract, defaults.get(key))
+        if _missing(contract.get(key)) and value:
+            _set(contract, key, value, decisions, key, f"project.defaults.{key}")
 
 
 def _apply_operations_defaults(
@@ -184,6 +205,13 @@ def _schema_for_layer(contract: Mapping[str, Any], defaults: Mapping[str, Any]) 
         return defaults.get("schema")
     layer = str(contract.get("layer") or defaults.get("layer") or "bronze")
     return schemas.get(layer) or schemas.get("default") or defaults.get("schema")
+
+
+def _layer_default(contract: Mapping[str, Any], value: Any) -> Any:
+    if not isinstance(value, Mapping):
+        return value
+    layer = str(contract.get("layer") or "bronze")
+    return value.get(layer) or value.get("default")
 
 
 def _normalize_operations_defaults(value: dict[str, Any]) -> dict[str, Any]:

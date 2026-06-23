@@ -76,6 +76,11 @@ added value in `defaults.decisions[]`. Existing contract values always win. Use
 `contractforge resolve-bundle <path>` to inspect the effective contract before
 adapter deployment.
 
+Use `defaults.adapters.<adapter>` for catalog/schema bindings that differ by
+platform. Contracts under `contracts/databricks/...`, `contracts/aws/...`,
+`contracts/snowflake/...`, `contracts/fabric/...` or `contracts/gcp/...` receive
+the matching adapter defaults after the shared defaults.
+
 Use `project.yaml` for job wiring that spans multiple contracts:
 
 ```yaml

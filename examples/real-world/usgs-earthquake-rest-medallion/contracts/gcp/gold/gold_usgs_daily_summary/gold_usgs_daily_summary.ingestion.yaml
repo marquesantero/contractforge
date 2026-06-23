@@ -20,13 +20,10 @@ source:
     source_complete: true
 
 target:
-  catalog: gcp-project-redacted
-  schema: contractforge_gcp_usgs_rest_gold
   table: g_usgs_earthquake_daily_summary
 
 layer: gold
 mode: overwrite
-schema_policy: additive_only
 
 quality_rules:
   not_null: [event_date]

@@ -108,13 +108,10 @@ source:
     source_complete: true
 
 target:
-  catalog: gcp-project-redacted
-  schema: contractforge_gcp_usgs_rest_silver
   table: s_usgs_earthquake_events
 
 layer: silver
 mode: overwrite
-schema_policy: additive_only
 
 quality_rules:
   not_null: [earthquake_id, event_time, latitude, longitude]

@@ -56,6 +56,19 @@ defaults:
     table:
       tags:
         domain: seismology
+  adapters:
+    databricks:
+      catalog: workspace
+      schemas:
+        bronze: cf_bronze
+        silver: cf_silver
+        gold: cf_gold
+    snowflake:
+      catalog: CONTRACTFORGE_TEST_DB
+      schemas:
+        bronze: PUBLIC
+        silver: PUBLIC
+        gold: PUBLIC
 
 deployment:
   databricks:
@@ -242,6 +255,13 @@ defaults:
     table:
       tags:
         domain: commerce
+  adapters:
+    aws:
+      catalog: contractforge
+      schemas:
+        bronze: cf_orders_bronze
+        silver: cf_orders_silver
+        gold: cf_orders_gold
 ```
 
 Then an ingestion contract can stay focused on dataset intent:
@@ -293,6 +313,13 @@ contractforge resolve-bundle contracts/silver/orders/orders.ingestion.yaml
 
 The output includes `defaults.decisions[]`, a ledger with the field path, value,
 source and reason for every value added by the resolver.
+
+For cross-platform projects, put shared defaults directly under `defaults` and
+platform bindings under `defaults.adapters.<adapter>`. When a contract path is
+under `contracts/<adapter>/...`, the bundle loader applies the matching adapter
+defaults after the shared defaults. This is useful for catalog and schema
+bindings that differ between Databricks, AWS, Snowflake, Fabric and GCP while
+the contract intent remains the same.
 
 ## Deployment
 

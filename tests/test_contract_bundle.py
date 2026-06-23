@@ -403,6 +403,58 @@ merge_keys: [order_id]
     assert bundle.semantic.write.schema_policy == "additive_only"
 
 
+def test_load_contract_bundle_applies_adapter_specific_project_defaults(tmp_path) -> None:
+    (tmp_path / "project.yaml").write_text(
+        """
+name: demo
+defaults:
+  schema_policy:
+    bronze: permissive
+    silver: additive_only
+    gold: additive_only
+  operations:
+    technical_owner: data-platform
+  adapters:
+    databricks:
+      catalog: workspace
+      schemas:
+        bronze: cf_bronze
+        silver: cf_silver
+    aws:
+      catalog: contractforge
+      schemas:
+        bronze: aws_bronze
+        silver: aws_silver
+""".lstrip(),
+        encoding="utf-8",
+    )
+    contract_dir = tmp_path / "contracts" / "aws" / "silver" / "orders"
+    contract_dir.mkdir(parents=True)
+    base = contract_dir / "orders"
+    (contract_dir / "orders.ingestion.yaml").write_text(
+        """
+source:
+  type: table
+  table: contractforge.aws_bronze.orders
+target:
+  table: orders
+layer: silver
+mode: overwrite
+""".lstrip(),
+        encoding="utf-8",
+    )
+
+    bundle = load_contract_bundle(base)
+
+    assert bundle.contract["target"] == {"table": "orders", "catalog": "contractforge", "schema": "aws_silver"}
+    assert bundle.contract["schema_policy"] == "additive_only"
+    assert bundle.contract["operations"]["ownership"]["technical_owner"] == "data-platform"
+    decisions = {decision["path"]: decision["source"] for decision in bundle.metadata["defaults"]["decisions"]}
+    assert decisions["target.catalog"] == "project.defaults.catalog"
+    assert decisions["target.schema"] == "project.defaults.schemas"
+    assert decisions["schema_policy"] == "project.defaults.schema_policy"
+
+
 def test_contract_defaults_do_not_override_explicit_values() -> None:
     resolved = resolve_contract_defaults(
         {

@@ -81,8 +81,12 @@ def load_contract_bundle(path: str | Path) -> ContractBundle:
         environment=sections["environment"],
         metadata=metadata,
     )
-    project = _project_mapping(ingestion_path.parent)
-    resolved = resolve_contract_defaults(bundle.contract, project=project)
+    project, project_root = _project_context(ingestion_path.parent)
+    resolved = resolve_contract_defaults(
+        bundle.contract,
+        project=project,
+        adapter=_adapter_from_project_path(ingestion_path, project_root=project_root),
+    )
     if resolved.decisions:
         metadata["defaults"] = {"decisions": resolved.decisions_json()}
     return ContractBundle(
@@ -171,15 +175,28 @@ def _find_project_root(base_dir: Path) -> Path | None:
     return None
 
 
-def _project_mapping(base_dir: Path) -> dict[str, Any] | None:
+def _project_context(base_dir: Path) -> tuple[dict[str, Any] | None, Path | None]:
     root = _find_project_root(base_dir)
     if root is None:
-        return None
+        return None, None
     project_path = root / "project.yaml"
     if not project_path.exists():
         project_path = root / "project.yml"
     payload = _load_mapping(project_path)
-    return payload if isinstance(payload, dict) else None
+    return (payload if isinstance(payload, dict) else None), root
+
+
+def _adapter_from_project_path(path: Path, *, project_root: Path | None) -> str | None:
+    if project_root is None:
+        return None
+    try:
+        relative = path.resolve().relative_to(project_root.resolve())
+    except ValueError:
+        return None
+    parts = tuple(relative.parts)
+    if len(parts) >= 2 and parts[0] == "contracts":
+        return parts[1]
+    return None
 
 
 def _connection_source_payload(payload: dict[str, Any], path: Path) -> dict[str, Any]:
