@@ -116,6 +116,25 @@ class DeduplicateContractModel(StrictContractModel):
     order_by: str | list[DeduplicateOrderContractModel]
 
 
+class CustomTransformContractModel(StrictContractModel):
+    """Portable custom treatment declaration; runtime bindings live in adapter extensions."""
+
+    name: str | None = None
+    description: str | None = None
+    output: str | None = None
+    expected_columns: list[str] | None = None
+    parameters: dict[str, Any] = Field(default_factory=dict)
+
+    @field_validator("expected_columns", mode="before")
+    @classmethod
+    def _expected_columns_must_be_list(cls, value: Any) -> Any:
+        if value is None:
+            return value
+        if isinstance(value, str):
+            raise ValueError("must be a list")
+        return value
+
+
 class TransformContractModel(StrictContractModel):
     shape: ShapeContractModel | None = None
     cast: dict[str, str] | None = None
@@ -123,6 +142,7 @@ class TransformContractModel(StrictContractModel):
     derive: dict[str, str] | None = None
     standardize: dict[str, StandardizeColumnContractModel] | None = None
     deduplicate: DeduplicateContractModel | None = None
+    custom: CustomTransformContractModel | None = None
 
     @field_validator("cast", "derive", mode="before")
     @classmethod

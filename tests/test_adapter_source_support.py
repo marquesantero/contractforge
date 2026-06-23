@@ -25,6 +25,7 @@ def test_databricks_source_support_declares_portable_connector_mappings() -> Non
     }
     assert databricks_source_support("http_json")["native_mapping"] == "Core HTTP file fetch + Spark reader"
     assert databricks_source_support("rest_api")["native_mapping"] == "Core REST client + Spark JSON materialization"
+    assert databricks_source_support("custom_transform")["native_mapping"] == "Databricks notebook task in Asset Bundle"
     assert databricks_source_support("native_passthrough")["status"] == "REVIEW_REQUIRED"
 
 

@@ -25,6 +25,7 @@ ALLOWED_DATABRICKS_DATACLASSES = {
     "DatabricksIngestOptions",
     "DatabricksIngestionHooks",
     "DatabricksJobSpec",
+    "DatabricksNotebookTaskSpec",
     "DatabricksSourceClassification",
     "HashDiffLatestSelection",
     "CostModel",

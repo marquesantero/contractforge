@@ -12,6 +12,7 @@ DATABRICKS_EXTENSION_FIELDS = {
     "autoloader",
     "cache_source",
     "cluster_columns",
+    "custom_transform",
     "delta_properties",
     "encoding",
     "encoding_columns",

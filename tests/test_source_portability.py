@@ -42,6 +42,13 @@ def test_native_passthrough_is_first_class() -> None:
     assert classification.portability == "NATIVE_PASSTHROUGH"
 
 
+def test_custom_transform_is_portable_builtin_boundary() -> None:
+    classification = classify_source_type("custom_transform")
+
+    assert classification.portability == "PORTABLE_BUILTIN"
+    assert classification.adapter is None
+
+
 def test_odata_is_not_a_portable_builtin() -> None:
     classification = classify_source_type("odata")
 

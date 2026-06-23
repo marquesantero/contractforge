@@ -29,6 +29,7 @@ def list_databricks_source_support() -> tuple[dict[str, Any], ...]:
         "incremental_files",
         "http_json",
         "rest_api",
+        "custom_transform",
         "jdbc",
         "kafka_bounded",
         "eventhubs_bounded",

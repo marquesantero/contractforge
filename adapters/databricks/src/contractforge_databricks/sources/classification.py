@@ -74,6 +74,13 @@ def classify_databricks_source(source: dict[str, Any] | str) -> DatabricksSource
             native_mapping="Core REST client + Spark JSON materialization",
             note="Secrets resolve in Databricks.",
         )
+    if source_type == "custom_transform":
+        return DatabricksSourceClassification(
+            source_type=source_type,
+            status=SUPPORTED,
+            native_mapping="Databricks notebook task in Asset Bundle",
+            note="Contract declares inputs; Databricks binds the reviewed treatment notebook.",
+        )
     if is_bounded_stream_source(payload):
         return DatabricksSourceClassification(
             source_type=source_type,

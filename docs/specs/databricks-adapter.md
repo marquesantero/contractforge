@@ -366,6 +366,15 @@ Catalog sources render `spark.table(...)`, `spark.sql(...)` or path-based `spark
 
 Delta Sharing consumer sources render `spark.read.format("deltaSharing")` artifacts for `delta_share` contracts with profile file and shared table identifiers. Profile files and credentials remain deployment/runtime concerns.
 
+Custom treatment sources declare a reviewed transformation boundary:
+
+- `source.type: custom_transform`
+- named `source.inputs`
+- optional `transform.custom` output metadata
+- Databricks runtime binding in `extensions.databricks.custom_transform`
+
+The adapter emits `*.custom_transform_review.json` and `*.custom_transform_review.md`. If `extensions.databricks.custom_transform.notebook_path` is present, the Databricks Asset Bundle renders that notebook as a pre-task and the generated ContractForge run task depends on it. The notebook is an adapter binding only; the contract still controls target, write mode, schema policy, quality, access and evidence semantics.
+
 HTTP file sources render bounded Python `urllib` fetch artifacts followed by Spark file reads:
 
 - `http_file`

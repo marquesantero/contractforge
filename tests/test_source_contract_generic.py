@@ -80,6 +80,37 @@ def test_native_passthrough_source_contract_is_accepted() -> None:
     assert source["object"] == "Account"
 
 
+def test_custom_transform_source_contract_requires_named_inputs() -> None:
+    source = validate_source_contract(
+        {
+            "type": "custom_transform",
+            "intent": "custom_treatment",
+            "inputs": [
+                {"alias": "orders", "table_ref": {"layer": "silver", "table": "orders"}},
+                {"alias": "customers", "table": "main.silver.customers"},
+            ],
+        }
+    )
+
+    assert source["type"] == "custom_transform"
+    assert source["inputs"][0]["alias"] == "orders"
+    validate_source_semantics(source)
+
+    with pytest.raises(ValueError, match="source.inputs is required"):
+        validate_source_contract({"type": "custom_transform"})
+
+    with pytest.raises(ValueError, match="duplicated"):
+        validate_source_contract(
+            {
+                "type": "custom_transform",
+                "inputs": [
+                    {"alias": "orders", "table": "main.silver.orders"},
+                    {"alias": "orders", "table": "main.silver.orders_changes"},
+                ],
+            }
+        )
+
+
 def test_connection_source_contract_requires_external_path() -> None:
     source = validate_source_contract(
         {

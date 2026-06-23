@@ -37,6 +37,7 @@ Legacy top-level aliases such as `delta_properties`, `cluster_columns`, `partiti
 | `encoding` | string | Source character encoding used by Databricks emergency encoding repair. Only applies when `fix_encoding` is enabled. |
 | `encoding_columns` | list of strings | Limits emergency encoding repair to specific string columns. |
 | `cache_source` | boolean | Allows the adapter runtime to cache a prepared source DataFrame when useful. |
+| `custom_transform` | map | Databricks binding for `source.type: custom_transform`, including reviewed notebook task metadata. |
 | `explain_mode` | boolean or string | Captures Databricks explain plan evidence when a query runner is available. |
 | `explain_format` | string | Databricks explain format to capture, for example `formatted` or `extended`. |
 | `openlineage_enabled` | boolean | Emits or persists OpenLineage-compatible runtime events from Databricks evidence. |
@@ -109,6 +110,37 @@ extensions:
 The core owns the intent: checkpointed new-file discovery. The Databricks adapter translates it to `cloudFiles` and may consume `extensions.databricks.autoloader` for native options.
 
 `source.type: autoloader` is not portable core syntax.
+
+## Custom Treatment Notebook Binding
+
+Portable contract:
+
+```yaml
+source:
+  type: custom_transform
+  intent: custom_treatment
+  inputs:
+    - alias: orders
+      table_ref:
+        layer: silver
+        table: orders
+transform:
+  custom:
+    name: customer_feature_engineering
+    output: customer_features
+    expected_columns: [customer_id, order_count, lifetime_value]
+extensions:
+  databricks:
+    custom_transform:
+      notebook_path: /Workspace/ContractForge/customer_features/treatment
+      task_key: prepare_customer_features
+      base_parameters:
+        contract: customer_features.ingestion.yaml
+```
+
+The adapter renders a review artifact for every `custom_transform` source. When `notebook_path` is declared, the Databricks Asset Bundle includes the notebook as a pre-task and the generated ContractForge run task depends on it.
+
+The notebook path is a Databricks binding only. The semantic contract still owns declared inputs, target, write mode, schema policy, quality rules, access rules and evidence requirements.
 
 ## Runtime Metadata Boundary
 

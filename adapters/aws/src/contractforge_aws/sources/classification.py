@@ -49,6 +49,14 @@ def classify_aws_source(source: dict[str, Any] | str) -> AWSSourceClassification
 
     payload = {"type": source} if isinstance(source, str) else dict(source)
     source_type = str(payload.get("connector") or payload.get("type") or "").strip().lower()
+    if source_type == "custom_transform":
+        return _supported_classification(
+            source_type,
+            status=REVIEW_REQUIRED,
+            native_mapping="AWS Glue job or Lambda/Step Functions task with contract-managed output validation",
+            note="Custom treatment boundaries need adapter-owned runtime artifact review before AWS rendering is stable.",
+            renderable=False,
+        )
     for rule in _CLASSIFICATION_RULES:
         if rule.matches(payload):
             return rule.classify(payload, source_type)
@@ -159,21 +167,11 @@ def _available_now_classification(source: dict[str, Any], source_type: str) -> A
 
 
 def _bounded_stream_classification(_source: dict[str, Any], source_type: str) -> AWSSourceClassification:
-    return _supported_classification(
-        source_type,
-        status=SUPPORTED_WITH_WARNINGS,
-        native_mapping="Spark bounded kafka/eventhubs reader in Glue",
-        note="Connector jars must be supplied.",
-    )
+    return _supported_classification(source_type, status=SUPPORTED_WITH_WARNINGS, native_mapping="Spark bounded kafka/eventhubs reader in Glue", note="Connector jars must be supplied.")
 
 
 def _delta_share_classification(_source: dict[str, Any], source_type: str) -> AWSSourceClassification:
-    return _supported_classification(
-        source_type,
-        status=SUPPORTED_WITH_WARNINGS,
-        native_mapping="Delta Sharing Spark connector in Glue",
-        note="Connector jar must be supplied.",
-    )
+    return _supported_classification(source_type, status=SUPPORTED_WITH_WARNINGS, native_mapping="Delta Sharing Spark connector in Glue", note="Connector jar must be supplied.")
 
 
 def _file_classification(source: dict[str, Any], source_type: str) -> AWSSourceClassification:

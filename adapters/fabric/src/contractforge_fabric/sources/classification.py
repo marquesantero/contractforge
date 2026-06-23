@@ -293,6 +293,20 @@ def _native_passthrough_classification(_source: dict[str, Any], source_type: str
     )
 
 
+def _is_custom_transform(source: dict[str, Any]) -> bool:
+    return str(source.get("type") or "").strip().lower() == "custom_transform"
+
+
+def _custom_transform_classification(_source: dict[str, Any], source_type: str) -> FabricSourceClassification:
+    return _supported(
+        source_type,
+        status=REVIEW_REQUIRED,
+        native_mapping="Fabric notebook or Data Factory activity with contract-managed output validation",
+        note="Custom treatment boundaries need adapter-owned runtime artifact review before Fabric rendering is stable.",
+        renderable=False,
+    )
+
+
 def _is_incremental_files(source: dict[str, Any]) -> bool:
     return str(source.get("type") or "").strip().lower() == "incremental_files"
 
@@ -426,5 +440,6 @@ _CLASSIFICATION_RULES = (
     _SourceRule(is_bounded_stream_source, _bounded_stream_classification),
     _SourceRule(is_delta_share_source, _delta_share_classification),
     _SourceRule(_is_plain_file_source, _file_classification),
+    _SourceRule(_is_custom_transform, _custom_transform_classification),
     _SourceRule(is_native_passthrough_source, _native_passthrough_classification),
 )

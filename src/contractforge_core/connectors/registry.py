@@ -40,6 +40,13 @@ CONNECTOR_CATALOG: dict[str, dict[str, Any]] = {
     "blob": {"family": "object_storage", "description": "Generic blob/object storage files.", "required": ["provider", "format", "path"], "supported_formats": FILE_FORMATS, "providers": ["adls", "azure_blob", "gcs", "s3"]},
     "object_storage": {"family": "object_storage", "description": "Provider-neutral object storage files.", "required": ["provider", "format", "path"], "supported_formats": FILE_FORMATS, "providers": ["adls", "azure_blob", "gcs", "s3"]},
     "connection": {"family": "connection_reference", "description": "Reference to an external connection YAML resolved by the bundle loader.", "required": ["connection_path"], "runtime": "Resolved by the core before adapter planning; not a runtime source type."},
+    "custom_transform": {
+        "family": "custom_transform",
+        "description": "Declared custom treatment boundary for complex transformations with named inputs and adapter-native execution.",
+        "required": ["inputs"],
+        "runtime": "The core validates intent, inputs and downstream contract semantics; adapters render the native execution artifact such as a notebook or task.",
+        "recommended_usage": "Use when declarative shape/cast/derive/deduplicate cannot express the treatment and the implementation still needs contract-managed validation and evidence.",
+    },
     "incremental_files": {"family": "incremental_files", "description": "Checkpointed new-file discovery intent.", "required": ["path", "format"], "incremental": True, "supported_formats": FILE_FORMATS, "recommended_usage": "Adapters map this to native incremental file discovery such as Databricks Auto Loader, Glue bookmarks or Fabric incremental pipelines."},
     "http_file": {"family": "http_files", "description": "Bounded HTTP(S) file fetch.", "required": ["request.url", "format"], "runtime": "Adapter-owned bounded HTTP fetch; Databricks uses Python urllib and Spark materialization.", "auth_modes": ["none", "bearer_token", "api_key", "basic"], "supported_formats": ["csv", "json", "jsonl", "ndjson", "text"], "limits": HTTP_FILE_LIMITS},
     "http_csv": {"family": "http_files", "description": "Bounded HTTP(S) CSV file fetch.", "required": ["request.url"], "runtime": "Adapter-owned bounded HTTP fetch; format fixed to csv.", "auth_modes": ["none", "bearer_token", "api_key", "basic"], "supported_formats": ["csv"], "limits": HTTP_FILE_LIMITS},

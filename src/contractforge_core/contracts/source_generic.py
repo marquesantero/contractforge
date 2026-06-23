@@ -12,6 +12,7 @@ from contractforge_core.contracts.base import StrictContractModel
 SourceIntentName = Literal[
     "api_call",
     "catalog_query",
+    "custom_treatment",
     "database_query",
     "file_batch",
     "file_stream",
@@ -66,6 +67,23 @@ class SourceTableReferenceContract(StrictContractModel):
     catalog: str | None = None
 
 
+class SourceInputReferenceContract(StrictContractModel):
+    """Named input consumed by a custom treatment boundary."""
+
+    alias: str
+    ref: str | None = None
+    table: str | None = None
+    table_ref: str | SourceTableReferenceContract | None = None
+    path: str | None = None
+    query: Any = None
+
+    @model_validator(mode="after")
+    def _requires_reference(self) -> "SourceInputReferenceContract":
+        if self.ref or self.table or self.table_ref or self.path or self.query not in (None, ""):
+            return self
+        raise ValueError("source input requires one of ref, table, table_ref, path or query")
+
+
 class GenericSourceContract(StrictContractModel):
     """Portable and passthrough source contract shape."""
 
@@ -77,6 +95,7 @@ class GenericSourceContract(StrictContractModel):
     table: str | None = None
     ref: str | None = None
     table_ref: str | SourceTableReferenceContract | None = None
+    inputs: list[SourceInputReferenceContract] | None = None
     query: Any = None
     url: str | None = None
     system: str | None = None
@@ -120,3 +139,18 @@ class GenericSourceContract(StrictContractModel):
         if not value:
             raise ValueError("must not be empty")
         return value
+
+    @model_validator(mode="after")
+    def _custom_transform_requires_named_inputs(self) -> "GenericSourceContract":
+        if self.type != "custom_transform":
+            return self
+        if not self.inputs:
+            raise ValueError("source.inputs is required for connector=custom_transform")
+        aliases: set[str] = set()
+        for item in self.inputs:
+            if not item.alias:
+                raise ValueError("source.inputs.alias is required")
+            if item.alias in aliases:
+                raise ValueError(f"source.inputs alias {item.alias!r} is duplicated")
+            aliases.add(item.alias)
+        return self
