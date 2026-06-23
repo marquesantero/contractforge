@@ -36,6 +36,34 @@ quality_rules:
   unique_key: [order_id]
 ```
 
+When `project.yaml` declares `defaults`, the same intent can be shorter:
+
+```yaml
+source:
+  type: table
+  ref: bronze.orders
+
+target:
+  table: orders
+
+layer: silver
+mode: upsert
+merge_keys: [order_id]
+```
+
+The core resolves project defaults before semantic validation. It can fill
+target catalog/schema, schema policy, common operations metadata and common
+annotation tags. For identity-based write modes, `merge_keys` can also seed
+`quality_rules.unique_key` and missing `not_null` checks. The resolver records
+every default or inference in a decision ledger; inspect it with:
+
+```bash
+contractforge resolve-bundle contracts/silver/orders/orders.ingestion.yaml
+```
+
+Defaults reduce YAML volume but do not guess the source, target table, secrets,
+access rules or merge keys.
+
 The write mode is semantic. It does not prescribe Delta MERGE, Iceberg MERGE, Snowflake MERGE or Fabric pipeline behavior. The adapter decides whether equivalent behavior is available.
 
 The ingestion contract may also inherit common connection settings from a reusable YAML file without losing the ability to declare a complete inline source:

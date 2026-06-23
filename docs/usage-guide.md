@@ -49,6 +49,33 @@ publishes and creates or updates the Glue job in one adapter-owned flow.
 
 ## Project Scheduling
 
+Use `project.yaml.defaults` for values that are true for the whole project and
+should not be repeated in every contract:
+
+```yaml
+defaults:
+  catalog: workspace
+  schemas:
+    bronze: cf_bronze
+    silver: cf_silver
+    gold: cf_gold
+    tmp: cf_tmp
+  schema_policy: additive_only
+  operations:
+    technical_owner: data-platform
+    criticality: medium
+    expected_frequency: daily
+  annotations:
+    table:
+      tags:
+        domain: customer_analytics
+```
+
+The core applies these defaults when loading split bundles and records every
+added value in `defaults.decisions[]`. Existing contract values always win. Use
+`contractforge resolve-bundle <path>` to inspect the effective contract before
+adapter deployment.
+
 Use `project.yaml` for job wiring that spans multiple contracts:
 
 ```yaml

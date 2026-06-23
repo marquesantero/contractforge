@@ -5,6 +5,16 @@ All notable changes to `contractforge-core` are documented in this file.
 The format follows Keep a Changelog, and this package follows semantic
 versioning as described in `docs/specs/api-stability.md`.
 
+## [Unreleased]
+
+### Added
+
+- Added core contract default resolution for split bundles using
+  `project.yaml.defaults`, including an auditable decision ledger and the
+  `contractforge resolve-bundle` inspection command.
+- Added safe inference from `merge_keys` to `quality_rules.unique_key` and
+  missing `not_null` checks for identity-based write modes.
+
 ## [0.2.0] - 2026-06-19
 
 ### Added

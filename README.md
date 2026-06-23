@@ -60,6 +60,7 @@ rewriting the framework for every platform.
 | Native adapters | Databricks, AWS, Snowflake, Fabric and GCP translate the same intent into native runtime behavior instead of forcing a lowest-common-denominator engine. |
 | Evidence as product surface | Deployments, runs, errors, quality, quarantine, schema changes, lineage, governance actions and cost signals are tracked consistently. |
 | Reusable connections | Shared `connection.yaml` files centralize connector defaults; ingestion contracts override only dataset-specific fields. |
+| Auditable defaults | `project.yaml.defaults` removes repeated catalog, schema, operations and annotation fields while `resolve-bundle` shows the effective contract and every default decision. |
 | AI-assisted project design | ContractForge AI turns prompts and schemas into reviewable projects, then validates them through Core and adapter planners. |
 
 ## How It Works
