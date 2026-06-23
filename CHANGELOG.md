@@ -16,6 +16,9 @@ versioning as described in `docs/specs/api-stability.md`.
   missing `not_null` checks for identity-based write modes.
 - Added adapter-specific project defaults for cross-platform contract trees and
   layer-aware defaults such as `schema_policy`.
+- Documented the complete parameter-defaults reference, including
+  `project.yaml.defaults`, adapter overrides and deterministic
+  quality/custom-transform inferences.
 
 ## [0.2.0] - 2026-06-19
 

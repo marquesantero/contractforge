@@ -68,7 +68,9 @@ For cross-platform projects, catalog and schema usually live under
 `project.yaml.defaults.adapters.<adapter>`. A contract under
 `contracts/aws/...` receives AWS defaults; the equivalent contract under
 `contracts/databricks/...` receives Databricks defaults. The resolved contract
-is what adapters plan and execute.
+is what adapters plan and execute. See
+[Project YAML Defaults Reference](project-yaml.md#defaults-reference) for the
+complete list of supported default keys and deterministic inferences.
 
 The write mode is semantic. It does not prescribe Delta MERGE, Iceberg MERGE, Snowflake MERGE or Fabric pipeline behavior. The adapter decides whether equivalent behavior is available.
 
