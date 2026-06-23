@@ -473,7 +473,7 @@ def _step_contract_path(step: dict[str, Any], environment_key: str) -> str:
 
 
 def _load_contract_input(path: Path) -> tuple[dict[str, Any], dict[str, Any] | None]:
-    if path.is_dir() or _looks_like_split_contract(path):
+    if path.is_dir() or _looks_like_split_contract(path) or _has_project_context(path):
         bundle = load_contract_bundle(_bundle_base(path))
         environment = bundle.environment if isinstance(bundle.environment, dict) else None
         return bundle.contract, environment
@@ -482,6 +482,11 @@ def _load_contract_input(path: Path) -> tuple[dict[str, Any], dict[str, Any] | N
 
 def _looks_like_split_contract(path: Path) -> bool:
     return any(marker in path.name for marker in (".ingestion.", ".annotations.", ".operations.", ".access.", ".environment."))
+
+
+def _has_project_context(path: Path) -> bool:
+    base = path if path.is_dir() else path.parent
+    return any((candidate / "project.yaml").exists() or (candidate / "project.yml").exists() for candidate in (base, *base.parents))
 
 
 def _bundle_base(path: Path) -> Path:

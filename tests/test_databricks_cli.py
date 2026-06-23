@@ -275,6 +275,34 @@ def test_cli_governance_preview_writes_databricks_artifacts(tmp_path, capsys) ->
     assert "INSERT INTO `audit`.`ops`.`ctrl_ingestion_operations`" in (output / "s_customers.operations_evidence.sql").read_text()
 
 
+def test_cli_governance_preview_applies_project_defaults(tmp_path, capsys) -> None:
+    (tmp_path / "project.yaml").write_text(
+        """
+name: governance_defaults
+defaults:
+  schemas:
+    silver: governed_silver
+  adapters:
+    databricks:
+      catalog: workspace
+""".lstrip(),
+        encoding="utf-8",
+    )
+    base = tmp_path / "contracts" / "databricks" / "silver" / "s_customers"
+    _write_split_governance_bundle(base, include_target_namespace=False)
+    output = tmp_path / "review"
+
+    assert main(["governance-preview", str(base.with_suffix(".ingestion.yaml")), "--output-dir", str(output), "--indent", "0"]) == 0
+
+    payload = json.loads(capsys.readouterr().out)
+    governance_sql = (output / "s_customers.governance.sql").read_text()
+    access_sql = (output / "s_customers.access.sql").read_text()
+
+    assert payload["status"] == "SUCCESS"
+    assert "COMMENT ON TABLE `workspace`.`governed_silver`.`customers`" in governance_sql
+    assert "GRANT SELECT ON TABLE `workspace`.`governed_silver`.`customers` TO `analysts`" in access_sql
+
+
 def test_cli_governance_apply_plan_is_reviewable_sql(tmp_path, capsys) -> None:
     base = tmp_path / "contracts" / "silver" / "s_customers"
     _write_split_governance_bundle(base)
@@ -289,28 +317,29 @@ def test_cli_governance_apply_plan_is_reviewable_sql(tmp_path, capsys) -> None:
     assert "INSERT INTO `audit`.`ops`.`ctrl_ingestion_operations`" in sql
 
 
-def _write_split_governance_bundle(base) -> None:
+def _write_split_governance_bundle(base, *, include_target_namespace: bool = True) -> None:
     base.parent.mkdir(parents=True, exist_ok=True)
+    target_namespace = "  catalog: main\n  schema: silver\n" if include_target_namespace else ""
     (base.with_suffix(".ingestion.yaml")).write_text(
-        """
+        f"""
 source:
   type: table
   table: main.raw.customers
 target:
-  catalog: main
-  schema: silver
-  table: customers
+{target_namespace}  table: customers
+layer: silver
 mode: scd0_append
 """.lstrip(),
         encoding="utf-8",
     )
+    section_target = (
+        "target:\n  catalog: main\n  schema: silver\n  table: customers\n"
+        if include_target_namespace
+        else "target:\n  table: customers\n"
+    )
     (base.with_suffix(".annotations.yaml")).write_text(
-        """
-target:
-  catalog: main
-  schema: silver
-  table: customers
-table:
+        f"""
+{section_target}table:
   description: Customer table
   tags:
     domain: crm
@@ -321,12 +350,8 @@ columns:
         encoding="utf-8",
     )
     (base.with_suffix(".operations.yaml")).write_text(
-        """
-target:
-  catalog: main
-  schema: silver
-  table: customers
-criticality: high
+        f"""
+{section_target}criticality: high
 expected_frequency: daily
 freshness_sla_minutes: 60
 alert_on_failure: true
@@ -334,12 +359,8 @@ alert_on_failure: true
         encoding="utf-8",
     )
     (base.with_suffix(".access.yaml")).write_text(
-        """
-target:
-  catalog: main
-  schema: silver
-  table: customers
-access_policy:
+        f"""
+{section_target}access_policy:
   mode: validate_only
 grants:
   - principal: analysts

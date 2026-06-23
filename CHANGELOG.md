@@ -17,6 +17,12 @@ versioning as described in `docs/specs/api-stability.md`.
 - Added adapter-specific project defaults for cross-platform contract trees and
   layer-aware defaults such as `schema_policy`.
 
+### Changed
+
+- Aligned adapter project loaders so project-scoped simple YAML contracts can
+  use `project.yaml.defaults` consistently across AWS, Databricks, Snowflake,
+  Fabric and GCP.
+
 ## [0.2.0] - 2026-06-19
 
 ### Added

@@ -7,7 +7,7 @@ from pathlib import Path
 from typing import Any
 
 from contractforge_core.cli_io import yaml_load
-from contractforge_core.contracts import compose_contract_sections, semantic_contract_from_mapping
+from contractforge_core.contracts import load_contract_bundle, semantic_contract_from_mapping
 from contractforge_core.semantic import SemanticContract
 from contractforge_databricks.annotations import render_annotations_sql
 from contractforge_databricks.environment import DatabricksEnvironment
@@ -71,32 +71,12 @@ def _governance_apply_plan(args: Any) -> int:
 
 
 def _load_contract(path: Path) -> tuple[SemanticContract, dict[str, Any] | None]:
-    if _is_split_ingestion(path):
-        bundle = _load_bundle(path)
+    if path.is_dir() or _is_split_ingestion(path) or _has_project_context(path):
+        bundle = load_contract_bundle(_bundle_base(path))
         return bundle.semantic, bundle.environment
     payload = _load_mapping(path)
     environment = payload.get("environment") if isinstance(payload.get("environment"), dict) else None
     return semantic_contract_from_mapping(payload), environment
-
-
-def _load_bundle(path: Path):
-    base = _bundle_base(path)
-    paths = {
-        "ingestion": base.with_suffix(".ingestion.yaml"),
-        "annotations": base.with_suffix(".annotations.yaml"),
-        "operations": base.with_suffix(".operations.yaml"),
-        "access": base.with_suffix(".access.yaml"),
-        "environment": base.with_suffix(".environment.yaml"),
-    }
-    ingestion = _load_mapping(paths["ingestion"])
-    optional = {name: _load_mapping(item) for name, item in paths.items() if name != "ingestion" and item.exists()}
-    return compose_contract_sections(
-        ingestion=ingestion,
-        annotations=optional.get("annotations"),
-        operations=optional.get("operations"),
-        access=optional.get("access"),
-        environment=optional.get("environment"),
-    )
 
 
 def _emit(artifacts: dict[str, str], output_dir: Path | None, indent: int) -> int:
@@ -135,6 +115,11 @@ def _bundle_base(path: Path) -> Path:
 
 def _is_split_ingestion(path: Path) -> bool:
     return path.is_file() and ".ingestion." in path.name
+
+
+def _has_project_context(path: Path) -> bool:
+    base = path if path.is_dir() else path.parent
+    return any((candidate / "project.yaml").exists() or (candidate / "project.yml").exists() for candidate in (base, *base.parents))
 
 
 def _print(payload: object, indent: int) -> int:
