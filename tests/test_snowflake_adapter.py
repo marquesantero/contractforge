@@ -1073,6 +1073,24 @@ def test_snowflake_runtime_quotes_known_columns_in_quality_expressions(tmp_path)
     assert any('WHERE NOT ("balance" >= 0) OR ("balance" >= 0) IS NULL' in command for command in session.commands)
 
 
+def test_snowflake_runtime_quality_resolves_unquoted_sql_alias_case(tmp_path) -> None:
+    contract = {
+        "source": {"type": "sql", "query": "SELECT 1 AS movie_id, 'Dune' AS title"},
+        "target": {"catalog": "ANALYTICS", "schema": "SILVER", "table": "MOVIES"},
+        "mode": "scd0_overwrite",
+        "quality_rules": {"not_null": ["movie_id"], "unique_key": ["movie_id"]},
+    }
+    contract_path = tmp_path / "contract.json"
+    contract_path.write_text(json.dumps(contract), encoding="utf-8")
+    session = _ExecutingSnowflakeSession(columns=("MOVIE_ID", "TITLE"))
+
+    result = run_snowflake_contract(contract_uri=str(contract_path), session=session)
+
+    assert result["status"] == "SUCCESS"
+    assert any('WHERE "MOVIE_ID" IS NULL' in command for command in session.commands)
+    assert any('SELECT "MOVIE_ID", COUNT(*) AS _CF_COUNT' in command for command in session.commands)
+
+
 def test_snowflake_runtime_quarantines_row_level_quality_failures(tmp_path) -> None:
     contract = {
         "source": {"type": "table", "table": "raw.customers"},
