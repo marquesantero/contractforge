@@ -33,9 +33,6 @@ environments:
   snowflake: environments/snowflake.environment.yaml
   fabric: environments/fabric.environment.yaml
   gcp: environments/gcp.environment.yaml
-  snowflake: environments/snowflake.environment.yaml
-  fabric: environments/fabric.environment.yaml
-  gcp: environments/gcp.environment.yaml
 
 connections:
   usgs_geojson: connections/usgs.yaml
@@ -320,6 +317,40 @@ under `contracts/<adapter>/...`, the bundle loader applies the matching adapter
 defaults after the shared defaults. This is useful for catalog and schema
 bindings that differ between Databricks, AWS, Snowflake, Fabric and GCP while
 the contract intent remains the same.
+
+### Defaults Reference
+
+The default resolver accepts these keys under `defaults` and under
+`defaults.adapters.<adapter>`. Adapter-specific values are merged after shared
+defaults. Explicit contract fields always win.
+
+| Default key | Applies to | Supports layer map? | Effect |
+| --- | --- | --- | --- |
+| `catalog` | `target.catalog` | no | Fills target catalog when omitted. |
+| `catalog_type` | `target.catalog_type` | no | Fills logical catalog type when omitted. |
+| `layer` | schema selection only | no | Used only to select `schemas.<layer>` when the contract omits `layer`; it does not write `layer` into the contract. |
+| `schema` | `target.schema` | no | Fallback schema when `schemas` does not provide the contract layer. |
+| `schemas.<layer>` | `target.schema` | yes | Fills target schema for the contract `layer`, for example `schemas.bronze`, `schemas.silver` or `schemas.gold`. |
+| `schemas.default` | `target.schema` | no | Fallback schema when the contract layer is not listed. |
+| `schemas.tmp` | custom transform output inference | no | Temporary schema used to infer `transform.custom.output` for `source.type: custom_transform`. |
+| `schemas.staging` | custom transform output inference | no | Secondary fallback for custom transform output inference when `schemas.tmp` is not set. |
+| `tmp_schema` | custom transform output inference | no | Explicit temporary schema for inferred custom transform output. Takes precedence over `schemas.tmp`. |
+| `mode` | `mode` | yes | Fills write mode when omitted. Use with care; most production contracts should keep mode explicit unless a preset owns it. |
+| `schema_policy` | `schema_policy` | yes | Fills schema policy when omitted. Common pattern: `bronze: permissive`, `silver/gold: additive_only`. |
+| `on_quality_fail` | `on_quality_fail` | yes | Fills quality failure action when omitted. |
+| `operations` | `operations` section | nested merge | Fills omitted operations metadata. Flat owner fields such as `technical_owner` are normalized under `operations.ownership`. |
+| `annotations` | `annotations` section | nested merge | Fills omitted annotation metadata, commonly shared table tags. |
+| `adapters.<adapter>` | any key above | same as key | Adapter-specific override block selected from contract path `contracts/<adapter>/...`. |
+
+The resolver also performs two deterministic inferences:
+
+| Inference | Condition | Result |
+| --- | --- | --- |
+| Identity quality | `merge_keys` is declared and mode is `upsert`, `hash_diff_upsert`, `historical` or `snapshot_reconcile_soft_delete` | Fills missing `quality_rules.unique_key` and appends missing `quality_rules.not_null` entries from `merge_keys`. |
+| Custom transform output | `source.type: custom_transform`, no `transform.custom.output`, and catalog plus temp schema are known | Fills `transform.custom.output` as `<catalog>.<tmp_schema>.<target_table>__custom_output`. |
+
+Defaults do not infer `source`, `target.table`, `merge_keys`, secrets,
+authentication, access grants, row filters or masks.
 
 ## Deployment
 
