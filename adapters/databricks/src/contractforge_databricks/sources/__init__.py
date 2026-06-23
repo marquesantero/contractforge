@@ -10,6 +10,7 @@ from contractforge_databricks.sources.bounded_streams import (
 )
 from contractforge_databricks.sources.custom_transform import (
     custom_transform_notebook_task,
+    custom_transform_output_table,
     is_custom_transform_source,
     render_custom_transform_review_markdown,
     render_custom_transform_review_plan,
@@ -74,4 +75,5 @@ __all__ = [
     "source_metadata_from_contract",
     "databricks_source_support",
     "custom_transform_notebook_task",
+    "custom_transform_output_table",
 ]

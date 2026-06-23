@@ -40,6 +40,7 @@ from contractforge_databricks.runtime.watermark import collect_previous_watermar
 from contractforge_databricks.runtime.storage_auth import configure_object_storage_access
 from contractforge_databricks.security import resolve_databricks_secret_placeholders, validate_source_security
 from contractforge_databricks.sources.interpret import interpret_incremental_files_source, is_incremental_file_source
+from contractforge_databricks.sources.custom_transform import custom_transform_output_table, is_custom_transform_source
 from contractforge_databricks.sources.rds_iam_runtime import materialize_rds_iam_options
 from contractforge_databricks.sources.table_refs import (
     contract_with_databricks_source_refs,
@@ -79,6 +80,10 @@ def resolve_source_dataframe(spark: Any, source: dict[str, Any], *, contract: Se
         return resolve_http_file_dataframe(spark, source)
     if is_rest_api_connector(source):
         return resolve_rest_api_dataframe(spark, source)
+    if is_custom_transform_source(source):
+        if contract is None:
+            raise ValueError("custom_transform source resolution requires the semantic contract")
+        return spark.table(custom_transform_output_table(contract))
     if source_type in {"jdbc", "connector"} or source.get("connector") in _JDBC_SOURCE_ALIASES:
         jdbc_options = materialize_rds_iam_options(
             jdbc_common_options(source),
@@ -204,13 +209,7 @@ def _read_with_options(reader: Any, source_format: str, options: dict[str, str],
     return builder.load(path if isinstance(path, list) else str(path)) if path is not None else builder.load()
 
 
-def _read_source_with_options(
-    reader: Any,
-    source_format: str,
-    options: dict[str, str],
-    path: object | None,
-    source: dict[str, Any],
-) -> Any:
+def _read_source_with_options(reader: Any, source_format: str, options: dict[str, str], path: object | None, source: dict[str, Any]) -> Any:
     builder = reader.format(source_format)
     for key, value in sorted(options.items()):
         builder = builder.option(key, value)

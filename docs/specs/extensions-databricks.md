@@ -134,11 +134,12 @@ extensions:
     custom_transform:
       notebook_path: /Workspace/ContractForge/customer_features/treatment
       task_key: prepare_customer_features
+      output_table: main.tmp.customer_features_prepared
       base_parameters:
         contract: customer_features.ingestion.yaml
 ```
 
-The adapter renders a review artifact for every `custom_transform` source. When `notebook_path` is declared, the Databricks Asset Bundle includes the notebook as a pre-task and the generated ContractForge run task depends on it.
+The adapter renders a review artifact for every `custom_transform` source. When `notebook_path` is declared, the Databricks Asset Bundle includes the notebook as a pre-task and the generated ContractForge run task depends on it. At runtime, the Databricks resolver reads `extensions.databricks.custom_transform.output_table`; if that is omitted it falls back to `transform.custom.output`. One of those values is required so the library can read the reviewed notebook output and then apply normal schema, quality, write and evidence handling.
 
 The notebook path is a Databricks binding only. The semantic contract still owns declared inputs, target, write mode, schema policy, quality rules, access rules and evidence requirements.
 

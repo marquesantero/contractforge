@@ -107,6 +107,24 @@ def custom_transform_notebook_task(
     )
 
 
+def custom_transform_output_table(contract: SemanticContract) -> str:
+    """Return the reviewed table/view produced by the native custom treatment."""
+
+    extension = _custom_extension(contract)
+    output_table = str(extension.get("output_table") or "").strip()
+    if output_table:
+        return output_table
+    transform = dict(contract.transform.raw or {}) if contract.transform else {}
+    custom = dict(transform.get("custom") or {})
+    output = str(custom.get("output") or "").strip()
+    if output:
+        return output
+    raise ValueError(
+        "source.type='custom_transform' requires extensions.databricks.custom_transform.output_table "
+        "or transform.custom.output so the runtime can read the reviewed notebook output"
+    )
+
+
 def _custom_extension(contract: SemanticContract) -> dict[str, Any]:
     value = databricks_extensions(contract).get("custom_transform")
     return dict(value) if isinstance(value, dict) else {}
