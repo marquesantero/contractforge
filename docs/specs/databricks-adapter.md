@@ -373,7 +373,7 @@ Custom treatment sources declare a reviewed transformation boundary:
 - optional `transform.custom` output metadata
 - Databricks runtime binding in `extensions.databricks.custom_transform`
 
-The adapter emits `*.custom_transform_review.json` and `*.custom_transform_review.md`. If `extensions.databricks.custom_transform.notebook_path` is present, the Databricks Asset Bundle renders that notebook as a pre-task and the generated ContractForge run task depends on it. The notebook is an adapter binding only; the contract still controls target, write mode, schema policy, quality, access and evidence semantics.
+The adapter emits `*.custom_transform_review.json` and `*.custom_transform_review.md`. If `extensions.databricks.custom_transform.notebook_path` is present, the Databricks Asset Bundle renders that notebook as a pre-task and the generated ContractForge run task depends on it. The runtime reads the reviewed output from `extensions.databricks.custom_transform.output_table` or `transform.custom.output`, then applies normal target, write mode, schema policy, quality, access and evidence semantics. The notebook is an adapter binding only.
 
 HTTP file sources render bounded Python `urllib` fetch artifacts followed by Spark file reads:
 

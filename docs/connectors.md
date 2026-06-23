@@ -83,6 +83,7 @@ extensions:
     custom_transform:
       notebook_path: /Workspace/ContractForge/customer_features/treatment
       task_key: prepare_customer_features
+      output_table: main.tmp.customer_features_prepared
 ```
 
 The notebook or job is a native adapter binding. It must not bypass schema, quality, access, write-mode or evidence semantics. Adapters should record review artifacts and require explicit runtime support before marking this source stable.

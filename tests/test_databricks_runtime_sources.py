@@ -435,6 +435,47 @@ def test_resolve_rest_api_source_creates_dataframe(monkeypatch) -> None:
     assert spark.created_dataframes == [[{"id": 1}, {"id": 2}]]
 
 
+def test_resolve_custom_transform_reads_reviewed_output_table() -> None:
+    spark = FakeSpark()
+    contract = semantic_contract_from_mapping(
+        {
+            "source": {
+                "type": "custom_transform",
+                "intent": "custom_treatment",
+                "inputs": [{"alias": "orders", "table": "main.silver.orders"}],
+            },
+            "target": {"catalog": "main", "schema": "gold", "table": "customer_features"},
+            "transform": {"custom": {"name": "features", "output": "main.tmp.customer_features_prepared"}},
+            "extensions": {
+                "databricks": {
+                    "custom_transform": {"output_table": "main.tmp.customer_features_notebook_output"}
+                }
+            },
+        }
+    )
+
+    result = resolve_source_dataframe(spark, contract.source.raw or {}, contract=contract)
+
+    assert result is spark.table_df
+    assert spark.table_calls == ["main.tmp.customer_features_notebook_output"]
+
+
+def test_resolve_custom_transform_requires_declared_output() -> None:
+    contract = semantic_contract_from_mapping(
+        {
+            "source": {
+                "type": "custom_transform",
+                "intent": "custom_treatment",
+                "inputs": [{"alias": "orders", "table": "main.silver.orders"}],
+            },
+            "target": {"catalog": "main", "schema": "gold", "table": "customer_features"},
+        }
+    )
+
+    with pytest.raises(ValueError, match="custom_transform.output_table"):
+        resolve_source_dataframe(FakeSpark(), contract.source.raw or {}, contract=contract)
+
+
 def test_resolve_incremental_files_uses_read_stream_cloudfiles() -> None:
     spark = FakeSpark()
 
