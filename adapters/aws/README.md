@@ -30,7 +30,7 @@ from contractforge_aws import plan_aws_contract, render_aws_contract
 contract = {
     "source": {"type": "s3", "path": "s3://landing/orders", "format": "parquet"},
     "target": {"catalog": "glue", "schema": "bronze", "table": "orders"},
-    "mode": "scd0_append",
+    "mode": "append",
 }
 
 result = plan_aws_contract(contract)
@@ -136,7 +136,7 @@ evidence = reconcile_aws_glue_job_run_evidence(
     job_name="cf-orders",
     run_id=run.run_id,
     target_table="glue.bronze.orders",
-    mode="scd0_append",
+    mode="append",
 )
 
 print(evidence.run.status)
@@ -154,7 +154,7 @@ sql = render_aws_glue_job_run_evidence_sql(
     job_name="cf-orders",
     run_id=run.run_id,
     target_table="glue.bronze.orders",
-    mode="scd0_append",
+    mode="append",
     database="contractforge_ops",
 )
 ```
@@ -181,7 +181,7 @@ The adapter includes a cost-gated smoke runner for the smallest real AWS validat
 - creates/uses a tagged Glue IAM role;
 - renders and publishes ContractForge AWS artifacts through the adapter;
 - registers a Glue Spark/Iceberg job;
-- optionally starts one `scd0_overwrite` run.
+- optionally starts one `overwrite` run.
 
 Dry-run is the default and does not call AWS:
 
