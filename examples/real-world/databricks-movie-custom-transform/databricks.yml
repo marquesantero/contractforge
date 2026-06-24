@@ -1,0 +1,85 @@
+bundle:
+  name: contractforge_movie_custom_transform
+resources:
+  jobs:
+    movie_custom_transform:
+      name: contractforge_movie_custom_transform
+      schedule:
+        quartz_cron_expression: 0 0 4 * * ?
+        timezone_id: America/Sao_Paulo
+        pause_status: PAUSED
+      max_concurrent_runs: 1
+      queue:
+        enabled: true
+      environments:
+      - environment_key: contractforge_runtime
+        spec:
+          environment_version: '2'
+          dependencies:
+          - contractforge-core
+          - contractforge-databricks
+      tasks:
+      - task_key: bronze_movie_ratings
+        environment_key: contractforge_runtime
+        notebook_task:
+          notebook_path: ./notebooks/run_contractforge.py
+          base_parameters:
+            bundle_root: ${var.bundle_root}
+            contract: contracts/databricks/bronze/bronze_movie_ratings/bronze_movie_ratings.ingestion.yaml
+            evidence_catalog: ${var.evidence_catalog}
+            evidence_schema: ${var.evidence_schema}
+      - task_key: bronze_movie_titles
+        environment_key: contractforge_runtime
+        notebook_task:
+          notebook_path: ./notebooks/run_contractforge.py
+          base_parameters:
+            bundle_root: ${var.bundle_root}
+            contract: contracts/databricks/bronze/bronze_movie_titles/bronze_movie_titles.ingestion.yaml
+            evidence_catalog: ${var.evidence_catalog}
+            evidence_schema: ${var.evidence_schema}
+      - task_key: silver_movie_ratings
+        environment_key: contractforge_runtime
+        depends_on:
+        - task_key: bronze_movie_ratings
+        notebook_task:
+          notebook_path: ./notebooks/run_contractforge.py
+          base_parameters:
+            bundle_root: ${var.bundle_root}
+            contract: contracts/databricks/silver/silver_movie_ratings/silver_movie_ratings.ingestion.yaml
+            evidence_catalog: ${var.evidence_catalog}
+            evidence_schema: ${var.evidence_schema}
+      - task_key: prepare_movie_features
+        environment_key: contractforge_runtime
+        depends_on:
+        - task_key: silver_movie_ratings
+        - task_key: bronze_movie_titles
+        notebook_task:
+          notebook_path: ./notebooks/prepare_movie_features.py
+          base_parameters:
+            ratings_table: workspace.cf_movie_silver.s_movie_ratings
+            movies_table: workspace.cf_movie_bronze.b_movie_titles
+            output_table: workspace.cf_movie_tmp.movie_feature_engineering_output
+            min_ratings: "10"
+      - task_key: gold_movie_feature_summary
+        environment_key: contractforge_runtime
+        depends_on:
+        - task_key: prepare_movie_features
+        notebook_task:
+          notebook_path: ./notebooks/run_contractforge.py
+          base_parameters:
+            bundle_root: ${var.bundle_root}
+            contract: contracts/databricks/gold/gold_movie_feature_summary/gold_movie_feature_summary.ingestion.yaml
+            evidence_catalog: ${var.evidence_catalog}
+            evidence_schema: ${var.evidence_schema}
+targets:
+  dev:
+    default: true
+workspace:
+  root_path: /Workspace/Shared/contractforge-examples/Movie_Custom_Transform
+variables:
+  bundle_root:
+    default: /Workspace/Shared/contractforge-examples/Movie_Custom_Transform/files
+  evidence_catalog:
+    default: workspace
+  evidence_schema:
+    default: cf_movie_ops

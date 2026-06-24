@@ -1,0 +1,114 @@
+name: databricks_movie_custom_transform
+description: Databricks movie medallion project with a reviewed custom treatment notebook before gold.
+source_system: movie_lens_like
+source_connector: table
+default_environment: databricks
+
+environments:
+  databricks: environments/databricks.environment.yaml
+
+defaults:
+  schema_policy:
+    bronze: permissive
+    silver: additive_only
+    gold: additive_only
+  mode:
+    bronze: overwrite
+    silver: overwrite
+    gold: overwrite
+  adapters:
+    databricks:
+      catalog: workspace
+      schemas:
+        bronze: cf_movie_bronze
+        silver: cf_movie_silver
+        gold: cf_movie_gold
+        tmp: cf_movie_tmp
+      operations:
+        ownership:
+          technical_owner: data-platform@example.com
+          support_group: data-platform
+        expected_frequency: daily
+        freshness_sla_minutes: 1440
+        alert_on_failure: true
+        alert_on_quality_fail: true
+      annotations:
+        table:
+          tags:
+            domain: media_analytics
+
+deployment:
+  databricks:
+    bundle_name: contractforge_movie_custom_transform
+    job_key: movie_custom_transform
+    job_name: contractforge_movie_custom_transform
+    workspace_root_path: /Workspace/Shared/contractforge-examples/Movie_Custom_Transform
+    bundle_root: /Workspace/Shared/contractforge-examples/Movie_Custom_Transform/files
+    evidence_catalog: workspace
+    evidence_schema: cf_movie_ops
+    environment_key: contractforge_runtime
+    runtime_environment:
+      dependencies:
+        - contractforge-core
+        - contractforge-databricks
+
+schedule:
+  cron: "0 4 * * *"
+  timezone: America/Sao_Paulo
+  enabled: false
+  adapters:
+    databricks:
+      pause_status: PAUSED
+      max_concurrent_runs: 1
+      queue: true
+      extra_tasks:
+        - name: prepare_movie_features
+          task_key: prepare_movie_features
+          notebook_path: ./notebooks/prepare_movie_features.py
+          depends_on: [silver_movie_ratings, bronze_movie_titles]
+          base_parameters:
+            ratings_table: workspace.cf_movie_silver.s_movie_ratings
+            movies_table: workspace.cf_movie_bronze.b_movie_titles
+            output_table: workspace.cf_movie_tmp.movie_feature_engineering_output
+            min_ratings: "10"
+
+execution_order:
+  - name: bronze_movie_ratings
+    layer: bronze
+    contracts:
+      databricks: contracts/databricks/bronze/bronze_movie_ratings/bronze_movie_ratings.ingestion.yaml
+  - name: bronze_movie_titles
+    layer: bronze
+    contracts:
+      databricks: contracts/databricks/bronze/bronze_movie_titles/bronze_movie_titles.ingestion.yaml
+  - name: silver_movie_ratings
+    layer: silver
+    depends_on: [bronze_movie_ratings]
+    contracts:
+      databricks: contracts/databricks/silver/silver_movie_ratings/silver_movie_ratings.ingestion.yaml
+  - name: gold_movie_feature_summary
+    layer: gold
+    depends_on: [prepare_movie_features]
+    contracts:
+      databricks: contracts/databricks/gold/gold_movie_feature_summary/gold_movie_feature_summary.ingestion.yaml
+
+portability:
+  invariant_contract_intent:
+    - source.type
+    - target.layer
+    - mode
+    - schema_policy
+    - transform.shape
+    - transform.standardize
+    - transform.derive
+    - transform.deduplicate
+    - transform.custom
+    - quality_rules
+    - annotations
+    - operations
+  platform_bindings:
+    databricks:
+      custom_treatment: notebook_task
+      table_format: delta
+      evidence_store: delta_control_tables
+      extensions_namespace: extensions.databricks

@@ -1,0 +1,16 @@
+table:
+  description: Gold movie feature summary produced by a reviewed Databricks custom treatment notebook and governed by ContractForge.
+  tags:
+    domain: media_analytics
+    layer: gold
+    entity: movie_features
+    source_type: custom_transform
+columns:
+  genre:
+    description: Exploded and normalized movie genre.
+  rating_band:
+    description: Derived rating quality band.
+  rating_count:
+    description: Number of ratings represented by the row.
+  avg_rating:
+    description: Average rating for the genre and rating band.

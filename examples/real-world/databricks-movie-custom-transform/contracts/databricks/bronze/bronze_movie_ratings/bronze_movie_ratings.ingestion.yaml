@@ -1,0 +1,33 @@
+source:
+  type: table
+  system: movie_lens_like
+  table: workspace.cf_movie_source.raw_ratings
+  read:
+    source_complete: true
+
+target:
+  table: b_movie_ratings
+
+layer: bronze
+mode: overwrite
+
+select_columns:
+  - rating_event_id
+  - user_id
+  - movie_id
+  - rating
+  - rated_at
+
+quality_rules:
+  not_null: [rating_event_id, user_id, movie_id, rating]
+  unique_key: [rating_event_id]
+  expressions:
+    - name: valid_rating_range
+      expression: rating BETWEEN 0 AND 5
+      severity: abort
+      message: Movie ratings must be between 0 and 5.
+
+extensions:
+  databricks:
+    delta_properties:
+      delta.enableChangeDataFeed: "true"

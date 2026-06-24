@@ -1,0 +1,15 @@
+table:
+  description: Raw movie rating events staged from the controlled movie test dataset.
+  tags:
+    domain: media_analytics
+    layer: bronze
+    entity: ratings
+columns:
+  rating_event_id:
+    description: Stable source event identifier.
+  user_id:
+    description: Source user identifier.
+  movie_id:
+    description: Source movie identifier.
+  rating:
+    description: Numeric rating on a 0 to 5 scale.

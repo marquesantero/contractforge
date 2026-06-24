@@ -1,0 +1,56 @@
+source:
+  type: custom_transform
+  intent: custom_treatment
+  inputs:
+    - alias: ratings
+      table: workspace.cf_movie_silver.s_movie_ratings
+    - alias: movies
+      table: workspace.cf_movie_bronze.b_movie_titles
+
+target:
+  table: g_movie_feature_summary
+
+layer: gold
+mode: overwrite
+
+transform:
+  custom:
+    name: movie_genre_feature_engineering
+    output: workspace.cf_movie_tmp.movie_feature_engineering_output
+    expected_columns:
+      - genre
+      - rating_band
+      - rating_count
+      - movie_count
+      - user_count
+      - avg_rating
+      - rating_stddev
+      - computed_at_utc
+    parameters:
+      min_ratings: 10
+
+quality_rules:
+  not_null: [genre, rating_band, rating_count, avg_rating]
+  expressions:
+    - name: positive_rating_count
+      expression: rating_count > 0
+      severity: abort
+      message: Gold feature rows must represent at least one rating.
+    - name: valid_average_rating
+      expression: avg_rating BETWEEN 0 AND 5
+      severity: abort
+      message: Average rating must stay in the source rating scale.
+
+extensions:
+  databricks:
+    custom_transform:
+      notebook_path: ./notebooks/prepare_movie_features.py
+      task_key: prepare_movie_features
+      output_table: workspace.cf_movie_tmp.movie_feature_engineering_output
+      base_parameters:
+        ratings_table: workspace.cf_movie_silver.s_movie_ratings
+        movies_table: workspace.cf_movie_bronze.b_movie_titles
+        output_table: workspace.cf_movie_tmp.movie_feature_engineering_output
+        min_ratings: "10"
+    delta_properties:
+      delta.enableChangeDataFeed: "true"

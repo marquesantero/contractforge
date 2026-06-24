@@ -1,0 +1,43 @@
+source:
+  type: table
+  system: movie_curated
+  table: workspace.cf_movie_bronze.b_movie_ratings
+  read:
+    source_complete: true
+
+target:
+  table: s_movie_ratings
+
+layer: silver
+mode: hash_diff_upsert
+merge_keys: [rating_event_id]
+hash_keys: [user_id, movie_id, rating, rated_at]
+
+transform:
+  shape:
+    columns:
+      rating_event_id: {alias: rating_event_id, cast: STRING}
+      user_id: {alias: user_id, cast: STRING}
+      movie_id: {alias: movie_id, cast: STRING}
+      rating: {alias: rating, cast: DOUBLE}
+      rated_at: {alias: rated_at, cast: TIMESTAMP}
+  derive:
+    rating_date: to_date(rated_at)
+    rating_month: date_trunc('month', rated_at)
+    normalized_at_utc: CURRENT_TIMESTAMP()
+  deduplicate:
+    keys: [rating_event_id]
+    order_by:
+      - {column: rated_at, direction: desc, nulls: last}
+
+quality_rules:
+  expressions:
+    - name: valid_rating_range
+      expression: rating BETWEEN 0 AND 5
+      severity: abort
+      message: Movie ratings must be between 0 and 5 after silver normalization.
+
+extensions:
+  databricks:
+    delta_properties:
+      delta.enableChangeDataFeed: "true"
