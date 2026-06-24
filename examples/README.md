@@ -20,6 +20,7 @@ End-to-end medallion and failure-path projects on real data.
 - [aws-incremental-files](real-world/aws-incremental-files/README.md) — AWS Glue incremental file ingestion.
 - [aws-eventhubs-kafka-available-now](real-world/aws-eventhubs-kafka-available-now/README.md) — AWS ingestion from Azure Event Hubs (Kafka) in available-now batch mode.
 - [databricks-confluent-kafka-available-now](real-world/databricks-confluent-kafka-available-now/README.md) — Databricks ingestion from Confluent Kafka in available-now mode.
+- [databricks-movie-custom-transform](real-world/databricks-movie-custom-transform/README.md) — Databricks movie/ratings medallion project with a reviewed notebook treatment step before the governed gold write.
 - [aws-failure-paths](real-world/aws-failure-paths/README.md) — contract-only negative tests for failed-run evidence, error evidence and redaction.
 
 ## Source expansion
