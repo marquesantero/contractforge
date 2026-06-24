@@ -3,10 +3,10 @@
 `contractforge-snowflake` is the Snowflake adapter for ContractForge.
 
 The documented `snowflake_sql_warehouse` surface is stable-supported: real
-Snowflake validation has covered table, SQL and staged-file sources, hosted
-procedure execution, quality, schema policy, evidence/control tables,
-governance comments/tags, lineage/explain and cost reconciliation. Task graph
-live execution and the reference hash-diff production benchmark are also
+Snowflake validation has covered table, SQL, bounded REST and staged-file
+sources, hosted procedure execution, quality, schema policy, evidence/control
+tables, governance comments/tags, lineage/explain and cost reconciliation. Task
+graph live execution and the reference hash-diff production benchmark are also
 validated. SCD2/snapshot soft delete are excluded from stable-final.
 Continuous ingestion surfaces and account-feature-dependent access policy
 validation remain explicit review or final-certification boundaries.
@@ -82,6 +82,34 @@ Live smoke commands accept either `--connect-options <yaml>` or
 `--connection <name>` when the Snowflake Python connector can resolve that
 connection name, for example `--connection cfingestsvc-pat`.
 
+Authenticated REST sources must bind secrets through the Snowflake environment.
+The contract references only a Snowflake-scoped alias:
+
+```yaml
+source:
+  type: rest_api
+  request:
+    url: https://api.example.com/v1/resources
+    method: GET
+    headers:
+      Authorization: "Bearer {{ secret:snowflake/api_token }}"
+```
+
+The environment maps that alias to a fully qualified Snowflake secret object:
+
+```yaml
+parameters:
+  snowflake:
+    external_access_integrations:
+      - CF_EXAMPLE_REST_ACCESS
+    secrets:
+      api_token: CONTRACTFORGE_TEST_DB.PUBLIC.CF_EXAMPLE_API_TOKEN
+```
+
+The procedure DDL renders `SECRETS = ('api_token' = ...CF_EXAMPLE_API_TOKEN)`,
+and the runtime resolves the placeholder inside Snowflake. Other secret scopes,
+missing aliases and inline credentials are fail-closed boundaries.
+
 Staged-file sources support CSV, JSON and Parquet batch reads from Snowflake
 stages. Provide a named Snowflake file format through
 `source.options.file_format`, or use a stage with a default file format. CSV
@@ -115,9 +143,11 @@ GRANT CREATE PROCEDURE ON SCHEMA CONTRACTFORGE_TEST_DB.PUBLIC
 ```
 
 Use `contractforge-snowflake smoke-task-graph --execute --execute-cleanup` to
-deploy and manually execute a two-step task graph. In addition to the procedure
-grant, the service role needs task creation/execution privileges in the task
-schema; the live validation account now has these grants:
+deploy and manually execute a two-step task graph. Project deployment uses
+`CREATE OR REPLACE TASK` and suspends existing task definitions before
+replacement. In addition to the procedure grant, the service role needs task
+creation/execution privileges in the task schema; the live validation account
+now has these grants:
 
 ```sql
 GRANT CREATE TASK ON SCHEMA CONTRACTFORGE_TEST_DB.PUBLIC
@@ -131,6 +161,11 @@ commands without connecting; `run-project --wait` polls bounded
 `INFORMATION_SCHEMA.TASK_HISTORY` for terminal task states. `cleanup-plan`
 prints explicit drop commands for tasks and the runtime procedure but does not
 drop data target tables or staged artifacts.
+
+Quality checks resolve contract column names against Snowflake source metadata
+with exact matching first and Snowflake-safe case-insensitive matching second.
+This handles unquoted SQL aliases that Snowflake returns in uppercase without
+changing contract semantics.
 
 Each runtime run records immediate lineage and explain evidence. The lineage
 row in `ctrl_ingestion_lineage` includes a ContractForge/OpenLineage-style

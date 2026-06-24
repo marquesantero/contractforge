@@ -376,14 +376,23 @@ artifacts:
   uri: stage://CONTRACTFORGE_ARTIFACTS/prod/
 parameters:
   snowflake:
-    account: "{{ secret:snowflake/account }}"
     warehouse: CF_WH
     role: CONTRACTFORGE_ROLE
     runtime_database: CONTRACTFORGE
     runtime_schema: CF_RUNTIME
     task_database: CONTRACTFORGE
     task_schema: CF_TASKS
+    external_access_integrations:
+      - CF_TMDB_REST_ACCESS
+    secrets:
+      tmdb_api_token: CONTRACTFORGE.CF_RUNTIME.CF_TMDB_API_TOKEN
 ```
+
+`{{ secret:snowflake/<alias> }}` placeholders are for values resolved inside a
+Snowflake hosted procedure. They must correspond to aliases declared in
+`parameters.snowflake.secrets`, which renders Snowflake `SECRETS = (...)`
+bindings. Connection profiles and account names remain deployment/runtime
+configuration, not ingestion contract secrets.
 
 ### Tests
 

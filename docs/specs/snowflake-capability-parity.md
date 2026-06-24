@@ -64,8 +64,8 @@ should declare explicit subtargets.
 
 | Subtarget | Status target | Purpose |
 | --- | --- | --- |
-| `snowflake_sql_warehouse` | Primary | SQL execution over warehouse compute. Handles table, SQL, file-stage, quality, merge and evidence writes. |
-| `snowflake_task_graph` | Primary deployment path | Renders task/task-graph deployment artifacts for scheduled project execution. |
+| `snowflake_sql_warehouse` | Primary | SQL execution over warehouse compute. Handles table, SQL, bounded REST, file-stage, quality, merge and evidence writes. |
+| `snowflake_task_graph` | Primary deployment path | Renders, deploys and executes task/task-graph artifacts for scheduled project execution. |
 | `snowflake_snowpipe` | Review-first | Handles staged file continuous loading where Snowpipe semantics preserve the contract. |
 | `snowflake_streams_tasks` | Review-first | Handles table CDC and incremental table-to-table workflows. |
 | `snowflake_snowpark` | Future | Handles complex transforms or connector behavior that is not clean in SQL alone. |
@@ -93,7 +93,7 @@ should declare explicit subtargets.
 | `source.type: delta_share` | Marketplace/native sharing/external table pattern | `SUPPORTED_WITH_WARNINGS` | Needs adapter-specific source resolver. |
 | `source.type: native_passthrough` | Snowflake connector/native app/marketplace source | `SUPPORTED_WITH_WARNINGS` | Must return explicit warnings about connector-owned semantics and evidence gaps. |
 | `source.connection_path` | Core-resolved shared connection before adapter planning | `SUPPORTED` | Snowflake adapter receives the resolved source; it must not re-read arbitrary local paths. |
-| `source.auth` | Snowflake secrets, integrations, key-pair auth or environment secret resolver | `REVIEW_REQUIRED` | The adapter owns credential resolution and must redact evidence. |
+| `source.auth` | Snowflake scoped placeholders plus procedure `SECRETS` bindings | `SUPPORTED_WITH_WARNINGS` for bounded REST secrets declared in `environment.parameters.snowflake.secrets`; otherwise `REVIEW_REQUIRED` | The contract uses `{{ secret:snowflake/<alias> }}` and the environment binds the alias to a Snowflake secret object. Inline credentials and non-Snowflake secret scopes remain blocked or review-required. |
 | `source.watermark` | SQL predicate, stream offset, `COPY_HISTORY` marker or state table value | `SUPPORTED_WITH_WARNINGS` | The implementation path changes the strength of guarantees. |
 | `source.progress_location` | ContractForge state table or stage/copy marker | `REVIEW_REQUIRED` | The core field is portable, but Snowflake implementation must choose table state vs native metadata. |
 | `source.schema_tracking_location` | Information Schema snapshot or adapter state table | `REVIEW_REQUIRED` | Snowflake does not need a Databricks-style schema location; the adapter should map the intent to schema evidence. |
@@ -128,6 +128,7 @@ should declare explicit subtargets.
 | `quality_rules.min_rows` | SQL row count or DMF `ROW_COUNT` | `SUPPORTED` | The result goes to `ctrl_ingestion_quality`. |
 | `quality_rules.max_null_ratio` | SQL null count divided by row count | `SUPPORTED` | DMF use is optional. |
 | `quality_rules.expressions` | Snowflake SQL boolean predicate | `SUPPORTED_WITH_WARNINGS` | Expressions are dialect-specific and must be marked as such in planning. |
+| Quality column alias resolution | Exact source metadata match, then Snowflake-safe case-insensitive match | `SUPPORTED` | Handles unquoted SQL aliases returned as uppercase by Snowflake metadata without changing the declared contract alias. |
 | `on_quality_fail: fail` | Raise error before target commit | `SUPPORTED` | Failure must still persist error/run evidence where possible. |
 | `on_quality_fail: warn` | Persist quality evidence and continue | `SUPPORTED` | Run status remains independent from quality status. |
 | `on_quality_fail: quarantine` | Write failed rows to `ctrl_ingestion_quarantine`, then write passed rows | `SUPPORTED_WITH_WARNINGS` | Row-level quarantine is supported for row-identifiable SQL rules; aggregate rules become recorded warnings. |
@@ -153,6 +154,8 @@ should declare explicit subtargets.
 | `environment.parameters.snowflake.warehouse` | Warehouse binding | `PLATFORM_EXTENSION` | Adapter-owned deployment/runtime setting. |
 | `environment.parameters.snowflake.role` | Role binding | `PLATFORM_EXTENSION` | Adapter-owned security setting. |
 | `environment.parameters.snowflake.task_schema` | Task deployment namespace | `PLATFORM_EXTENSION` | Keep out of ingestion contracts. |
+| `environment.parameters.snowflake.external_access_integrations` | Hosted procedure network access binding | `PLATFORM_EXTENSION` | Required for bounded REST sources executed inside Snowflake. |
+| `environment.parameters.snowflake.secrets` | Hosted procedure secret alias map | `PLATFORM_EXTENSION` | Maps contract aliases such as `api_token` to Snowflake secret objects; keeps credentials out of ingestion contracts. |
 
 ### Annotations And Access
 

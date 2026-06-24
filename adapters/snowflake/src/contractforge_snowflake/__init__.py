@@ -38,7 +38,7 @@ from contractforge_snowflake.subtargets import list_snowflake_subtargets
 try:
     __version__ = _version("contractforge-snowflake")
 except PackageNotFoundError:  # pragma: no cover - editable/source tree without installed metadata
-    __version__ = "0.2.0"
+    __version__ = "0.2.1"
 
 __all__ = [
     "SNOWFLAKE_SUBTARGET_SNOWPIPE",

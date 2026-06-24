@@ -142,3 +142,7 @@ contract family across all three adapters. JDBC/database-source parity remains a
 separate connector-specific concern and is not the cross-adapter proof page.
 Snowflake hosted-procedure REST execution requires `CF_USGS_REST_ACCESS` to
 allow outbound HTTPS to `earthquake.usgs.gov:443`.
+For authenticated REST sources, the contract uses
+`{{ secret:snowflake/<alias> }}` and the Snowflake environment maps that alias
+under `parameters.snowflake.secrets`; plaintext credentials are not part of the
+parity contract.

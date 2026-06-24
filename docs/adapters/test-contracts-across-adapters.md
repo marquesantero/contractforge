@@ -440,6 +440,19 @@ intent.
 | Silver transformation | The output event shape, filters, derived fields and deduplication rule are the same. | Databricks, AWS, Fabric and GCP use the declarative transform path; Snowflake uses native SQL text with `PARSE_JSON`, `LATERAL FLATTEN` and `QUALIFY`. |
 | Storage hints | Storage configuration does not change business logic or quality semantics. | Databricks sets a Delta property; AWS sets an Iceberg warehouse path; Fabric uses Lakehouse storage; GCP binds BigQuery/GCS artifacts; this Snowflake contract has no storage extension. |
 
+For authenticated REST, the same principle applies: the contract keeps the
+logical source and request shape, while each adapter owns the native secret
+binding. Snowflake uses `{{ secret:snowflake/<alias> }}` in the contract and
+declares the alias under `parameters.snowflake.secrets` in the environment so
+the hosted procedure can render a Snowflake `SECRETS = (...)` binding.
+
+Recent real-source validation extended this pattern with a TMDB authenticated
+REST project. AWS, Snowflake, Fabric and GCP completed bronze-to-gold execution
+with deployed platform artifacts. Databricks completed the same bronze-to-gold
+REST pattern with USGS; the TMDB endpoint was blocked by workspace DNS for
+`api.themoviedb.org`, which is tracked as a platform administration issue rather
+than a ContractForge semantic gap.
+
 ## Contract Parameter Snippets
 
 Shared quality and write intent:
