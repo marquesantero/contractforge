@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="generator" content="Docusaurus v3.10.1">
 <title data-rh="true">Adaptadores | ContractForge</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:image" content="https://marquesantero.github.io/contractforge/pt-BR/img/contractforge-logo.png"><meta data-rh="true" name="twitter:image" content="https://marquesantero.github.io/contractforge/pt-BR/img/contractforge-logo.png"><meta data-rh="true" property="og:url" content="https://marquesantero.github.io/contractforge/pt-BR/docs/adapters/overview/"><meta data-rh="true" property="og:locale" content="pt_BR"><meta data-rh="true" property="og:locale:alternate" content="en_US"><meta data-rh="true" name="docusaurus_locale" content="pt-BR"><meta data-rh="true" name="docsearch:language" content="pt-BR"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="Adaptadores | ContractForge"><meta data-rh="true" name="description" content="Os adaptadores são a camada de implementação da plataforma ContractForge. Eles declaram capacidades, renderizam artefatos nativos e, opcionalmente, executam planos."><meta data-rh="true" property="og:description" content="Os adaptadores são a camada de implementação da plataforma ContractForge. Eles declaram capacidades, renderizam artefatos nativos e, opcionalmente, executam planos."><link data-rh="true" rel="icon" href="/contractforge/pt-BR/img/contractforge-mark.png"><link data-rh="true" rel="canonical" href="https://marquesantero.github.io/contractforge/pt-BR/docs/adapters/overview/"><link data-rh="true" rel="alternate" href="https://marquesantero.github.io/contractforge/docs/adapters/overview/" hreflang="en-US"><link data-rh="true" rel="alternate" href="https://marquesantero.github.io/contractforge/pt-BR/docs/adapters/overview/" hreflang="pt-BR"><link data-rh="true" rel="alternate" href="https://marquesantero.github.io/contractforge/docs/adapters/overview/" hreflang="x-default"><script data-rh="true" type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Adaptadores","item":"https://marquesantero.github.io/contractforge/pt-BR/docs/adapters/overview"}]}</script><link rel="stylesheet" href="/contractforge/pt-BR/assets/css/styles.e35730a0.css">
-<script src="/contractforge/pt-BR/assets/js/runtime~main.52ed5373.js" defer="defer"></script>
-<script src="/contractforge/pt-BR/assets/js/main.28e4ba6e.js" defer="defer"></script>
+<script src="/contractforge/pt-BR/assets/js/runtime~main.dd2a8499.js" defer="defer"></script>
+<script src="/contractforge/pt-BR/assets/js/main.56f1cbed.js" defer="defer"></script>
 </head>
 <body>
 <svg style="display: none;"><defs>
@@ -27,7 +27,7 @@
 <p>Os adaptadores devem primeiro preservar a semântica do ContractForge e depois escolher a implementação nativa.</p>
 <p>Exemplos:</p>
 <ul>
-<li class=""><code>scd1_upsert</code> requires upsert/merge semantics.</li>
+<li class=""><code>upsert</code> exige semântica de merge/upsert.</li>
 <li class=""><code>scd2</code> requer semântica de histórico, datação eficaz e comportamento da linha atual.</li>
 <li class="">filtros de linha e máscaras de coluna exigem primitivas de governança nativas ou um mapeamento explícito que requer revisão.</li>
 <li class="">a quarentena deve manter o sucesso/falha da execução separados do status de qualidade.</li>
