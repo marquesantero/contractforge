@@ -195,7 +195,7 @@ adapters carry native runtime dependencies and behavior.
 | `contractforge-core` | `0.2.0` | [PyPI](https://pypi.org/project/contractforge-core/) | [core](src/contractforge_core) |
 | `contractforge-databricks` | `0.2.0` | [PyPI](https://pypi.org/project/contractforge-databricks/) | [adapter](adapters/databricks) |
 | `contractforge-aws` | `0.2.0` | [PyPI](https://pypi.org/project/contractforge-aws/) | [adapter](adapters/aws) |
-| `contractforge-snowflake` | `0.2.0` | [PyPI](https://pypi.org/project/contractforge-snowflake/) | [adapter](adapters/snowflake) |
+| `contractforge-snowflake` | `0.2.1` | [PyPI](https://pypi.org/project/contractforge-snowflake/) | [adapter](adapters/snowflake) |
 | `contractforge-fabric` | `0.2.0` | [PyPI](https://pypi.org/project/contractforge-fabric/) | [adapter](adapters/fabric) |
 | `contractforge-gcp` | `0.2.0` | [PyPI](https://pypi.org/project/contractforge-gcp/) | [adapter](adapters/gcp) |
 | `contractforge-ai` | `0.3.0` | [PyPI](https://pypi.org/project/contractforge-ai/) | [AI companion](ai) |
@@ -290,7 +290,7 @@ values override global connection defaults.
 | Databricks | `contractforge-databricks` | Reference implementation | Delta, Unity Catalog, Auto Loader, Lakeflow planning, Jobs, Asset Bundles, control tables, governance, lineage, cost and dashboards. |
 | AWS | `contractforge-aws` | Stable supported surface | Glue Spark, Iceberg, Glue Catalog, Lake Formation review/apply helpers, S3 artifacts, Glue jobs, Athena/Iceberg evidence and cost records for the documented `aws_glue_iceberg` surface. |
 | Fabric | `contractforge-fabric` | Stable supported surface | Notebook-first Lakehouse execution, Lakehouse Delta writes, source expansion, shortcut reads, Kafka catch-up, core write modes, control evidence, workspace roles, sensitivity labels and OneLake data access role apply helpers for the documented `fabric_lakehouse` surface. |
-| Snowflake | `contractforge-snowflake` | Stable supported surface | SQL warehouse runtime, hosted Snowpark procedure library runner with staged ZIP imports, table/SQL/bounded REST/staged-file sources, append/overwrite/upsert/hash-diff writes, quality, schema policy, governance, evidence/control tables, lineage, cost reconciliation and project deployment for the documented `snowflake_sql_warehouse` surface. Task graph live execution still needs task grants. See [Snowflake adapter guide](docs/adapters/snowflake.md). |
+| Snowflake | `contractforge-snowflake` | Stable supported surface | SQL warehouse runtime, hosted Snowpark procedure library runner with staged ZIP imports, table/SQL/bounded REST/staged-file sources, append/overwrite/upsert/hash-diff writes, Snowflake-scoped REST secrets, quality, schema policy, governance, evidence/control tables, lineage, cost reconciliation and project deployment with live task graph execution for the documented `snowflake_sql_warehouse` surface. Requires explicit Snowflake procedure/task/stage/warehouse grants and external access or secret authorization for sources that need them. See [Snowflake adapter guide](docs/adapters/snowflake.md). |
 | GCP | `contractforge-gcp` | Stable supported surface | BigQuery table/view/SQL sources, GCS load jobs, BigLake Iceberg table reads, core writes, SQL quality, evidence tables, row access policies, masking, policy tags and descriptions for the documented `gcp_bigquery` surface. |
 
 Use the same project model for adapter deployment:

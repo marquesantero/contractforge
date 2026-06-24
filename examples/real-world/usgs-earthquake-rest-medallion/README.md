@@ -97,6 +97,8 @@ files by name.
 Snowflake REST execution inside the hosted procedure requires the account-level
 external access integration declared by `environments/snowflake.environment.yaml`
 (`CF_USGS_REST_ACCESS`) to allow outbound HTTPS to `earthquake.usgs.gov`.
+USGS is intentionally unauthenticated, so it does not declare
+`parameters.snowflake.secrets`.
 
 Fabric execution uses generated notebooks in the configured Lakehouse. The
 Fabric binding removes Unity Catalog-style `workspace.` prefixes from
@@ -129,3 +131,36 @@ TO ROLE CONTRACTFORGE_INGEST_ROLE;
 
 Use `ALLOWED_AUTHENTICATION_SECRETS = none`, without parentheses. The form
 `(none)` can be parsed as a secret named `PUBLIC.NONE`.
+
+For authenticated REST sources, keep the contract credential-free and declare
+Snowflake secret bindings in the environment:
+
+```yaml
+source:
+  type: rest_api
+  request:
+    headers:
+      Authorization: "Bearer {{ secret:snowflake/api_token }}"
+```
+
+```yaml
+parameters:
+  snowflake:
+    external_access_integrations:
+      - CF_TMDB_REST_ACCESS
+    secrets:
+      api_token: CONTRACTFORGE_TEST_DB.PUBLIC.CF_TMDB_API_TOKEN
+```
+
+The hosted procedure binds that alias through Snowflake `SECRETS = (...)` and
+resolves the value at runtime inside Snowflake.
+
+Recent live validation:
+
+| Platform | Status | Notes |
+| --- | --- | --- |
+| Databricks | `PASS` | USGS REST bronze-to-gold ran through a Databricks Asset Bundle job on serverless with PyPI-installed ContractForge packages. |
+| AWS | `PASS` | TMDB authenticated REST bronze-to-gold ran through deployed Glue jobs and S3-hosted artifacts. |
+| Snowflake | `PASS` | TMDB authenticated REST bronze-to-gold ran through hosted procedure tasks, `{{ secret:snowflake/<alias> }}` resolution and task-history polling. |
+| Fabric | `PASS` | TMDB authenticated REST bronze-to-gold completed through generated Fabric notebooks; capacity availability remains an operational platform concern. |
+| GCP | `PASS` | TMDB authenticated REST bronze-to-gold completed through the BigQuery/Workflows runtime path. |

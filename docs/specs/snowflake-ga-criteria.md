@@ -34,6 +34,8 @@ Stable source families:
 
 - `table` and `view`;
 - `sql` / `query`;
+- bounded `rest_api`, including authenticated REST when secrets are declared
+  through `parameters.snowflake.secrets`;
 - `staged_files` with CSV, JSON and Parquet using named Snowflake file
   formats.
 
@@ -99,7 +101,8 @@ Required projects:
 - `snowflake_smoke_minimal`;
 - `snowflake_smoke_stage_publish`;
 - `snowflake_smoke_procedure`;
-- `snowflake_usgs_rest_medallion`.
+- `snowflake_usgs_rest_medallion`;
+- `snowflake_tmdb_authenticated_rest`.
 
 Each project must create/write target Snowflake tables, populate
 `ctrl_ingestion_runs`, record quality/state/metadata/lineage where applicable,
@@ -184,6 +187,8 @@ attached to release notes or the release evidence manifest at
 - The base Snowflake package does not eagerly import Snowflake connector or
   Snowpark SDK modules.
 - Rendered artifacts do not contain plaintext secrets.
+- Authenticated REST contracts use `{{ secret:snowflake/<alias> }}` and the
+  hosted procedure binds aliases through Snowflake `SECRETS = (...)`.
 - Runtime connection options are allowlisted.
 - Stage artifact paths reject unsafe traversal.
 - Failure and reconciliation warnings redact sensitive values before evidence

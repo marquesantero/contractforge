@@ -7,11 +7,34 @@ versioning as described in `../../docs/specs/api-stability.md`.
 
 ## [Unreleased]
 
+No unreleased changes.
+
+## [0.2.1] - 2026-06-24
+
+### Added
+
+- Documented Snowflake REST secret binding through
+  `parameters.snowflake.secrets` and `{{ secret:snowflake/<alias> }}`
+  placeholders for hosted procedure execution.
+- Documented the validated TMDB task-graph execution path for authenticated
+  bounded REST ingestion.
+
 ### Changed
 
 - Aligned project contract loading so simple YAML contracts under a
   `project.yaml` tree use the core `project.yaml.defaults` resolver before
   Snowflake planning, publishing or project task deployment.
+- Updated Snowflake task-graph deployment guidance to reflect the live
+  `CREATE OR REPLACE TASK` lifecycle with existing task suspension and
+  `run-project --wait` task-history polling.
+
+### Fixed
+
+- Fixed Snowflake quality-rule documentation for unquoted SQL aliases returned
+  by Snowflake metadata in uppercase; contract aliases are matched
+  case-insensitively during runtime quality checks.
+- Clarified that undeclared Snowflake secret placeholders are rejected or fail
+  closed instead of falling back to accidental objects such as `PUBLIC.NONE`.
 
 ## [0.2.0] - 2026-06-19
 

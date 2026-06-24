@@ -18,7 +18,7 @@ The current public release line is:
 | `contractforge-core` | `0.2.0` | Beta public API boundary. |
 | `contractforge-databricks` | `0.2.0` | Stable supported surface for the documented Databricks Delta/serverless-oriented boundary. |
 | `contractforge-aws` | `0.2.0` | Stable supported surface for `aws_glue_iceberg`; advanced boundaries remain explicit planner decisions. |
-| `contractforge-snowflake` | `0.2.0` | Stable supported surface for `snowflake_sql_warehouse`; account-feature-dependent boundaries remain explicit planner decisions. |
+| `contractforge-snowflake` | `0.2.1` | Stable supported surface for `snowflake_sql_warehouse`; account-feature-dependent boundaries remain explicit planner decisions. |
 | `contractforge-fabric` | `0.2.0` | Stable supported surface for `fabric_lakehouse`; capacity availability remains an operational platform concern. |
 | `contractforge-gcp` | `0.2.0` | Stable supported surface for `gcp_bigquery`; Workflows orchestration and BigQuery execution are adapter-owned. |
 | `contractforge-ai` | `0.3.0` | Alpha AI companion surface. |

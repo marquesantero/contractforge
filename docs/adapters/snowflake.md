@@ -89,8 +89,46 @@ definitions are not permitted because they make syntax validation harder.
 | `kafka` | `UNSUPPORTED` | Blocked |
 
 Snowflake hosted procedure execution for `rest_api` requires an external access
-integration that permits the target HTTPS host. For the USGS example this is
-`CF_USGS_REST_ACCESS` allowing `earthquake.usgs.gov:443`.
+integration that permits the target HTTPS host. For unauthenticated endpoints,
+such as the USGS example, the integration can declare
+`ALLOWED_AUTHENTICATION_SECRETS = none`.
+
+Authenticated REST endpoints must keep the secret object in Snowflake and bind
+it through the environment, not inline credentials in the contract. The contract
+uses only a Snowflake-scoped alias:
+
+```yaml
+source:
+  type: rest_api
+  request:
+    url: https://api.example.com/v1/resources
+    method: GET
+    headers:
+      Authorization: "Bearer {{ secret:snowflake/api_token }}"
+```
+
+The environment binds that alias to the Snowflake secret object and external
+access integration:
+
+```yaml
+parameters:
+  snowflake:
+    external_access_integrations:
+      - CF_EXAMPLE_REST_ACCESS
+    secrets:
+      api_token: CONTRACTFORGE_TEST_DB.PUBLIC.CF_EXAMPLE_API_TOKEN
+```
+
+The adapter renders the hosted procedure with
+`SECRETS = ('api_token' = CONTRACTFORGE_TEST_DB.PUBLIC.CF_EXAMPLE_API_TOKEN)`
+and resolves `{{ secret:snowflake/api_token }}` inside Snowflake through the
+Snowpark secret API. Other secret scopes, missing aliases and inline secrets are
+not treated as valid Snowflake runtime bindings. The service role must be
+authorized for both the external access integration and the declared Snowflake
+secret according to the account's Snowflake secret policy.
+
+For the USGS example this is `CF_USGS_REST_ACCESS`, allowing
+`earthquake.usgs.gov:443`.
 
 Minimal account setup for the unauthenticated USGS REST example:
 
@@ -163,6 +201,13 @@ Schema change evidence is recorded in `ctrl_ingestion_schema_changes`.
 Aggregate quarantine without a row predicate is rejected. Quarantined rows are
 written to a quarantine table with the run id. Quality evidence is recorded in
 `ctrl_ingestion_quality` and `ctrl_ingestion_quarantine`.
+
+Runtime quality checks match contract column names against prepared-source SQL
+metadata using exact names first, then Snowflake-safe case-insensitive matching.
+This handles Snowflake's default uppercase metadata for unquoted SQL aliases, so
+a rule declared against `event_date` still resolves when Snowflake exposes
+`EVENT_DATE`. The adapter does not weaken the rule: unresolved or invalid
+columns still fail through the normal quality SQL path.
 
 ## Preparation
 
@@ -286,11 +331,19 @@ non-destructive helper.
 Deployment artifacts include:
 
 - Stable runner procedure `CREATE OR REPLACE PROCEDURE`.
-- Task graph `CREATE TASK` for scheduled or dependency-driven execution.
+- Task graph `CREATE OR REPLACE TASK` for scheduled or dependency-driven
+  execution.
+- Existing task definitions are suspended before replacement so redeploys do
+  not leave stale graph state behind.
 - Task history polling for `run-project --wait`.
 
 Procedure live smoke has passed with the hosted Snowpark library runner. Task
 graph live smoke has also passed with root/dependent task execution and cleanup.
+The service role still needs the expected Snowflake privileges, including
+`CREATE PROCEDURE` on the runtime schema, `CREATE TASK` on the task schema,
+`EXECUTE TASK` on the account, warehouse usage, stage usage/read/import access,
+and any external access integration or secret authorization required by the
+contract source.
 
 ## Smoke Tests
 
@@ -309,7 +362,8 @@ Recent live Snowflake validation covered:
 | --- | --- | --- |
 | `smoke-procedure` | `PASS` | Hosted Snowpark procedure imported ZIP-packaged core/adapter libraries and wrote 2 rows; procedure query id `00000000-0000-0000-0000-000000000000`. |
 | `smoke-task-graph` | `PASS` | Live task graph deployed two tasks, executed the root task, waited for bronze/silver `SUCCEEDED` states, verified 2-row bronze/silver counts and cleaned up smoke artifacts. |
-| USGS GeoJSON REST medallion | `LOCAL PASS` | The example project now declares Snowflake bronze-to-gold contracts beside the Databricks and AWS contracts, with Snowflake bronze using the same `source.type: rest_api` URL/method/raw response contract. Local runtime tests execute the declared Snowflake contracts in project order. Live hosted-procedure execution requires `CF_USGS_REST_ACCESS` in the Snowflake account. |
+| USGS GeoJSON REST medallion | `LOCAL PASS` | The example project declares Snowflake bronze-to-gold contracts beside Databricks, AWS, Fabric and GCP, with Snowflake bronze using the same `source.type: rest_api` URL/method/raw response contract. Live hosted-procedure execution requires `CF_USGS_REST_ACCESS` in the Snowflake account. |
+| TMDB authenticated REST project | `PASS` | Live task graph executed five hosted-procedure tasks from bronze to gold using a Snowflake secret alias declared in `parameters.snowflake.secrets`, bounded REST materialization, SQL quality checks and task-history polling. |
 
 ## Install And Dependencies
 

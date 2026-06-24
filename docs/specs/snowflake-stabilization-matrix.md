@@ -27,14 +27,14 @@ thesis.
 
 | Area | Stable candidate scope | Out of scope for stable candidate |
 | --- | --- | --- |
-| Sources | `table`, `view`, `sql`, `staged_files` with CSV, JSON and Parquet named file formats | `autoloader`, `kafka`, `copy_into`, Snowpipe, Streams, external stages |
+| Sources | `table`, `view`, `sql`, bounded `rest_api` with optional Snowflake-scoped secret aliases, `staged_files` with CSV, JSON and Parquet named file formats | `autoloader`, `kafka`, `copy_into`, Snowpipe, Streams, unmanaged external stages |
 | Write modes | `append`, `overwrite`, `upsert`, `hash_diff_upsert` | historical equivalence, snapshot soft delete |
-| Quality | abort, warn, row-level quarantine, `not_null`, `required_columns`, `accepted_values`, `min_rows`, `unique_key`, `max_null_ratio`, row-level expressions | Data Metric Functions integration |
+| Quality | abort, warn, row-level quarantine, `not_null`, `required_columns`, `accepted_values`, `min_rows`, `unique_key`, `max_null_ratio`, row-level expressions, case-insensitive matching for Snowflake metadata aliases | Data Metric Functions integration |
 | Preparation | SQL-compatible casts, derives, standardization, filters, deterministic deduplicate | Complex nested shapes, array explosions, unsafe bronze operations |
 | Schema policy | additive only, strict, permissive via `INFORMATION_SCHEMA.COLUMNS` | Automatic column evolution policies |
 | Evidence | runs, errors, quality, quarantine, schema changes, state, annotations, access, operations, lineage, explain, cost | Alternate evidence stores |
 | Governance | Table/column comments, tag SQL with validate-only mode, row access policy SQL, masking policy SQL, destructive revoke gating | Automatic consumer-engine guarantees for row filters and column masks |
-| Deployment | Dry-run validation, publish-to-stage, hosted procedure execution, task graph rendering, project run/cleanup | Live task graph execution (blocked by task grants) |
+| Deployment | Dry-run validation, publish-to-stage, hosted procedure execution, `CREATE OR REPLACE TASK` graph deployment, live project run/wait and cleanup when task/procedure grants exist | Long-running production scheduling operations beyond the declared project task graph |
 | Cost | Query history reconciliation, query attribution signals, pending/latency handling | Real-time cost dashboards |
 | Lineage | Immediate lineage and explain evidence, delayed `ACCESS_HISTORY` reconciliation | Real-time lineage streaming |
 
@@ -51,6 +51,7 @@ Snowflake account.
 | `smoke-stage-publish` | Internal stage | Stage publish, artifact reload, staged contract execution | Published bundle loads and runs from `@stage` |
 | `smoke-procedure` | Internal stage + procedure | Procedure deployment, staged ZIP imports, procedure call | Procedure deploys and runs one contract |
 | `smoke-task-graph` | Procedure + tasks | Task graph deployment, root task execution, task history polling | Tasks deploy and execute through runner procedure |
+| `tmdb-authenticated-rest` | Snowflake secret + external access integration | Authenticated bounded REST, secret alias resolution, task graph lifecycle, quality checks | Five bronze-to-gold tasks complete through hosted procedure execution |
 
 Hash-diff scenarios must declare `merge_keys` and a hash strategy. The Snowflake
 adapter validates null and duplicate merge keys before executing the write. Hash
@@ -95,14 +96,17 @@ documented unblock plan.
 | Governance comments and tags | `PASS` | Table/column comments applied; tag validate-only evidence recorded with correct grants. |
 | Schema policy | `PASS` | `INFORMATION_SCHEMA.COLUMNS` inspection with connector metadata fallback; additive column smoke and strict failure smoke passed. |
 | Quality runtime | `PASS` | Pass, quarantine and abort scenarios all produced correct evidence and propagated `quality_status` into run records. |
+| Quality alias matching | `PASS` | Runtime quality checks resolve contract aliases against Snowflake source metadata with exact matching first and Snowflake-safe case-insensitive matching for unquoted uppercase SQL aliases. |
 | State idempotency and locks | `PASS` | Watermark candidate calculation, previous watermark filtering, idempotent replay skip, lock acquire and release tested. |
 | Procedure deployment | `PASS` | Hosted Snowpark procedure deployed with staged ZIP imports for the core/adapter libraries, called the stable runner, and live smoke wrote 2 rows. |
-| Task graph deployment | `PASS` | Live smoke deployed the graph, executed the root task, waited for root/dependent task success and cleaned up smoke artifacts. |
+| Task graph deployment | `PASS` | Live smoke deployed the graph, executed the root task, waited for root/dependent task success and cleaned up smoke artifacts. Redeploys suspend existing task definitions before `CREATE OR REPLACE TASK`. |
+| Authenticated REST secrets | `PASS` | TMDB task graph run resolved `{{ secret:snowflake/<alias> }}` through `parameters.snowflake.secrets` and Snowflake procedure `SECRETS` bindings without inline credentials. |
 | Staged file source parity | `PASS` | CSV positional projections, JSON payload/typed projections and Parquet typed projections with named file formats validated. Unsafe paths and column expressions rejected. |
 | Preparation registry | `PASS` | Metadata projection, filters, casts, derives, standardization and deterministic deduplicate validated with live smoke. |
 | Write mode registry | `PASS` | Append, overwrite, upsert and hash-diff split into independent registry modules with prewrite merge-key validation. |
 | Cleanup lifecycle | `PASS` | `smoke --execute --execute-cleanup` removes all `CF_SMOKE_*` objects. `cleanup-plan` produces non-destructive DROP IF EXISTS SQL. |
-| Docs/site update | `PASS` | Snowflake adapter operations guide, parity execution plan, capability parity spec and stabilization matrix are published. |
+| Cross-platform real source validation | `PASS` | TMDB authenticated REST project completed on Snowflake task graph alongside AWS, Fabric and GCP validations. Databricks TMDB was blocked by workspace DNS for `api.themoviedb.org`, while Databricks USGS REST bronze-to-gold validation passed separately. |
+| Docs/site update | `PASS` | Snowflake adapter operations guide, parity execution plan, capability parity spec and stabilization matrix are published and now document secret aliases, quality alias matching and task graph lifecycle. |
 
 ## Blocked Gates Unblock Plan
 

@@ -10,7 +10,7 @@ from typing import Any
 def add_stabilization_parser(subcommands: argparse._SubParsersAction[argparse.ArgumentParser]) -> None:
     report = subcommands.add_parser(
         "stabilization-report",
-        help="Print the Snowflake adapter stabilization status for the supported v0.2.0 surface.",
+        help="Print the Snowflake adapter stabilization status for the supported v0.2.x surface.",
     )
     report.add_argument(
         "--strict-final",
