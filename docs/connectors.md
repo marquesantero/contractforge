@@ -88,6 +88,9 @@ extensions:
 
 The notebook or job is a native adapter binding. It must not bypass schema, quality, access, write-mode or evidence semantics. Adapters should record review artifacts and require explicit runtime support before marking this source stable.
 
+For a complete Databricks project using this boundary, see
+[Databricks custom transform example](adapters/databricks-custom-transform.md).
+
 ## Reusable Connection YAML
 
 Use `source.type: connection` when several ingestion contracts share endpoint, auth, driver and common read defaults.

@@ -14,6 +14,7 @@ ContractForge is a multi-runtime contract-first ingestion platform. The core pac
 - [Adapter CLI](cli.md): standardized adapter command vocabulary and common flags.
 - [Adapters](adapters.md): how platform adapters depend on the core and where adapter-specific behavior belongs.
 - [Databricks adapter](databricks.md): Databricks reference adapter, capabilities and runtime boundary.
+- [Databricks custom transform example](adapters/databricks-custom-transform.md): real movie/ratings project using a Databricks notebook as a reviewed treatment step before ContractForge gold validation and write.
 - [AWS adapter](adapters/aws.md): AWS Glue Iceberg adapter thesis, phases and capability boundary.
 - [Fabric adapter](adapters/fabric.md): Microsoft Fabric Lakehouse notebook-first adapter, validated subset and review boundaries.
 - [Snowflake adapter](adapters/snowflake.md): Snowflake SQL warehouse adapter guide, stable supported surface and review boundaries.
@@ -24,6 +25,7 @@ ContractForge is a multi-runtime contract-first ingestion platform. The core pac
 - [Deployment versioning](deployment-versioning.md): core-owned deployment ledger schema, adapter-native persistence and stable hash semantics.
 - [Examples index](../examples/README.md): all runnable and reference projects grouped by category (real-world, source expansion, benchmarks, stable surface).
 - [USGS GeoJSON medallion example](../examples/real-world/usgs-earthquake-rest-medallion/README.md): real Databricks, AWS, Snowflake, Fabric and GCP adapter parity project using the shared GeoJSON medallion intent.
+- [Databricks movie custom transform example](../examples/real-world/databricks-movie-custom-transform/README.md): Databricks Asset Bundle with bronze/silver contracts, a native notebook treatment task and a governed gold `custom_transform` contract.
 - [S3 file medallion example](../examples/real-world/s3-file-medallion/README.md): AWS Glue/Iceberg file ingestion project using S3 CSV files, Glue bookmarks and control-table evidence.
 - [AWS failure-path example](../examples/real-world/aws-failure-paths/README.md): contract-only negative tests for failed run evidence, error evidence and redaction.
 - [Roadmap](roadmap.md): adapter maturity, second-adapter criteria and release signals.
