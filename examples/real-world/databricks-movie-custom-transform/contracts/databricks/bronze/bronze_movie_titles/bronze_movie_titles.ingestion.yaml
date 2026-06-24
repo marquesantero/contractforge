@@ -1,0 +1,27 @@
+source:
+  type: table
+  system: movie_lens_like
+  table: workspace.cf_movie_source.raw_movies
+  read:
+    source_complete: true
+
+target:
+  table: b_movie_titles
+
+layer: bronze
+mode: overwrite
+
+select_columns:
+  - movie_id
+  - title
+  - genres
+  - release_year
+
+quality_rules:
+  not_null: [movie_id, title]
+  unique_key: [movie_id]
+
+extensions:
+  databricks:
+    delta_properties:
+      delta.enableChangeDataFeed: "true"

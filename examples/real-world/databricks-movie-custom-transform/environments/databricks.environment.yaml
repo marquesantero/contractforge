@@ -1,0 +1,10 @@
+name: movie_custom_transform_databricks
+adapter: databricks
+runtime:
+  runtime_type: serverless
+evidence:
+  catalog: workspace
+  schema: cf_movie_ops
+parameters:
+  databricks:
+    runtime: serverless

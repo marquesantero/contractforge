@@ -1,0 +1,9 @@
+ownership:
+  technical_owner: data-platform@example.com
+  support_group: data-platform
+criticality: high
+expected_frequency: daily
+freshness_sla_minutes: 1440
+alert_on_failure: true
+alert_on_quality_fail: true
+runbook_url: https://example.com/runbooks/contractforge/movie-feature-summary

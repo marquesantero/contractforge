@@ -1,0 +1,13 @@
+table:
+  description: Raw movie title and genre metadata staged from the controlled movie test dataset.
+  tags:
+    domain: media_analytics
+    layer: bronze
+    entity: titles
+columns:
+  movie_id:
+    description: Source movie identifier.
+  title:
+    description: Movie title.
+  genres:
+    description: Pipe-delimited source genre list.

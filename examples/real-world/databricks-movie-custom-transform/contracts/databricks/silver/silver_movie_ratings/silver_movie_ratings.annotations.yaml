@@ -1,0 +1,14 @@
+table:
+  description: Curated and deduplicated movie ratings ready for feature engineering.
+  tags:
+    domain: media_analytics
+    layer: silver
+    entity: ratings
+    write_mode: hash_diff_upsert
+columns:
+  rating_event_id:
+    description: Stable event key used by hash-diff upsert.
+  rating_date:
+    description: Date derived from the source rating timestamp.
+  normalized_at_utc:
+    description: Runtime timestamp for silver normalization.
