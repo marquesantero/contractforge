@@ -6,7 +6,7 @@ from dataclasses import dataclass
 
 from contractforge_core.adapters.base.protocol import RenderedArtifacts
 from contractforge_core.capabilities.models import PlatformCapabilities
-from contractforge_core.planner import ExecutionPlan, PlanningResult, plan_contract
+from contractforge_core.planner import PlanningResult, plan_contract
 from contractforge_core.semantic.models import SemanticContract
 
 
@@ -23,14 +23,16 @@ class CapabilitiesAdapter:
     def plan(self, contract: SemanticContract) -> PlanningResult:
         return plan_contract(contract, self.declared_capabilities)
 
-    def render(self, plan: ExecutionPlan) -> RenderedArtifacts:
+    def render_contract(self, contract: SemanticContract) -> RenderedArtifacts:
+        planning = plan_contract(contract, self.declared_capabilities)
         lines = [
-            f"# Execution plan for {plan.platform}",
+            f"# Execution plan for {self.declared_capabilities.platform}",
             "",
             "| Step | Intent |",
             "| --- | --- |",
         ]
-        lines.extend(f"| {step.name} | {step.intent} |" for step in plan.steps)
+        if planning.plan is not None:
+            lines.extend(f"| {step.name} | {step.intent} |" for step in planning.plan.steps)
         return RenderedArtifacts(artifacts={"review.md": "\n".join(lines) + "\n"})
 
 

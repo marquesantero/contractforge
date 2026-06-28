@@ -7,7 +7,7 @@ from typing import Any
 
 from contractforge_core.adapters import RenderedArtifacts
 from contractforge_core.capabilities import PlatformCapabilities
-from contractforge_core.planner import ExecutionPlan, PlanningResult, plan_contract
+from contractforge_core.planner import PlanningResult, plan_contract
 from contractforge_core.semantic import SemanticContract
 from contractforge_gcp.capabilities import GCP_SUBTARGET_BIGQUERY, gcp_bigquery_capabilities
 from contractforge_gcp.diagnostics import gcp_planning_warnings, source_review_required, unsupported_source_blockers
@@ -41,9 +41,6 @@ class GCPAdapter:
         if result.status == "SUPPORTED":
             return PlanningResult(status="SUPPORTED_WITH_WARNINGS", plan=result.plan, warnings=warnings)
         return PlanningResult(status=result.status, plan=result.plan, blockers=result.blockers, warnings=warnings)
-
-    def render(self, plan: ExecutionPlan) -> RenderedArtifacts:
-        return render_gcp_bigquery_artifacts(plan=plan, planning=None, environment=self.environment)
 
     def render_contract(self, contract: SemanticContract, *, raw_contract: dict[str, Any] | None = None) -> RenderedArtifacts:
         planning = self.plan(contract)

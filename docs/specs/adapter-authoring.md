@@ -63,7 +63,7 @@ The core adapter protocol is intentionally small:
 ```python
 from contractforge_core.adapters import PlatformAdapter, RenderedArtifacts
 from contractforge_core.capabilities import PlatformCapabilities
-from contractforge_core.planner import ExecutionPlan, PlanningResult, plan_contract
+from contractforge_core.planner import PlanningResult, plan_contract
 from contractforge_core.semantic import SemanticContract
 
 
@@ -82,7 +82,7 @@ class MyPlatformAdapter:
     def plan(self, contract: SemanticContract) -> PlanningResult:
         return plan_contract(contract, self.capabilities())
 
-    def render(self, plan: ExecutionPlan) -> RenderedArtifacts:
+    def render_contract(self, contract: SemanticContract) -> RenderedArtifacts:
         return RenderedArtifacts(
             artifacts={
                 "review.md": "...",
@@ -91,7 +91,7 @@ class MyPlatformAdapter:
         )
 ```
 
-A production adapter will usually add methods around this protocol, such as `render_contract()`, `ingest_bundle()`, `apply_access_contract()` or `execute_plan()`. Those methods are adapter-owned and must not be required by the core.
+A production adapter will usually add methods around this protocol, such as `ingest_bundle()`, `apply_access_contract()` or `execute_plan()`. Those methods are adapter-owned and must not be required by the core.
 
 ## Capability Declaration Contract
 

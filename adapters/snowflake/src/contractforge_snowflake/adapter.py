@@ -7,7 +7,7 @@ from typing import Any
 
 from contractforge_core.adapters import RenderedArtifacts
 from contractforge_core.capabilities import PlatformCapabilities
-from contractforge_core.planner import ExecutionPlan, PlanningResult, plan_contract
+from contractforge_core.planner import PlanningResult, plan_contract
 from contractforge_core.semantic import SemanticContract
 from contractforge_snowflake.capabilities import (
     SNOWFLAKE_SUBTARGET_SQL_WAREHOUSE,
@@ -63,9 +63,6 @@ class SnowflakeAdapter:
             blockers=result.blockers,
             warnings=warnings + review_warnings,
         )
-
-    def render(self, plan: ExecutionPlan) -> RenderedArtifacts:
-        return render_snowflake_review_artifacts(plan=plan, planning=None, environment=self.environment)
 
     def render_contract(self, contract: SemanticContract, *, raw_contract: dict[str, Any] | None = None) -> RenderedArtifacts:
         planning = self.plan(contract)

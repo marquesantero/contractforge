@@ -33,7 +33,7 @@ The core owns:
 ```python
 from contractforge_core.adapters import RenderedArtifacts
 from contractforge_core.capabilities import PlatformCapabilities
-from contractforge_core.planner import ExecutionPlan, PlanningResult, plan_contract
+from contractforge_core.planner import PlanningResult, plan_contract
 from contractforge_core.semantic import SemanticContract
 
 
@@ -46,7 +46,7 @@ class MyAdapter:
     def plan(self, contract: SemanticContract) -> PlanningResult:
         return plan_contract(contract, self.capabilities())
 
-    def render(self, plan: ExecutionPlan) -> RenderedArtifacts:
+    def render_contract(self, contract: SemanticContract) -> RenderedArtifacts:
         ...
 ```
 

@@ -31,7 +31,10 @@ def is_available_now_stream_source(source: dict[str, Any]) -> bool:
 
 
 def stream_source_format(source: dict[str, Any]) -> str:
-    """Return the Spark format identifier for a kafka / eventhubs stream source."""
+    """Return the neutral stream-format token (``kafka`` or ``eventhubs``).
+
+    Adapters map this token to their native streaming reader format.
+    """
 
     if is_kafka_stream_source(source):
         return "kafka"

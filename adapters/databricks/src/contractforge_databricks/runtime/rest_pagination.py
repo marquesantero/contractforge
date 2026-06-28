@@ -1,6 +1,6 @@
 """Compatibility re-exports for the core REST pagination helpers."""
 
-from contractforge_core.connectors.api.rest.pagination import (
+from contractforge_core.connectors.api.rest import (
     json_path,
     link_header_next,
     max_pages_for_source,

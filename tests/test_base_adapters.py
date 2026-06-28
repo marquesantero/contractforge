@@ -49,7 +49,7 @@ def test_full_feature_adapter_renders_neutral_artifacts() -> None:
     result = adapter.plan(contract)
     assert result.plan is not None
 
-    artifacts = adapter.render(result.plan)
+    artifacts = adapter.render_contract(contract)
 
     assert set(artifacts.artifacts) == {"review.md"}
     assert "Execution plan for full-feature-generic" in artifacts.artifacts["review.md"]
