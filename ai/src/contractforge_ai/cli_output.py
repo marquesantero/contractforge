@@ -2,6 +2,17 @@
 
 from __future__ import annotations
 
+import json
+
+
+def _html_artifact(project) -> object | None:
+    if project is None:
+        return None
+    for artifact in project.artifacts:
+        if artifact.path.endswith(".html"):
+            return artifact
+    return None
+
 
 def _print_text_review(result) -> None:
     print(f"Contract: {result.contract_path}")
