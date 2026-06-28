@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from typing import Protocol
 
 from contractforge_core.capabilities.models import PlatformCapabilities
-from contractforge_core.planner.result import ExecutionPlan, PlanningResult
+from contractforge_core.planner.result import PlanningResult
 from contractforge_core.semantic.models import SemanticContract
 
 
@@ -24,6 +24,6 @@ class PlatformAdapter(Protocol):
     def plan(self, contract: SemanticContract) -> PlanningResult:
         ...
 
-    def render(self, plan: ExecutionPlan) -> RenderedArtifacts:
+    def render_contract(self, contract: SemanticContract) -> RenderedArtifacts:
         ...
 

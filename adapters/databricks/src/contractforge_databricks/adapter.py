@@ -7,7 +7,7 @@ from typing import Any
 
 from contractforge_core.adapters import RenderedArtifacts
 from contractforge_core.capabilities import PlatformCapabilities
-from contractforge_core.planner import ExecutionPlan, PlanningResult, plan_contract
+from contractforge_core.planner import PlanningResult, plan_contract
 from contractforge_core.semantic import SemanticContract
 from contractforge_databricks.capabilities import DatabricksCapabilities, evaluate_databricks_capabilities, to_core_capabilities
 from contractforge_databricks.contract_extensions import databricks_extension_warnings
@@ -60,9 +60,6 @@ class DatabricksAdapter:
         if result.status == "SUPPORTED":
             return PlanningResult(status="SUPPORTED_WITH_WARNINGS", plan=result.plan, blockers=result.blockers, warnings=warnings)
         return PlanningResult(status=result.status, plan=result.plan, blockers=result.blockers, warnings=warnings)
-
-    def render(self, plan: ExecutionPlan) -> RenderedArtifacts:
-        raise NotImplementedError("Use render_contract(contract) so Databricks artifacts include contract context.")
 
     def render_contract(self, contract: SemanticContract) -> RenderedArtifacts:
         planning = self.plan(contract)

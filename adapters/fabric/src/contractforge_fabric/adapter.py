@@ -7,7 +7,7 @@ from typing import Any
 
 from contractforge_core.adapters import RenderedArtifacts
 from contractforge_core.capabilities import PlatformCapabilities
-from contractforge_core.planner import ExecutionPlan, PlanningResult, plan_contract
+from contractforge_core.planner import PlanningResult, plan_contract
 from contractforge_core.semantic import SemanticContract
 from contractforge_fabric.capabilities import FABRIC_SUBTARGET_LAKEHOUSE, fabric_lakehouse_capabilities
 from contractforge_fabric.diagnostics import fabric_planning_warnings, unsupported_source_blockers
@@ -48,9 +48,6 @@ class FabricAdapter:
             blockers=result.blockers,
             warnings=warnings,
         )
-
-    def render(self, plan: ExecutionPlan) -> RenderedArtifacts:
-        return render_fabric_review_artifacts(plan=plan, planning=None, environment=self.environment)
 
     def render_contract(self, contract: SemanticContract, *, raw_contract: dict[str, Any] | None = None) -> RenderedArtifacts:
         planning = self.plan(contract)
