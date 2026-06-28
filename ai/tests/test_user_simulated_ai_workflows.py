@@ -5,7 +5,7 @@ from pathlib import Path
 
 import yaml
 
-from contractforge_ai.agentic import IntentGenerationRequest, generate_from_intent, interpret_intent
+from contractforge_ai.agentic import IntentGenerationRequest, generate_from_intent
 from contractforge_ai.generators.project import (
     generate_aws_glue_iceberg_project,
     generate_databricks_dab_project,
