@@ -12,7 +12,7 @@ from contractforge_ai.cli_prompt_evaluation import PROMPT_EVALUATION_COMMAND_HAN
 from contractforge_ai.cli_project_generation import PROJECT_GENERATION_COMMAND_HANDLERS
 from contractforge_ai.cli_validation_commands import VALIDATION_COMMAND_HANDLERS
 from contractforge_ai.cli_workflows import WORKFLOW_COMMAND_HANDLERS
-from contractforge_ai.context import collect_databricks_run_evidence
+from contractforge_ai.context import collect_databricks_run_evidence  # noqa: F401 - exposed as cli.collect_databricks_run_evidence for getattr/monkeypatch
 
 
 COMMAND_GROUPS = (

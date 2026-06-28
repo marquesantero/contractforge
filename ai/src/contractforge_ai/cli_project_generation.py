@@ -8,6 +8,7 @@ import sys
 from contractforge_ai.agentic import IntentGenerationRequest, generate_from_intent
 from contractforge_ai.cli_io import load_mapping_file, load_text_file
 from contractforge_ai.cli_output import (
+    _html_artifact,
     _print_text_enrichment,
     _print_text_guided_project,
     _print_text_intent_generation,
@@ -174,15 +175,6 @@ PROJECT_GENERATION_COMMAND_HANDLERS = {
     "guided-project": _handle_guided_project_command,
     "generate": _handle_generate_command,
 }
-
-
-def _html_artifact(project) -> object | None:
-    if project is None:
-        return None
-    for artifact in project.artifacts:
-        if artifact.path.endswith(".html"):
-            return artifact
-    return None
 
 
 def _guided_project_request_from_args(args) -> GuidedProjectRequest:
