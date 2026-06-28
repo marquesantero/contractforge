@@ -6,9 +6,10 @@ import json
 from dataclasses import dataclass
 from typing import Any
 
+from contractforge_core.adapters import RenderedArtifacts
 from contractforge_aws.api import render_aws_contract
 from contractforge_aws.capabilities import AWS_SUBTARGET_GLUE_ICEBERG
-from contractforge_aws.runtime.glue_jobs import GlueJobRegistration, create_or_update_glue_job_payload
+from contractforge_aws.runtime.glue_jobs import create_or_update_glue_job_payload
 from contractforge_aws.runtime.s3_artifacts import (
     PublishedArtifact,
     materialize_published_artifact_body,

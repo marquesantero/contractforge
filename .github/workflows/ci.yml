@@ -56,6 +56,9 @@ jobs:
           uv sync --extra dev
           uv pip install -e adapters/databricks -e adapters/aws -e adapters/snowflake -e adapters/fabric -e adapters/gcp -e ai
 
+      - name: Lint (ruff)
+        run: uv run ruff check src adapters
+
       - name: Select validation scope
         id: scope
         shell: bash

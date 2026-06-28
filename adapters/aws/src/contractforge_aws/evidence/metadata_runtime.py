@@ -28,7 +28,7 @@ def render_source_metadata_write(
             f"_cf_source_metadata = {metadata!r}",
             "_cf_source_metadata.setdefault('source_metrics', {})['rows_read'] = _cf_rows_read",
             f"_cf_source_metadata.setdefault('source_metrics', {{}})['columns_read'] = len({dataframe_name}.columns)",
-            f"_cf_source_metadata['source_schema'] = {{",
+            "_cf_source_metadata['source_schema'] = {",
             "    'columns': [",
             "        {",
             "            'name': field.name,",

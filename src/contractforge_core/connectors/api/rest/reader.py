@@ -29,7 +29,7 @@ from contractforge_core.connectors.api.rest.retry import (
     sleep_retry_backoff,
 )
 from contractforge_core.connectors.api.rest.safety import validate_http_target
-from contractforge_core.connectors.api.rest.transport import NoRedirect as _NoRedirect
+from contractforge_core.connectors.api.rest.transport import NoRedirect as _NoRedirect  # noqa: F401 - re-exported for test access
 from contractforge_core.connectors.api.rest.transport import open_request as _open_request
 from contractforge_core.watermark import extract_watermark_field_value
 

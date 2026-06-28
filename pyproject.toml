@@ -33,7 +33,7 @@ Issues = "https://github.com/marquesantero/contractforge/issues"
 Changelog = "https://github.com/marquesantero/contractforge/blob/main/CHANGELOG.md"
 
 [project.optional-dependencies]
-dev = ["pytest>=8"]
+dev = ["pytest>=8", "ruff>=0.15"]
 
 [project.scripts]
 contractforge = "contractforge_core.cli:main"
@@ -41,6 +41,16 @@ contractforge = "contractforge_core.cli:main"
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = [".", "src", "adapters/databricks/src", "adapters/aws/src", "adapters/snowflake/src", "adapters/fabric/src", "adapters/gcp/src"]
+
+[tool.ruff]
+target-version = "py310"
+extend-exclude = ["build", "dist", ".tmp"]
+
+[tool.ruff.lint]
+# Explicit form of Ruff's default selection: pyflakes (F) plus the
+# always-safe pycodestyle error groups. This gates undefined names (F821),
+# unused imports (F401) and empty f-strings (F541) so they cannot recur.
+select = ["E4", "E7", "E9", "F"]
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/contractforge_core"]

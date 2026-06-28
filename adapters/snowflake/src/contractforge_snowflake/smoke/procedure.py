@@ -12,7 +12,7 @@ from typing import Any, Callable
 
 from contractforge_snowflake.deployment.procedure import render_runtime_procedure_sql
 from contractforge_snowflake.naming import quote_identifier, quote_multipart_identifier
-from contractforge_snowflake.runtime import SnowflakeConnectorSession, publish_snowflake_contract, run_snowflake_contract
+from contractforge_snowflake.runtime import SnowflakeConnectorSession, publish_snowflake_contract
 from contractforge_snowflake.session_ops import execute, scalar_int
 from contractforge_snowflake.smoke.connection import require_smoke_connection, smoke_connect_options
 from contractforge_snowflake.smoke.models import SnowflakeSmokeConfig

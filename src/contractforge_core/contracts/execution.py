@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Any, Literal
 
-from pydantic import Field, ValidationError, field_validator
+from pydantic import ValidationError
 
 from contractforge_core.config import VALID_IDEMPOTENCY_POLICIES
 from contractforge_core.contracts.base import StrictContractModel, contract_validation_error

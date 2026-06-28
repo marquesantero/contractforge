@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any
 
 from contractforge_aws.cli.project_run import project_runtime_payload
 from contractforge_aws.cli.project_support import deployment_payload
