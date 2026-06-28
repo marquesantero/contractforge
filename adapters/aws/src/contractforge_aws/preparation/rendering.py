@@ -6,7 +6,6 @@ from contractforge_core.semantic import SemanticContract
 from contractforge_aws.preparation.metadata import render_metadata_preparation
 from contractforge_aws.preparation.shape import (
     can_render_shape,
-    render_flatten_helper,
     render_shape_preparation,
     shape_requires_flatten,
     shape_requires_functions,

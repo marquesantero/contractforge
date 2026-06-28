@@ -9,12 +9,8 @@ from contractforge_core.contracts import semantic_contract_from_mapping
 from contractforge_core.planner import PlanningResult
 from contractforge_aws.capabilities import AWS_SUBTARGET_GLUE_ICEBERG
 from contractforge_aws.cost import CostModel, render_operational_cost_query
-from contractforge_aws.deployment_api import (
-    render_aws_glue_job_cloudformation,
-    render_aws_glue_job_definition,
-    render_aws_glue_job_iam_policy,
-    render_aws_glue_job_terraform,
-)
+# Re-exported as part of the public AWS adapter API (see contractforge_aws.__init__).
+from contractforge_aws.deployment_api import render_aws_glue_job_cloudformation, render_aws_glue_job_definition, render_aws_glue_job_iam_policy, render_aws_glue_job_terraform  # noqa: F401
 from contractforge_aws.environment import AWSEnvironment
 from contractforge_aws.operations import render_operations_insert_sql, render_operations_json
 from contractforge_aws.rendering import (

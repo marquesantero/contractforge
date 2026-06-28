@@ -29,7 +29,7 @@ def render_quarantine_block(
         f"    frame={frame}_input,",
         f"    ruleset='''{ruleset}''',",
         f"    publishing_options={{'dataQualityEvaluationContext': {frame!r}, 'enableDataQualityResultsPublishing': False}},",
-        f"    additional_options={{'performanceTuning.caching': 'CACHE_NOTHING'}},",
+        "    additional_options={'performanceTuning.caching': 'CACHE_NOTHING'},",
         ")",
         f"{frame}_outcomes = SelectFromCollection.apply(dfc={frame}_results, key='ruleOutcomes', transformation_ctx='{frame}_outcomes').toDF().collect()",
         f"_cf_persist_quality_evidence(spark, {quality_table!r}, _cf_run_id, {target_table!r}, {frame}_outcomes, 'quarantine')",

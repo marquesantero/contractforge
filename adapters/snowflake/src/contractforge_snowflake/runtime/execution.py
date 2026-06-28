@@ -413,10 +413,6 @@ def _scalar_int(session: Any, sql: str) -> int:
     return int(scalar_value(session, sql, key="COUNT") or 0)
 
 
-def _hash_expr(alias: str, columns: tuple[str, ...]) -> str:
-    return "HASH(" + ", ".join(f"{alias}.{quote_identifier(column)}" for column in columns) + ")"
-
-
 def _query_tag_sql(contract: SemanticContract, *, run_id: str | None, target: str) -> str:
     payload = {
         "product": "contractforge",
